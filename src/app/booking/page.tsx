@@ -233,7 +233,9 @@ export default function BookingPage() {
             <div className="pt-4 border-t border-white/10">
               <div className="flex justify-between items-center mb-6">
                 <div className="text-sm text-gray">سعر الليلة التقديري</div>
-                <div className="text-2xl font-black text-gold">1,200 ج.م</div>
+                <div className="text-2xl font-black text-gold">
+                  {JSON.parse(localStorage.getItem('apartments') || '[]').filter((a: any) => a.status === 'available')[0]?.price || '1,200'} ج.م
+                </div>
               </div>
               
               <button 

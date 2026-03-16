@@ -6,15 +6,29 @@ export default function ApartmentsManagement() {
   const [apartments, setApartments] = useState<any[]>([]);
 
   useEffect(() => {
-    // Initialize or get apartments from localStorage
     const saved = localStorage.getItem('apartments');
     if (saved) {
       setApartments(JSON.parse(saved));
     } else {
-      const initial = Array.from({ length: 10 }, (_, i) => ({
+      const apartmentTypes = [
+        { name: 'جناح ملكي عصري', price: 2500, img: '/apartments/apt1.png' },
+        { name: 'شقة كلاسيكية فاخرة', price: 1800, img: '/apartments/apt2.png' },
+        { name: 'ستوديو مينيمالست', price: 1200, img: '/apartments/apt3.png' },
+        { name: 'بنتهاوس بانورامي', price: 3500, img: '/apartments/apt4.png' },
+        { name: 'جناح سكاندينافي', price: 1500, img: '/apartments/apt1.png' },
+        { name: 'شقة النخبة 6', price: 2000, img: '/apartments/apt2.png' },
+        { name: 'شقة النخبة 7', price: 2200, img: '/apartments/apt3.png' },
+        { name: 'شقة النخبة 8', price: 1900, img: '/apartments/apt4.png' },
+        { name: 'شقة النخبة 9', price: 1700, img: '/apartments/apt1.png' },
+        { name: 'شقة النخبة 10', price: 2100, img: '/apartments/apt2.png' },
+      ];
+
+      const initial = apartmentTypes.map((type, i) => ({
         id: i + 1,
-        name: `شقة ${i + 1}`,
-        status: 'available', // available, maintenance, occupied
+        name: type.name,
+        price: type.price,
+        image: type.img,
+        status: 'available',
       }));
       setApartments(initial);
       localStorage.setItem('apartments', JSON.stringify(initial));
@@ -40,28 +54,46 @@ export default function ApartmentsManagement() {
         <p className="text-gray text-sm">تتبع حالة الـ 10 شقق وتحديث توافرها للصيانة أو الحجز.</p>
       </header>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
         {apartments.map((apt) => (
-          <div key={apt.id} className={`glass-card p-6 border-l-4 ${
-            apt.status === 'available' ? 'border-l-success' : 'border-l-warning'
-          }`}>
-            <div className="flex justify-between items-start mb-4">
-              <span className="text-2xl">🏢</span>
-              <span className={`text-[10px] font-black uppercase px-2 py-1 rounded ${
-                apt.status === 'available' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'
-              }`}>
-                {apt.status === 'available' ? 'متاحة' : 'صيانة'}
-              </span>
+          <div key={apt.id} className="glass-card !p-0 overflow-hidden flex flex-col group">
+            <div className="relative aspect-video overflow-hidden">
+              <img 
+                src={apt.image} 
+                alt={apt.name} 
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+              />
+              <div className="absolute top-3 right-3">
+                <span className={`text-[10px] font-black uppercase px-3 py-1.5 rounded-full backdrop-blur-md shadow-lg ${
+                  apt.status === 'available' ? 'bg-success/20 text-success border border-success/30' : 'bg-warning/20 text-warning border border-warning/30'
+                }`}>
+                  {apt.status === 'available' ? 'متاحة' : 'صيانة'}
+                </span>
+              </div>
             </div>
-            <h3 className="font-bold text-lg mb-4">{apt.name}</h3>
             
-            <button 
-              onClick={() => toggleStatus(apt.id)}
-              className="w-full py-2 rounded-xl border border-white/10 text-[10px] font-bold hover:bg-white/5 transition-all outline-none focus:ring-1 focus:ring-gold"
-              aria-label={`تغيير حالة ${apt.name}`}
-            >
-              {apt.status === 'available' ? 'تحويل للصيانة 🛠️' : 'تفعيل للجمهور ✅'}
-            </button>
+            <div className="p-5 flex-1 flex flex-col">
+              <div className="flex justify-between items-start mb-3">
+                <h3 className="font-bold text-lg">{apt.name}</h3>
+                <div className="text-gold font-black">{apt.price} <span className="text-[10px]">ج.م</span></div>
+              </div>
+              
+              <div className="mt-auto pt-4 flex gap-2">
+                <button 
+                  onClick={() => toggleStatus(apt.id)}
+                  className={`flex-1 py-2.5 rounded-xl border font-bold text-[10px] transition-all outline-none ${
+                    apt.status === 'available' 
+                      ? 'border-warning/30 text-warning hover:bg-warning/10' 
+                      : 'border-success/30 text-success hover:bg-success/10'
+                  }`}
+                >
+                  {apt.status === 'available' ? 'تحويل للصيانة 🛠️' : 'تفعيل للجمهور ✅'}
+                </button>
+                <button className="p-2.5 rounded-xl border border-white/10 hover:bg-white/5 transition-colors">
+                  ✏️
+                </button>
+              </div>
+            </div>
           </div>
         ))}
       </div>
