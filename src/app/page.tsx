@@ -1,169 +1,89 @@
+'use client';
+
+import React from 'react';
 import Link from 'next/link';
 
-export default function Home() {
+export default function MazarHybridLanding() {
   return (
-    <main className="min-h-screen">
-      {/* Navbar Placeholder */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0f1e]/80 backdrop-blur-xl border-b border-gold/20 px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="text-2xl font-black text-gradient">مجمع النخبة</Link>
-        <div className="hidden md:flex gap-8 font-bold text-sm">
-          <Link href="/about" className="hover:text-gold transition-colors">عن المكان</Link>
-          <Link href="/rules" className="hover:text-gold transition-colors">قوانين المكان</Link>
-          <Link href="/how-to" className="hover:text-gold transition-colors">طريقة الحجز</Link>
-          <Link href="/booking" className="btn-gold !py-2 !px-6 text-xs">احجز الآن</Link>
+    <main dir="rtl" className="min-h-screen bg-[#FDFBF7] text-[#2A2723] selection:bg-[#C1A68D] selection:text-white overflow-x-hidden relative" style={{ fontFamily: 'Calibri, sans-serif' }}>
+      
+      {/* Background Ambient Glows (Light/Warm mode) */}
+      <div className="absolute top-0 left-0 w-[800px] h-[800px] bg-[#EAE4D9]/40 rounded-full blur-[120px] -z-10 pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-[#D5C5B3]/20 rounded-full blur-[100px] -z-10 pointer-events-none" />
+
+      {/* Navigation (Light) */}
+      <nav className="w-full px-8 py-5 flex justify-between items-center max-w-screen-2xl mx-auto z-50 sticky top-0 bg-white/70 backdrop-blur-xl border-b border-[#EAE4D9]">
+        <Link href="/" className="text-3xl font-bold tracking-tight text-[#2A2723] flex items-center gap-2">
+            مزار 
+            <span className="w-2 h-2 rounded-full bg-[#C1A68D]"></span>
+        </Link>
+        
+        <div className="hidden md:flex gap-10 text-sm font-bold text-[#5C554B]">
+          <Link href="/mazar/about" className="hover:text-[#2A2723] transition-colors">عن المكان</Link>
+          <Link href="/mazar/rules" className="hover:text-[#2A2723] transition-colors">قوانين المكان</Link>
+          <Link href="/mazar/how-to-book" className="hover:text-[#2A2723] transition-colors">طريقة الحجز</Link>
         </div>
+
+        <Link href="/mazar/book" className="bg-[#2A2723] text-white text-sm font-bold px-8 py-2.5 rounded-full hover:bg-[#3E3A35] hover:shadow-lg transition-all">
+          تجربة الحجز
+        </Link>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 px-6 flex flex-col items-center justify-center text-center overflow-hidden min-h-[90vh]">
-        {/* Background Glow */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-gold/10 blur-[120px] rounded-full pointer-events-none" />
+      <section className="pt-24 pb-32 px-6 flex flex-col items-center text-center relative z-10">
         
-        <div className="relative z-10 max-w-4xl">
-          <span className="inline-block px-4 py-1 rounded-full bg-gold/10 border border-gold/20 text-gold text-xs font-bold mb-6 tracking-widest uppercase">
-            تجربة فندقية استثنائية
-          </span>
-          <h1 className="text-5xl md:text-7xl font-black leading-tight mb-8">
-            أناقة السكن و <br />
-            <span className="text-gradient">راحة المتعة</span>
-          </h1>
-          <p className="text-gray text-lg md:text-xl max-w-2xl mx-auto mb-12">
-            اكتشف مجموعة من أرقى الشقق المفروشة بتصاميم عصرية ومواقع استراتيجية. نوفر لك الأمان، الخصوصية، والرفاهية التي تستحقها.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/booking" className="btn-gold">
-              ابدأ الحجز الآن
-            </Link>
-            <Link href="#about" className="btn-outline">
-              اكتشف المزيد
-            </Link>
-          </div>
+        {/* Top Pill / Badge */}
+        <div className="bg-white border border-[#EAE4D9] text-[#7A7061] px-5 py-2 rounded-full text-xs font-bold mb-8 shadow-sm">
+          ✨ تجربة إقامة متكاملة في قلب مدينة نصر
         </div>
 
-        {/* Hero Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-24 relative z-10 w-full max-w-5xl">
-          {[
-            { label: 'شقق فاخرة', value: '10+' },
-            { label: 'عملاء سعداء', value: '500+' },
-            { label: 'تقييم النزلاء', value: '4.9/5' },
-            { label: 'ساعات الدعم', value: '24/7' },
-          ].map((stat, i) => (
-            <div key={i} className="text-center">
-              <div className="text-3xl font-black text-gradient">{stat.value}</div>
-              <div className="text-gray text-sm mt-1">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
+        {/* Big Titles */}
+        <h1 className="text-5xl md:text-7xl font-bold text-[#2A2723] mb-4 tracking-tight leading-tight">
+          إقامة فندقية فاخرة..
+        </h1>
+        <h2 className="text-4xl md:text-6xl font-light italic text-[#7A7061] mb-8">
+          بتجربة مختلفة
+        </h2>
 
-      {/* About Section */}
-      <section id="about" className="py-24 px-6 bg-white/5">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
-          <div className="glass-card !p-2 aspect-video overflow-hidden rounded-3xl relative group">
-            <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all flex items-center justify-center">
-               <div className="w-16 h-16 rounded-full bg-gold flex items-center justify-center text-navy text-2xl animate-pulse cursor-pointer">
-                 ▶
-               </div>
-            </div>
-            <img 
-               src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=2070&auto=format&fit=crop" 
-               alt="Apartment Interior" 
-               className="w-full h-full object-cover"
-            />
-          </div>
-          
-          <div>
-            <h2 className="text-3xl md:text-4xl font-black mb-6">
-              لماذا تختار <span className="text-gold">مجمع النخبة</span>؟
-            </h2>
-            <p className="text-gray mb-8 leading-loose">
-              نحن نؤمن أن المسكن ليس مجرد مكان للنوم، بل هو تجربة متكاملة. لذا حرصنا على تجهيز كل شقة بأحدث الأجهزة الذكية، وأرقى أنواع الأثاث، مع خدمات تنظيف وصيانة دورية لضمان راحتك التامة.
-            </p>
-            <ul className="space-y-4">
-              {[
-                'مواقع حيوية وقريبة من الخدمات',
-                'نظام أمني متطور وكاميرات مراقبة 24/7',
-                'إنترنت فائق السرعة وخدمات ترفيهية',
-                'إجراءات حجز ذكية وسريعة',
-              ].map((feature, i) => (
-                <li key={i} className="flex items-center gap-3">
-                  <div className="w-6 h-6 rounded-full bg-gold/20 flex items-center justify-center text-gold text-xs">
-                    ✓
-                  </div>
-                  <span className="font-bold">{feature}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
+        {/* Subtitle */}
+        <p className="max-w-2xl text-lg md:text-xl text-[#5C554B] leading-relaxed mb-16 px-4">
+          في مزار بنقدملك تجربة إقامة متكاملة مش مكان مفروش. ستوديوهات مجهزة بالكامل، دخول ذكي بدون مفاتيح، وخدمة و ريسبشن 24 ساعة… علشان تعيش راحتك فعلاً.
+        </p>
 
-      {/* Featured Apartments Section */}
-      <section id="apartments" className="py-24 px-6 overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-            <div className="max-w-2xl">
-              <span className="text-gold font-bold text-xs tracking-widest uppercase mb-4 block">إقامات فاخرة</span>
-              <h2 className="text-4xl md:text-5xl font-black">شققنا <span className="text-gradient">المختارة</span></h2>
-            </div>
-            <Link href="/booking" className="text-gold font-bold flex items-center gap-2 hover:gap-4 transition-all">
-              عرض كل الشقق <span>→</span>
-            </Link>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              { name: 'جناح ملكي عصري', price: 2500, img: '/apartments/apt1.png', tags: ['غرفتين', 'إطلالة مدينة'] },
-              { name: 'شقة كلاسيكية فاخرة', price: 1800, img: '/apartments/apt2.png', tags: ['غرفتين', 'ديكور كلاسيك'] },
-              { name: 'بنتهاوس بانورامي', price: 3500, img: '/apartments/apt4.png', tags: ['3 غرف', 'مسبح خاص'] },
-            ].map((apt, i) => (
-              <div key={i} className="glass-card !p-0 rounded-[2.5rem] group hover:-translate-y-2 transition-all duration-500">
-                <div className="relative aspect-[4/3] rounded-[2.5rem] overflow-hidden m-2">
-                  <img 
-                    src={apt.img} 
-                    alt={apt.name} 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute bottom-4 right-4 left-4 flex justify-between items-center">
-                    <div className="flex gap-2">
-                      {apt.tags.map((tag, j) => (
-                        <span key={j} className="backdrop-blur-xl bg-black/40 text-[10px] font-bold px-3 py-1.5 rounded-full border border-white/10 uppercase">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="p-8">
-                  <div className="flex justify-between items-start mb-6">
-                    <div>
-                      <h3 className="text-xl font-black mb-2">{apt.name}</h3>
-                      <div className="flex items-center gap-1 text-gold">
-                        <span className="text-sm">★★★★★</span>
-                      </div>
-                    </div>
-                    <div className="text-left">
-                      <div className="text-2xl font-black text-white">{apt.price}</div>
-                      <div className="text-[10px] text-gray uppercase tracking-widest">ج.م / ليلة</div>
-                    </div>
-                  </div>
-                  
-                  <Link href="/booking" className="w-full py-4 rounded-2xl border border-white/10 flex items-center justify-center font-bold text-sm bg-white/5 hover:bg-gold hover:text-navy hover:border-gold transition-all group">
-                    احجز الآن <span className="mr-2 group-hover:mr-4 transition-all">→</span>
-                  </Link>
-                </div>
+        {/* Overlapping Images (Luxury Light Style) */}
+        <div className="relative w-full max-w-5xl h-[450px] md:h-[550px] mt-4 rounded-3xl z-10">
+           {/* Left Image (Front/Lower) - Glass Frame */}
+           <div className="absolute right-0 md:right-10 bottom-0 md:-bottom-16 w-[85%] md:w-[55%] h-[320px] md:h-[420px] rounded-3xl overflow-hidden shadow-2xl border-4 border-white z-20 group">
+              <div className="absolute inset-0 bg-white/10 group-hover:bg-transparent transition-colors z-10 duration-500" />
+              <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=2070&auto=format&fit=crop" alt="Studio Bedroom" className="w-full h-full object-cover scale-105 group-hover:scale-100 transition-transform duration-700" />
+              
+              <div className="absolute bottom-6 right-6 left-6 bg-white/90 backdrop-blur-md p-5 rounded-2xl text-right z-20 shadow-sm border border-gray-100">
+                 <h3 className="font-bold text-[#2A2723] text-xl mb-1">رفاهية الإقامة</h3>
+                 <p className="text-sm text-[#7A7061]">وراحة من أول لحظة</p>
               </div>
-            ))}
-          </div>
+           </div>
+
+           {/* Right Image (Back/Higher) */}
+           <div className="absolute left-0 md:left-10 top-0 w-[85%] md:w-[65%] h-[350px] md:h-[450px] rounded-3xl overflow-hidden shadow-xl border border-[#EAE4D9] z-10">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60 z-10" />
+              <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=2070&auto=format&fit=crop" alt="Luxury Living Room" className="w-full h-full object-cover" />
+           </div>
         </div>
       </section>
 
-      {/* Footer Placeholder */}
-      <footer className="py-12 px-6 border-t border-white/10 text-center text-gray text-sm">
-        <p>© {new Date().getFullYear()} جميع الحقوق محفوظة لـ <span className="text-gold">مجمع النخبة السكني</span></p>
+      {/* Footer */}
+      <footer className="py-12 text-center text-[#5C554B] border-t border-[#EAE4D9] bg-white">
+         <div className="text-3xl font-bold text-[#2A2723] mb-6 flex items-center justify-center gap-2">
+           مزار <span className="w-1 h-1 rounded-full bg-[#C1A68D]"></span>
+         </div>
+         <div className="flex justify-center gap-6 mb-8 text-sm font-bold">
+           <Link href="/mazar/how-to-book" className="hover:text-[#C1A68D]">الشروط والأحكام</Link>
+           <Link href="/mazar/how-to-book" className="hover:text-[#C1A68D]">طريقة الحجز</Link>
+           <Link href="/mazar/rules" className="hover:text-[#C1A68D]">قوانين المكان</Link>
+         </div>
+         <p className="text-sm opacity-80">جميع الحقوق محفوظة © 2026 لمشروع مزار.</p>
       </footer>
+
     </main>
   );
 }

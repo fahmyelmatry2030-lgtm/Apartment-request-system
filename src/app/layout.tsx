@@ -9,8 +9,8 @@ const cairo = Cairo({
 });
 
 export const metadata: Metadata = {
-  title: "نظام حجز الشقق | الرفاهية والراحة",
-  description: "نظام حجز شقق متطور بواجهة عصرية وتجربة مستخدم فاخرة",
+  title: "مزار | تجربة إقامة فندقية فاخرة في مدينة نصر",
+  description: "اكتشف أرقى الاستوديوهات الفندقية في مزار، مع دخول ذكي وخدمة ريسيبشن 24 ساعة.",
 };
 
 export default function RootLayout({
@@ -20,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl">
-      <body className={`${cairo.variable} font-cairo antialiased bg-[#0a0f1e] text-white`}>
+      <body className={`${cairo.variable} font-cairo antialiased selection:bg-[#C1A68D] selection:text-white`}>
         {children}
       </body>
     </html>
