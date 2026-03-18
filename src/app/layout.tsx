@@ -13,15 +13,19 @@ export const metadata: Metadata = {
   description: "اكتشف أرقى الاستوديوهات الفندقية في مزار، مع دخول ذكي وخدمة ريسيبشن 24 ساعة.",
 };
 
+import { LanguageProvider } from "@/lib/LanguageContext";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ar" dir="rtl">
+    <html lang="ar">
       <body className={`${cairo.variable} font-cairo antialiased selection:bg-[#C1A68D] selection:text-white`}>
-        {children}
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );
