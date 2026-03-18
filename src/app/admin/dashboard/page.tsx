@@ -180,7 +180,7 @@ export default function DashboardOverview() {
              <span className="text-gold">📩</span> آخر المراسلات المرسلة
            </h3>
            <div className="space-y-4 flex-1">
-              {JSON.parse(localStorage.getItem('bookings') || '[]')
+              {(typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('bookings') || '[]') : [])
                 .filter((b: any) => b.paymentInfo)
                 .slice(0, 4)
                 .map((m: any, i: number) => (
@@ -192,7 +192,7 @@ export default function DashboardOverview() {
                     <p className="text-[10px] text-gray-400 line-clamp-2 italic leading-relaxed font-medium">"{m.paymentInfo}"</p>
                   </div>
                 ))}
-              {JSON.parse(localStorage.getItem('bookings') || '[]').filter((b: any) => b.paymentInfo).length === 0 && (
+              {(typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('bookings') || '[]') : []).filter((b: any) => b.paymentInfo).length === 0 && (
                 <div className="h-full flex items-center justify-center text-[10px] text-gray opacity-30 italic py-10">
                    لم يتم إرسال أي تعليمات دفع حتى الآن.
                 </div>
