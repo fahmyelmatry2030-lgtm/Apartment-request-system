@@ -117,6 +117,25 @@ export const translations = {
       successTitle: 'تم إرسال طلبك بنجاح!',
       successDesc: 'طلب الحجز المبدئي قيد المراجعة. سيتم التواصل معك قريباً عبر الواتساب.',
       backToHome: 'العودة للرئيسية'
+    },
+    design4: {
+      heroTitleTop: 'سكـن',
+      heroTitleBottom: 'المستـقبـل',
+      heroSubtitle: 'نستخدم أحدث تقنيات الأنظمة الذكية لتوفير تجربة سكنية غير مسبوقة. تفاعل مع منزلك كما لم تفعل من قبل.',
+      stats: {
+        smartControl: 'تحكم ذكي',
+        uptime: 'وقت التشغيل',
+        latency: 'الاستجابة'
+      },
+      featuresTitle: 'تجربة مُشفـرة بالفخامة',
+      features: [
+        'هوية رقمية لكل مستخدم للحجز وخدمات النظافة.',
+        'نظام مراقبة ذكي يعتمد على الذكاء الاصطناعي للأمان.',
+        'تحكم صوتي وحركي في جميع مرافق الشقة الذكية.',
+        'خدمة إنترنت فضائي فائق السرعة مدمج في كل الوحدات.'
+      ],
+      cta: 'بدء الحجز الان',
+      copyright: 'نظام جميع الحقوق محفوظة © 2026 للنخبة'
     }
   },
   en: {
@@ -235,6 +254,25 @@ export const translations = {
       successTitle: 'Your request sent successfully!',
       successDesc: 'The preliminary request is under review. You will be contacted via WhatsApp soon.',
       backToHome: 'Back to Home'
+    },
+    design4: {
+      heroTitleTop: 'URBAN',
+      heroTitleBottom: 'FUTURE',
+      heroSubtitle: 'We use the latest smart system technologies to provide an unprecedented residential experience. Interact with your home like never before.',
+      stats: {
+        smartControl: 'Smart Control',
+        uptime: 'Uptime',
+        latency: 'Latency'
+      },
+      featuresTitle: 'ENCRYPTED Luxury Experience',
+      features: [
+        'Digital ID for every user for booking and cleaning services.',
+        'AI-based smart monitoring system for security.',
+        'Voice and gesture control in all smart apartment facilities.',
+        'Integrated high-speed satellite internet in all units.'
+      ],
+      cta: 'INITIALIZE BOOKING',
+      copyright: 'System Copyright © 2026 ELITE_NOKBA'
     }
   }
 };
