@@ -39,6 +39,15 @@ Copy-Item -Recurse -Force $PublicSrc $PublicDest
 Write-Host "      -> $(Get-ChildItem $PublicDest -Recurse -File | Measure-Object).Count files copied from public/." -ForegroundColor Green
 
 Write-Host ""
+Write-Host "[3/3] Injecting environment variables..." -ForegroundColor Yellow
+if (Test-Path "$ProjectRoot\.env.local") {
+    Copy-Item "$ProjectRoot\.env.local" "$StandaloneDir\.env" -Force
+    Write-Host "      -> .env.local copied to standalone/.env" -ForegroundColor Green
+} else {
+    Write-Host "      -> WARNING: .env.local not found!" -ForegroundColor Red
+}
+
+Write-Host ""
 Write-Host "====================================" -ForegroundColor Cyan
 Write-Host "  Build ready! Run: npm run desktop" -ForegroundColor Green
 Write-Host "====================================" -ForegroundColor Cyan
