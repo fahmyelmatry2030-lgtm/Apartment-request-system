@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+@theme {
+  --color-mazar-cream: #FDFBF7;
+  --color-mazar-coffee: #2A2723;
+  --color-mazar-gold: #C1A68D;
+  --color-mazar-gold-light: #D5C5B3;
+  --color-mazar-gray: #7A7061;
+  
+  --font-cairo: var(--font-cairo);
+}
+
+@layer base {
+  html, body {
+    @apply overflow-x-hidden w-full m-0 p-0;
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  body {
+    @apply bg-mazar-cream text-mazar-coffee font-cairo antialiased;
+  }
+}
+
+@layer components {
+  .btn-premium {
+    @apply px-8 py-3 rounded-full font-bold transition-all duration-300 transform hover:scale-105 active:scale-95;
+    background: var(--color-mazar-coffee);
+    color: white;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+
+   .btn-gold {
+    @apply px-8 py-3 rounded-full font-bold transition-all duration-300 border-2 border-mazar-gold text-mazar-gold hover:bg-mazar-gold/10 transform hover:scale-105;
+  }
+
+  .glass-card {
+    @apply bg-white/70 backdrop-blur-xl border border-[#EAE4D9] p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] shadow-sm hover:shadow-md transition-all duration-500;
+  }
+}
+
+/* Custom Utilities & Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in { animation: fadeIn 0.8s ease-out forwards; }
+.animate-slide-up { animation: slideUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+
+/* Luxury Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-mazar-cream);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-mazar-gold);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-mazar-gray);
+}
+
+.selection\:bg-mazar-gold::selection {
+  background-color: var(--color-mazar-gold);
+  color: white;
+}

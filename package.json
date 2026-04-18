@@ -1,0 +1,84 @@
+{
+  "name": "mazar-booking",
+  "version": "1.0.0",
+  "private": true,
+  "main": "main.js",
+  "author": "Mazar Booking",
+  "description": "Mazar Booking Admin Dashboard",
+  "scripts": {
+    "dev": "next dev --webpack",
+    "dev:webpack": "next dev --webpack",
+    "build": "next build --webpack",
+    "start": "next start",
+    "lint": "eslint",
+    "prepare:desktop": "powershell -ExecutionPolicy Bypass -File scripts/prepare-desktop.ps1",
+    "desktop": "npm run build && npm run prepare:desktop && electron .",
+    "desktop:run": "npm run prepare:desktop && electron .",
+    "electron:dev": "concurrently \"next dev\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron:build": "npm run build && npm run prepare:desktop && electron-builder",
+    "electron:preview": "electron .",
+    "build:client": "npm run build && npm run prepare:desktop && electron-builder"
+  },
+  "build": {
+    "appId": "com.mazarbooking.admin",
+    "productName": "Mazar Booking",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": ".next/standalone",
+        "to": "standalone",
+        "filter": ["**/*"]
+      },
+      {
+        "from": ".next/static",
+        "to": "standalone/.next/static",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "public",
+        "to": "standalone/public",
+        "filter": ["**/*"]
+      }
+    ],
+    "win": {
+      "target": ["portable"],
+      "icon": "public/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "public/icon.png",
+      "installerHeaderIcon": "public/icon.png",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Mazar Booking"
+    }
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.103.0",
+    "next": "16.1.6",
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "babel-plugin-react-compiler": "1.0.0",
+    "concurrently": "^8.2.2",
+    "electron": "^33.0.2",
+    "electron-builder": "^24.13.3",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "wait-on": "^7.2.0"
+  }
+}

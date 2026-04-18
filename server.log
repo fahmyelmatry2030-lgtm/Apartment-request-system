@@ -1,0 +1,1404 @@
+▲ Next.js 16.1.6
+- Local:         http://127.0.0.1:3000
+- Network:       http://127.0.0.1:3000
+
+✓ Starting...
+✓ Ready in 343ms
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+[AUTH] Login attempt: username="admin" password_length=9
+[AUTH] Fallback/Backdoor login success
+▲ Next.js 16.1.6
+- Local:         http://127.0.0.1:3000
+- Network:       http://127.0.0.1:3000
+
+✓ Starting...
+✓ Ready in 271ms
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+Error reading staff: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.staff' in the schema cache"
+}
+Error reading vacations: {
+  code: 'PGRST205',
+  details: null,
+  hint: "Perhaps you meant the table 'public.translations'",
+  message: "Could not find the table 'public.vacations' in the schema cache"
+}
+Error reading staff: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.staff' in the schema cache"
+}
+Error reading salaries: {
+  code: 'PGRST205',
+  details: null,
+  hint: "Perhaps you meant the table 'public.translations'",
+  message: "Could not find the table 'public.salaries' in the schema cache"
+}
+Error reading staff: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.staff' in the schema cache"
+}
+Error reading salaries: {
+  code: 'PGRST205',
+  details: null,
+  hint: "Perhaps you meant the table 'public.translations'",
+  message: "Could not find the table 'public.salaries' in the schema cache"
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+Error reading staff: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.staff' in the schema cache"
+}
+Error reading vacations: {
+  code: 'PGRST205',
+  details: null,
+  hint: "Perhaps you meant the table 'public.translations'",
+  message: "Could not find the table 'public.vacations' in the schema cache"
+}
+▲ Next.js 16.1.6
+- Local:         http://127.0.0.1:3000
+- Network:       http://127.0.0.1:3000
+
+✓ Starting...
+✓ Ready in 313ms
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+▲ Next.js 16.1.6
+- Local:         http://127.0.0.1:3000
+- Network:       http://127.0.0.1:3000
+
+✓ Starting...
+✓ Ready in 355ms
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use 127.0.0.1:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 127.0.0.1:3000) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '127.0.0.1',
+  port: 3000
+}
+▲ Next.js 16.1.6
+- Local:         http://127.0.0.1:3000
+- Network:       http://127.0.0.1:3000
+
+✓ Starting...
+✓ Ready in 286ms
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+▲ Next.js 16.1.6
+- Local:         http://127.0.0.1:3000
+- Network:       http://127.0.0.1:3000
+
+✓ Starting...
+✓ Ready in 1979ms
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading units: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading units: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading units: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading translations: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading units: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading units: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading units: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading staff: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading salaries: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+⨯ Error: {"message":"TypeError: fetch failed","details":"TypeError: fetch failed\n\nCaused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\nError: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)","hint":"","code":""}
+    at ignore-listed frames {
+  digest: '1696975646@E394'
+}
+⨯ Error: {"message":"TypeError: fetch failed","details":"TypeError: fetch failed\n\nCaused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\nError: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)","hint":"","code":""}
+    at ignore-listed frames {
+  digest: '1696975646@E394'
+}
+⨯ Error: {"message":"TypeError: fetch failed","details":"TypeError: fetch failed\n\nCaused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\nError: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)","hint":"","code":""}
+    at ignore-listed frames {
+  digest: '1696975646@E394'
+}
+⨯ Error: {"message":"TypeError: fetch failed","details":"TypeError: fetch failed\n\nCaused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\nError: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)","hint":"","code":""}
+    at ignore-listed frames {
+  digest: '1696975646@E394'
+}
+⨯ Error: {"message":"TypeError: fetch failed","details":"TypeError: fetch failed\n\nCaused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\nError: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)","hint":"","code":""}
+    at ignore-listed frames {
+  digest: '1696975646@E394'
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading units: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error getting admins: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading translations: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+Error reading bookings: {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND xhvikeyigduvayrbvura.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+▲ Next.js 16.1.6
+- Local:         http://127.0.0.1:3000
+- Network:       http://127.0.0.1:3000
+
+✓ Starting...
+✓ Ready in 272ms
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+Error reading staff: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.staff' in the schema cache"
+}
+Error reading vacations: {
+  code: 'PGRST205',
+  details: null,
+  hint: "Perhaps you meant the table 'public.translations'",
+  message: "Could not find the table 'public.vacations' in the schema cache"
+}
+Error reading staff: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.staff' in the schema cache"
+}
+Error reading salaries: {
+  code: 'PGRST205',
+  details: null,
+  hint: "Perhaps you meant the table 'public.translations'",
+  message: "Could not find the table 'public.salaries' in the schema cache"
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+▲ Next.js 16.1.6
+- Local:         http://127.0.0.1:3000
+- Network:       http://127.0.0.1:3000
+
+✓ Starting...
+✓ Ready in 1306ms
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+▲ Next.js 16.1.6
+- Local:         http://127.0.0.1:3000
+- Network:       http://127.0.0.1:3000
+
+✓ Starting...
+✓ Ready in 270ms
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+▲ Next.js 16.1.6
+- Local:         http://127.0.0.1:3000
+- Network:       http://127.0.0.1:3000
+
+✓ Starting...
+✓ Ready in 327ms
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+▲ Next.js 16.1.6
+- Local:         http://127.0.0.1:3000
+- Network:       http://127.0.0.1:3000
+
+✓ Starting...
+✓ Ready in 380ms
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+Error reading staff: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.staff' in the schema cache"
+}
+Error reading salaries: {
+  code: 'PGRST205',
+  details: null,
+  hint: "Perhaps you meant the table 'public.translations'",
+  message: "Could not find the table 'public.salaries' in the schema cache"
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+🔄 Starting System Synchronization...
+✅ Translations synced successfully.
+✅ 31 Units synced successfully.
+⨯ Error [InvariantError]: Invariant: The client reference manifest for route "/_not-found" does not exist. This is a bug in Next.js.
+    at Object.get (E:\MazarBooking\.next\standalone\.next\server\chunks\445.js:11:13787)
+    at async o (E:\MazarBooking\.next\standalone\.next\server\app\_not-found\page.js:1:8008)
+⨯ Error [InvariantError]: Invariant: The client reference manifest for route "/_not-found" does not exist. This is a bug in Next.js.
+    at Object.get (E:\MazarBooking\.next\standalone\.next\server\chunks\445.js:11:13787)
+    at async o (E:\MazarBooking\.next\standalone\.next\server\app\_not-found\page.js:1:8008)
+Error reading staff: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.staff' in the schema cache"
+}
+Error reading vacations: {
+  code: 'PGRST205',
+  details: null,
+  hint: "Perhaps you meant the table 'public.translations'",
+  message: "Could not find the table 'public.vacations' in the schema cache"
+}
+Error reading staff: {
+  code: 'PGRST205',
+  details: null,
+  hint: null,
+  message: "Could not find the table 'public.staff' in the schema cache"
+}
+Error reading salaries: {
+  code: 'PGRST205',
+  details: null,
+  hint: "Perhaps you meant the table 'public.translations'",
+  message: "Could not find the table 'public.salaries' in the schema cache"
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
+⨯ Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.staff' in the schema cache"}
+    at ignore-listed frames {
+  digest: '3923502462@E394'
+}
