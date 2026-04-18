@@ -7,6 +7,7 @@ export function getSupabaseServerClient() {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!url || !serviceRoleKey) {
+    console.error('[SUPABASE_SERVER] ❌ CRITICAL: SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY missing on Server!');
     return null;
   }
 
