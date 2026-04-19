@@ -343,39 +343,28 @@ export default function ReportsPage() {
         {/* Unit Tabs */}
         <div className="no-print bg-white p-4 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm space-y-4" dir="rtl">
           <div>
-            <div className="text-[9px] font-black text-[#C1A68D] uppercase tracking-[0.25em] px-3 mb-2">الفرع الأول — الاستديوهات</div>
+            <div className="text-[9px] font-black text-[#C1A68D] uppercase tracking-[0.25em] px-3 mb-2">الاستديوهات الفندقية</div>
             <div className="flex flex-wrap gap-1.5">
-              {units.filter(u => u.type === 'studio' && !u.id.startsWith('s-') && (u.branch === 1 || u.branch === '1' || !u.branch)).map(u => (
-                <button
-                  key={u.id}
-                  onClick={() => setSelectedUnit(u.id)}
-                  className={`px-3 py-2 rounded-xl text-[10px] font-black transition-all ${
-                    selectedUnit === u.id
-                      ? 'bg-[#2A2723] text-white shadow-lg shadow-black/10'
-                      : 'bg-[#FDFBF7] text-[#7A7061] hover:bg-[#EAE4D9]/50 hover:text-[#2A2723] border border-[#EAE4D9]/40'
-                  }`}
-                >
-                  {u.title?.ar || u.id}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <div className="text-[9px] font-black text-[#C1A68D] uppercase tracking-[0.25em] px-3 mb-2">الفرع الثاني — الاستديوهات</div>
-            <div className="flex flex-wrap gap-1.5">
-              {units.filter(u => u.type === 'studio' && !u.id.startsWith('s-') && (u.branch === 2 || u.branch === '2')).map(u => (
-                <button
-                  key={u.id}
-                  onClick={() => setSelectedUnit(u.id)}
-                  className={`px-3 py-2 rounded-xl text-[10px] font-black transition-all ${
-                    selectedUnit === u.id
-                      ? 'bg-[#2A2723] text-white shadow-lg shadow-black/10'
-                      : 'bg-[#FDFBF7] text-[#7A7061] hover:bg-[#EAE4D9]/50 hover:text-[#2A2723] border border-[#EAE4D9]/40'
-                  }`}
-                >
-                  {u.title?.ar || u.id}
-                </button>
-              ))}
+              {units
+                .filter(u => u.type === 'studio' && !u.id.startsWith('s-'))
+                .sort((a, b) => {
+                  const numA = parseInt((a.title?.ar || a.id).match(/\d+/)?.[0] || '0', 10);
+                  const numB = parseInt((b.title?.ar || b.id).match(/\d+/)?.[0] || '0', 10);
+                  return numA - numB;
+                })
+                .map(u => (
+                  <button
+                    key={u.id}
+                    onClick={() => setSelectedUnit(u.id)}
+                    className={`px-3 py-2 rounded-xl text-[10px] font-black transition-all ${
+                      selectedUnit === u.id
+                        ? 'bg-[#2A2723] text-white shadow-lg shadow-black/10'
+                        : 'bg-[#FDFBF7] text-[#7A7061] hover:bg-[#EAE4D9]/50 hover:text-[#2A2723] border border-[#EAE4D9]/40'
+                    }`}
+                  >
+                    {u.title?.ar || u.id}
+                  </button>
+                ))}
             </div>
           </div>
           <div>
