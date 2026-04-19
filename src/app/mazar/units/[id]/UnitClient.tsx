@@ -6,7 +6,7 @@ import Logo from '@/components/Logo';
 import Footer from '@/components/Footer';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useLanguage } from '@/lib/LanguageContext';
-import { getSystemUnits, getStudios } from '@/lib/data-init';
+import { getPublicSystemUnits, getStudios } from '@/lib/data-init';
 
 export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
   const { t, isRTL, language } = useLanguage();
@@ -24,7 +24,7 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
   useEffect(() => {
     if (initialUnit) return;
     const loadUnit = async (): Promise<void> => {
-        const allUnits = await getSystemUnits();
+        const allUnits = await getPublicSystemUnits();
         const foundUnit: any = allUnits.find((u: any) => u.id === id);
         if (foundUnit) {
           setUnit(foundUnit);

@@ -56,7 +56,7 @@ export default function BookingsManagement() {
                 return bIn < checkOutDate && bOut > checkInDate;
             }).map((b: any) => b.apartmentId));
     
-            const free = units.filter((a: any) => a.status === 'متاح' && !bookedIds.has(a.id));
+            const free = units.filter((a: any) => a.status === 'متاح' && !a.id.startsWith('s-') && !bookedIds.has(a.id));
             setAvailableAptsForBooking(free);
             setSelectedAptId(selectedBooking.apartmentId || (free.length > 0 ? free[0].id : null));
         }

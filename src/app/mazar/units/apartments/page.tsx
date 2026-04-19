@@ -6,7 +6,7 @@ import Logo from '@/components/Logo';
 import Footer from '@/components/Footer';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useLanguage } from '@/lib/LanguageContext';
-import { getSystemUnits } from '@/lib/data-init';
+import { getPublicSystemUnits } from '@/lib/data-init';
 import UnitCard from '@/components/UnitCard';
 
 export default function ApartmentsListingPage() {
@@ -17,7 +17,7 @@ export default function ApartmentsListingPage() {
 
   useEffect(() => {
     const loadUnits = async () => {
-      const allUnits = await getSystemUnits();
+      const allUnits = await getPublicSystemUnits();
       setLuxuryApartments(allUnits.filter((u: any) => u.type === 'apartment'));
     };
     loadUnits();

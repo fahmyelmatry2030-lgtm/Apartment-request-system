@@ -345,7 +345,25 @@ export default function ReportsPage() {
           <div>
             <div className="text-[9px] font-black text-[#C1A68D] uppercase tracking-[0.25em] px-3 mb-2">الفرع الأول — الاستديوهات</div>
             <div className="flex flex-wrap gap-1.5">
-              {units.filter(u => u.type === 'studio' && (u.branch === 1 || u.branch === '1' || !u.branch)).map(u => (
+              {units.filter(u => u.type === 'studio' && !u.id.startsWith('s-') && (u.branch === 1 || u.branch === '1' || !u.branch)).map(u => (
+                <button
+                  key={u.id}
+                  onClick={() => setSelectedUnit(u.id)}
+                  className={`px-3 py-2 rounded-xl text-[10px] font-black transition-all ${
+                    selectedUnit === u.id
+                      ? 'bg-[#2A2723] text-white shadow-lg shadow-black/10'
+                      : 'bg-[#FDFBF7] text-[#7A7061] hover:bg-[#EAE4D9]/50 hover:text-[#2A2723] border border-[#EAE4D9]/40'
+                  }`}
+                >
+                  {u.title?.ar || u.id}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div className="text-[9px] font-black text-[#C1A68D] uppercase tracking-[0.25em] px-3 mb-2">الفرع الثاني — الاستديوهات</div>
+            <div className="flex flex-wrap gap-1.5">
+              {units.filter(u => u.type === 'studio' && !u.id.startsWith('s-') && (u.branch === 2 || u.branch === '2')).map(u => (
                 <button
                   key={u.id}
                   onClick={() => setSelectedUnit(u.id)}

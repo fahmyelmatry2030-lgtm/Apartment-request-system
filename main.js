@@ -27,7 +27,7 @@ let isCreatingWindow = false; // Flag to prevent multiple creation calls
 const PORT = 3000;
 const LOCAL_URL = `http://localhost:${PORT}`;
 // CHANGE THIS TO YOUR LIVE VERCEL URL FOR AUTOMATIC UPDATES
-const REMOTE_URL = 'https://mazarstudios.vercel.app'; 
+const REMOTE_URL = 'https://mazar-nine.vercel.app';
 const PREFER_REMOTE = true; // Enabled to keep everything in sync by default
 
 const isPackaged = app.isPackaged;

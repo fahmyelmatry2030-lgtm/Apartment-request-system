@@ -14,10 +14,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // Ensure webpack is forced for production builds to avoid Turbopack font issues
-  webpack: (config) => {
-    return config;
-  },
+  turbopack: {},
 };
 
 export default nextConfig;

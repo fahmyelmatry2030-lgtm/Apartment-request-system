@@ -6,7 +6,7 @@ import Footer from '@/components/Footer';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import Calendar from '@/components/Calendar';
 import { useLanguage } from '@/lib/LanguageContext';
-import { saveBooking, initializeData, getSystemUnits, getBookings } from '@/lib/data-init';
+import { saveBooking, initializeData, getPublicSystemUnits, getBookings } from '@/lib/data-init';
 
 export default function BookingPage() {
   const { t, isRTL, language } = useLanguage();
@@ -126,7 +126,7 @@ export default function BookingPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const allUnits = await getSystemUnits();
+      const allUnits = await getPublicSystemUnits();
 
       const activeUnitsByStatus = allUnits.filter((u: any) => u.status === 'متاح' || !u.status);
       const available = activeUnitsByStatus;

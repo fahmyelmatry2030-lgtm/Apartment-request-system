@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { getBookings, getSystemUnits } from '@/lib/data-init';
+import { getBookings, getPublicSystemUnits } from '@/lib/data-init';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
 export default function DashboardOverview() {
@@ -27,7 +27,7 @@ export default function DashboardOverview() {
 
   const loadOverviewData = useCallback(async () => {
     const bookings = await getBookings();
-    const apts = await getSystemUnits();
+    const apts = await getPublicSystemUnits();
     
     const today = new Date();
     const todayStr = today.toISOString().split('T')[0];

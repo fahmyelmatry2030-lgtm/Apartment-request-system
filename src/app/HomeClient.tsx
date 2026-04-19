@@ -7,7 +7,7 @@ import Logo from '@/components/Logo';
 import Footer from '@/components/Footer';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useLanguage } from '@/lib/LanguageContext';
-import { getSystemUnits } from '@/lib/data-init';
+import { getPublicSystemUnits } from '@/lib/data-init';
 import UnitCard from '@/components/UnitCard';
 
 export default function HomeClient() {
@@ -18,7 +18,7 @@ export default function HomeClient() {
   useEffect(() => {
     const loadUnits = async () => {
       try {
-        const allUnits = await getSystemUnits();
+        const allUnits = await getPublicSystemUnits();
         setUnits(allUnits);
       } catch (e) {
         console.error('Failed to load units on home page:', e);

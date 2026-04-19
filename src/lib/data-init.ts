@@ -60,6 +60,12 @@ export const getSystemUnits = async () => {
   return units;
 };
 
+// Returns only the 7 display categories (hides the 24 physical studios)
+export const getPublicSystemUnits = async () => {
+  const allUnits = await getSystemUnits();
+  return allUnits.filter(u => !u.id.startsWith('b1-s') && !u.id.startsWith('b2-s'));
+};
+
 export const updateUnitDetails = async (id: string, updates: any) => {
   try {
     return await updateDbUnitDetails(id, updates);
@@ -157,6 +163,6 @@ export const updateBookingStatus = async (id: string, updates: any) => {
 };
 
 export const getStudios = async () => {
-  const units = await getSystemUnits();
+  const units = await getPublicSystemUnits();
   return units.filter((u: any) => u.type === 'studio');
 };

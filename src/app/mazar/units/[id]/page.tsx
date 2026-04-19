@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { getSystemUnits } from '@/lib/data-init';
+import { getPublicSystemUnits } from '@/lib/data-init';
 import UnitClient from './UnitClient';
 
 interface Props {
@@ -8,7 +8,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const units = await getSystemUnits();
+  const units = await getPublicSystemUnits();
   const unit = units.find((u: any) => u.id === id);
 
   if (!unit) {
@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function Page({ params }: Props) {
   const { id } = await params;
-  const units = await getSystemUnits();
+  const units = await getPublicSystemUnits();
   const unit = units.find((u: any) => u.id === id);
 
   return <UnitClient initialUnit={unit} />;

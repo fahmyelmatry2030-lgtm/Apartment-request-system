@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { getSystemUnits, updateUnitDetails } from '@/lib/data-init';
+import { getPublicSystemUnits, updateUnitDetails } from '@/lib/data-init';
 import { uploadImage } from '@/lib/actions/upload';
 
 export default function UnitsManagement() {
@@ -21,7 +21,7 @@ export default function UnitsManagement() {
 
   const refreshData = useCallback(async () => {
     setIsLoading(true);
-    const data = await getSystemUnits();
+    const data = await getPublicSystemUnits();
     setAllUnits(data);
     setIsLoading(false);
   }, []);
