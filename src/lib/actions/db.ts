@@ -438,14 +438,30 @@ export async function getDbVacations() {
     console.error('Error reading vacations:', error);
     return [];
   }
-  return data || [];
+  return (data || []).map((v: any) => ({
+    id: v.id,
+    staff_id: v.staff_id,
+    start_date: v.start_date,
+    end_date: v.end_date,
+    type: v.status,
+    notes: v.reason
+  }));
 }
 
 export async function saveDbVacation(vacation: any) {
   const supabase = getSupabaseServerClient();
   if (!supabase) return vacation;
 
-  const { error } = await supabase.from('vacations').upsert(vacation);
+  const dbData = {
+    id: vacation.id,
+    staff_id: vacation.staff_id,
+    start_date: vacation.start_date,
+    end_date: vacation.end_date,
+    status: vacation.type,
+    reason: vacation.notes
+  };
+
+  const { error } = await supabase.from('vacations').upsert(dbData);
   if (error) throw error;
   return vacation;
 }
