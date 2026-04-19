@@ -83,9 +83,24 @@ function startNextServer() {
     return;
   }
 
+  // Parse .env since standalone does not automatically load it
+  const envVars = {};
+  const envPath = path.join(STANDALONE_DIR, '.env');
+  if (fs.existsSync(envPath)) {
+    const lines = fs.readFileSync(envPath, 'utf8').split('\n');
+    for (const line of lines) {
+      if (line && line.includes('=')) {
+        const [key, ...rest] = line.split('=');
+        envVars[key.trim()] = rest.join('=').trim().replace(/['"]/g, '');
+      }
+    }
+    log(`Loaded environment variables from ${envPath}`);
+  }
+
   nextServer = spawn('node', [serverScript], {
     env: {
       ...process.env,
+      ...envVars,
       PORT: String(PORT),
       NODE_ENV: 'production',
       HOSTNAME: '127.0.0.1',
