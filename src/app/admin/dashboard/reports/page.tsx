@@ -386,7 +386,6 @@ export default function ReportsPage() {
       days,
       pricePerNight,
       total,
-      discount,
       commission,
       brokerName: booking.brokerName || '',
       netValue,

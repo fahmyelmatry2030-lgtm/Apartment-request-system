@@ -16,6 +16,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
   const [showProfile, setShowProfile] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isInstallable, setIsInstallable] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
