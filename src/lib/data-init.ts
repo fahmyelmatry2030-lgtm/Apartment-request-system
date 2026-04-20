@@ -95,8 +95,8 @@ export const getBookings = async () => {
     const dbBookings = await getDbBookings();
     const localBookings = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('local_bookings') || '[]') : [];
     
-    // Combine and remove duplicates based on ID
-    const combined = [...dbBookings, ...localBookings];
+    // Combine: Database data must come LAST to overwrite stale local storage data in the Map
+    const combined = [...localBookings, ...dbBookings];
     const unique = Array.from(new Map(combined.map(item => [item.id, item])).values());
     
     return unique.sort((a: any, b: any) => 
@@ -134,7 +134,18 @@ export const saveBooking = async (booking: any) => {
 
 export const updateBookingStatus = async (id: string, updates: any) => {
   try {
-    return await updateDbBookingStatus(id, updates);
+    const result = await updateDbBookingStatus(id, updates);
+    
+    // Cleanup: If DB update succeeded, remove any stale copy from LocalStorage
+    if (typeof window !== 'undefined') {
+      const local = JSON.parse(localStorage.getItem('local_bookings') || '[]');
+      const filtered = local.filter((b: any) => b.id !== id);
+      if (local.length !== filtered.length) {
+        localStorage.setItem('local_bookings', JSON.stringify(filtered));
+      }
+    }
+    
+    return result;
   } catch (e) {
     console.warn('DB Update failed, applying to LocalStorage:', e);
     
