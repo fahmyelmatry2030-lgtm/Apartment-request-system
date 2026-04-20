@@ -182,26 +182,41 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
 
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] flex flex-col md:flex-row custom-scrollbar" dir="rtl">
+    <div className="min-h-screen bg-[#FDFBF7] flex custom-scrollbar" dir="rtl">
+      {/* Toggle Button for Mobile */}
+      <button 
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        className="lg:hidden fixed bottom-6 right-6 z-50 bg-[#2A2723] text-white p-4 rounded-2xl shadow-2xl active:scale-95 transition-transform"
+      >
+        {isMobileMenuOpen ? <span>✖️</span> : <span>☰</span>}
+      </button>
+
       {/* Sidebar */}
-        <div className="p-6 md:p-8 flex justify-between items-center bg-[#FDFBF7]/80 backdrop-blur-md border-b border-[#EAE4D9]/50 mb-6 sticky top-0 z-50">
-          <div className="flex flex-col items-start gap-1">
+      <aside className={`fixed inset-y-0 right-0 z-40 w-[280px] bg-[#FDFBF7] border-l border-[#EAE4D9]/50 transform transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : 'translate-x-full'} flex flex-col`}>
+        <div className="p-6 md:p-8 flex flex-col items-center justify-between border-b border-[#EAE4D9]/50 mb-6 gap-4">
+          <div className="w-full flex justify-between items-center">
             <Link href="/admin/dashboard" className="transition-all hover:scale-105" title="الرئيسية للوحة التحكم">
                <Logo size={25} className="!justify-start" imageClassName="max-h-[50px]" />
             </Link>
-            <span className="text-[9px] text-[#C1A68D] font-black uppercase tracking-widest opacity-80">Management System</span>
+            {/* Close button for mobile */}
+            <button 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="lg:hidden p-2 text-[#7A7061] hover:bg-[#EAE4D9]/50 rounded-lg transition-colors"
+            >
+              ✖️
+            </button>
           </div>
           <button 
             onClick={() => window.location.reload()}
-            className="flex items-center justify-center w-10 h-10 md:w-auto md:px-5 md:py-3 rounded-2xl bg-[#2A2723] text-white hover:bg-black transition-all shadow-xl shadow-black/20 active:scale-95 group border border-white/10"
+            className="flex items-center justify-center w-full py-3 rounded-2xl bg-[#2A2723] text-white hover:bg-black transition-all shadow-xl shadow-black/20 active:scale-95 group border border-white/10"
             title="تحديث بيانات النظام"
           >
-            <span className="text-sm group-hover:rotate-180 transition-transform duration-700 ease-in-out">🔄</span>
-            <span className="hidden md:inline text-[11px] font-black uppercase tracking-[0.2em] mr-2">تحديث</span>
+            <span className="text-sm group-hover:rotate-180 transition-transform duration-700 ease-in-out mb-0.5">🔄</span>
+            <span className="text-[11px] font-black uppercase tracking-[0.2em] mr-2">تحديث</span>
           </button>
         </div>
 
-        <nav className="flex-1 px-4 space-y-2">
+        <nav className="flex-1 px-4 space-y-2 overflow-y-auto custom-scrollbar pb-6">
           {menuItems.map((item) => {
             const isActive = pathname === item.href;
             return (
@@ -226,7 +241,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
           })}
         </nav>
 
-        <div className="p-4 md:p-8 border-t border-[#EAE4D9]/50 space-y-4">
+        <div className="p-4 md:p-8 border-t border-[#EAE4D9]/50 space-y-4 bg-white/50">
            {/* Quick Action: WhatsApp Owner */}
           <a 
             href="https://wa.me/201554788708" 
@@ -252,7 +267,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
               sessionStorage.removeItem('isAdmin');
               router.push('/admin/login');
             }}
-            className="flex items-center gap-4 text-[#7A7061] hover:text-[#E63946] transition-colors font-black text-sm w-full outline-none px-6"
+            className="flex items-center gap-4 text-[#7A7061] hover:text-[#E63946] transition-colors font-black text-sm w-full outline-none px-6 mt-4"
           >
             <span>🚪</span> تسجيل الخروج
           </button>
