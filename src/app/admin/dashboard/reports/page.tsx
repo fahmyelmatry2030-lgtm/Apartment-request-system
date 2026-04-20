@@ -469,16 +469,32 @@ export default function ReportsPage() {
 
       <div className="space-y-8 animate-fade-in relative z-0">
         {/* Header */}
-        <header className="no-print flex justify-between items-end flex-wrap gap-4">
+        <header className="no-print flex justify-between items-center flex-wrap gap-4">
           <div>
-            <h1 className="text-4xl font-black mb-2 text-[#2A2723]">تقارير <span className="text-[#C1A68D]">الوحدات</span></h1>
+            <div className="flex items-center gap-3 mb-1">
+              <h1 className="text-4xl font-black text-[#2A2723]">تقارير <span className="text-[#C1A68D]">الوحدات</span></h1>
+              <span className="text-[10px] font-black text-[#C1A68D] bg-[#FDFBF7] border border-[#EAE4D9]/50 px-2.5 py-1 rounded-full uppercase tracking-widest shadow-sm">v1.3.0 SYNC-FIX</span>
+            </div>
             <p className="text-[#7A7061] font-bold opacity-70 text-sm">جدول حجوزات شهري لكل وحدة — اضغط على أي خلية لتعديلها مباشرة.</p>
           </div>
-          {saveStatus && (
-            <div className="bg-white border border-[#EAE4D9] px-4 py-2 rounded-xl text-[10px] font-black text-[#C1A68D] animate-scale-in shadow-sm">
-              {saveStatus}
-            </div>
-          )}
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => {
+                if(confirm("⚠️ سيتم مسح الذاكرة المؤقتة للمتصفح بالكامل وإعادة التحميل من قاعدة البيانات لضمان المزامنة بنسبة 100%. هل أنت متأكد؟")) {
+                  localStorage.clear();
+                  window.location.reload();
+                }
+              }}
+              className="bg-red-50 text-red-600 hover:bg-red-100 px-4 py-2.5 rounded-xl text-xs font-black transition-all flex items-center gap-2 border border-red-100 shadow-md active:scale-95"
+            >
+              🔄 حل مشكلة المزامنة (مسح شامل)
+            </button>
+            {saveStatus && (
+              <div className="bg-white border border-[#EAE4D9] px-4 py-2 rounded-xl text-[10px] font-black text-[#C1A68D] animate-scale-in shadow-sm">
+                {saveStatus}
+              </div>
+            )}
+          </div>
         </header>
 
         {/* Filters Bar */}
@@ -648,25 +664,9 @@ export default function ReportsPage() {
 
         {/* THE TABLE */}
         <div ref={printRef} className="print-area bg-white rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
-          <div className="print-header p-10 flex justify-between items-start">
-            <div className="space-y-2">
-              <h2 className="text-3xl font-black text-[#2A2723]">مزار — تقرير حجوزات {selectedUnitInfo?.title?.ar || selectedUnit}</h2>
-              <p className="text-[#7A7061] text-lg font-bold">{MONTHS_AR[selectedMonth]} {selectedYear}</p>
-            </div>
-            <div className="no-print flex flex-col items-end gap-3">
-              <span className="text-[10px] font-black text-[#C1A68D] bg-[#FDFBF7] border border-[#EAE4D9]/50 px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">v1.2.8 SYNC-FIX</span>
-              <button 
-                onClick={() => {
-                  if(confirm("⚠️ سيتم مسح الذاكرة المؤقتة (LocalStorage) بالكامل وإعادة التحميل من الداتابيز. هل أنت متأكد؟")) {
-                    localStorage.clear();
-                    window.location.reload();
-                  }
-                }}
-                className="bg-red-50 text-red-600 hover:bg-red-100 px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2 border border-red-100 shadow-sm"
-              >
-                🔄 مسح الكاش والبدء من جديد
-              </button>
-            </div>
+          <div className="print-header">
+            <h2>مزار — تقرير حجوزات {selectedUnitInfo?.title?.ar || selectedUnit}</h2>
+            <p>{MONTHS_AR[selectedMonth]} {selectedYear}</p>
           </div>
 
           <div className="overflow-x-auto">
