@@ -91,8 +91,8 @@ export async function saveDbBooking(booking: any) {
     const newBooking = {
       ...booking,
       id: `#B-${Math.floor(1000 + Math.random() * 9000)}`,
-      status: 'رد جديد',
-      timestamp: new Date().toISOString(),
+      status: booking.status || 'رد جديد',
+      timestamp: booking.timestamp || new Date().toISOString(),
     };
 
     const supabase = getSupabaseServerClient();

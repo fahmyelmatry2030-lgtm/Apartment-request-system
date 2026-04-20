@@ -88,10 +88,10 @@ export default function ReportsPage() {
   const safeDateStr = `${selectedYear}-${monthStr}-01`;
   
   const [newRecord, setNewRecord] = useState({
-    name: 'عميل جديد (تعديل يدوي)',
+    name: '',
     nationality: '',
     idNumber: '',
-    phone: '---',
+    phone: '',
     checkIn: safeDateStr,
     checkOut: safeDateStr,
     pricePerNight: 0,
@@ -203,10 +203,10 @@ export default function ReportsPage() {
       const resetStr = String(selectedMonth + 1).padStart(2, '0');
       const sDateStr = `${selectedYear}-${resetStr}-01`;
       setNewRecord({
-        name: 'عميل جديد (تعديل يدوي)',
+        name: '',
         nationality: '',
         idNumber: '',
-        phone: '---',
+        phone: '',
         checkIn: sDateStr,
         checkOut: sDateStr,
         pricePerNight: 0,
