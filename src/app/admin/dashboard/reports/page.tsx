@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { getBookings, getSystemUnits, updateBookingStatus, saveBooking } from '@/lib/data-init';
 
 // Units will be fetched dynamically from the database
+const LAYOUT_VERSION = 'v1.4.0'; // Auto-increment this to force-clear client caches
 
 const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 
@@ -83,6 +84,19 @@ export default function ReportsPage() {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [isLoading, setIsLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState('');
+
+  // AUTO-RESET LOGIC: Clears stale localStorage once per version update
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const lastVersion = localStorage.getItem('mazar_layout_version');
+      if (lastVersion !== LAYOUT_VERSION) {
+        console.log(`[VERSION-UPDATE] Migrating from ${lastVersion} to ${LAYOUT_VERSION}. Clearing cache...`);
+        localStorage.clear();
+        localStorage.setItem('mazar_layout_version', LAYOUT_VERSION);
+        window.location.reload();
+      }
+    }
+  }, []);
   
   const monthStr = String(selectedMonth + 1).padStart(2, '0');
   const safeDateStr = `${selectedYear}-${monthStr}-01`;
@@ -473,7 +487,7 @@ export default function ReportsPage() {
           <div>
             <div className="flex items-center gap-3 mb-1">
               <h1 className="text-4xl font-black text-[#2A2723]">تقارير <span className="text-[#C1A68D]">الوحدات</span></h1>
-              <span className="text-[10px] font-black text-[#C1A68D] bg-[#FDFBF7] border border-[#EAE4D9]/50 px-2.5 py-1 rounded-full uppercase tracking-widest shadow-sm">v1.3.0 SYNC-FIX</span>
+              <span className="text-[10px] font-black text-[#C1A68D] bg-[#FDFBF7] border border-[#EAE4D9]/50 px-2.5 py-1 rounded-full uppercase tracking-widest shadow-sm">{LAYOUT_VERSION} AUTO-SYNC</span>
             </div>
             <p className="text-[#7A7061] font-bold opacity-70 text-sm">جدول حجوزات شهري لكل وحدة — اضغط على أي خلية لتعديلها مباشرة.</p>
           </div>
