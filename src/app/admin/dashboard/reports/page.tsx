@@ -202,10 +202,14 @@ export default function ReportsPage() {
         delete updates.discount; // Field doesn't exist in DB
       }
 
-      await updateBookingStatus(bookingId, updates);
+      const freshData = await updateBookingStatus(bookingId, updates);
       
-      // Update local state immediately with all updated fields
-      setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, ...updates } : b));
+      // Update local state WITH THE FRESH DATA RETURNED FROM SERVER
+      if (freshData && Array.isArray(freshData)) {
+        setBookings(freshData);
+      } else {
+        setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, ...updates } : b));
+      }
       
       setSaveStatus('✅ تم الحفظ');
       setTimeout(() => setSaveStatus(''), 2000);

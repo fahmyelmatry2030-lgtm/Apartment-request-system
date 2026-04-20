@@ -95,9 +95,32 @@ export const getBookings = async (nonce?: string) => {
     const dbBookings = await getFreshDbBookings(nonce);
     const localBookings = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('local_bookings') || '[]') : [];
     
-    // Combine: Database data must come LAST to overwrite stale local storage data in the Map
-    const combined = [...localBookings, ...dbBookings];
-    const unique = Array.from(new Map(combined.filter(b => b && b.id).map(item => [item.id, item])).values());
+    // Combine: Filter out nulls/no-id
+    const combined = [...localBookings, ...dbBookings].filter(b => b && b.id);
+    
+    // Deduplicate by ID, keeping the one with the newest timestamp
+    const uniqueMap = new Map();
+    combined.forEach(item => {
+      const existing = uniqueMap.get(item.id);
+      const itemTime = item.timestamp ? new Date(item.timestamp).getTime() : 0;
+      const existingTime = existing?.timestamp ? new Date(existing.timestamp).getTime() : 0;
+      
+      if (!existing || itemTime > existingTime) {
+        uniqueMap.set(item.id, item);
+      }
+    });
+
+    const unique = Array.from(uniqueMap.values());
+    
+    // Cleanup LocalStorage: If a record is in DB, we don't need it in LocalStorage anymore
+    if (typeof window !== 'undefined' && dbBookings.length > 0) {
+      const local = JSON.parse(localStorage.getItem('local_bookings') || '[]');
+      const dbIds = new Set(dbBookings.map(b => b.id));
+      const filteredLocal = local.filter((b: any) => !dbIds.has(b.id));
+      if (local.length !== filteredLocal.length) {
+        localStorage.setItem('local_bookings', JSON.stringify(filteredLocal));
+      }
+    }
     
     return unique.sort((a: any, b: any) => {
         const timeA = a.timestamp ? new Date(a.timestamp).getTime() : 0;

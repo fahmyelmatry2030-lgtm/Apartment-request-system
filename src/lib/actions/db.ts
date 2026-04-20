@@ -163,6 +163,9 @@ export async function updateDbBookingStatus(id: string, updates: any) {
   if (updates.commission !== undefined) patch.commission = updates.commission;
   if (updates.brokerName !== undefined) patch.broker_name = updates.brokerName;
   if (updates.notes !== undefined) patch.notes = updates.notes;
+  
+  // ALWAYS update the timestamp on edit to ensure "Fresh First" sync logic works
+  patch.timestamp = new Date().toISOString();
 
   const { data, error } = await supabase.from('bookings')
     .update(patch)
