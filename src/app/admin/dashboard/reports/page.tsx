@@ -149,12 +149,14 @@ export default function ReportsPage() {
       }
       setSaveStatus('جاري إضافة سجل جديد...');
       
-      const firstDayOfMonth = new Date(selectedYear, selectedMonth, 1).toISOString().split('T')[0];
+      const monthStr = String(selectedMonth + 1).padStart(2, '0');
+      const safeDateStr = `${selectedYear}-${monthStr}-01`;
+      
       const newBooking = {
         name: 'عميل جديد (تعديل يدوي)',
         phone: '---',
-        checkIn: firstDayOfMonth,
-        checkOut: firstDayOfMonth,
+        checkIn: safeDateStr,
+        checkOut: safeDateStr,
         apartmentId: selectedUnit,
         studio: units.find((u: any) => u.id === selectedUnit)?.title?.ar || selectedUnit,
         status: 'approved',
