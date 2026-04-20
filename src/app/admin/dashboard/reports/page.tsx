@@ -141,10 +141,13 @@ export default function ReportsPage() {
         const cOut = field === 'checkOut' ? value : currentBooking.checkOut;
         
         let pNight = field === 'pricePerNight' ? (parseInt(value, 10) || 0) : null;
+        
+        // Extract current discount safely
+        const dMatch = currentBooking.notes?.match(/خصم بقيمة (\d+)/);
+        const existDiscount = dMatch ? parseInt(dMatch[1], 10) : 0;
+
         if (pNight === null) {
-          // Derive existing pNight precisely
-          const dMatch = currentBooking.notes?.match(/خصم بقيمة (\d+)/);
-          const existDiscount = dMatch ? parseInt(dMatch[1], 10) : 0;
+          // Derive existing pNight precisely from totalAmount
           if (currentBooking.numberOfDays > 0) {
             pNight = (currentBooking.totalAmount + existDiscount) / currentBooking.numberOfDays;
           } else {
@@ -157,14 +160,46 @@ export default function ReportsPage() {
           const dOut = new Date(cOut);
           const diff = Math.ceil((dOut.getTime() - dIn.getTime()) / (1000 * 60 * 60 * 24));
           const nights = diff > 0 ? diff : 0;
-          updates.numberOfDays = nights;
-          
-          const dMatch = currentBooking.notes?.match(/خصم بقيمة (\d+)/);
-          const existDiscount = dMatch ? parseInt(dMatch[1], 10) : 0;
-          
           updates.totalAmount = (nights * pNight) - existDiscount;
           updates.pricePerNight = pNight;
+          
+          // Overlap check on edit
+          if (nights > 0) {
+            const hasOverlap = bookings.some(b => {
+              if (b.id === bookingId || b.status === 'deleted' || b.apartmentId !== currentBooking.apartmentId) return false;
+              if (b.status !== 'approved' && b.status !== 'مؤكد') return false;
+              const bIn = new Date(b.checkIn).getTime();
+              const bOut = new Date(b.checkOut).getTime();
+              const nIn = new Date(cIn).getTime();
+              const nOut = new Date(cOut).getTime();
+              return nIn < bOut && nOut > bIn;
+            });
+            if (hasOverlap && !confirm("⚠️ تنبيه: التواريخ الجديدة تتداخل مع حجز موجود بالفعل لهذا الاستوديو. هل تريد الاستمرار؟")) {
+              return;
+            }
+          }
         }
+      }
+
+      if (field === 'discount') {
+        const discVal = parseInt(value, 10) || 0;
+        const dMatch = currentBooking.notes?.match(/خصم بقيمة (\d+)/);
+        const oldNotes = dMatch ? currentBooking.notes.replace(/خصم بقيمة \d+/, '').trim() : currentBooking.notes;
+        
+        updates.notes = discVal > 0 ? `خصم بقيمة ${discVal} ${oldNotes}` : oldNotes;
+        
+        // Recalculate totalAmount based on current nights and price
+        const dIn = new Date(currentBooking.checkIn);
+        const dOut = new Date(currentBooking.checkOut);
+        const diff = Math.ceil((dOut.getTime() - dIn.getTime()) / (1000 * 60 * 60 * 24));
+        const nights = diff > 0 ? diff : 0;
+        
+        // Get price per night
+        const existDiscount = dMatch ? parseInt(dMatch[1], 10) : 0;
+        const pNight = nights > 0 ? (currentBooking.totalAmount + existDiscount) / nights : 0;
+        
+        updates.totalAmount = (nights * pNight) - discVal;
+        delete updates.discount; // Field doesn't exist in DB
       }
 
       await updateBookingStatus(bookingId, updates);
@@ -190,9 +225,29 @@ export default function ReportsPage() {
       const inDate = new Date(newRecord.checkIn || new Date());
       const outDate = new Date(newRecord.checkOut || new Date());
       const diff = Math.ceil((outDate.getTime() - inDate.getTime()) / (1000 * 60 * 60 * 24));
-      const nights = diff > 0 ? diff : 0;
       const discountVal = newRecord.discount || 0;
       const totalAmount = (nights * newRecord.pricePerNight) - discountVal;
+
+      // Overlap check for new record
+      if (nights > 0) {
+        const hasOverlap = bookings.some(b => {
+          if (b.status === 'deleted' || b.apartmentId !== selectedUnit) return false;
+          const isApproved = b.status === 'approved' || b.status === 'مؤكد';
+          if (!isApproved) return false;
+          
+          const bIn = new Date(b.checkIn).getTime();
+          const bOut = new Date(b.checkOut).getTime();
+          const nIn = inDate.getTime();
+          const nOut = outDate.getTime();
+          
+          return nIn < bOut && nOut > bIn;
+        });
+        
+        if (hasOverlap && !confirm("⚠️ تنبيه: يوجد حجز آخر بالفعل في هذه التواريخ لهذا الاستوديو. هل تريد المتابعة وإضافة هذا الحجز أيضاً؟")) {
+          setSaveStatus('');
+          return;
+        }
+      }
       
       const newBooking = {
         name: newRecord.name,
@@ -266,14 +321,20 @@ export default function ReportsPage() {
       const total = b.totalAmount || 0;
       const commission = b.commission || 0;
       const netValue = total - commission;
+      
+      let discount = 0;
+      const dMatch = b.notes?.match(/خصم بقيمة (\d+)/);
+      if (dMatch) discount = parseInt(dMatch[1], 10);
+
       return {
         days: acc.days + days,
         total: acc.total + total,
         commission: acc.commission + commission,
+        discount: acc.discount + discount,
         netValue: acc.netValue + netValue,
       };
     },
-    { days: 0, total: 0, commission: 0, netValue: 0 }
+    { days: 0, total: 0, commission: 0, discount: 0, netValue: 0 }
   );
 
   // Build row data
@@ -307,10 +368,11 @@ export default function ReportsPage() {
       days,
       pricePerNight,
       total,
+      discount,
       commission,
       brokerName: booking.brokerName || '',
       netValue,
-      notes: booking.notes || '',
+      notes: booking.notes?.replace(/خصم بقيمة \d+/, '').trim() || '',
       hasData: true,
     };
   });
@@ -321,7 +383,7 @@ export default function ReportsPage() {
     no: dataRows.length + i + 1,
     id: '', date: '', name: '', nationality: '', idNumber: '', phone: '',
     checkIn: '', checkOut: '', days: 0, pricePerNight: 0, total: 0,
-    commission: 0, brokerName: '', netValue: 0, notes: '', hasData: false,
+    discount: 0, commission: 0, brokerName: '', netValue: 0, notes: '', hasData: false,
   }));
 
   const allRows = [...dataRows, ...emptyRows];
@@ -591,6 +653,8 @@ export default function ReportsPage() {
                   <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">الأيام</th>
                   <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">سعر الليلة</th>
                   <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">الإجمالي</th>
+                  <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">الخصم</th>
+                  <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">بعد الخصم</th>
                   <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">العمولة</th>
                   <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">الوسيط</th>
                   <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">الصافي</th>
@@ -649,6 +713,14 @@ export default function ReportsPage() {
                         {row.hasData ? <EditableCell value={row.pricePerNight} bookingId={row.id} field="pricePerNight" onSave={handleCellSave} type="number" className="text-[#7A7061] font-bold" /> : <span className="text-[#EAE4D9]">0</span>}
                       </td>
                       
+                      <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-black text-[#2A2723]">
+                        {row.hasData ? (row.days * row.pricePerNight).toLocaleString() : 0}
+                      </td>
+
+                      <td className="px-1 py-2.5 border-l border-[#EAE4D9]/20">
+                         {row.hasData ? <EditableCell value={row.discount} bookingId={row.id} field="discount" onSave={handleCellSave} type="number" className="text-red-500 font-bold" /> : <span className="text-[#EAE4D9]">0</span>}
+                      </td>
+
                       <td className="px-1 py-2.5 border-l border-[#EAE4D9]/20">
                          {row.hasData ? <EditableCell value={row.total} bookingId={row.id} field="totalAmount" onSave={handleCellSave} type="number" className="text-[#2A2723] font-black" /> : <span className="text-[#EAE4D9]">0</span>}
                       </td>
@@ -684,6 +756,8 @@ export default function ReportsPage() {
                   <td colSpan={8} className="px-4 py-4 text-center tracking-widest uppercase text-[9px]">الإجمالي</td>
                   <td className="px-3 py-4 border-l border-[#3a3730]">{totals.days}</td>
                   <td className="px-3 py-4 border-l border-[#3a3730]"></td>
+                  <td className="px-3 py-4 border-l border-[#3a3730] text-gray-400">{(totals.total + totals.discount).toLocaleString()}</td>
+                  <td className="px-3 py-4 border-l border-[#3a3730] text-red-300">{totals.discount.toLocaleString()}</td>
                   <td className="px-3 py-4 border-l border-[#3a3730] text-[#C1A68D]">{totals.total.toLocaleString()}</td>
                   <td className="px-3 py-4 border-l border-[#3a3730] text-orange-300">{totals.commission.toLocaleString()}</td>
                   <td className="px-3 py-4 border-l border-[#3a3730]"></td>
