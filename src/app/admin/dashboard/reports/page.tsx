@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { getBookings, getSystemUnits, updateBookingStatus } from '@/lib/data-init';
+import { getBookings, getSystemUnits, updateBookingStatus, saveBooking } from '@/lib/data-init';
 
 // Units will be fetched dynamically from the database
 
@@ -137,6 +137,41 @@ export default function ReportsPage() {
     } catch (err) {
       console.error('Save failed:', err);
       setSaveStatus('❌ فشل الحفظ');
+      setTimeout(() => setSaveStatus(''), 3000);
+    }
+  };
+
+  const addNewManualRecord = async () => {
+    try {
+      if (!selectedUnit) {
+        alert('الرجاء اختيار وحدة أولاً');
+        return;
+      }
+      setSaveStatus('جاري إضافة سجل جديد...');
+      
+      const firstDayOfMonth = new Date(selectedYear, selectedMonth, 1).toISOString().split('T')[0];
+      const newBooking = {
+        name: 'عميل جديد (تعديل يدوي)',
+        phone: '---',
+        checkIn: firstDayOfMonth,
+        checkOut: firstDayOfMonth,
+        apartmentId: selectedUnit,
+        studio: units.find((u: any) => u.id === selectedUnit)?.title?.ar || selectedUnit,
+        status: 'approved',
+        paymentInfo: 'حجز يدوي من التقارير',
+        totalAmount: 0,
+        numberOfDays: 0,
+        notes: ''
+      };
+      
+      await saveBooking(newBooking);
+      await loadData();
+      
+      setSaveStatus('✅ تمت إضافة السجل للجدول');
+      setTimeout(() => setSaveStatus(''), 3000);
+    } catch (err) {
+      console.error(err);
+      setSaveStatus('❌ فشل إضافة السجل');
       setTimeout(() => setSaveStatus(''), 3000);
     }
   };
@@ -326,6 +361,13 @@ export default function ReportsPage() {
 
           <div className="flex-1" />
 
+          <button
+            onClick={addNewManualRecord}
+            className="flex items-center gap-2 bg-[#C1A68D] text-white px-5 py-2.5 rounded-xl text-[10px] font-black hover:bg-[#D5C5B3] transition-all shadow-lg shadow-[#C1A68D]/20 animate-pulse hover:animate-none"
+          >
+            <span>➕</span> إضافة سجل يدوي جديد
+          </button>
+          
           <button
             onClick={exportCSV}
             className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-black hover:bg-green-700 transition-all shadow-lg shadow-green-600/20"
