@@ -165,6 +165,17 @@ async function createWindow() {
   mainWindow.loadURL(urlToLoad + '/admin/dashboard');
   log(`Loading URL: ${urlToLoad}/admin/dashboard`);
 
+  // HANDY: Add Refresh Shortcut (F5 or Ctrl+R) to the desktop app
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    if (input.type === 'keyDown') {
+      if (input.key === 'F5' || (input.control && input.key.toLowerCase() === 'r')) {
+        log('Manual Refresh triggered via keyboard shortcut');
+        mainWindow.reload();
+        event.preventDefault();
+      }
+    }
+  });
+
   mainWindow.once('ready-to-show', () => {
     log('Main window ready to show');
     if (splashWindow && !splashWindow.isDestroyed()) {
