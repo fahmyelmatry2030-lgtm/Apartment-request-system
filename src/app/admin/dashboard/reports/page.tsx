@@ -135,11 +135,22 @@ export default function ReportsPage() {
 
       const updates: any = { [field]: value };
       
-      // Automatic Recalculations for dates/prices
-      if (field === 'checkIn' || field === 'checkOut' || field === 'pricePerNight') {
+      // Auto-calculate dependencies
+      if (['checkIn', 'checkOut', 'pricePerNight'].includes(field)) {
         const cIn = field === 'checkIn' ? value : currentBooking.checkIn;
         const cOut = field === 'checkOut' ? value : currentBooking.checkOut;
-        const pNight = field === 'pricePerNight' ? Number(value) : (currentBooking.pricePerNight || unitPrice);
+        
+        let pNight = field === 'pricePerNight' ? (parseInt(value, 10) || 0) : null;
+        if (pNight === null) {
+          // Derive existing pNight precisely
+          const dMatch = currentBooking.notes?.match(/خصم بقيمة (\d+)/);
+          const existDiscount = dMatch ? parseInt(dMatch[1], 10) : 0;
+          if (currentBooking.numberOfDays > 0) {
+            pNight = (currentBooking.totalAmount + existDiscount) / currentBooking.numberOfDays;
+          } else {
+            pNight = 0;
+          }
+        }
 
         if (cIn && cOut) {
           const dIn = new Date(cIn);
@@ -147,7 +158,11 @@ export default function ReportsPage() {
           const diff = Math.ceil((dOut.getTime() - dIn.getTime()) / (1000 * 60 * 60 * 24));
           const nights = diff > 0 ? diff : 0;
           updates.numberOfDays = nights;
-          updates.totalAmount = nights * pNight;
+          
+          const dMatch = currentBooking.notes?.match(/خصم بقيمة (\d+)/);
+          const existDiscount = dMatch ? parseInt(dMatch[1], 10) : 0;
+          
+          updates.totalAmount = (nights * pNight) - existDiscount;
           updates.pricePerNight = pNight;
         }
       }
@@ -248,8 +263,7 @@ export default function ReportsPage() {
   const totals = filteredBookings.reduce(
     (acc: any, b: any) => {
       const days = b.numberOfDays || 0;
-      const pricePerNight = unitPrice || 0;
-      const total = b.totalAmount || (days * pricePerNight);
+      const total = b.totalAmount || 0;
       const commission = b.commission || 0;
       const netValue = total - commission;
       return {
@@ -265,7 +279,18 @@ export default function ReportsPage() {
   // Build row data
   const dataRows = filteredBookings.map((booking: any, i: number) => {
     const days = booking.numberOfDays || 0;
-    const pricePerNight = unitPrice || 0;
+    
+    let discount = 0;
+    const discountMatch = booking.notes?.match(/خصم بقيمة (\d+)/);
+    if (discountMatch) {
+      discount = parseInt(discountMatch[1], 10);
+    }
+
+    let pricePerNight = unitPrice;
+    if (days > 0 && booking.totalAmount !== undefined && booking.totalAmount !== null) {
+      pricePerNight = (booking.totalAmount + discount) / days;
+    }
+
     const total = booking.totalAmount || (days * pricePerNight);
     const commission = booking.commission || 0;
     const netValue = total - commission;
