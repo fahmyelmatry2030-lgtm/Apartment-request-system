@@ -83,7 +83,32 @@ export default function ReportsPage() {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [isLoading, setIsLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState('');
+  const [showAddModal, setShowAddModal] = useState(false);
+  
+  const monthStr = String(selectedMonth + 1).padStart(2, '0');
+  const safeDateStr = `${selectedYear}-${monthStr}-01`;
+  
+  const [newRecord, setNewRecord] = useState({
+    name: 'عميل جديد (تعديل يدوي)',
+    nationality: '',
+    idNumber: '',
+    phone: '---',
+    checkIn: safeDateStr,
+    checkOut: safeDateStr,
+    pricePerNight: 0,
+    commission: 0,
+    brokerName: '',
+    notes: ''
+  });
+
   const printRef = useRef<HTMLDivElement>(null);
+
+  // Update checkIn/Out safely if month/year changes
+  useEffect(() => {
+    const sStr = String(selectedMonth + 1).padStart(2, '0');
+    const safeStr = `${selectedYear}-${sStr}-01`;
+    setNewRecord(prev => ({ ...prev, checkIn: safeStr, checkOut: safeStr }));
+  }, [selectedMonth, selectedYear]);
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
@@ -141,34 +166,56 @@ export default function ReportsPage() {
     }
   };
 
-  const addNewManualRecord = async () => {
+  const handleSaveNewRecord = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
-      if (!selectedUnit) {
-        alert('الرجاء اختيار وحدة أولاً');
-        return;
-      }
-      setSaveStatus('جاري إضافة سجل جديد...');
+      if (!selectedUnit) return alert('الرجاء اختيار وحدة أولاً');
+      setSaveStatus('جاري الحفظ...');
       
-      const monthStr = String(selectedMonth + 1).padStart(2, '0');
-      const safeDateStr = `${selectedYear}-${monthStr}-01`;
+      const inDate = new Date(newRecord.checkIn || new Date());
+      const outDate = new Date(newRecord.checkOut || new Date());
+      const diff = Math.ceil((outDate.getTime() - inDate.getTime()) / (1000 * 60 * 60 * 24));
+      const nights = diff > 0 ? diff : 0;
+      const totalAmount = nights * newRecord.pricePerNight;
       
       const newBooking = {
-        name: 'عميل جديد (تعديل يدوي)',
-        phone: '---',
-        checkIn: safeDateStr,
-        checkOut: safeDateStr,
+        name: newRecord.name,
+        nationality: newRecord.nationality,
+        idNumber: newRecord.idNumber,
+        phone: newRecord.phone,
+        checkIn: newRecord.checkIn,
+        checkOut: newRecord.checkOut,
         apartmentId: selectedUnit,
         studio: units.find((u: any) => u.id === selectedUnit)?.title?.ar || selectedUnit,
         status: 'approved',
         paymentInfo: 'حجز يدوي من التقارير',
-        totalAmount: 0,
-        numberOfDays: 0,
-        notes: ''
+        totalAmount,
+        numberOfDays: nights,
+        pricePerNight: newRecord.pricePerNight,
+        commission: newRecord.commission,
+        brokerName: newRecord.brokerName,
+        notes: newRecord.notes
       };
       
       await saveBooking(newBooking);
+      setShowAddModal(false);
       await loadData();
       
+      // Reset form
+      const resetStr = String(selectedMonth + 1).padStart(2, '0');
+      const sDateStr = `${selectedYear}-${resetStr}-01`;
+      setNewRecord({
+        name: 'عميل جديد (تعديل يدوي)',
+        nationality: '',
+        idNumber: '',
+        phone: '---',
+        checkIn: sDateStr,
+        checkOut: sDateStr,
+        pricePerNight: 0,
+        commission: 0,
+        brokerName: '',
+        notes: ''
+      });
       setSaveStatus('✅ تمت إضافة السجل للجدول');
       setTimeout(() => setSaveStatus(''), 3000);
     } catch (err) {
@@ -364,7 +411,7 @@ export default function ReportsPage() {
           <div className="flex-1" />
 
           <button
-            onClick={addNewManualRecord}
+            onClick={() => setShowAddModal(true)}
             className="flex items-center gap-2 bg-[#C1A68D] text-white px-5 py-2.5 rounded-xl text-[10px] font-black hover:bg-[#D5C5B3] transition-all shadow-lg shadow-[#C1A68D]/20 animate-pulse hover:animate-none"
           >
             <span>➕</span> إضافة سجل يدوي جديد
@@ -594,6 +641,66 @@ export default function ReportsPage() {
             </ul>
           </div>
         </div>
+        {/* ADD MANUAL RECORD MODAL */}
+        {showAddModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1816]/60 backdrop-blur-sm animate-fade-in no-print" dir="rtl">
+            <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-scale-in flex flex-col max-h-[90vh]">
+              <div className="p-6 border-b border-[#EAE4D9]/50 flex justify-between items-center shrink-0">
+                <h2 className="text-xl font-black text-[#2A2723]">إضافة حجز يدوي مباشر للتقرير</h2>
+                <button type="button" onClick={() => setShowAddModal(false)} className="text-2xl opacity-30 hover:opacity-100 transition-opacity">×</button>
+              </div>
+              <div className="p-6 overflow-y-auto">
+                <form id="add-record-form" onSubmit={handleSaveNewRecord} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">الاسم</label>
+                      <input type="text" required value={newRecord.name} onChange={e => setNewRecord({...newRecord, name: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-xs font-bold outline-none focus:border-[#C1A68D]" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">رقم الهاتف</label>
+                      <input type="text" value={newRecord.phone} onChange={e => setNewRecord({...newRecord, phone: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-xs font-bold outline-none focus:border-[#C1A68D]" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">الجنسية</label>
+                      <input type="text" value={newRecord.nationality} onChange={e => setNewRecord({...newRecord, nationality: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-xs font-bold outline-none focus:border-[#C1A68D]" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">رقم الهوية</label>
+                      <input type="text" value={newRecord.idNumber} onChange={e => setNewRecord({...newRecord, idNumber: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-xs font-bold outline-none focus:border-[#C1A68D]" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">تاريخ الدخول</label>
+                      <input type="date" required value={newRecord.checkIn} onChange={e => setNewRecord({...newRecord, checkIn: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-xs font-bold outline-none focus:border-[#C1A68D]" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">تاريخ الخروج</label>
+                      <input type="date" required value={newRecord.checkOut} onChange={e => setNewRecord({...newRecord, checkOut: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-xs font-bold outline-none focus:border-[#C1A68D]" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">سعر الليلة</label>
+                      <input type="number" value={newRecord.pricePerNight} onChange={e => setNewRecord({...newRecord, pricePerNight: Number(e.target.value)})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-xs font-black outline-none focus:border-[#C1A68D]" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">العمولة</label>
+                      <input type="number" value={newRecord.commission} onChange={e => setNewRecord({...newRecord, commission: Number(e.target.value)})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-xs font-black text-orange-500 outline-none focus:border-[#C1A68D]" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">اسم الوسيط</label>
+                      <input type="text" value={newRecord.brokerName} onChange={e => setNewRecord({...newRecord, brokerName: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-xs font-bold outline-none focus:border-[#C1A68D]" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">ملاحظات</label>
+                      <input type="text" value={newRecord.notes} onChange={e => setNewRecord({...newRecord, notes: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-xs font-bold outline-none focus:border-[#C1A68D]" />
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div className="p-6 border-t border-[#EAE4D9]/50 shrink-0">
+                 <button type="submit" form="add-record-form" className="w-full bg-[#2A2723] text-white font-black py-4 rounded-2xl hover:bg-black transition-all text-sm">إضافة وحفظ في التقرير</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
