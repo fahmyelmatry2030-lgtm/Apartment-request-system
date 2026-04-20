@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { getBookings, getSystemUnits, updateBookingStatus, saveBooking, deleteBooking } from '@/lib/data-init';
 
 // Units will be fetched dynamically from the database
-const LAYOUT_VERSION = 'v1.4.0'; // Auto-increment this to force-clear client caches
+const LAYOUT_VERSION = 'v1.5.0'; // Auto-increment this to force-clear client caches
 
 const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 
@@ -811,6 +811,7 @@ export default function ReportsPage() {
                       <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-black text-green-600">{row.hasData ? row.netValue : 0}</td>
 
                       {/* EDITABLE: Notes */}
+                      <td className="px-1 py-2.5">
                         {row.hasData ? (
                           <EditableCell value={row.notes} bookingId={row.id} field="notes" onSave={handleCellSave} className="text-[#7A7061] font-bold text-[9px]" />
                         ) : <span className="text-[#EAE4D9]">—</span>}

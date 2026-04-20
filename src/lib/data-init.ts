@@ -210,6 +210,26 @@ export const updateBookingStatus = async (id: string, updates: any) => {
   }
 };
 
+export const deleteBooking = async (id: string) => {
+  try {
+    const result = await deleteDbBooking(id);
+    
+    // Cleanup local storage if needed
+    if (typeof window !== 'undefined') {
+      const local = JSON.parse(localStorage.getItem('local_bookings') || '[]');
+      const filtered = local.filter((b: any) => b.id !== id);
+      if (local.length !== filtered.length) {
+        localStorage.setItem('local_bookings', JSON.stringify(filtered));
+      }
+    }
+    
+    return result;
+  } catch (e) {
+    console.error('Error in deleteBooking:', e);
+    throw e;
+  }
+};
+
 export const getStudios = async () => {
   const units = await getPublicSystemUnits();
   return units.filter((u: any) => u.type === 'studio');
