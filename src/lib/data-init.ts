@@ -92,7 +92,7 @@ export const updateUnitDetails = async (id: string, updates: any) => {
 
 export const getBookings = async (nonce?: string) => {
   try {
-    const dbBookings = await getDbBookings(nonce);
+    const dbBookings = await getFreshDbBookings(nonce);
     const localBookings = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('local_bookings') || '[]') : [];
     
     // Combine: Database data must come LAST to overwrite stale local storage data in the Map

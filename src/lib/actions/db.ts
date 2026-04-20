@@ -52,7 +52,7 @@ https://wa.me/${cleanPhone}
 
 // --- BOOKINGS ---
 
-export async function getDbBookings(nonce?: string) {
+export async function getFreshDbBookings(nonce?: string) {
   if (nonce) console.log(`[SYNC] Fetching fresh bookings with nonce: ${nonce}`);
   const supabase = getSupabaseServerClient();
   if (!supabase) return [];
@@ -188,7 +188,7 @@ export async function updateDbBookingStatus(id: string, updates: any) {
   revalidatePath('/admin/dashboard/reports');
   
   // Return the fresh data directly
-  return await getDbBookings(Date.now().toString());
+  return await getFreshDbBookings(Date.now().toString());
 }
 
 // --- UNITS ---

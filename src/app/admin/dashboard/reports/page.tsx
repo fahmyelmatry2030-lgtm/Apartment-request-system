@@ -644,9 +644,25 @@ export default function ReportsPage() {
 
         {/* THE TABLE */}
         <div ref={printRef} className="print-area bg-white rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
-          <div className="print-header">
-            <h2>مزار — تقرير حجوزات {selectedUnitInfo?.title?.ar || selectedUnit}</h2>
-            <p>{MONTHS_AR[selectedMonth]} {selectedYear}</p>
+          <div className="print-header p-10 flex justify-between items-start">
+            <div className="space-y-2">
+              <h2 className="text-3xl font-black text-[#2A2723]">مزار — تقرير حجوزات {selectedUnitInfo?.title?.ar || selectedUnit}</h2>
+              <p className="text-[#7A7061] text-lg font-bold">{MONTHS_AR[selectedMonth]} {selectedYear}</p>
+            </div>
+            <div className="no-print flex flex-col items-end gap-3">
+              <span className="text-[10px] font-black text-[#C1A68D] bg-[#FDFBF7] border border-[#EAE4D9]/50 px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">v1.2.8 SYNC-FIX</span>
+              <button 
+                onClick={() => {
+                  if(confirm("⚠️ سيتم مسح الذاكرة المؤقتة (LocalStorage) بالكامل وإعادة التحميل من الداتابيز. هل أنت متأكد؟")) {
+                    localStorage.clear();
+                    window.location.reload();
+                  }
+                }}
+                className="bg-red-50 text-red-600 hover:bg-red-100 px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2 border border-red-100 shadow-sm"
+              >
+                🔄 مسح الكاش والبدء من جديد
+              </button>
+            </div>
           </div>
 
           <div className="overflow-x-auto">
