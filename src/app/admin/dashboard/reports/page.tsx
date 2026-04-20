@@ -305,9 +305,12 @@ export default function ReportsPage() {
     // Match unit
     if (b.apartmentId !== selectedUnit) return false;
 
-    // Match month/year based on check-in date
-    const checkIn = new Date(b.checkIn);
-    return checkIn.getMonth() === selectedMonth && checkIn.getFullYear() === selectedYear;
+    // Match month/year based on check-in date string (Timezone Safe)
+    const parts = b.checkIn?.split('-');
+    if (!parts || parts.length < 2) return false;
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1; // 0-indexed
+    return month === selectedMonth && year === selectedYear;
   });
 
   // Get unit price
@@ -317,21 +320,21 @@ export default function ReportsPage() {
   // Calculate totals
   const totals = filteredBookings.reduce(
     (acc: any, b: any) => {
-      const days = b.numberOfDays || 0;
-      const total = b.totalAmount || 0;
-      const commission = b.commission || 0;
+      const days = Number(b.numberOfDays || 0);
+      const total = Number(b.totalAmount || 0);
+      const commission = Number(b.commission || 0);
       const netValue = total - commission;
       
       let discount = 0;
       const dMatch = b.notes?.match(/خصم بقيمة (\d+)/);
-      if (dMatch) discount = parseInt(dMatch[1], 10);
+      if (dMatch) discount = Number(dMatch[1] || 0);
 
       return {
-        days: acc.days + days,
-        total: acc.total + total,
-        commission: acc.commission + commission,
-        discount: acc.discount + discount,
-        netValue: acc.netValue + netValue,
+        days: Number(acc.days) + days,
+        total: Number(acc.total) + total,
+        commission: Number(acc.commission) + commission,
+        discount: Number(acc.discount) + discount,
+        netValue: Number(acc.netValue) + netValue,
       };
     },
     { days: 0, total: 0, commission: 0, discount: 0, netValue: 0 }

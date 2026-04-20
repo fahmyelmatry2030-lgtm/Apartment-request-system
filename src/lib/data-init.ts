@@ -97,11 +97,13 @@ export const getBookings = async () => {
     
     // Combine: Database data must come LAST to overwrite stale local storage data in the Map
     const combined = [...localBookings, ...dbBookings];
-    const unique = Array.from(new Map(combined.map(item => [item.id, item])).values());
+    const unique = Array.from(new Map(combined.filter(b => b && b.id).map(item => [item.id, item])).values());
     
-    return unique.sort((a: any, b: any) => 
-        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-    );
+    return unique.sort((a: any, b: any) => {
+        const timeA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+        const timeB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+        return timeB - timeA;
+    });
   } catch (e) {
     console.error('DB Bookings fetch failed, falling back to local storage:', e);
     return typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('local_bookings') || '[]') : [];
@@ -110,7 +112,18 @@ export const getBookings = async () => {
 
 export const saveBooking = async (booking: any) => {
   try {
-    return await saveDbBooking(booking);
+    const result = await saveDbBooking(booking);
+    
+    // Cleanup: If DB save succeeded, remove any local backup to avoid shadowing
+    if (typeof window !== 'undefined' && result?.id) {
+       const local = JSON.parse(localStorage.getItem('local_bookings') || '[]');
+       const filtered = local.filter((b: any) => b.id !== result.id);
+       if (local.length !== filtered.length) {
+         localStorage.setItem('local_bookings', JSON.stringify(filtered));
+       }
+    }
+    
+    return result;
   } catch (e) {
     console.warn('Database save failed, falling back to LocalStorage:', e);
     

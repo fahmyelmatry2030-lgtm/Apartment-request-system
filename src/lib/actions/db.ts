@@ -1,6 +1,7 @@
 'use server';
 
 import { getSupabaseServerClient } from '@/lib/supabase/server';
+import { revalidatePath } from 'next/cache';
 
 
 // --- TELEGRAM CONFIG ---
@@ -75,11 +76,11 @@ export async function getDbBookings() {
     studio: b.studio,
     status: b.status,
     paymentInfo: b.payment_info,
-    totalAmount: b.total_amount,
-    numberOfDays: b.number_of_days,
+    totalAmount: Number(b.total_amount || 0),
+    numberOfDays: Number(b.number_of_days || 0),
     nationality: b.nationality,
     idNumber: b.id_number,
-    commission: b.commission,
+    commission: Number(b.commission || 0),
     brokerName: b.broker_name,
     notes: b.notes,
     timestamp: b.timestamp,
@@ -129,6 +130,7 @@ export async function saveDbBooking(booking: any) {
       console.error('Telegram notification error:', err);
     }
 
+    revalidatePath('/admin/dashboard/reports');
     return newBooking;
   } catch (error) {
     console.error('Error saving booking:', error);
@@ -166,6 +168,7 @@ export async function updateDbBookingStatus(id: string, updates: any) {
     throw error;
   }
 
+  revalidatePath('/admin/dashboard/reports');
   return await getDbBookings();
 }
 
