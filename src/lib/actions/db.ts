@@ -59,6 +59,7 @@ export async function getDbBookings() {
   const { data, error } = await supabase
     .from('bookings')
     .select('*')
+    .not('id', 'is', null) // Bypasses exact-match caches
     .order('timestamp', { ascending: false });
 
   if (error) {
@@ -162,12 +163,25 @@ export async function updateDbBookingStatus(id: string, updates: any) {
   if (updates.brokerName !== undefined) patch.broker_name = updates.brokerName;
   if (updates.notes !== undefined) patch.notes = updates.notes;
 
-  const { error } = await supabase.from('bookings').update(patch).eq('id', id);
+  const { data, error } = await supabase.from('bookings')
+    .update(patch)
+    .eq('id', id)
+    .select();
+
   if (error) {
     console.error('Error updating booking:', error);
     throw error;
   }
 
+  // If no rows were affected, the ID is probably wrong or doesn't exist in DB
+  // Note: .update().eq() returns success even if 0 rows match. We must check.
+  const affected = data ? data.length : 0;
+  if (affected === 0) {
+    console.error(`⚠️ Update FAILED: No record found with ID ${id}`);
+    throw new Error(`لم يتم العثور على سجل بالرقم التعريف: ${id}`);
+  }
+
+  console.log(`✅ Successfully updated ${affected} row(s) for ID: ${id}`);
   revalidatePath('/admin/dashboard/reports');
   return await getDbBookings();
 }
