@@ -14,6 +14,8 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
   const [showNotifs, setShowNotifs] = useState(false);
   const [showSent, setShowSent] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isInstallable, setIsInstallable] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -140,6 +142,28 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
     }
   }, [pathname, router, loadData]);
 
+  useEffect(() => {
+    const handleBeforeInstall = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setIsInstallable(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstall);
+
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setIsInstallable(false);
+    }
+    setDeferredPrompt(null);
+  };
+
   if (!isAuthorized && pathname !== '/admin/login') return null;
   if (pathname === '/admin/login') return <>{children}</>;
 
@@ -202,13 +226,33 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
           })}
         </nav>
 
-        <div className="p-8 border-t border-[#EAE4D9]/50">
+        <div className="p-4 md:p-8 border-t border-[#EAE4D9]/50 space-y-4">
+           {/* Quick Action: WhatsApp Owner */}
+          <a 
+            href="https://wa.me/201554788708" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center gap-4 px-6 py-3 rounded-2xl bg-green-500/10 text-green-600 hover:bg-green-500 hover:text-white transition-all font-black text-xs"
+          >
+            <span>💬</span> تواصل مع المالك
+          </a>
+
+          {/* PWA Install Button */}
+          {isInstallable && (
+            <button 
+              onClick={handleInstallClick}
+              className="flex items-center gap-4 px-6 py-3 rounded-2xl bg-[#C1A68D]/10 text-[#C1A68D] hover:bg-[#C1A68D] hover:text-white transition-all font-black text-xs w-full"
+            >
+              <span>📲</span> تثبيت التطبيق على الهاتف
+            </button>
+          )}
+
           <button 
             onClick={() => {
               sessionStorage.removeItem('isAdmin');
               router.push('/admin/login');
             }}
-            className="flex items-center gap-4 text-[#7A7061] hover:text-[#E63946] transition-colors font-black text-sm w-full outline-none"
+            className="flex items-center gap-4 text-[#7A7061] hover:text-[#E63946] transition-colors font-black text-sm w-full outline-none px-6"
           >
             <span>🚪</span> تسجيل الخروج
           </button>

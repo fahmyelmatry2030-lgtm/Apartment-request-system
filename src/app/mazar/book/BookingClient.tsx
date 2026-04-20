@@ -40,7 +40,7 @@ export default function BookingPage() {
   const [bookedDates, setBookedDates] = useState<string[]>([]);
   const [rulesAccepted, setRulesAccepted] = useState(false);
 
-  const ADMIN_WHATSAPP = '201026107134';
+  const ADMIN_WHATSAPP = '201554788708';
 
   useEffect(() => {
     const init = async () => {

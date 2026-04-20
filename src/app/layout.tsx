@@ -63,6 +63,12 @@ export const metadata: Metadata = {
     ],
   },
   category: 'travel',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Mazar',
+  },
 };
 
 export default async function RootLayout({
@@ -100,7 +106,7 @@ export default async function RootLayout({
       addressRegion: 'Cairo',
       addressCountry: 'EG',
     },
-    telephone: '+201026107134', // From the booking buttons
+    telephone: '+201554788708', // Personal client number
     starRating: {
       '@type': 'Rating',
       ratingValue: '5',
@@ -118,6 +124,21 @@ export default async function RootLayout({
         <LanguageProvider initialTranslations={initialTranslations}>
           {children}
         </LanguageProvider>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js').then(function(reg) {
+                    console.log('ServiceWorker registration successful');
+                  }, function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                  });
+                });
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   );
