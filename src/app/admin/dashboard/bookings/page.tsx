@@ -519,8 +519,8 @@ export default function BookingsManagement() {
                 )}
                 
                 <div className="flex flex-wrap gap-2">
-                   <button onClick={() => setPaymentInfo(prev => `${prev}\n\nعبر إنستا باي (Instapay) برقم: 01026107134.`)} className="text-[9px] bg-[#2A2723] text-white px-5 py-2.5 rounded-full border border-transparent hover:bg-black transition-all font-black shadow-lg shadow-black/10">إنستا باي +</button>
-                   <button onClick={() => setPaymentInfo(prev => `${prev}\n\nفودافون كاش على رقم: 01026107134.`)} className="text-[9px] bg-red-600 text-white px-5 py-2.5 rounded-full border border-transparent hover:bg-red-700 transition-all font-black shadow-lg shadow-red-600/10">فودافون كاش +</button>
+                   <button onClick={() => setPaymentInfo(prev => `${prev}\n\nعبر إنستا باي (Instapay) برقم: 01554788708.`)} className="text-[9px] bg-[#2A2723] text-white px-5 py-2.5 rounded-full border border-transparent hover:bg-black transition-all font-black shadow-lg shadow-black/10">إنستا باي +</button>
+                   <button onClick={() => setPaymentInfo(prev => `${prev}\n\nفودافون كاش على رقم: 01554788708.`)} className="text-[9px] bg-red-600 text-white px-5 py-2.5 rounded-full border border-transparent hover:bg-red-700 transition-all font-black shadow-lg shadow-red-600/10">فودافون كاش +</button>
                 </div>
                 <textarea 
                   placeholder="اكتب تفاصيل الدفع أو أي ملاحظات للعميل هنا..."
