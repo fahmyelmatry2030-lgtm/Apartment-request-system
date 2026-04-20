@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { getBookings, getSystemUnits, updateBookingStatus, saveBooking, deleteBooking } from '@/lib/data-init';
 
 // Units will be fetched dynamically from the database
-const LAYOUT_VERSION = 'v1.5.0'; // Auto-increment this to force-clear client caches
+const LAYOUT_VERSION = 'v1.6.0'; // Auto-increment this to force-clear client caches
 
 const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 
@@ -156,14 +156,9 @@ export default function ReportsPage() {
         
         let pNight = field === 'pricePerNight' ? (parseInt(value, 10) || 0) : null;
         
-        // Extract current discount safely
-        const dMatch = currentBooking.notes?.match(/خصم بقيمة (\d+)/);
-        const existDiscount = dMatch ? parseInt(dMatch[1], 10) : 0;
-
         if (pNight === null) {
-          // Derive existing pNight precisely from totalAmount
           if (currentBooking.numberOfDays > 0) {
-            pNight = (currentBooking.totalAmount + existDiscount) / currentBooking.numberOfDays;
+            pNight = currentBooking.totalAmount / currentBooking.numberOfDays;
           } else {
             pNight = 0;
           }
@@ -174,7 +169,7 @@ export default function ReportsPage() {
           const dOut = new Date(cOut);
           const diff = Math.ceil((dOut.getTime() - dIn.getTime()) / (1000 * 60 * 60 * 24));
           const nights = diff > 0 ? diff : 0;
-          updates.totalAmount = (nights * pNight) - existDiscount;
+          updates.totalAmount = nights * pNight;
           updates.pricePerNight = pNight;
           
           // Overlap check on edit
@@ -195,26 +190,7 @@ export default function ReportsPage() {
         }
       }
 
-      if (field === 'discount') {
-        const discVal = parseInt(value, 10) || 0;
-        const dMatch = currentBooking.notes?.match(/خصم بقيمة (\d+)/);
-        const oldNotes = dMatch ? currentBooking.notes.replace(/خصم بقيمة \d+/, '').trim() : currentBooking.notes;
-        
-        updates.notes = discVal > 0 ? `خصم بقيمة ${discVal} ${oldNotes}` : oldNotes;
-        
-        // Recalculate totalAmount based on current nights and price
-        const dIn = new Date(currentBooking.checkIn);
-        const dOut = new Date(currentBooking.checkOut);
-        const diff = Math.ceil((dOut.getTime() - dIn.getTime()) / (1000 * 60 * 60 * 24));
-        const nights = diff > 0 ? diff : 0;
-        
-        // Get price per night
-        const existDiscount = dMatch ? parseInt(dMatch[1], 10) : 0;
-        const pNight = nights > 0 ? (currentBooking.totalAmount + existDiscount) / nights : 0;
-        
-        updates.totalAmount = (nights * pNight) - discVal;
-        delete updates.discount; // Field doesn't exist in DB
-      }
+      // Removed manual discount logic
 
       const freshData = await updateBookingStatus(bookingId, updates);
       
@@ -266,8 +242,7 @@ export default function ReportsPage() {
       const outDate = new Date(newRecord.checkOut || new Date());
       const diff = Math.ceil((outDate.getTime() - inDate.getTime()) / (1000 * 60 * 60 * 24));
       const nights = diff > 0 ? diff : 0;
-      const discountVal = newRecord.discount || 0;
-      const totalAmount = (nights * newRecord.pricePerNight) - discountVal;
+      const totalAmount = nights * newRecord.pricePerNight;
 
       // Overlap check for new record
       if (nights > 0) {
@@ -306,7 +281,8 @@ export default function ReportsPage() {
         pricePerNight: newRecord.pricePerNight,
         commission: newRecord.commission,
         brokerName: newRecord.brokerName,
-        notes: discountVal > 0 ? `خصم بقيمة ${discountVal}` : newRecord.notes
+        clientStatus: (newRecord as any).clientStatus || 'انتظار',
+        notes: newRecord.notes
       };
       
       await saveBooking(newBooking);
@@ -374,34 +350,24 @@ export default function ReportsPage() {
       const commission = safeNum(b.commission);
       const netValue = total - commission;
       
-      let discount = 0;
-      const dMatch = b.notes?.match(/خصم بقيمة (\d+)/);
-      if (dMatch) discount = safeNum(dMatch[1]);
-
       return {
         days: safeNum(acc.days) + days,
         total: safeNum(acc.total) + total,
         commission: safeNum(acc.commission) + commission,
-        discount: safeNum(acc.discount) + discount,
         netValue: safeNum(acc.netValue) + netValue,
       };
     },
-    { days: 0, total: 0, commission: 0, discount: 0, netValue: 0 }
+    { days: 0, total: 0, commission: 0, netValue: 0 }
   );
 
   // Build row data
   const dataRows = filteredBookings.map((booking: any, i: number) => {
     const days = booking.numberOfDays || 0;
     
-    let discount = 0;
-    const discountMatch = booking.notes?.match(/خصم بقيمة (\d+)/);
-    if (discountMatch) {
-      discount = parseInt(discountMatch[1], 10);
-    }
-
+    
     let pricePerNight = unitPrice;
     if (days > 0 && booking.totalAmount !== undefined && booking.totalAmount !== null) {
-      pricePerNight = (booking.totalAmount + discount) / days;
+      pricePerNight = booking.totalAmount / days;
     }
 
     const total = booking.totalAmount || (days * pricePerNight);
@@ -424,6 +390,7 @@ export default function ReportsPage() {
       commission,
       brokerName: booking.brokerName || '',
       netValue,
+      clientStatus: booking.clientStatus || 'انتظار',
       notes: booking.notes?.replace(/خصم بقيمة \d+/, '').trim() || '',
       hasData: true,
     };
@@ -435,7 +402,7 @@ export default function ReportsPage() {
     no: dataRows.length + i + 1,
     id: '', date: '', name: '', nationality: '', idNumber: '', phone: '',
     checkIn: '', checkOut: '', days: 0, pricePerNight: 0, total: 0,
-    discount: 0, commission: 0, brokerName: '', netValue: 0, notes: '', hasData: false,
+    commission: 0, brokerName: '', netValue: 0, clientStatus: '', notes: '', hasData: false,
   }));
 
   const allRows = [...dataRows, ...emptyRows];
@@ -443,15 +410,15 @@ export default function ReportsPage() {
   // Export CSV
   const exportCSV = () => {
     const unitLabel = units.find(u => u.id === selectedUnit)?.title?.ar || selectedUnit;
-    const header = ['No', 'Date', 'Name', 'Nationality', 'ID Number', 'Phone Number', 'Check In', 'Check Out', 'No. of Days', 'Price Per Night', 'Total', 'Commission', 'Broker Name', 'Net Value', 'Notes'];
+    const header = ['No', 'Date', 'Name', 'Nationality', 'ID Number', 'Phone Number', 'Check In', 'Check Out', 'No. of Days', 'Price Per Night', 'Total', 'Client Status', 'Commission', 'Broker Name', 'Net Value', 'Notes'];
 
     const csvRows = dataRows.map(r => [
       r.no, r.date, r.name, r.nationality, r.idNumber, r.phone,
       r.checkIn, r.checkOut, r.days, r.pricePerNight, r.total,
-      r.commission, r.brokerName, r.netValue, r.notes,
+      r.clientStatus, r.commission, r.brokerName, r.netValue, r.notes,
     ].join(','));
 
-    csvRows.push(['', '', '', '', '', '', '', '', totals.days, '', totals.total, totals.commission, '', totals.netValue, ''].join(','));
+    csvRows.push(['', '', '', '', '', '', '', '', totals.days, '', totals.total, '', totals.commission, '', totals.netValue, ''].join(','));
 
     const csvContent = '\uFEFF' + [header.join(','), ...csvRows].join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -617,8 +584,12 @@ export default function ReportsPage() {
                 <input type="number" value={newRecord.commission} onChange={e => setNewRecord({...newRecord, commission: Number(e.target.value)})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-black text-orange-500 outline-none focus:border-[#C1A68D]" />
               </div>
               <div className="space-y-1">
-                <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">الديسكونت</label>
-                <input type="number" value={newRecord.discount} onChange={e => setNewRecord({...newRecord, discount: Number(e.target.value)})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-black text-red-500 outline-none focus:border-[#C1A68D]" />
+                <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">حالة العميل</label>
+                <select value={(newRecord as any).clientStatus || 'انتظار'} onChange={e => setNewRecord({...newRecord, clientStatus: e.target.value} as any)} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-black text-[#2A2723] outline-none focus:border-[#C1A68D]">
+                  <option value="انتظار">انتظار</option>
+                  <option value="متواجد">متواجد</option>
+                  <option value="غادر">غادر</option>
+                </select>
               </div>
             </div>
             
@@ -721,8 +692,7 @@ export default function ReportsPage() {
                   <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">الأيام</th>
                   <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">سعر الليلة</th>
                   <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">الإجمالي</th>
-                  <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">الخصم</th>
-                  <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">بعد الخصم</th>
+                  <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">الحالة</th>
                   <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">العمولة</th>
                   <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">الوسيط</th>
                   <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">الصافي</th>
@@ -781,17 +751,26 @@ export default function ReportsPage() {
                       <td className="px-1 py-2.5 border-l border-[#EAE4D9]/20">
                         {row.hasData ? <EditableCell value={row.pricePerNight} bookingId={row.id} field="pricePerNight" onSave={handleCellSave} type="number" className="text-[#7A7061] font-bold" /> : <span className="text-[#EAE4D9]">0</span>}
                       </td>
-                      
-                      <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-black text-[#2A2723]">
-                        {row.hasData ? (row.days * row.pricePerNight).toLocaleString() : 0}
-                      </td>
-
-                      <td className="px-1 py-2.5 border-l border-[#EAE4D9]/20">
-                         {row.hasData ? <EditableCell value={row.discount} bookingId={row.id} field="discount" onSave={handleCellSave} type="number" className="text-red-500 font-bold" /> : <span className="text-[#EAE4D9]">0</span>}
-                      </td>
-
                       <td className="px-1 py-2.5 border-l border-[#EAE4D9]/20">
                          {row.hasData ? <EditableCell value={row.total} bookingId={row.id} field="totalAmount" onSave={handleCellSave} type="number" className="text-[#2A2723] font-black" /> : <span className="text-[#EAE4D9]">0</span>}
+                      </td>
+
+                      <td className="px-1 py-2.5 border-l border-[#EAE4D9]/20">
+                        {row.hasData ? (
+                          <select 
+                            value={row.clientStatus || 'انتظار'}
+                            onChange={(e) => handleCellSave(row.id, 'clientStatus', e.target.value)}
+                            className={`bg-transparent outline-none font-black text-[10px] p-1.5 rounded-lg text-center cursor-pointer appearance-none ${
+                              row.clientStatus === 'متواجد' ? 'text-green-600 bg-green-50' : 
+                              row.clientStatus === 'غادر' ? 'text-gray-500 bg-gray-100' : 
+                              'text-orange-600 bg-orange-50'
+                            }`}
+                          >
+                            <option value="انتظار">انتظار</option>
+                            <option value="متواجد">متواجد</option>
+                            <option value="غادر">غادر</option>
+                          </select>
+                        ) : <span className="text-[#EAE4D9]">—</span>}
                       </td>
 
                       {/* EDITABLE: Commission */}
@@ -838,9 +817,8 @@ export default function ReportsPage() {
                   <td colSpan={8} className="px-4 py-4 text-center tracking-widest uppercase text-[9px]">الإجمالي</td>
                   <td className="px-3 py-4 border-l border-[#3a3730]">{totals.days}</td>
                   <td className="px-3 py-4 border-l border-[#3a3730]"></td>
-                  <td className="px-3 py-4 border-l border-[#3a3730] text-gray-400">{(totals.total + totals.discount).toLocaleString()}</td>
-                  <td className="px-3 py-4 border-l border-[#3a3730] text-red-300">{totals.discount.toLocaleString()}</td>
                   <td className="px-3 py-4 border-l border-[#3a3730] text-[#C1A68D]">{totals.total.toLocaleString()}</td>
+                  <td className="px-3 py-4 border-l border-[#3a3730]"></td>
                   <td className="px-3 py-4 border-l border-[#3a3730] text-orange-300">{totals.commission.toLocaleString()}</td>
                   <td className="px-3 py-4 border-l border-[#3a3730]"></td>
                   <td className="px-3 py-4 border-l border-[#3a3730] text-green-400">{totals.netValue.toLocaleString()}</td>
