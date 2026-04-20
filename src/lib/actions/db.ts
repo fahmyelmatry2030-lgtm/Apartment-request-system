@@ -144,6 +144,11 @@ export async function updateDbBookingStatus(id: string, updates: any) {
   }
 
   const patch: any = {};
+  if (updates.name !== undefined) patch.name = updates.name;
+  if (updates.phone !== undefined) patch.phone = updates.phone;
+  if (updates.checkIn !== undefined) patch.check_in = updates.checkIn;
+  if (updates.checkOut !== undefined) patch.check_out = updates.checkOut;
+  if (updates.studio !== undefined) patch.studio = updates.studio;
   if (updates.status !== undefined) patch.status = updates.status;
   if (updates.apartmentId !== undefined) patch.apartment_id = updates.apartmentId;
   if (updates.paymentInfo !== undefined) patch.payment_info = updates.paymentInfo;
