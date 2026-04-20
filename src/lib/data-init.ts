@@ -3,6 +3,7 @@ import {
   getFreshDbBookings, 
   saveDbBooking, 
   updateDbBookingStatus, 
+  deleteDbBooking,
   getDbUnits, 
   updateDbUnitDetails 
 } from './actions/db';

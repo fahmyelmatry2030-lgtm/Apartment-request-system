@@ -194,6 +194,32 @@ export async function updateDbBookingStatus(id: string, updates: any) {
   return await getFreshDbBookings(Date.now().toString());
 }
 
+export async function deleteDbBooking(id: string) {
+  const supabase = getSupabaseServerClient();
+  if (!supabase) {
+    console.warn('⚠️ Database Offline: Simulate deleting booking', id);
+    return await getFreshDbBookings();
+  }
+
+  const { error } = await supabase
+    .from('bookings')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error deleting booking:', error);
+    throw error;
+  }
+
+  console.log(`✅ Successfully deleted booking ID: ${id}`);
+  
+  // Revalidate to clear server-side cache
+  revalidatePath('/admin/dashboard/reports');
+  
+  // Return the fresh data
+  return await getFreshDbBookings(Date.now().toString());
+}
+
 // --- UNITS ---
 
 export async function getDbUnits() {
