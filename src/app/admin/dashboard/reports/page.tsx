@@ -96,6 +96,7 @@ export default function ReportsPage() {
     checkOut: safeDateStr,
     pricePerNight: 0,
     commission: 0,
+    discount: 0,
     brokerName: '',
     notes: ''
   });
@@ -175,7 +176,8 @@ export default function ReportsPage() {
       const outDate = new Date(newRecord.checkOut || new Date());
       const diff = Math.ceil((outDate.getTime() - inDate.getTime()) / (1000 * 60 * 60 * 24));
       const nights = diff > 0 ? diff : 0;
-      const totalAmount = nights * newRecord.pricePerNight;
+      const discountVal = newRecord.discount || 0;
+      const totalAmount = (nights * newRecord.pricePerNight) - discountVal;
       
       const newBooking = {
         name: newRecord.name,
@@ -193,7 +195,7 @@ export default function ReportsPage() {
         pricePerNight: newRecord.pricePerNight,
         commission: newRecord.commission,
         brokerName: newRecord.brokerName,
-        notes: newRecord.notes
+        notes: discountVal > 0 ? `خصم بقيمة ${discountVal}` : newRecord.notes
       };
       
       await saveBooking(newBooking);
@@ -211,6 +213,7 @@ export default function ReportsPage() {
         checkOut: sDateStr,
         pricePerNight: 0,
         commission: 0,
+        discount: 0,
         brokerName: '',
         notes: ''
       });
@@ -424,31 +427,49 @@ export default function ReportsPage() {
 
         {/* ADD MANUAL RECORD INLINE FORM */}
         <div className="no-print bg-white p-6 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm" dir="rtl">
-          <form id="add-record-form" onSubmit={handleSaveNewRecord} className="flex flex-col md:flex-row gap-3 items-end">
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 flex-1">
-              <div className="space-y-1">
+          <form id="add-record-form" onSubmit={handleSaveNewRecord} className="flex flex-col gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 xl:grid-cols-9 gap-3">
+              <div className="space-y-1 col-span-2 xl:col-span-2">
                 <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">الاسم</label>
                 <input type="text" required value={newRecord.name} onChange={e => setNewRecord({...newRecord, name: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-[#C1A68D]" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">الجنسية</label>
+                <input type="text" value={newRecord.nationality} onChange={e => setNewRecord({...newRecord, nationality: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-[#C1A68D]" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">رقم الهوية</label>
+                <input type="text" value={newRecord.idNumber} onChange={e => setNewRecord({...newRecord, idNumber: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-[#C1A68D]" />
               </div>
               <div className="space-y-1">
                 <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">الهاتف</label>
                 <input type="text" value={newRecord.phone} onChange={e => setNewRecord({...newRecord, phone: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-[#C1A68D]" />
               </div>
               <div className="space-y-1">
-                <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">م. الدخول</label>
+                <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">دخول</label>
                 <input type="date" required value={newRecord.checkIn} onChange={e => setNewRecord({...newRecord, checkIn: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-[#C1A68D]" />
               </div>
               <div className="space-y-1">
-                <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">م. الخروج</label>
+                <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">خروج</label>
                 <input type="date" required value={newRecord.checkOut} onChange={e => setNewRecord({...newRecord, checkOut: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-[#C1A68D]" />
               </div>
               <div className="space-y-1">
                 <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">سعر الليلة</label>
-                <input type="number" value={newRecord.pricePerNight} onChange={e => setNewRecord({...newRecord, pricePerNight: Number(e.target.value)})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-black outline-none focus:border-[#C1A68D]" />
+                <input type="number" required value={newRecord.pricePerNight} onChange={e => setNewRecord({...newRecord, pricePerNight: Number(e.target.value)})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-black outline-none focus:border-[#C1A68D]" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">العمولة</label>
+                <input type="number" value={newRecord.commission} onChange={e => setNewRecord({...newRecord, commission: Number(e.target.value)})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-black text-orange-500 outline-none focus:border-[#C1A68D]" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">الديسكونت</label>
+                <input type="number" value={newRecord.discount} onChange={e => setNewRecord({...newRecord, discount: Number(e.target.value)})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-black text-red-500 outline-none focus:border-[#C1A68D]" />
               </div>
             </div>
             
-            <button type="submit" className="h-[36px] px-8 bg-[#2A2723] text-white font-black rounded-xl hover:bg-black transition-all text-xs whitespace-nowrap shadow-lg">إضافة للتقرير</button>
+            <div className="flex justify-end mt-2">
+              <button type="submit" className="h-[40px] px-10 bg-[#2A2723] text-white font-black rounded-xl hover:bg-black transition-all text-sm whitespace-nowrap shadow-lg">إضافة للجدول</button>
+            </div>
           </form>
         </div>
 
