@@ -431,6 +431,65 @@ export default function ReportsPage() {
           </button>
         </div>
 
+        {/* ADD MANUAL RECORD INLINE FORM */}
+        {showAddModal && (
+          <div className="no-print bg-white rounded-[2rem] border-2 border-[#C1A68D]/30 shadow-md overflow-hidden animate-scale-in mb-4" dir="rtl">
+            <div className="p-6 border-b border-[#EAE4D9]/50 flex justify-between items-center shadow-sm">
+              <h2 className="text-xl font-black text-[#2A2723]">إضافة حجز يدوي مباشر</h2>
+              <button type="button" onClick={() => setShowAddModal(false)} className="text-2xl opacity-40 hover:opacity-100 transition-opacity">×</button>
+            </div>
+            <div className="p-6 bg-[#FDFBF7]/30">
+              <form id="add-record-form" onSubmit={handleSaveNewRecord} className="space-y-4">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                  <div className="space-y-1 md:col-span-2">
+                    <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">الاسم</label>
+                    <input type="text" required value={newRecord.name} onChange={e => setNewRecord({...newRecord, name: e.target.value})} className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:border-[#C1A68D]" />
+                  </div>
+                  <div className="space-y-1 md:col-span-1">
+                    <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">رقم الهاتف</label>
+                    <input type="text" value={newRecord.phone} onChange={e => setNewRecord({...newRecord, phone: e.target.value})} className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:border-[#C1A68D]" />
+                  </div>
+                  <div className="space-y-1 md:col-span-1">
+                    <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">الجنسية</label>
+                    <input type="text" value={newRecord.nationality} onChange={e => setNewRecord({...newRecord, nationality: e.target.value})} className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:border-[#C1A68D]" />
+                  </div>
+                  <div className="space-y-1 md:col-span-1">
+                    <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">الهوية</label>
+                    <input type="text" value={newRecord.idNumber} onChange={e => setNewRecord({...newRecord, idNumber: e.target.value})} className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:border-[#C1A68D]" />
+                  </div>
+                  <div className="space-y-1 md:col-span-1">
+                    <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">م. الدخول</label>
+                    <input type="date" required value={newRecord.checkIn} onChange={e => setNewRecord({...newRecord, checkIn: e.target.value})} className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:border-[#C1A68D]" />
+                  </div>
+                  <div className="space-y-1 md:col-span-1">
+                    <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">م. الخروج</label>
+                    <input type="date" required value={newRecord.checkOut} onChange={e => setNewRecord({...newRecord, checkOut: e.target.value})} className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:border-[#C1A68D]" />
+                  </div>
+                  <div className="space-y-1 md:col-span-1">
+                    <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">سعر الليلة</label>
+                    <input type="number" value={newRecord.pricePerNight} onChange={e => setNewRecord({...newRecord, pricePerNight: Number(e.target.value)})} className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-2.5 text-xs font-black outline-none focus:border-[#C1A68D]" />
+                  </div>
+                  <div className="space-y-1 md:col-span-1">
+                    <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">العمولة</label>
+                    <input type="number" value={newRecord.commission} onChange={e => setNewRecord({...newRecord, commission: Number(e.target.value)})} className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-2.5 text-xs font-black text-orange-500 outline-none focus:border-[#C1A68D]" />
+                  </div>
+                  <div className="space-y-1 md:col-span-1">
+                    <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">اسم الوسيط</label>
+                    <input type="text" value={newRecord.brokerName} onChange={e => setNewRecord({...newRecord, brokerName: e.target.value})} className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:border-[#C1A68D]" />
+                  </div>
+                  <div className="space-y-1 md:col-span-5 w-full">
+                    <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">ملاحظات</label>
+                    <input type="text" value={newRecord.notes} onChange={e => setNewRecord({...newRecord, notes: e.target.value})} className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:border-[#C1A68D]" />
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div className="p-4 border-t border-[#EAE4D9]/50 shrink-0 bg-white">
+               <button type="submit" form="add-record-form" className="w-full md:w-auto px-12 bg-[#2A2723] text-white font-black py-4 rounded-xl hover:bg-black transition-all text-xs">إضافة وحفظ في التقرير</button>
+            </div>
+          </div>
+        )}
+
         {/* Unit Tabs */}
         <div className="no-print bg-white p-4 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm space-y-4" dir="rtl">
           <div>
@@ -641,66 +700,6 @@ export default function ReportsPage() {
             </ul>
           </div>
         </div>
-        {/* ADD MANUAL RECORD MODAL */}
-        {showAddModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1816]/60 backdrop-blur-sm animate-fade-in no-print" dir="rtl">
-            <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-scale-in flex flex-col max-h-[90vh]">
-              <div className="p-6 border-b border-[#EAE4D9]/50 flex justify-between items-center shrink-0">
-                <h2 className="text-xl font-black text-[#2A2723]">إضافة حجز يدوي مباشر للتقرير</h2>
-                <button type="button" onClick={() => setShowAddModal(false)} className="text-2xl opacity-30 hover:opacity-100 transition-opacity">×</button>
-              </div>
-              <div className="p-6 overflow-y-auto">
-                <form id="add-record-form" onSubmit={handleSaveNewRecord} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">الاسم</label>
-                      <input type="text" required value={newRecord.name} onChange={e => setNewRecord({...newRecord, name: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-xs font-bold outline-none focus:border-[#C1A68D]" />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">رقم الهاتف</label>
-                      <input type="text" value={newRecord.phone} onChange={e => setNewRecord({...newRecord, phone: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-xs font-bold outline-none focus:border-[#C1A68D]" />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">الجنسية</label>
-                      <input type="text" value={newRecord.nationality} onChange={e => setNewRecord({...newRecord, nationality: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-xs font-bold outline-none focus:border-[#C1A68D]" />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">رقم الهوية</label>
-                      <input type="text" value={newRecord.idNumber} onChange={e => setNewRecord({...newRecord, idNumber: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-xs font-bold outline-none focus:border-[#C1A68D]" />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">تاريخ الدخول</label>
-                      <input type="date" required value={newRecord.checkIn} onChange={e => setNewRecord({...newRecord, checkIn: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-xs font-bold outline-none focus:border-[#C1A68D]" />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">تاريخ الخروج</label>
-                      <input type="date" required value={newRecord.checkOut} onChange={e => setNewRecord({...newRecord, checkOut: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-xs font-bold outline-none focus:border-[#C1A68D]" />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">سعر الليلة</label>
-                      <input type="number" value={newRecord.pricePerNight} onChange={e => setNewRecord({...newRecord, pricePerNight: Number(e.target.value)})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-xs font-black outline-none focus:border-[#C1A68D]" />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">العمولة</label>
-                      <input type="number" value={newRecord.commission} onChange={e => setNewRecord({...newRecord, commission: Number(e.target.value)})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-xs font-black text-orange-500 outline-none focus:border-[#C1A68D]" />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">اسم الوسيط</label>
-                      <input type="text" value={newRecord.brokerName} onChange={e => setNewRecord({...newRecord, brokerName: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-xs font-bold outline-none focus:border-[#C1A68D]" />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-2">ملاحظات</label>
-                      <input type="text" value={newRecord.notes} onChange={e => setNewRecord({...newRecord, notes: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-xs font-bold outline-none focus:border-[#C1A68D]" />
-                    </div>
-                  </div>
-                </form>
-              </div>
-              <div className="p-6 border-t border-[#EAE4D9]/50 shrink-0">
-                 <button type="submit" form="add-record-form" className="w-full bg-[#2A2723] text-white font-black py-4 rounded-2xl hover:bg-black transition-all text-sm">إضافة وحفظ في التقرير</button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </>
   );
