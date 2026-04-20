@@ -317,24 +317,32 @@ export default function ReportsPage() {
   const currentUnit = units.find((u: any) => u.id === selectedUnit);
   const unitPrice = currentUnit?.price ? parseInt(currentUnit.price.toString().replace(/[^0-9]/g, '')) || 0 : 0;
 
-  // Calculate totals
+  // Calculate totals with strict numeric safety
+  const safeNum = (v: any) => {
+    if (v === null || v === undefined) return 0;
+    if (typeof v === 'number') return v;
+    const clean = String(v).replace(/[^0-9.-]/g, '');
+    const n = Number(clean);
+    return isNaN(n) ? 0 : n;
+  };
+
   const totals = filteredBookings.reduce(
     (acc: any, b: any) => {
-      const days = Number(b.numberOfDays || 0);
-      const total = Number(b.totalAmount || 0);
-      const commission = Number(b.commission || 0);
+      const days = safeNum(b.numberOfDays);
+      const total = safeNum(b.totalAmount);
+      const commission = safeNum(b.commission);
       const netValue = total - commission;
       
       let discount = 0;
       const dMatch = b.notes?.match(/خصم بقيمة (\d+)/);
-      if (dMatch) discount = Number(dMatch[1] || 0);
+      if (dMatch) discount = safeNum(dMatch[1]);
 
       return {
-        days: Number(acc.days) + days,
-        total: Number(acc.total) + total,
-        commission: Number(acc.commission) + commission,
-        discount: Number(acc.discount) + discount,
-        netValue: Number(acc.netValue) + netValue,
+        days: safeNum(acc.days) + days,
+        total: safeNum(acc.total) + total,
+        commission: safeNum(acc.commission) + commission,
+        discount: safeNum(acc.discount) + discount,
+        netValue: safeNum(acc.netValue) + netValue,
       };
     },
     { days: 0, total: 0, commission: 0, discount: 0, netValue: 0 }
