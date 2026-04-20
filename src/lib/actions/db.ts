@@ -21,6 +21,7 @@ async function sendTelegramNotification(booking: any) {
 ━━━━━━━━━━━━━━
 <b>👤 العميل:</b> ${booking.name}
 <b>📱 هاتف:</b> ${booking.phone}
+<b>👥 عدد الأشخاص:</b> ${booking.guestsCount ?? 1}
 <b>🏠 الوحدة:</b> ${booking.studio} (ID: ${booking.apartmentId})
 <b>📅 الفترة:</b> ${booking.checkIn} إلى ${booking.checkOut}
 <b>⏰ التاريخ:</b> ${new Date().toLocaleString('ar-EG')}
@@ -84,6 +85,7 @@ export async function getFreshDbBookings(nonce?: string) {
     idNumber: b.id_number,
     commission: Number(b.commission || 0),
     brokerName: b.broker_name,
+    guestsCount: Number(b.guests_count || 1),
     notes: b.notes,
     timestamp: b.timestamp,
   }));
@@ -120,6 +122,7 @@ export async function saveDbBooking(booking: any) {
       id_number: newBooking.idNumber ?? null,
       commission: newBooking.commission ?? null,
       broker_name: newBooking.brokerName ?? null,
+      guests_count: newBooking.guestsCount ?? 1,
       notes: newBooking.notes ?? null,
       timestamp: newBooking.timestamp,
     });
@@ -162,6 +165,7 @@ export async function updateDbBookingStatus(id: string, updates: any) {
   if (updates.idNumber !== undefined) patch.id_number = updates.idNumber;
   if (updates.commission !== undefined) patch.commission = updates.commission;
   if (updates.brokerName !== undefined) patch.broker_name = updates.brokerName;
+  if (updates.guestsCount !== undefined) patch.guests_count = updates.guestsCount;
   if (updates.notes !== undefined) patch.notes = updates.notes;
   
   // ALWAYS update the timestamp on edit to ensure "Fresh First" sync logic works
@@ -217,6 +221,26 @@ export async function deleteDbBooking(id: string) {
   revalidatePath('/admin/dashboard/reports');
   
   // Return the fresh data
+  return await getFreshDbBookings(Date.now().toString());
+}
+
+export async function deleteDbBookingsByPhone(phone: string) {
+  const supabase = getSupabaseServerClient();
+  if (!supabase) return [];
+
+  const { error } = await supabase
+    .from('bookings')
+    .delete()
+    .eq('phone', phone);
+
+  if (error) {
+    console.error('Error deleting bookings by phone:', error);
+    throw error;
+  }
+
+  console.log(`✅ Successfully deleted all bookings for phone: ${phone}`);
+  revalidatePath('/admin/dashboard/customers');
+  revalidatePath('/admin/dashboard/reports');
   return await getFreshDbBookings(Date.now().toString());
 }
 

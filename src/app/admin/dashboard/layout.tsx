@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { getBookings } from '@/lib/data-init';
+import Logo from '@/components/Logo';
 
 export default function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -159,10 +160,21 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
   return (
     <div className="min-h-screen bg-[#FDFBF7] flex flex-col md:flex-row custom-scrollbar" dir="rtl">
       {/* Sidebar */}
-      <aside className="w-full md:w-72 bg-white border-l border-[#EAE4D9]/50 flex flex-col z-40 shadow-sm">
-        <div className="p-8">
-          <Link href="/" className="text-2xl font-black text-[#2A2723] block mb-1 tracking-tighter">مزار</Link>
-          <span className="text-[10px] text-[#C1A68D] font-black uppercase tracking-wider">نظام الإدارة المتكامل</span>
+        <div className="p-6 md:p-8 flex justify-between items-center bg-[#FDFBF7]/80 backdrop-blur-md border-b border-[#EAE4D9]/50 mb-6 sticky top-0 z-50">
+          <div className="flex flex-col items-start gap-1">
+            <Link href="/admin/dashboard" className="transition-all hover:scale-105" title="الرئيسية للوحة التحكم">
+               <Logo size={25} className="!justify-start" imageClassName="max-h-[50px]" />
+            </Link>
+            <span className="text-[9px] text-[#C1A68D] font-black uppercase tracking-widest opacity-80">Management System</span>
+          </div>
+          <button 
+            onClick={() => window.location.reload()}
+            className="flex items-center justify-center w-10 h-10 md:w-auto md:px-5 md:py-3 rounded-2xl bg-[#2A2723] text-white hover:bg-black transition-all shadow-xl shadow-black/20 active:scale-95 group border border-white/10"
+            title="تحديث بيانات النظام"
+          >
+            <span className="text-sm group-hover:rotate-180 transition-transform duration-700 ease-in-out">🔄</span>
+            <span className="hidden md:inline text-[11px] font-black uppercase tracking-[0.2em] mr-2">تحديث</span>
+          </button>
         </div>
 
         <nav className="flex-1 px-4 space-y-2">

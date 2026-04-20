@@ -25,6 +25,7 @@ export default function BookingPage() {
   const [checkOut, setCheckOut] = useState(getTomorrowStr());
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [guestsCount, setGuestsCount] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [selectedUnitId, setSelectedUnitId] = useState('');
@@ -76,7 +77,7 @@ export default function BookingPage() {
     const end = new Date(checkOut).getTime();
     const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
     
-    const adminMsg = `🔔 *طلب حجز جديد من الموقع!*\n\n👤 *العميل:* ${name}\n📱 *الموبايل:* ${phone}\n🏠 *الوحدة:* ${selectedUnit ? selectedUnit.title['ar'] : selectedUnitId}\n📅 *الفترة:* من ${checkIn} إلى ${checkOut} (إجمالي ${nights} ليالي)\n\nيرجى تأكيد الحجز معي.`;
+    const adminMsg = `🔔 *طلب حجز جديد من الموقع!*\n\n👤 *العميل:* ${name}\n📱 *الموبايل:* ${phone}\n👥 *عدد الأشخاص:* ${guestsCount}\n🏠 *الوحدة:* ${selectedUnit ? selectedUnit.title['ar'] : selectedUnitId}\n📅 *الفترة:* من ${checkIn} إلى ${checkOut} (إجمالي ${nights} ليالي)\n\nيرجى تأكيد الحجز معي.`;
     const waUrl = `https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(adminMsg)}`;
     window.open(waUrl, '_blank');
   }, [availableUnits, checkIn, checkOut, name, phone, selectedUnitId]);
@@ -163,6 +164,7 @@ export default function BookingPage() {
       apartmentId: selectedUnitId,
       dates: `${checkIn} - ${checkOut}`,
       guest: name,
+      guestsCount: guestsCount,
       studio: selectedUnit ? selectedUnit.title[language] : selectedUnitId,
     };
 
@@ -689,6 +691,25 @@ export default function BookingPage() {
                           className={`w-full bg-[#F7F5F0] border-2 border-transparent focus:border-[#C1A68D] focus:bg-white rounded-2xl md:rounded-3xl px-6 md:px-8 py-4 md:py-5 outline-none font-bold transition-all ${isRTL ? 'text-right' : 'text-left'}`}
                         />
                       </div>
+                      
+                      <div className="space-y-2">
+                        <label className={`block text-[9px] md:text-[10px] font-black text-[#5C554B] uppercase px-2 ${isRTL ? 'text-right' : 'text-left'}`}>
+                          👥 {isRTL ? 'عدد الضيوف' : 'Number of Guests'}
+                        </label>
+                        <div className="flex gap-2">
+                          {[1, 2, 3, 4, 5, 6].map(num => (
+                            <button
+                              key={num}
+                              type="button"
+                              onClick={() => setGuestsCount(num)}
+                              className={`flex-1 py-3 rounded-xl font-black transition-all border-2 ${guestsCount === num ? 'bg-[#2A2723] text-white border-[#2A2723]' : 'bg-[#F7F5F0] text-[#7A7061] border-transparent hover:border-gray-200'}`}
+                            >
+                              {num}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
                     </div>
 
                     {selectedUnitId && (

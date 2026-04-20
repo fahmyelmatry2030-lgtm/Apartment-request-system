@@ -28,7 +28,7 @@ const PORT = 3000;
 const LOCAL_URL = `http://localhost:${PORT}`;
 // CHANGE THIS TO YOUR LIVE VERCEL URL FOR AUTOMATIC UPDATES
 const REMOTE_URL = 'https://mazar-nine.vercel.app';
-const PREFER_REMOTE = true; // Enabled to keep everything in sync by default
+const PREFER_REMOTE = true; // Set to true for live production updates
 
 const isPackaged = app.isPackaged;
 const STANDALONE_DIR = isPackaged
@@ -156,9 +156,9 @@ async function createWindow() {
     const isOnline = await checkConnectivity(REMOTE_URL);
     if (isOnline) {
       urlToLoad = REMOTE_URL;
-      console.log('Loading Remote System (Live Updates Enabled)');
+      log('Loading Remote System (Live Updates Enabled)');
     } else {
-      console.log('Remote system unreachable, falling back to Local Standalone');
+      log('Remote system unreachable, falling back to Local Standalone');
     }
   }
 

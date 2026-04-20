@@ -230,6 +230,11 @@ export const deleteBooking = async (id: string) => {
   }
 };
 
+export const deleteBookingsByPhone = async (phone: string) => {
+  const { deleteDbBookingsByPhone } = await import('./actions/db');
+  return await deleteDbBookingsByPhone(phone);
+};
+
 export const getStudios = async () => {
   const units = await getPublicSystemUnits();
   return units.filter((u: any) => u.type === 'studio');
