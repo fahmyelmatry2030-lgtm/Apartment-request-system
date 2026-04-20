@@ -1,6 +1,6 @@
 import { units as staticUnits } from './data';
 import { 
-  getDbBookings, 
+  getFreshDbBookings, 
   saveDbBooking, 
   updateDbBookingStatus, 
   getDbUnits, 

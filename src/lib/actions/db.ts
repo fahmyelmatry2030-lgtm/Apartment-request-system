@@ -144,7 +144,7 @@ export async function updateDbBookingStatus(id: string, updates: any) {
   const supabase = getSupabaseServerClient();
   if (!supabase) {
     console.warn('⚠️ Database Offline: Simulate updating booking status', id);
-    return await getDbBookings();
+    return await getFreshDbBookings();
   }
 
   const patch: any = {};

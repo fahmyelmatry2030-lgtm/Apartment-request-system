@@ -243,6 +243,7 @@ export default function ReportsPage() {
       const inDate = new Date(newRecord.checkIn || new Date());
       const outDate = new Date(newRecord.checkOut || new Date());
       const diff = Math.ceil((outDate.getTime() - inDate.getTime()) / (1000 * 60 * 60 * 24));
+      const nights = diff > 0 ? diff : 0;
       const discountVal = newRecord.discount || 0;
       const totalAmount = (nights * newRecord.pricePerNight) - discountVal;
 
