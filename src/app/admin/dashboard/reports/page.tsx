@@ -527,9 +527,6 @@ export default function ReportsPage() {
       <div className="space-y-8 animate-fade-in relative z-0">
         {/* Header */}
         <header className="no-print flex justify-between items-center flex-wrap gap-4">
-          <div className="w-full bg-red-600 text-white p-2 text-center text-xs font-black animate-pulse rounded-xl mb-4">
-            ⚠️ النسخة الجديدة v1.9.0 تعمل الآن — إذا كنت ترى هذا الشريط فالتحديث وصل بنجاح
-          </div>
           <div>
             <div className="flex items-center gap-3 mb-1">
               <h1 className="text-4xl font-black text-[#2A2723]">تقارير <span className="text-[#C1A68D]">الوحدات</span></h1>
