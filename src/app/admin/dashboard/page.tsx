@@ -80,13 +80,19 @@ export default function DashboardOverview() {
     });
     setApartmentMap(map);
 
-    // 2. Calculate Category Availability for SELECTED DATE
+    // 2. Calculate Category Availability for SELECTED DATE using hardcoded IDs from the handwritten list
     const physicalStudios = map.filter((u: any) => u.id.startsWith('b1-s'));
+    
+    const singleIds = [2, 3, 6, 7, 8, 17].map(n => `b1-s${n}`);
+    const doubleIds = [1, 5, 9, 10, 11, 12, 13, 18, 20, 24].map(n => `b1-s${n}`);
+    const tripleIds = [4, 14, 15, 22, 23].map(n => `b1-s${n}`);
+    const twoRoomIds = [16, 19, 21].map(n => `b1-s${n}`);
+
     const categories = [
-      { label: 'سنجل', count: physicalStudios.filter(u => u.title?.ar === 'استوديو سنجل' && !u.isOccupied).length, color: 'text-green-500' },
-      { label: 'دبل', count: physicalStudios.filter(u => u.title?.ar === 'استوديو دبل' && !u.isOccupied).length, color: 'text-blue-400' },
-      { label: 'تريبل', count: physicalStudios.filter(u => u.title?.ar === 'استوديو تريبل' && !u.isOccupied).length, color: 'text-orange-400' },
-      { label: 'غرفتين', count: physicalStudios.filter(u => u.title?.ar === 'استوديو غرفتين' && !u.isOccupied).length, color: 'text-purple-400' }
+      { label: 'سنجل', count: physicalStudios.filter(u => singleIds.includes(u.id) && !u.isOccupied).length, color: 'text-green-500' },
+      { label: 'دبل', count: physicalStudios.filter(u => doubleIds.includes(u.id) && !u.isOccupied).length, color: 'text-blue-400' },
+      { label: 'تريبل', count: physicalStudios.filter(u => tripleIds.includes(u.id) && !u.isOccupied).length, color: 'text-orange-400' },
+      { label: 'غرفتين', count: physicalStudios.filter(u => twoRoomIds.includes(u.id) && !u.isOccupied).length, color: 'text-purple-400' }
     ];
     setInventoryStats(categories);
 
