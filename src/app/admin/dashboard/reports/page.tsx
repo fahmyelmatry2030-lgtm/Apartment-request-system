@@ -374,16 +374,19 @@ export default function ReportsPage() {
     const commission = booking.commission || 0;
     const netValue = total - commission;
 
-    // Automatic Status Calculation based on Dates (Robust comparison)
+    // Automatic Status Calculation based on LOCAL Dates
     let clientStatus = booking.clientStatus || 'انتظار';
     if (booking.checkIn && booking.checkOut) {
-      const today = new Date();
-      const todayStr = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
+      const now = new Date();
+      // Format today as YYYY-MM-DD in LOCAL time
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      const todayStr = `${y}-${m}-${d}`;
       
       const checkInStr = booking.checkIn;
       const checkOutStr = booking.checkOut;
 
-      // Logic using string comparison (safe for YYYY-MM-DD)
       if (todayStr >= checkInStr && todayStr < checkOutStr) {
         if (clientStatus === 'انتظار') clientStatus = 'متواجد';
       } else if (todayStr >= checkOutStr) {
@@ -732,9 +735,9 @@ export default function ReportsPage() {
                       key={i}
                       className={`border-t border-[#EAE4D9]/30 transition-colors ${
                         row.hasData
-                          ? row.clientStatus === 'متواجد' ? 'bg-green-100 hover:bg-green-200'
-                            : row.clientStatus === 'غادر' ? 'bg-gray-200 hover:bg-gray-300'
-                            : row.clientStatus === 'انتظار' ? 'bg-orange-100 hover:bg-orange-200' 
+                          ? row.clientStatus === 'متواجد' ? 'bg-green-200/60 hover:bg-green-300/60'
+                            : row.clientStatus === 'غادر' ? 'bg-gray-300/80 hover:bg-gray-400/80'
+                            : row.clientStatus === 'انتظار' ? 'bg-orange-200/60 hover:bg-orange-300/60' 
                             : 'bg-white hover:bg-yellow-50/30'
                           : 'bg-[#FDFBF7]/50'
                       }`}
