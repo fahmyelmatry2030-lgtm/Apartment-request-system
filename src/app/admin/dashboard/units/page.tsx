@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { getPublicSystemUnits, updateUnitDetails } from '@/lib/data-init';
 import { uploadImage } from '@/lib/actions/upload';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
 export default function UnitsManagement() {
   const [allUnits, setAllUnits] = useState<any[]>([]);
@@ -77,25 +78,46 @@ export default function UnitsManagement() {
     const file = e.target.files?.[0];
     if (!file || !editingUnit) return;
 
-    // Client-side size check
-    if (file.size > 4 * 1024 * 1024) {
-      alert('حجم الصورة كبير جداً (أكبر من 4 ميجابايت). يرجى تقليل حجم الصورة أو اختيار صورة أخرى.');
-      return;
-    }
-
     setIsUploading(true);
     try {
-      const formData = new FormData();
-      formData.append('file', file);
+      let publicUrl = '';
       
-      const publicUrl = await uploadImage(formData);
+      // Try Client-side upload first (to bypass Vercel limits)
+      const supabase = getSupabaseBrowserClient();
+      if (supabase) {
+        const safeName = file.name.replace(/[^\w.\-]+/g, '-');
+        const objectPath = `${Date.now()}-${safeName}`;
+        
+        const { data, error } = await supabase.storage
+          .from('uploads')
+          .upload(objectPath, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+          
+        if (error) {
+           console.warn('Client-side upload failed, falling back to server action:', error);
+           // Fallback to server action if client upload fails (e.g. due to RLS)
+           const formData = new FormData();
+           formData.append('file', file);
+           publicUrl = await uploadImage(formData);
+        } else {
+           const { data: urlData } = supabase.storage.from('uploads').getPublicUrl(objectPath);
+           publicUrl = urlData.publicUrl;
+        }
+      } else {
+        // Fallback to server action
+        const formData = new FormData();
+        formData.append('file', file);
+        publicUrl = await uploadImage(formData);
+      }
       
       setEditingUnit({
         ...editingUnit,
         images: [...(editingUnit.images || []), publicUrl]
       });
     } catch (error: any) {
-      alert(error.message || 'حدث خطأ أثناء رفع الصورة. تواصل مع المطور.');
+      alert(error.message || 'حدث خطأ أثناء رفع الصورة. تأكد من اتصال الإنترنت وحجم الصورة.');
       console.error(error);
     } finally {
       setIsUploading(false);
@@ -110,16 +132,29 @@ export default function UnitsManagement() {
   };
 
   const replaceImage = async (index: number, file: File) => {
-    if (file.size > 4 * 1024 * 1024) {
-      alert('حجم الصورة كبير جداً (أكبر من 4 ميجابايت).');
-      return;
-    }
-
     setIsUploading(true);
     try {
-        const formData = new FormData();
-        formData.append('file', file);
-        const publicUrl = await uploadImage(formData);
+        let publicUrl = '';
+        const supabase = getSupabaseBrowserClient();
+        
+        if (supabase) {
+            const safeName = file.name.replace(/[^\w.\-]+/g, '-');
+            const objectPath = `${Date.now()}-${safeName}`;
+            const { error } = await supabase.storage.from('uploads').upload(objectPath, file);
+            
+            if (error) {
+                const formData = new FormData();
+                formData.append('file', file);
+                publicUrl = await uploadImage(formData);
+            } else {
+                const { data } = supabase.storage.from('uploads').getPublicUrl(objectPath);
+                publicUrl = data.publicUrl;
+            }
+        } else {
+            const formData = new FormData();
+            formData.append('file', file);
+            publicUrl = await uploadImage(formData);
+        }
         
         const updatedImages = [...editingUnit.images];
         updatedImages[index] = publicUrl;
