@@ -4,17 +4,28 @@ import { useEffect, useState, useCallback } from 'react';
 import { getBookings, updateBookingStatus, updateUnitDetails } from '@/lib/data-init';
 
 export default function OperationsCenter() {
-  const [activeTab, setActiveTab] = useState<'today' | 'tomorrow' | 'after'>('today');
+  const [activeTab, setActiveTab] = useState<'today' | 'tomorrow' | 'after' | 'custom'>('today');
+  const [customDate, setCustomDate] = useState(new Date().toISOString().split('T')[0]);
   const [bookings, setBookings] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
-    // Add timestamp to bypass cache
     const data = await getBookings(Date.now().toString());
-    setBookings(data.filter((b: any) => 
-      !['cancelled', 'deleted', 'rejected', 'مرفوض'].includes(b.status)
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    // Auto-Cancel Logic: If it's a request and check-in is today or earlier
+    const processed = data.map((b: any) => {
+      const isRequest = b.status === 'pending' || b.status === 'طلب جديد' || b.status === 'انتظار';
+      if (isRequest && b.checkIn <= todayStr) {
+        return { ...b, status: 'cancelled_auto' }; // Mark as auto-cancelled
+      }
+      return b;
+    });
+
+    setBookings(processed.filter((b: any) => 
+      !['cancelled', 'deleted', 'rejected', 'مرفوض', 'cancelled_auto'].includes(b.status)
     ));
     setIsLoading(false);
   }, []);
@@ -48,6 +59,7 @@ export default function OperationsCenter() {
   };
 
   const targetDate = () => {
+    if (activeTab === 'custom') return customDate;
     const d = new Date();
     if (activeTab === 'tomorrow') d.setDate(d.getDate() + 1);
     if (activeTab === 'after') d.setDate(d.getDate() + 2);
@@ -57,7 +69,8 @@ export default function OperationsCenter() {
   const dayLabel = () => {
     if (activeTab === 'today') return 'اليوم';
     if (activeTab === 'tomorrow') return 'غداً';
-    return 'بعد غد';
+    if (activeTab === 'after') return 'بعد غد';
+    return customDate;
   };
 
   const dateStr = targetDate();
@@ -89,24 +102,36 @@ export default function OperationsCenter() {
         </div>
 
         {/* Filters Tabs */}
-        <div className="flex gap-1 bg-[#23211F] p-1.5 rounded-2xl border border-white/5 w-full md:w-fit shadow-2xl">
-          {[
-            { id: 'today', label: 'اليوم' },
-            { id: 'tomorrow', label: 'غداً' },
-            { id: 'after', label: 'بعد غد' }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`px-8 py-4 rounded-xl text-sm font-black transition-all duration-500 ${
-                activeTab === tab.id 
-                ? 'bg-yellow-400 text-black shadow-[0_0_20px_rgba(250,204,21,0.3)] scale-105' 
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+        <div className="flex flex-wrap gap-3 items-center">
+            <div className="flex gap-1 bg-[#23211F] p-1.5 rounded-2xl border border-white/5 w-full md:w-fit shadow-2xl">
+            {[
+                { id: 'today', label: 'اليوم' },
+                { id: 'tomorrow', label: 'غداً' },
+                { id: 'after', label: 'بعد غد' },
+                { id: 'custom', label: 'بحث بالتاريخ 🔍' }
+            ].map((tab) => (
+                <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`px-6 py-4 rounded-xl text-[10px] md:text-sm font-black transition-all duration-500 whitespace-nowrap ${
+                    activeTab === tab.id 
+                    ? 'bg-yellow-400 text-black shadow-[0_0_20px_rgba(250,204,21,0.3)] scale-105' 
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+                >
+                {tab.label}
+                </button>
+            ))}
+            </div>
+
+            {activeTab === 'custom' && (
+                <input 
+                    type="date"
+                    value={customDate}
+                    onChange={(e) => setCustomDate(e.target.value)}
+                    className="bg-[#23211F] border border-yellow-400/30 text-yellow-400 px-6 py-4 rounded-2xl outline-none font-black text-sm animate-fade-in focus:border-yellow-400 transition-all"
+                />
+            )}
         </div>
       </header>
 

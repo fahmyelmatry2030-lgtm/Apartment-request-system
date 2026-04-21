@@ -89,7 +89,51 @@ export const updateUnitDetails = async (id: string, updates: any) => {
   }
 };
 
-// --- BOOKINGS ---
+// Returns the 7 master units with calculated live availability from the 24 physical units
+export const getPublicUnitsWithAvailability = async () => {
+  const allUnits = await getSystemUnits();
+  const bookings = await getBookings(Date.now().toString());
+  const today = new Date().toISOString().split('T')[0];
+
+  // 1. Get the 7 master categories
+  const masterUnits = allUnits.filter(u => !u.id.startsWith('b1-s') && !u.id.startsWith('b2-s'));
+
+  // 2. Identify occupied physical units for today
+  const occupiedIds = bookings
+    .filter(b => {
+      // Logic: If today is within [checkIn, checkOut-1]
+      return b.checkIn <= today && today < b.checkOut && (b.status === 'approved' || b.status.includes('مؤكد'));
+    })
+    .map(b => b.apartmentId);
+
+  // 3. Map physical units to their categories and calculate availability
+  // Physical units are identified by b1-s1 to b1-s24
+  const physicalStudios = allUnits.filter(u => u.id.startsWith('b1-s'));
+
+  return masterUnits.map(master => {
+    let physicalGroup: any[] = [];
+    
+    // Simple mapping based on title (since my update script set these)
+    if (master.id === 's-single') physicalGroup = physicalStudios.filter(p => p.title?.ar === 'استوديو سنجل');
+    if (master.id === 's-double') physicalGroup = physicalStudios.filter(p => p.title?.ar === 'استوديو دبل');
+    if (master.id === 's-triple') physicalGroup = physicalStudios.filter(p => p.title?.ar === 'استوديو تريبل');
+    if (master.id === 's-tworoom') physicalGroup = physicalStudios.filter(p => p.title?.ar === 'استوديو غرفتين');
+    
+    // Apartments are handled individually or as a separate group
+    if (master.type === 'apartment') {
+      const isOccupied = occupiedIds.includes(master.id);
+      return { ...master, availableCount: isOccupied ? 0 : 1, totalCount: 1 };
+    }
+
+    const available = physicalGroup.filter(p => !occupiedIds.includes(p.id)).length;
+    
+    return {
+      ...master,
+      availableCount: available,
+      totalCount: physicalGroup.length
+    };
+  });
+};
 
 export const getBookings = async (nonce?: string) => {
   try {
