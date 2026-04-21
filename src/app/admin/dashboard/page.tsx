@@ -41,34 +41,32 @@ export default function DashboardOverview() {
     
     const today = new Date();
     const todayStr = today.toISOString().split('T')[0];
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
-    const tomorrowStr = tomorrow.toISOString().split('T')[0];
-
-    const targetDate = new Date(selectedDate);
     const targetDateStr = selectedDate;
+    const nextDay = new Date(targetDate);
+    nextDay.setDate(targetDate.getDate() + 1);
+    const nextDayStr = nextDay.toISOString().split('T')[0];
 
     const confirmed = bookings.filter((b: any) => CONFIRMED_STATUSES.includes(b.status));
     const pending = bookings.filter((b: any) => PENDING_STATUSES.includes(b.status));
 
     setTodaySchedule({
-      in: confirmed.filter((b: any) => b.checkIn === todayStr),
-      out: confirmed.filter((b: any) => b.checkOut === todayStr),
+      in: confirmed.filter((b: any) => b.checkIn === targetDateStr),
+      out: confirmed.filter((b: any) => b.checkOut === targetDateStr),
     });
 
     setTomorrowPlans({
-      in: confirmed.filter((b: any) => b.checkIn === tomorrowStr),
-      out: confirmed.filter((b: any) => b.checkOut === tomorrowStr),
+      in: confirmed.filter((b: any) => b.checkIn === nextDayStr),
+      out: confirmed.filter((b: any) => b.checkOut === nextDayStr),
     });
 
     setStats({
       totalBookings: bookings.length,
       pendingBookings: pending.length,
       approvedBookings: confirmed.length,
-      checkInToday: confirmed.filter((b: any) => b.checkIn === todayStr).length,
-      checkOutToday: confirmed.filter((b: any) => b.checkOut === todayStr).length,
-      checkInTomorrow: confirmed.filter((b: any) => b.checkIn === tomorrowStr).length,
-      checkOutTomorrow: confirmed.filter((b: any) => b.checkOut === tomorrowStr).length,
+      checkInToday: confirmed.filter((b: any) => b.checkIn === targetDateStr).length,
+      checkOutToday: confirmed.filter((b: any) => b.checkOut === targetDateStr).length,
+      checkInTomorrow: confirmed.filter((b: any) => b.checkIn === nextDayStr).length,
+      checkOutTomorrow: confirmed.filter((b: any) => b.checkOut === nextDayStr).length,
     });
 
     // 1. Map units based on SELECTED DATE

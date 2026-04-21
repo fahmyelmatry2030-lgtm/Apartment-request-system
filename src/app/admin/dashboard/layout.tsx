@@ -170,7 +170,6 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
 
   const menuItems = [
     { name: 'الاستعراض العام', href: '/admin/dashboard', icon: '📊', roles: ['Super Admin', 'مدير الحجوزات', 'مدير الوحدات'] },
-    { name: 'مركز العمليات', href: '/admin/dashboard/operations', icon: '📋', roles: ['Super Admin', 'مدير الحجوزات', 'مدير الوحدات'] },
     { name: 'طلبات الحجز', href: '/admin/dashboard/bookings', icon: '📩', roles: ['Super Admin', 'مدير الحجوزات'] },
     { name: 'إدارة الوحدات', href: '/admin/dashboard/units', icon: '🏢', roles: ['Super Admin', 'مدير الوحدات'] },
     { name: 'قاعدة العملاء', href: '/admin/dashboard/customers', icon: '📞', roles: ['Super Admin'] },
