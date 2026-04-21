@@ -31,6 +31,9 @@ export default function DashboardOverview() {
   const [tomorrowPlans, setTomorrowPlans] = useState<{in: any[], out: any[]}>({ in: [], out: [] });
   const [apartmentMap, setApartmentMap] = useState<any[]>([]);
 
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [inventoryStats, setInventoryStats] = useState<any[]>([]);
+
   const loadOverviewData = useCallback(async () => {
     setIsLoading(true);
     const bookings = await getBookings(Date.now().toString());
@@ -41,6 +44,9 @@ export default function DashboardOverview() {
     const tomorrow = new Date(today);
     tomorrow.setDate(today.getDate() + 1);
     const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+    const targetDate = new Date(selectedDate);
+    const targetDateStr = selectedDate;
 
     const confirmed = bookings.filter((b: any) => CONFIRMED_STATUSES.includes(b.status));
     const pending = bookings.filter((b: any) => PENDING_STATUSES.includes(b.status));
@@ -65,18 +71,30 @@ export default function DashboardOverview() {
       checkOutTomorrow: confirmed.filter((b: any) => b.checkOut === tomorrowStr).length,
     });
 
+    // 1. Map units based on SELECTED DATE
     const map = apts.map((apt: any) => {
       const activeBooking = confirmed.find((b: any) => {
-        const bIn = new Date(b.checkIn);
-        const bOut = new Date(b.checkOut);
-        return b.apartmentId === apt.id && today >= bIn && today < bOut;
+        const bIn = b.checkIn;
+        const bOut = b.checkOut;
+        return b.apartmentId === apt.id && targetDateStr >= bIn && targetDateStr < bOut;
       });
       return { ...apt, isOccupied: !!activeBooking || apt.status === 'مشغول', guest: activeBooking?.name, guestsCount: activeBooking?.guestsCount };
     });
     setApartmentMap(map);
+
+    // 2. Calculate Category Availability for SELECTED DATE
+    const physicalStudios = map.filter((u: any) => u.id.startsWith('b1-s'));
+    const categories = [
+      { label: 'سنجل', count: physicalStudios.filter(u => u.title?.ar === 'استوديو سنجل' && !u.isOccupied).length, color: 'text-green-500' },
+      { label: 'دبل', count: physicalStudios.filter(u => u.title?.ar === 'استوديو دبل' && !u.isOccupied).length, color: 'text-blue-400' },
+      { label: 'تريبل', count: physicalStudios.filter(u => u.title?.ar === 'استوديو تريبل' && !u.isOccupied).length, color: 'text-orange-400' },
+      { label: 'غرفتين', count: physicalStudios.filter(u => u.title?.ar === 'استوديو غرفتين' && !u.isOccupied).length, color: 'text-purple-400' }
+    ];
+    setInventoryStats(categories);
+
     setLastUpdated(new Date());
     setIsLoading(false);
-  }, []);
+  }, [selectedDate]);
 
   useEffect(() => {
     loadOverviewData();
@@ -159,6 +177,42 @@ export default function DashboardOverview() {
             <div className={`text-[9px] font-black uppercase tracking-widest opacity-70 ${kpi.text}`}>{kpi.label}</div>
           </div>
         ))}
+      </div>
+
+      {/* LIVE INVENTORY SEARCH */}
+      <div className="bg-[#2A2723] p-8 rounded-[2.5rem] shadow-2xl border border-white/5 relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#C1A68D] to-transparent opacity-30" />
+        
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 relative z-10">
+            <div className="space-y-2">
+                <h3 className="text-xl font-black text-white flex items-center gap-3">
+                    🏢 التوافر اللحظي <span className="text-[#C1A68D]">Inventory</span>
+                </h3>
+                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.2em]">عرض الوحدات المتاحة بالتاريخ</p>
+            </div>
+
+            <div className="flex items-center gap-4 bg-white/5 p-2 rounded-2xl border border-white/10">
+                <span className="text-xs font-black text-[#C1A68D] mr-2">ابحث عن تاريخ:</span>
+                <input 
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="bg-[#1A1816] text-white px-4 py-2 rounded-xl outline-none border border-white/10 focus:border-[#C1A68D] font-bold text-sm transition-all"
+                />
+            </div>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-10">
+            {inventoryStats.map((item, i) => (
+                <div key={i} className="bg-white/5 border border-white/5 p-6 rounded-3xl hover:bg-white/10 transition-all group">
+                    <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 group-hover:text-[#C1A68D] transition-colors">{item.label}</div>
+                    <div className="flex items-end gap-2">
+                        <div className={`text-5xl font-black ${item.count > 0 ? item.color : 'text-gray-700'}`}>{item.count}</div>
+                        <div className="text-[10px] font-bold text-gray-500 mb-2">متاح حالياً</div>
+                    </div>
+                </div>
+            ))}
+        </div>
       </div>
 
       {/* Main Grid */}

@@ -38,15 +38,8 @@ const UnitCard: React.FC<UnitCardProps> = ({ unit }) => {
         <div className={`absolute top-4 ${isRTL ? 'right-4' : 'left-4'} bg-[#2A2723]/80 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full border border-white/10 flex gap-2`}>
           <span>{unit.type === 'studio' ? (isRTL ? 'استوديو' : 'STUDIO') : (isRTL ? 'شقة' : 'APARTMENT')}</span>
         </div>
-        
-        {/* Live Availability Badge */}
-        <div className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} ${(unit.availableCount > 0) ? 'bg-green-500/90' : 'bg-red-500/90'} backdrop-blur-md text-white text-[10px] font-black px-4 py-1.5 rounded-full shadow-xl flex items-center gap-2 animate-pulse`}>
-          <span className="w-2 h-2 bg-white rounded-full animate-ping" />
-          {unit.availableCount > 0 ? (
-            isRTL ? `متاح الآن: ${unit.availableCount}` : `${unit.availableCount} Available Now`
-          ) : (
-            isRTL ? 'مكتمل العدد اليوم' : 'Fully Booked Today'
-          )}
+        <div className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} ${status === 'متاح' ? 'bg-green-500/90' : status === 'مشغول' ? 'bg-blue-500/90' : 'bg-red-500/90'} backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-md`}>
+          {status}
         </div>
       </div>
       <div className={`p-6 flex flex-col flex-1 ${isRTL ? 'text-right' : 'text-left'}`}>
