@@ -458,6 +458,7 @@ export default function UnitsManagement() {
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    {editingUnit.images?.map((img, idx) => (
                         <div key={idx} className="relative aspect-square rounded-[2rem] overflow-hidden border border-[#EAE4D9] group shadow-sm bg-white">
                             <Image 
                                 src={img} 

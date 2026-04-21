@@ -735,9 +735,9 @@ export default function ReportsPage() {
                       key={i}
                       className={`border-t border-[#EAE4D9]/30 transition-colors ${
                         row.hasData
-                          ? row.clientStatus === 'متواجد' ? 'bg-green-200/60 hover:bg-green-300/60'
-                            : row.clientStatus === 'غادر' ? 'bg-gray-300/80 hover:bg-gray-400/80'
-                            : row.clientStatus === 'انتظار' ? 'bg-orange-200/60 hover:bg-orange-300/60' 
+                          ? row.clientStatus.trim() === 'متواجد' ? 'bg-[#dcfce7] hover:bg-[#bbf7d0]'
+                            : row.clientStatus.trim() === 'غادر' ? 'bg-[#f3f4f6] hover:bg-[#e5e7eb]'
+                            : row.clientStatus.trim() === 'انتظار' ? 'bg-[#ffedd5] hover:bg-[#fed7aa]' 
                             : 'bg-white hover:bg-yellow-50/30'
                           : 'bg-[#FDFBF7]/50'
                       }`}
@@ -746,7 +746,10 @@ export default function ReportsPage() {
                       <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-bold text-[#2A2723] whitespace-nowrap">{row.date}</td>
                       <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-black text-[#2A2723]">
                         {row.hasData ? (
-                          <EditableCell value={row.name} bookingId={row.id} field="name" onSave={handleCellSave} className="text-[#2A2723] font-black" />
+                          <div className="flex flex-col items-center">
+                            <EditableCell value={row.name} bookingId={row.id} field="name" onSave={handleCellSave} className="text-[#2A2723] font-black" />
+                            <span className="text-[7px] text-[#C1A68D] opacity-50 uppercase tracking-tighter">({row.clientStatus})</span>
+                          </div>
                         ) : <span className="text-[#EAE4D9]">—</span>}
                       </td>
 
