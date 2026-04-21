@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { getBookings, getSystemUnits, updateBookingStatus, saveBooking, deleteBooking } from '@/lib/data-init';
 
 // Units will be fetched dynamically from the database
-const LAYOUT_VERSION = 'v1.6.0'; // Auto-increment this to force-clear client caches
+const LAYOUT_VERSION = 'v1.7.0'; // Auto-increment this to force-clear client caches
 
 const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 
@@ -712,7 +712,10 @@ export default function ReportsPage() {
                       key={i}
                       className={`border-t border-[#EAE4D9]/30 transition-colors ${
                         row.hasData
-                          ? 'bg-white hover:bg-yellow-50/30'
+                          ? row.clientStatus === 'متواجد' ? 'bg-green-50/60 hover:bg-green-100/60'
+                            : row.clientStatus === 'غادر' ? 'bg-gray-100 hover:bg-gray-200 opacity-80'
+                            : row.clientStatus === 'انتظار' ? 'bg-orange-50/40 hover:bg-orange-100/40' 
+                            : 'bg-white hover:bg-yellow-50/30'
                           : 'bg-[#FDFBF7]/50'
                       }`}
                     >
