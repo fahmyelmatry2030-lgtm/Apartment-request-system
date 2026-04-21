@@ -374,20 +374,22 @@ export default function ReportsPage() {
     const commission = booking.commission || 0;
     const netValue = total - commission;
 
-    // Automatic Status Calculation based on Dates
+    // Automatic Status Calculation based on Dates (Robust comparison)
     let clientStatus = booking.clientStatus || 'انتظار';
     if (booking.checkIn && booking.checkOut) {
-      const now = new Date();
-      now.setHours(0, 0, 0, 0);
-      const checkInDate = new Date(booking.checkIn);
-      const checkOutDate = new Date(booking.checkOut);
+      const today = new Date();
+      const todayStr = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
       
-      // Only auto-update if it's currently 'انتظار' or 'متواجد' 
-      // This allows 'غادر' to remain if set manually for early checkout
-      if (now >= checkInDate && now < checkOutDate && clientStatus === 'انتظار') {
-        clientStatus = 'متواجد';
-      } else if (now >= checkOutDate && clientStatus !== 'غادر') {
-        clientStatus = 'غادر';
+      const checkInStr = booking.checkIn;
+      const checkOutStr = booking.checkOut;
+
+      // Logic using string comparison (safe for YYYY-MM-DD)
+      if (todayStr >= checkInStr && todayStr < checkOutStr) {
+        if (clientStatus === 'انتظار') clientStatus = 'متواجد';
+      } else if (todayStr >= checkOutStr) {
+        if (clientStatus !== 'غادر') clientStatus = 'غادر';
+      } else if (todayStr < checkInStr) {
+        if (clientStatus !== 'انتظار') clientStatus = 'انتظار';
       }
     }
 
