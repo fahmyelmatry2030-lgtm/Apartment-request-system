@@ -375,7 +375,9 @@ export default function ReportsPage() {
     const netValue = total - commission;
 
     // Automatic Status Calculation based on LOCAL Dates
-    let clientStatus = (booking.clientStatus || 'انتظار').trim();
+    let rawStatus = (booking.clientStatus || 'انتظار').trim();
+    let clientStatus = rawStatus;
+
     if (booking.checkIn && booking.checkOut) {
       const now = new Date();
       const y = now.getFullYear();
@@ -386,19 +388,18 @@ export default function ReportsPage() {
       const checkInStr = booking.checkIn.trim();
       const checkOutStr = booking.checkOut.trim();
 
-      // Logic:
-      // If today is >= checkOut, it must be "غادر" unless it's already "غادر"
+      // Priority 1: If check-out date has passed, it is ALWAYS "غادر"
       if (todayStr >= checkOutStr) {
         clientStatus = 'غادر';
       } 
-      // If today is within the range, it's "متواجد" ONLY if it was "انتظار/منتظر"
-      // (This allows manual "غادر" to stay if they leave early)
+      // Priority 2: If we are in the stay period
       else if (todayStr >= checkInStr && todayStr < checkOutStr) {
-        if (clientStatus === 'انتظار' || clientStatus === 'منتظر') {
+        // Only move to "متواجد" if they were in any waiting state
+        if (rawStatus.includes('انتظار') || rawStatus.includes('منتظر')) {
           clientStatus = 'متواجد';
         }
       } 
-      // If today is before checkIn, it's "انتظار"
+      // Priority 3: If before check-in
       else if (todayStr < checkInStr) {
         clientStatus = 'انتظار';
       }
