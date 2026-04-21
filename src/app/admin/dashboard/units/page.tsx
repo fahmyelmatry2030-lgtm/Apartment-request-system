@@ -458,38 +458,43 @@ export default function UnitsManagement() {
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    {editingUnit.images?.map((img, idx) => (
-                        <div key={idx} className="relative aspect-square rounded-[2rem] overflow-hidden border border-[#EAE4D9] group shadow-sm bg-white">
-                            <Image 
-                                src={img} 
-                                alt={`Unit image ${idx + 1}`}
-                                fill
-                                sizes="(max-width: 768px) 50vw, 25vw"
-                                className="object-cover group-hover:scale-110 transition-transform" 
-                            />
-                            <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3">
-                                <label className="cursor-pointer bg-white text-[#2A2723] px-5 py-2 rounded-xl text-[10px] font-black hover:scale-105 transition-all shadow-xl">
-                                    استبدال 🔁
-                                    <input 
-                                        type="file" 
-                                        className="hidden" 
-                                        accept="image/*"
-                                        onChange={(e) => {
-                                            const file = e.target.files?.[0];
-                                            if(file) replaceImage(idx, file);
-                                        }} 
+                    {editingUnit.images && editingUnit.images.length > 0 ? (
+                        editingUnit.images.map((img: string, idx: number) => (
+                            <div key={`unit-img-${idx}`} className="relative aspect-square rounded-[2rem] overflow-hidden border border-[#EAE4D9] group shadow-sm bg-white">
+                                {img ? (
+                                    <Image 
+                                        src={img} 
+                                        alt="Unit"
+                                        fill
+                                        sizes="(max-width: 768px) 50vw, 25vw"
+                                        className="object-cover group-hover:scale-110 transition-transform" 
                                     />
-                                </label>
-                                <button 
-                                    onClick={() => removeImage(idx)}
-                                    className="bg-red-600 text-white px-5 py-2 rounded-xl text-[10px] hover:scale-105 transition-all font-black shadow-lg shadow-red-600/20"
-                                >
-                                    حذف 🗑️
-                                </button>
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center bg-gray-50 text-gray-300 text-[8px]">IMAGE_ERR</div>
+                                )}
+                                <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3">
+                                    <label className="cursor-pointer bg-white text-[#2A2723] px-5 py-2 rounded-xl text-[10px] font-black hover:scale-105 transition-all shadow-xl">
+                                        استبدال
+                                        <input 
+                                            type="file" 
+                                            className="hidden" 
+                                            accept="image/*"
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0];
+                                                if(file) replaceImage(idx, file);
+                                            }} 
+                                        />
+                                    </label>
+                                    <button 
+                                        onClick={() => removeImage(idx)}
+                                        className="bg-red-600 text-white px-5 py-2 rounded-xl text-[10px] hover:scale-105 transition-all font-black shadow-lg shadow-red-600/20"
+                                    >
+                                        حذف
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    ))}
-                    {editingUnit.images?.length === 0 && (
+                        ))
+                    ) : (
                         <div className="col-span-full py-20 border-2 border-dashed border-[#EAE4D9] rounded-[2.5rem] flex flex-col items-center justify-center text-[#7A7061] italic text-xs opacity-40">
                             لا توجد صور حالياً. اضغط للأعلى لزيادة الصور.
                         </div>
