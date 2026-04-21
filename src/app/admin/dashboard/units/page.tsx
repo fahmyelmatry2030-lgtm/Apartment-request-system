@@ -77,6 +77,12 @@ export default function UnitsManagement() {
     const file = e.target.files?.[0];
     if (!file || !editingUnit) return;
 
+    // Client-side size check
+    if (file.size > 4 * 1024 * 1024) {
+      alert('حجم الصورة كبير جداً (أكبر من 4 ميجابايت). يرجى تقليل حجم الصورة أو اختيار صورة أخرى.');
+      return;
+    }
+
     setIsUploading(true);
     try {
       const formData = new FormData();
@@ -88,11 +94,12 @@ export default function UnitsManagement() {
         ...editingUnit,
         images: [...(editingUnit.images || []), publicUrl]
       });
-    } catch (error) {
-      alert('حدث خطأ أثناء رفع الصورة. تواصل مع المطور.');
+    } catch (error: any) {
+      alert(error.message || 'حدث خطأ أثناء رفع الصورة. تواصل مع المطور.');
       console.error(error);
     } finally {
       setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -103,6 +110,11 @@ export default function UnitsManagement() {
   };
 
   const replaceImage = async (index: number, file: File) => {
+    if (file.size > 4 * 1024 * 1024) {
+      alert('حجم الصورة كبير جداً (أكبر من 4 ميجابايت).');
+      return;
+    }
+
     setIsUploading(true);
     try {
         const formData = new FormData();
@@ -112,8 +124,8 @@ export default function UnitsManagement() {
         const updatedImages = [...editingUnit.images];
         updatedImages[index] = publicUrl;
         setEditingUnit({ ...editingUnit, images: updatedImages });
-    } catch (error) {
-        alert('خطأ في استبدال الصورة');
+    } catch (error: any) {
+        alert(error.message || 'خطأ في استبدال الصورة');
     } finally {
         setIsUploading(false);
     }
@@ -269,7 +281,7 @@ export default function UnitsManagement() {
       {/* Advanced Edit Modal */}
       {isModalOpen && editingUnit && (
         <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-10 bg-white/80 backdrop-blur-xl animate-fade-in overflow-y-auto">
-          <div className="bg-[#FDFBF7] border border-[#EAE4D9] w-full max-w-4xl rounded-[3rem] shadow-[0_50px_150px_rgba(0,0,0,0.15)] overflow-hidden animate-scale-in mb-10 relative">
+          <div className="bg-[#FDFBF7] border border-[#EAE4D9] w-full max-w-6xl rounded-[3rem] shadow-[0_50px_150px_rgba(0,0,0,0.15)] overflow-hidden animate-scale-in mb-10 relative">
             <div className="p-8 md:p-10 border-b border-[#EAE4D9]/50 flex justify-between items-center px-8 md:px-14 bg-white/50">
               <div>
                 <h2 className="text-3xl font-black text-[#2A2723]">إدارة <span className="text-[#C1A68D]">بيانات الوحدة</span></h2>

@@ -193,7 +193,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
       </button>
 
       {/* Sidebar */}
-      <aside className={`fixed inset-y-0 right-0 z-40 w-[280px] bg-[#FDFBF7] border-l border-[#EAE4D9]/50 transform transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : 'translate-x-full'} flex flex-col`}>
+      <aside className={`fixed inset-y-0 right-0 z-40 w-[260px] bg-[#FDFBF7] border-l border-[#EAE4D9]/50 transform transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : 'translate-x-full'} flex flex-col`}>
         <div className="p-6 md:p-8 flex flex-col items-center justify-between border-b border-[#EAE4D9]/50 mb-6 gap-4">
           <div className="w-full flex justify-between items-center">
             <Link href="/admin/dashboard" className="transition-all hover:scale-105" title="الرئيسية للوحة التحكم">
@@ -379,7 +379,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
         </header>
 
         {/* Dynamic Content */}
-        <main className="flex-1 overflow-y-auto p-6 md:p-12 custom-scrollbar">
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
           {children}
         </main>
       </div>

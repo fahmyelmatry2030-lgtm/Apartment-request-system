@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { getBookings, getSystemUnits, updateBookingStatus, saveBooking, deleteBooking } from '@/lib/data-init';
 
 // Units will be fetched dynamically from the database
-const LAYOUT_VERSION = 'v1.7.0'; // Auto-increment this to force-clear client caches
+const LAYOUT_VERSION = 'v1.8.0'; // Auto-increment this to force-clear client caches
 
 const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 
@@ -110,7 +110,7 @@ export default function ReportsPage() {
     checkOut: safeDateStr,
     pricePerNight: 0,
     commission: 0,
-    discount: 0,
+    clientStatus: 'انتظار',
     brokerName: '',
     notes: ''
   });
@@ -281,7 +281,7 @@ export default function ReportsPage() {
         pricePerNight: newRecord.pricePerNight,
         commission: newRecord.commission,
         brokerName: newRecord.brokerName,
-        clientStatus: (newRecord as any).clientStatus || 'انتظار',
+        clientStatus: newRecord.clientStatus || 'انتظار',
         notes: newRecord.notes
       };
       
@@ -300,7 +300,7 @@ export default function ReportsPage() {
         checkOut: sDateStr,
         pricePerNight: 0,
         commission: 0,
-        discount: 0,
+        clientStatus: 'انتظار',
         brokerName: '',
         notes: ''
       });
@@ -712,9 +712,9 @@ export default function ReportsPage() {
                       key={i}
                       className={`border-t border-[#EAE4D9]/30 transition-colors ${
                         row.hasData
-                          ? row.clientStatus === 'متواجد' ? 'bg-green-50/60 hover:bg-green-100/60'
-                            : row.clientStatus === 'غادر' ? 'bg-gray-100 hover:bg-gray-200 opacity-80'
-                            : row.clientStatus === 'انتظار' ? 'bg-orange-50/40 hover:bg-orange-100/40' 
+                          ? row.clientStatus === 'متواجد' ? 'bg-green-100 hover:bg-green-200'
+                            : row.clientStatus === 'غادر' ? 'bg-gray-200 hover:bg-gray-300'
+                            : row.clientStatus === 'انتظار' ? 'bg-orange-100 hover:bg-orange-200' 
                             : 'bg-white hover:bg-yellow-50/30'
                           : 'bg-[#FDFBF7]/50'
                       }`}
