@@ -373,6 +373,24 @@ export default function ReportsPage() {
     const total = booking.totalAmount || (days * pricePerNight);
     const commission = booking.commission || 0;
     const netValue = total - commission;
+
+    // Automatic Status Calculation based on Dates
+    let clientStatus = booking.clientStatus || 'انتظار';
+    if (booking.checkIn && booking.checkOut) {
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      const checkInDate = new Date(booking.checkIn);
+      const checkOutDate = new Date(booking.checkOut);
+      
+      // Only auto-update if it's currently 'انتظار' or 'متواجد' 
+      // This allows 'غادر' to remain if set manually for early checkout
+      if (now >= checkInDate && now < checkOutDate && clientStatus === 'انتظار') {
+        clientStatus = 'متواجد';
+      } else if (now >= checkOutDate && clientStatus !== 'غادر') {
+        clientStatus = 'غادر';
+      }
+    }
+
     return {
       no: i + 1,
       id: booking.id,
@@ -389,7 +407,7 @@ export default function ReportsPage() {
       commission,
       brokerName: booking.brokerName || '',
       netValue,
-      clientStatus: booking.clientStatus || 'انتظار',
+      clientStatus,
       notes: booking.notes?.replace(/خصم بقيمة \d+/, '').trim() || '',
       hasData: true,
     };
