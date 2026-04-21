@@ -280,9 +280,10 @@ export default function UnitsManagement() {
 
       {/* Advanced Edit Modal */}
       {isModalOpen && editingUnit && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-10 bg-white/80 backdrop-blur-xl animate-fade-in overflow-y-auto">
-          <div className="bg-[#FDFBF7] border border-[#EAE4D9] w-full max-w-6xl rounded-[3rem] shadow-[0_50px_150px_rgba(0,0,0,0.15)] overflow-hidden animate-scale-in mb-10 relative">
-            <div className="p-8 md:p-10 border-b border-[#EAE4D9]/50 flex justify-between items-center px-8 md:px-14 bg-white/50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/80 backdrop-blur-xl animate-fade-in">
+          <div className="bg-[#FDFBF7] border border-[#EAE4D9] w-full max-w-6xl h-[90vh] rounded-[3rem] shadow-[0_50px_150px_rgba(0,0,0,0.15)] overflow-hidden animate-scale-in relative flex flex-col">
+            {/* Modal Header - Fixed */}
+            <div className="p-8 md:p-10 border-b border-[#EAE4D9]/50 flex justify-between items-center px-8 md:px-14 bg-white/50 flex-none">
               <div>
                 <h2 className="text-3xl font-black text-[#2A2723]">إدارة <span className="text-[#C1A68D]">بيانات الوحدة</span></h2>
                 <p className="text-[10px] text-[#7A7061] font-black uppercase tracking-widest mt-1.5 opacity-60">Ref ID: {editingUnit.id}</p>
@@ -290,7 +291,8 @@ export default function UnitsManagement() {
               <button onClick={() => setIsModalOpen(false)} className="text-[#7A7061] hover:text-red-500 text-4xl transition-colors">×</button>
             </div>
             
-            <div className="p-8 md:p-14 space-y-12 max-h-[70vh] overflow-y-auto custom-scrollbar text-right" dir="rtl">
+            {/* Modal Body - Scrollable */}
+            <div className="flex-1 overflow-y-auto p-8 md:p-14 space-y-12 custom-scrollbar text-right" dir="rtl">
               
               {/* General Data Section */}
               <section className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -492,7 +494,7 @@ export default function UnitsManagement() {
 
             </div>
 
-            <div className="p-10 md:p-14 border-t border-[#EAE4D9]/50 flex gap-6 px-14 bg-white/50">
+            <div className="p-10 md:p-14 border-t border-[#EAE4D9]/50 flex gap-6 px-14 bg-white/50 flex-none">
               <button 
                 onClick={saveChanges}
                 className="flex-[2] bg-[#2A2723] hover:bg-black text-white font-black py-5 rounded-[2rem] shadow-2xl shadow-black/10 transition-all active:scale-95 text-lg"
