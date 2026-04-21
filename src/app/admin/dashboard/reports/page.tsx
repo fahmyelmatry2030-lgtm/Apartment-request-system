@@ -752,9 +752,9 @@ export default function ReportsPage() {
                       key={i}
                       className={`border-t border-[#EAE4D9]/30 transition-colors ${
                         row.hasData
-                          ? row.clientStatus.trim() === 'متواجد' ? 'bg-[#dcfce7] hover:bg-[#bbf7d0]'
-                            : row.clientStatus.trim() === 'غادر' ? 'bg-[#f3f4f6] hover:bg-[#e5e7eb]'
-                            : row.clientStatus.trim() === 'انتظار' ? 'bg-[#ffedd5] hover:bg-[#fed7aa]' 
+                          ? row.clientStatus.trim() === 'متواجد' ? 'bg-green-200 hover:bg-green-300'
+                            : row.clientStatus.trim() === 'غادر' ? 'bg-gray-300 hover:bg-gray-400'
+                            : row.clientStatus.trim() === 'انتظار' ? 'bg-orange-200 hover:bg-orange-300' 
                             : 'bg-white hover:bg-yellow-50/30'
                           : 'bg-[#FDFBF7]/50'
                       }`}
