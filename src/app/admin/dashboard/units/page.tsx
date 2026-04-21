@@ -4,6 +4,8 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { getPublicSystemUnits, updateUnitDetails } from '@/lib/data-init';
 import { uploadImage } from '@/lib/actions/upload';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
+import imageCompression from 'browser-image-compression';
+import Image from 'next/image';
 
 export default function UnitsManagement() {
   const [allUnits, setAllUnits] = useState<any[]>([]);
@@ -80,35 +82,47 @@ export default function UnitsManagement() {
 
     setIsUploading(true);
     try {
+      // Image Compression Logic
+      const compressionOptions = {
+        maxSizeMB: 0.8, // Target 800KB
+        maxWidthOrHeight: 1600,
+        useWebWorker: true
+      };
+      
+      let fileToUpload = file;
+      try {
+          fileToUpload = await imageCompression(file, compressionOptions);
+          console.log(`Compressed: ${file.size / 1024 / 1024}MB -> ${fileToUpload.size / 1024 / 1024}MB`);
+      } catch (e) {
+          console.warn('Compression failed, using original file', e);
+      }
+
       let publicUrl = '';
       
       // Try Client-side upload first (to bypass Vercel limits)
       const supabase = getSupabaseBrowserClient();
       if (supabase) {
-        const safeName = file.name.replace(/[^\w.\-]+/g, '-');
+        const safeName = fileToUpload.name.replace(/[^\w.\-]+/g, '-');
         const objectPath = `${Date.now()}-${safeName}`;
         
-        const { data, error } = await supabase.storage
+        const { error } = await supabase.storage
           .from('uploads')
-          .upload(objectPath, file, {
+          .upload(objectPath, fileToUpload, {
             cacheControl: '3600',
             upsert: false
           });
           
         if (error) {
-           console.warn('Client-side upload failed, falling back to server action:', error);
-           // Fallback to server action if client upload fails (e.g. due to RLS)
            const formData = new FormData();
-           formData.append('file', file);
+           formData.append('file', fileToUpload);
            publicUrl = await uploadImage(formData);
         } else {
            const { data: urlData } = supabase.storage.from('uploads').getPublicUrl(objectPath);
            publicUrl = urlData.publicUrl;
         }
       } else {
-        // Fallback to server action
         const formData = new FormData();
-        formData.append('file', file);
+        formData.append('file', fileToUpload);
         publicUrl = await uploadImage(formData);
       }
       
@@ -134,17 +148,28 @@ export default function UnitsManagement() {
   const replaceImage = async (index: number, file: File) => {
     setIsUploading(true);
     try {
+        // Image Compression
+        const compressionOptions = {
+            maxSizeMB: 0.8,
+            maxWidthOrHeight: 1600,
+            useWebWorker: true
+        };
+        let fileToUpload = file;
+        try {
+            fileToUpload = await imageCompression(file, compressionOptions);
+        } catch (e) {}
+
         let publicUrl = '';
         const supabase = getSupabaseBrowserClient();
         
         if (supabase) {
-            const safeName = file.name.replace(/[^\w.\-]+/g, '-');
+            const safeName = fileToUpload.name.replace(/[^\w.\-]+/g, '-');
             const objectPath = `${Date.now()}-${safeName}`;
-            const { error } = await supabase.storage.from('uploads').upload(objectPath, file);
+            const { error } = await supabase.storage.from('uploads').upload(objectPath, fileToUpload);
             
             if (error) {
                 const formData = new FormData();
-                formData.append('file', file);
+                formData.append('file', fileToUpload);
                 publicUrl = await uploadImage(formData);
             } else {
                 const { data } = supabase.storage.from('uploads').getPublicUrl(objectPath);
@@ -152,7 +177,7 @@ export default function UnitsManagement() {
             }
         } else {
             const formData = new FormData();
-            formData.append('file', file);
+            formData.append('file', fileToUpload);
             publicUrl = await uploadImage(formData);
         }
         
@@ -239,10 +264,12 @@ export default function UnitsManagement() {
         ) : filteredUnits.map((unit) => (
           <div key={unit.id} className="bg-white rounded-[2rem] overflow-hidden flex flex-col group border border-[#EAE4D9]/50 hover:border-[#C1A68D]/40 transition-all duration-500 hover:-translate-y-1 shadow-sm hover:shadow-xl">
             <div className="relative aspect-video overflow-hidden bg-[#FDFBF7]">
-              <img 
+              <Image 
                 src={unit?.images?.[0] || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267'} 
                 alt={unit.title.ar} 
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-90 group-hover:opacity-100"
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover group-hover:scale-110 transition-transform duration-700 opacity-90 group-hover:opacity-100"
               />
               <div className="absolute top-3 right-3 flex flex-col gap-2">
                 <span className={`text-[9px] font-black uppercase px-3 py-1.5 rounded-full backdrop-blur-md shadow-lg border ${
@@ -431,9 +458,14 @@ export default function UnitsManagement() {
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    {editingUnit.images?.map((img: string, idx: number) => (
                         <div key={idx} className="relative aspect-square rounded-[2rem] overflow-hidden border border-[#EAE4D9] group shadow-sm bg-white">
-                            <img src={img} className="w-full h-full object-cover group-hover:scale-110 transition-transform" alt="" />
+                            <Image 
+                                src={img} 
+                                alt={`Unit image ${idx + 1}`}
+                                fill
+                                sizes="(max-width: 768px) 50vw, 25vw"
+                                className="object-cover group-hover:scale-110 transition-transform" 
+                            />
                             <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3">
                                 <label className="cursor-pointer bg-white text-[#2A2723] px-5 py-2 rounded-xl text-[10px] font-black hover:scale-105 transition-all shadow-xl">
                                     استبدال 🔁

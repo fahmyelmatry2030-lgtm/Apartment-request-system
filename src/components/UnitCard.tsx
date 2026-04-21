@@ -1,8 +1,8 @@
 'use client';
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useLanguage } from '@/lib/LanguageContext';
-import { Unit } from '@/lib/data';
 import { getStudios } from '@/lib/data-init';
 
 interface UnitCardProps {
@@ -27,10 +27,13 @@ const UnitCard: React.FC<UnitCardProps> = ({ unit }) => {
   return (
     <div className={`bg-white rounded-3xl border border-[#EAE4D9] overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group`}>
       <div className="relative h-64 overflow-hidden">
-        <img 
+        <Image 
           src={unit.images[0]} 
           alt={unit.title[language]} 
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="object-cover group-hover:scale-110 transition-transform duration-700"
+          priority={false}
         />
         <div className={`absolute top-4 ${isRTL ? 'right-4' : 'left-4'} bg-[#2A2723]/80 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full border border-white/10 flex gap-2`}>
           <span>{unit.type === 'studio' ? (isRTL ? 'استوديو' : 'STUDIO') : (isRTL ? 'شقة' : 'APARTMENT')}</span>
