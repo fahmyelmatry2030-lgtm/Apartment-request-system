@@ -8,6 +8,8 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useLanguage } from '@/lib/LanguageContext';
 import { getPublicSystemUnits, getStudios } from '@/lib/data-init';
 
+import Image from 'next/image';
+
 export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
   const { t, isRTL, language } = useLanguage();
   const params = useParams();
@@ -34,7 +36,7 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
         setIsLoading(false);
     };
     loadUnit();
-  }, [id]);
+  }, [id, initialUnit]);
 
   if (isLoading) {
     return <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center">Loading...</div>;
@@ -53,8 +55,6 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
       </div>
     );
   }
-
-
 
   return (
     <main className="min-h-screen bg-[#FDFBF7] text-[#2A2723] selection:bg-[#C1A68D] selection:text-white">
@@ -89,7 +89,14 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
                {activeImage.endsWith('.mp4') ? (
                  <video src={activeImage} controls autoPlay muted className="w-full h-full object-contain" />
                ) : (
-                 <img src={activeImage} alt={unit.title[language]} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                 <Image 
+                    src={activeImage} 
+                    alt={unit.title[language]} 
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-700" 
+                    priority
+                 />
                )}
                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
                <div className={`absolute bottom-6 ${isRTL ? 'right-6' : 'left-6'} text-white`}>
@@ -98,7 +105,7 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
             </div>
             
             {/* Thumbnail Grid (Media) */}
-            <div className="grid grid-cols-6 gap-3">
+            <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
                {unit.video && (
                   <button 
                     onClick={() => setActiveImage(unit.video)}
@@ -107,13 +114,19 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
                      <span className="text-white text-2xl">▶</span>
                   </button>
                )}
-               {unit.images.slice(0, 5).map((img: string, i: number) => (
+               {unit.images.map((img: string, i: number) => (
                   <button 
                     key={i} 
                     onClick={() => setActiveImage(img)}
-                    className={`aspect-square rounded-2xl overflow-hidden border-2 transition-all ${activeImage === img ? 'border-[#C1A68D] scale-95 shadow-lg' : 'border-[#EAE4D9] hover:border-[#C1A68D]/40'}`}
+                    className={`relative aspect-square rounded-2xl overflow-hidden border-2 transition-all ${activeImage === img ? 'border-[#C1A68D] scale-95 shadow-lg' : 'border-[#EAE4D9] hover:border-[#C1A68D]/40'}`}
                   >
-                     <img src={img} alt={`Thumb ${i}`} className="w-full h-full object-cover" />
+                     <Image 
+                        src={img} 
+                        alt={`Thumb ${i}`} 
+                        fill
+                        sizes="100px"
+                        className="object-cover" 
+                     />
                   </button>
                ))}
             </div>
@@ -189,13 +202,19 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
 
         </div>
 
-        {/* Gallery Grid (The "5 Images" again but in a more detailed view if needed) */}
+        {/* Gallery Grid */}
         <section className="mt-24 pt-20 border-t border-[#EAE4D9]">
            <h2 className="text-2xl font-black text-[#2A2723] mb-10">{t.unitsPage.gallery}</h2>
            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {unit.images.slice(1).map((img: string, i: number) => (
-                 <div key={i} className={`rounded-3xl overflow-hidden border border-[#EAE4D9] ${i === 0 ? 'md:col-span-2' : ''}`}>
-                    <img src={img} alt={`Detail ${i}`} className="w-full h-80 object-cover" />
+              {unit.images.map((img: string, i: number) => (
+                 <div key={i} className={`relative rounded-3xl overflow-hidden border border-[#EAE4D9] h-80 ${i % 3 === 0 ? 'md:col-span-2' : ''}`}>
+                    <Image 
+                        src={img} 
+                        alt={`Detail ${i}`} 
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-cover" 
+                    />
                  </div>
               ))}
            </div>
