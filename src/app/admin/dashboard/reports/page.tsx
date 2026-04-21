@@ -511,7 +511,12 @@ export default function ReportsPage() {
           <div>
             <div className="flex items-center gap-3 mb-1">
               <h1 className="text-4xl font-black text-[#2A2723]">تقارير <span className="text-[#C1A68D]">الوحدات</span></h1>
-              <span className="text-[10px] font-black text-[#C1A68D] bg-[#FDFBF7] border border-[#EAE4D9]/50 px-2.5 py-1 rounded-full uppercase tracking-widest shadow-sm">{LAYOUT_VERSION} AUTO-SYNC</span>
+              <span className="text-[10px] font-black text-[#C1A68D] bg-[#FDFBF7] border border-[#EAE4D9]/50 px-2.5 py-1 rounded-full uppercase tracking-widest shadow-sm">
+                {LAYOUT_VERSION} {isLoading ? 'SYNCING...' : 'SYNCED'}
+              </span>
+              <span className={`text-[9px] font-black px-2.5 py-1 rounded-full border shadow-sm ${bookings.some(b => String(b.id).startsWith('L-')) ? 'bg-red-50 text-red-600 border-red-100' : 'bg-green-50 text-green-600 border-green-100'}`}>
+                {bookings.some(b => String(b.id).startsWith('L-')) ? '⚠️ LOCAL MODE (OFFLINE)' : '✅ DB MODE (ONLINE)'}
+              </span>
             </div>
             <p className="text-[#7A7061] font-bold opacity-70 text-sm">جدول حجوزات شهري لكل وحدة — اضغط على أي خلية لتعديلها مباشرة.</p>
           </div>
