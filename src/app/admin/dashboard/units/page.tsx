@@ -281,7 +281,7 @@ export default function UnitsManagement() {
       {/* Advanced Edit Modal */}
       {isModalOpen && editingUnit && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/80 backdrop-blur-xl animate-fade-in">
-          <div className="bg-[#FDFBF7] border border-[#EAE4D9] w-full max-w-6xl h-[90vh] rounded-[3rem] shadow-[0_50px_150px_rgba(0,0,0,0.15)] overflow-hidden animate-scale-in relative flex flex-col">
+          <div className="bg-[#FDFBF7] border border-[#EAE4D9] w-full max-w-5xl h-[92vh] rounded-[3rem] shadow-[0_50px_150px_rgba(0,0,0,0.15)] overflow-hidden animate-scale-in relative flex flex-col">
             {/* Modal Header - Fixed */}
             <div className="p-8 md:p-10 border-b border-[#EAE4D9]/50 flex justify-between items-center px-8 md:px-14 bg-white/50 flex-none">
               <div>
