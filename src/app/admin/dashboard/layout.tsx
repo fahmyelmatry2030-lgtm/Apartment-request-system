@@ -185,12 +185,6 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
   return (
     <div className="min-h-screen bg-[#FDFBF7] flex custom-scrollbar" dir="rtl">
       {/* Toggle Button for Mobile */}
-      <button 
-        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        className="lg:hidden fixed bottom-6 right-6 z-50 bg-[#2A2723] text-white p-4 rounded-2xl shadow-2xl active:scale-95 transition-transform"
-      >
-        {isMobileMenuOpen ? <span>✖️</span> : <span>☰</span>}
-      </button>
 
       {/* Sidebar */}
       <aside className={`fixed inset-y-0 right-0 z-40 w-[280px] bg-[#FDFBF7] border-l border-[#EAE4D9]/50 transform transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : 'translate-x-full'} flex flex-col`}>
@@ -278,8 +272,16 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Header */}
-        <header className="h-20 bg-white/60 backdrop-blur-xl border-b border-[#EAE4D9]/50 flex items-center justify-end px-8 gap-6 z-30 sticky top-0">
-          <div className="relative">
+        <header className="h-20 bg-white/60 backdrop-blur-xl border-b border-[#EAE4D9]/50 flex items-center justify-between lg:justify-end px-6 md:px-8 gap-6 z-30 sticky top-0">
+          {/* Hamburger Menu for Mobile */}
+          <button 
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="lg:hidden p-3 bg-[#2A2723] text-white rounded-xl shadow-lg active:scale-95 transition-all"
+          >
+            <span className="text-xl">☰</span>
+          </button>
+
+          <div className="flex items-center gap-4 md:gap-6">
             <button 
               onClick={() => { setShowSent(!showSent); setShowNotifs(false); }}
               className={`p-3 rounded-xl transition-all relative ${showSent ? 'bg-[#2A2723] text-white' : 'bg-[#FDFBF7] text-[#7A7061] hover:text-[#2A2723] border border-[#EAE4D9]'}`}
