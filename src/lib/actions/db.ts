@@ -86,6 +86,7 @@ export async function getFreshDbBookings(nonce?: string) {
     commission: Number(b.commission || 0),
     brokerName: b.broker_name,
     guestsCount: Number(b.guests_count || 1),
+    clientStatus: b.client_status || 'انتظار',
     notes: b.notes,
     timestamp: b.timestamp,
   }));
@@ -122,6 +123,7 @@ export async function saveDbBooking(booking: any) {
       id_number: newBooking.idNumber ?? null,
       commission: newBooking.commission ?? null,
       broker_name: newBooking.brokerName ?? null,
+      client_status: newBooking.clientStatus || 'انتظار',
       guests_count: newBooking.guestsCount ?? 1,
       notes: newBooking.notes ?? null,
       timestamp: newBooking.timestamp,
@@ -165,6 +167,7 @@ export async function updateDbBookingStatus(id: string, updates: any) {
   if (updates.idNumber !== undefined) patch.id_number = updates.idNumber;
   if (updates.commission !== undefined) patch.commission = updates.commission;
   if (updates.brokerName !== undefined) patch.broker_name = updates.brokerName;
+  if (updates.clientStatus !== undefined) patch.client_status = updates.clientStatus;
   if (updates.guestsCount !== undefined) patch.guests_count = updates.guestsCount;
   if (updates.notes !== undefined) patch.notes = updates.notes;
   
