@@ -84,6 +84,8 @@ export default function ReportsPage() {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [isLoading, setIsLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState('');
+  const [editingBooking, setEditingBooking] = useState<any>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // AUTO-RESET LOGIC: Clears stale localStorage once per version update
   useEffect(() => {
@@ -207,6 +209,26 @@ export default function ReportsPage() {
       console.error('Save failed:', err);
       setSaveStatus('❌ فشل الحفظ');
       setTimeout(() => setSaveStatus(''), 3000);
+    }
+  };
+
+  const handleFullUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingBooking) return;
+    
+    try {
+      setSaveStatus('جاري حفظ التعديلات...');
+      const freshData = await updateBookingStatus(editingBooking.id, editingBooking);
+      if (freshData && Array.isArray(freshData)) {
+        setBookings(freshData);
+      }
+      setIsEditModalOpen(false);
+      setEditingBooking(null);
+      setSaveStatus('✅ تم تحديث كافة البيانات');
+      setTimeout(() => setSaveStatus(''), 3000);
+    } catch (err) {
+      console.error(err);
+      setSaveStatus('❌ فشل تحديث البيانات');
     }
   };
 
@@ -841,16 +863,32 @@ export default function ReportsPage() {
                         ) : <span className="text-[#EAE4D9]">—</span>}
                       </td>
 
-                      {/* --- DELETE ACTION --- */}
+                      {/* --- ACTIONS --- */}
                       <td className="px-1 py-1 no-print border-r border-[#EAE4D9]/20">
                         {row.hasData && (
-                          <button 
-                            onClick={() => handleDelete(row.id)}
-                            className="p-1.5 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                            title="حذف الحجز"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-                          </button>
+                          <div className="flex items-center justify-center gap-1">
+                            <button 
+                              onClick={() => {
+                                const fullBooking = bookings.find(b => b.id === row.id);
+                                if (fullBooking) {
+                                  setEditingBooking({...fullBooking});
+                                  setIsEditModalOpen(true);
+                                }
+                              }}
+                              className="p-1.5 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                              title="تعديل كافة البيانات"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                            </button>
+
+                            <button 
+                              onClick={() => handleDelete(row.id)}
+                              className="p-1.5 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                              title="حذف الحجز"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                            </button>
+                          </div>
                         )}
                       </td>
                     </tr>
@@ -888,6 +926,142 @@ export default function ReportsPage() {
             </ul>
           </div>
         </div>
+
+        {/* Edit Booking Modal */}
+        {isEditModalOpen && editingBooking && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in no-print">
+            <div className="bg-[#FDFBF7] border border-[#EAE4D9] w-full max-w-2xl rounded-[2rem] shadow-2xl overflow-hidden animate-scale-in flex flex-col max-h-[90vh]">
+              <div className="p-6 border-b border-[#EAE4D9]/50 flex justify-between items-center bg-white">
+                <h2 className="text-xl font-black text-[#2A2723]">تعديل بيانات <span className="text-[#C1A68D]">الحجز</span></h2>
+                <button onClick={() => setIsEditModalOpen(false)} className="text-2xl text-[#7A7061] hover:text-red-500">×</button>
+              </div>
+
+              <form onSubmit={handleFullUpdate} className="p-8 space-y-6 overflow-y-auto custom-scrollbar" dir="rtl">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest px-2">اسم العميل</label>
+                    <input 
+                      type="text" required
+                      value={editingBooking.name || ''}
+                      onChange={e => setEditingBooking({...editingBooking, name: e.target.value})}
+                      className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C1A68D] font-bold"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest px-2">رقم الهاتف</label>
+                    <input 
+                      type="text" required
+                      value={editingBooking.phone || ''}
+                      onChange={e => setEditingBooking({...editingBooking, phone: e.target.value})}
+                      className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C1A68D] font-bold"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest px-2">الجنسية</label>
+                    <input 
+                      type="text"
+                      value={editingBooking.nationality || ''}
+                      onChange={e => setEditingBooking({...editingBooking, nationality: e.target.value})}
+                      className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C1A68D] font-bold"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest px-2">رقم الهوية</label>
+                    <input 
+                      type="text"
+                      value={editingBooking.idNumber || ''}
+                      onChange={e => setEditingBooking({...editingBooking, idNumber: e.target.value})}
+                      className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C1A68D] font-bold"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest px-2">تاريخ الدخول</label>
+                    <input 
+                      type="date" required
+                      value={editingBooking.checkIn || ''}
+                      onChange={e => setEditingBooking({...editingBooking, checkIn: e.target.value})}
+                      className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C1A68D] font-bold"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest px-2">تاريخ الخروج</label>
+                    <input 
+                      type="date" required
+                      value={editingBooking.checkOut || ''}
+                      onChange={e => setEditingBooking({...editingBooking, checkOut: e.target.value})}
+                      className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C1A68D] font-bold"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest px-2">إجمالي المبلغ</label>
+                    <input 
+                      type="number" required
+                      value={editingBooking.totalAmount || 0}
+                      onChange={e => setEditingBooking({...editingBooking, totalAmount: Number(e.target.value)})}
+                      className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C1A68D] font-bold"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest px-2">العمولة</label>
+                    <input 
+                      type="number"
+                      value={editingBooking.commission || 0}
+                      onChange={e => setEditingBooking({...editingBooking, commission: Number(e.target.value)})}
+                      className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C1A68D] font-bold"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest px-2">اسم الوسيط</label>
+                    <input 
+                      type="text"
+                      value={editingBooking.brokerName || ''}
+                      onChange={e => setEditingBooking({...editingBooking, brokerName: e.target.value})}
+                      className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C1A68D] font-bold"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest px-2">حالة العميل (يدوياً)</label>
+                    <select 
+                      value={editingBooking.clientStatus || 'انتظار'}
+                      onChange={e => setEditingBooking({...editingBooking, clientStatus: e.target.value})}
+                      className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C1A68D] font-bold"
+                    >
+                      <option value="انتظار">انتظار</option>
+                      <option value="متواجد">متواجد</option>
+                      <option value="غادر">غادر</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest px-2">ملاحظات</label>
+                  <textarea 
+                    rows={3}
+                    value={editingBooking.notes || ''}
+                    onChange={e => setEditingBooking({...editingBooking, notes: e.target.value})}
+                    className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C1A68D] font-bold resize-none"
+                  />
+                </div>
+
+                <div className="flex gap-4 pt-4">
+                  <button 
+                    type="submit"
+                    className="flex-1 bg-[#2A2723] text-white font-black py-4 rounded-xl hover:bg-black transition-all shadow-lg"
+                  >
+                    حفظ كافة التعديلات 💾
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => setIsEditModalOpen(false)}
+                    className="flex-1 bg-white border border-[#EAE4D9] text-[#7A7061] font-black py-4 rounded-xl hover:bg-gray-50 transition-all"
+                  >
+                    إلغاء
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
