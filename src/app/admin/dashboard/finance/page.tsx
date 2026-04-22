@@ -143,58 +143,6 @@ export default function FinancePage() {
         </div>
       </header>
 
-      {/* ── SUM TABLE (Excel Layout) ── */}
-      <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
-        <div className="bg-[#2A2723] px-8 py-4 flex items-center gap-3">
-          <span className="text-white font-black text-sm tracking-widest uppercase">SUM</span>
-          <span className="text-[#C1A68D] text-xs font-bold">— ملخص الدورة المالية لشهر {MONTHS_AR[selectedMonth]} {selectedYear}</span>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-center">
-            <thead>
-              <tr>
-                <th className="px-6 py-4 font-black text-xs bg-[#F97316] text-white border border-orange-300">Rent (1)</th>
-                <th className="px-6 py-4 font-black text-xs bg-[#F97316] text-white border border-orange-300">Rent (2)</th>
-                <th className="px-6 py-4 font-black text-xs bg-[#F97316] text-white border border-orange-300">Expenses</th>
-                <th className="px-6 py-4 font-black text-xs bg-[#F97316] text-white border border-orange-300">Salaries</th>
-                <th className="px-6 py-4 font-black text-sm bg-[#FACC15] text-[#2A2723] border border-yellow-300">Final</th>
-              </tr>
-              <tr>
-                <th className="px-4 py-1 text-[10px] font-bold text-[#7A7061] bg-orange-50 border border-orange-100">الإيجار الأول</th>
-                <th className="px-4 py-1 text-[10px] font-bold text-[#7A7061] bg-orange-50 border border-orange-100">الإيجار الثاني</th>
-                <th className="px-4 py-1 text-[10px] font-bold text-[#7A7061] bg-orange-50 border border-orange-100">المصروفات</th>
-                <th className="px-4 py-1 text-[10px] font-bold text-[#7A7061] bg-orange-50 border border-orange-100">الرواتب</th>
-                <th className="px-4 py-1 text-[10px] font-bold text-[#2A2723] bg-yellow-50 border border-yellow-100">الصافي النهائي</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="px-6 py-8 border border-[#EAE4D9]/40">
-                  <div className="text-2xl font-black text-[#2A2723]">{isLoading ? '...' : rent1Total.toLocaleString()}</div>
-                  <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
-                </td>
-                <td className="px-6 py-8 border border-[#EAE4D9]/40">
-                  <div className="text-2xl font-black text-[#2A2723]">{isLoading ? '...' : rent2Total.toLocaleString()}</div>
-                  <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
-                </td>
-                <td className="px-6 py-8 border border-[#EAE4D9]/40">
-                  <div className="text-2xl font-black text-red-600">{isLoading ? '...' : otherExpenses.toLocaleString()}</div>
-                  <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
-                </td>
-                <td className="px-6 py-8 border border-[#EAE4D9]/40">
-                  <div className="text-2xl font-black text-orange-600">{isLoading ? '...' : salariesTotal.toLocaleString()}</div>
-                  <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
-                </td>
-                <td className={`px-6 py-8 border border-yellow-200 bg-[#FACC15]/10 ${netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  <div className="text-3xl font-black">{isLoading ? '...' : netProfit.toLocaleString()}</div>
-                  <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
       {/* ── KPI CARDS ── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm text-center">
@@ -370,6 +318,58 @@ export default function FinancePage() {
           </div>
         </div>
       )}
+
+      {/* ── SUM TABLE (Excel Layout) ── */}
+      <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
+        <div className="bg-[#2A2723] px-8 py-4 flex items-center gap-3">
+          <span className="text-white font-black text-sm tracking-widest uppercase">SUM</span>
+          <span className="text-[#C1A68D] text-xs font-bold">— ملخص الدورة المالية لشهر {MONTHS_AR[selectedMonth]} {selectedYear}</span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-center">
+            <thead>
+              <tr>
+                <th className="px-6 py-4 font-black text-xs bg-[#F97316] text-white border border-orange-300">Rent (1)</th>
+                <th className="px-6 py-4 font-black text-xs bg-[#F97316] text-white border border-orange-300">Rent (2)</th>
+                <th className="px-6 py-4 font-black text-xs bg-[#F97316] text-white border border-orange-300">Expenses</th>
+                <th className="px-6 py-4 font-black text-xs bg-[#F97316] text-white border border-orange-300">Salaries</th>
+                <th className="px-6 py-4 font-black text-sm bg-[#FACC15] text-[#2A2723] border border-yellow-300">Final</th>
+              </tr>
+              <tr>
+                <th className="px-4 py-1 text-[10px] font-bold text-[#7A7061] bg-orange-50 border border-orange-100">الإيجار الأول</th>
+                <th className="px-4 py-1 text-[10px] font-bold text-[#7A7061] bg-orange-50 border border-orange-100">الإيجار الثاني</th>
+                <th className="px-4 py-1 text-[10px] font-bold text-[#7A7061] bg-orange-50 border border-orange-100">المصروفات</th>
+                <th className="px-4 py-1 text-[10px] font-bold text-[#7A7061] bg-orange-50 border border-orange-100">الرواتب</th>
+                <th className="px-4 py-1 text-[10px] font-bold text-[#2A2723] bg-yellow-50 border border-yellow-100">الصافي النهائي</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="px-6 py-8 border border-[#EAE4D9]/40">
+                  <div className="text-2xl font-black text-[#2A2723]">{isLoading ? '...' : rent1Total.toLocaleString()}</div>
+                  <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
+                </td>
+                <td className="px-6 py-8 border border-[#EAE4D9]/40">
+                  <div className="text-2xl font-black text-[#2A2723]">{isLoading ? '...' : rent2Total.toLocaleString()}</div>
+                  <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
+                </td>
+                <td className="px-6 py-8 border border-[#EAE4D9]/40">
+                  <div className="text-2xl font-black text-red-600">{isLoading ? '...' : otherExpenses.toLocaleString()}</div>
+                  <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
+                </td>
+                <td className="px-6 py-8 border border-[#EAE4D9]/40">
+                  <div className="text-2xl font-black text-orange-600">{isLoading ? '...' : salariesTotal.toLocaleString()}</div>
+                  <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
+                </td>
+                <td className={`px-6 py-8 border border-yellow-200 bg-[#FACC15]/10 ${netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  <div className="text-3xl font-black">{isLoading ? '...' : netProfit.toLocaleString()}</div>
+                  <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       {/* ── FINAL NET BAR ── */}
       <div className={`p-10 rounded-[3rem] shadow-2xl flex flex-col md:flex-row justify-between items-center gap-8 ${netProfit >= 0 ? 'bg-[#2A2723]' : 'bg-red-900'}`}>
