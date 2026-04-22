@@ -32,6 +32,7 @@ export default function DashboardOverview() {
   const [apartmentMap, setApartmentMap] = useState<any[]>([]);
 
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const [inventoryStats, setInventoryStats] = useState<any[]>([]);
 
   const loadOverviewData = useCallback(async () => {
@@ -49,15 +50,52 @@ export default function DashboardOverview() {
     const confirmed = bookings.filter((b: any) => CONFIRMED_STATUSES.includes(b.status));
     const pending = bookings.filter((b: any) => PENDING_STATUSES.includes(b.status));
 
-    setTodaySchedule({
-      in: confirmed.filter((b: any) => b.checkIn === targetDateStr),
-      out: confirmed.filter((b: any) => b.checkOut === targetDateStr),
+    // Hardcoded IDs mapping for filtering
+    const singleIds = [2, 3, 6, 7, 8, 17].map(n => `b1-s${n}`);
+    const doubleIds = [1, 5, 9, 10, 11, 12, 13, 18, 20, 24].map(n => `b1-s${n}`);
+    const tripleIds = [4, 14, 15, 22, 23].map(n => `b1-s${n}`);
+    const twoRoomIds = [16, 19, 21].map(n => `b1-s${n}`);
+
+    // 1. Map units based on SELECTED DATE and CATEGORY
+    const map = apts.map((apt: any) => {
+      const activeBooking = confirmed.find((b: any) => {
+        const bIn = b.checkIn;
+        const bOut = b.checkOut;
+        return b.apartmentId === apt.id && targetDateStr >= bIn && targetDateStr < bOut;
+      });
+
+      // Categorization logic
+      let cat = 'apartment';
+      if (singleIds.includes(apt.id)) cat = 'single';
+      else if (doubleIds.includes(apt.id)) cat = 'double';
+      else if (tripleIds.includes(apt.id)) cat = 'triple';
+      else if (twoRoomIds.includes(apt.id)) cat = 'two-room';
+
+      return { 
+        ...apt, 
+        category: cat,
+        isOccupied: !!activeBooking || apt.status === 'مشغول', 
+        guest: activeBooking?.name, 
+        guestsCount: activeBooking?.guestsCount 
+      };
     });
 
-    setTomorrowPlans({
-      in: confirmed.filter((b: any) => b.checkIn === nextDayStr),
-      out: confirmed.filter((b: any) => b.checkOut === nextDayStr),
-    });
+    // Apply UI Filter
+    const filteredMap = selectedCategory === 'all' 
+      ? map 
+      : map.filter(u => u.category === selectedCategory);
+
+    setApartmentMap(filteredMap);
+
+    // 2. Calculate Category Availability for SELECTED DATE
+    const physicalStudios = map.filter((u: any) => u.id.startsWith('b1-s'));
+    const categories = [
+      { id: 'single', label: 'سنجل', count: physicalStudios.filter(u => singleIds.includes(u.id) && !u.isOccupied).length, color: 'text-green-500' },
+      { id: 'double', label: 'دبل', count: physicalStudios.filter(u => doubleIds.includes(u.id) && !u.isOccupied).length, color: 'text-blue-400' },
+      { id: 'triple', label: 'تريبل', count: physicalStudios.filter(u => tripleIds.includes(u.id) && !u.isOccupied).length, color: 'text-orange-400' },
+      { id: 'two-room', label: 'غرفتين', count: physicalStudios.filter(u => twoRoomIds.includes(u.id) && !u.isOccupied).length, color: 'text-purple-400' }
+    ];
+    setInventoryStats(categories);
 
     setStats({
       totalBookings: bookings.length,
@@ -69,36 +107,19 @@ export default function DashboardOverview() {
       checkOutTomorrow: confirmed.filter((b: any) => b.checkOut === nextDayStr).length,
     });
 
-    // 1. Map units based on SELECTED DATE
-    const map = apts.map((apt: any) => {
-      const activeBooking = confirmed.find((b: any) => {
-        const bIn = b.checkIn;
-        const bOut = b.checkOut;
-        return b.apartmentId === apt.id && targetDateStr >= bIn && targetDateStr < bOut;
-      });
-      return { ...apt, isOccupied: !!activeBooking || apt.status === 'مشغول', guest: activeBooking?.name, guestsCount: activeBooking?.guestsCount };
+    setTodaySchedule({
+      in: confirmed.filter((b: any) => b.checkIn === targetDateStr),
+      out: confirmed.filter((b: any) => b.checkOut === targetDateStr),
     });
-    setApartmentMap(map);
 
-    // 2. Calculate Category Availability for SELECTED DATE using hardcoded IDs from the handwritten list
-    const physicalStudios = map.filter((u: any) => u.id.startsWith('b1-s'));
-    
-    const singleIds = [2, 3, 6, 7, 8, 17].map(n => `b1-s${n}`);
-    const doubleIds = [1, 5, 9, 10, 11, 12, 13, 18, 20, 24].map(n => `b1-s${n}`);
-    const tripleIds = [4, 14, 15, 22, 23].map(n => `b1-s${n}`);
-    const twoRoomIds = [16, 19, 21].map(n => `b1-s${n}`);
-
-    const categories = [
-      { label: 'سنجل', count: physicalStudios.filter(u => singleIds.includes(u.id) && !u.isOccupied).length, color: 'text-green-500' },
-      { label: 'دبل', count: physicalStudios.filter(u => doubleIds.includes(u.id) && !u.isOccupied).length, color: 'text-blue-400' },
-      { label: 'تريبل', count: physicalStudios.filter(u => tripleIds.includes(u.id) && !u.isOccupied).length, color: 'text-orange-400' },
-      { label: 'غرفتين', count: physicalStudios.filter(u => twoRoomIds.includes(u.id) && !u.isOccupied).length, color: 'text-purple-400' }
-    ];
-    setInventoryStats(categories);
+    setTomorrowPlans({
+      in: confirmed.filter((b: any) => b.checkIn === nextDayStr),
+      out: confirmed.filter((b: any) => b.checkOut === nextDayStr),
+    });
 
     setLastUpdated(new Date());
     setIsLoading(false);
-  }, [selectedDate]);
+  }, [selectedDate, selectedCategory]);
 
   useEffect(() => {
     loadOverviewData();
@@ -207,12 +228,24 @@ export default function DashboardOverview() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-10">
+            <div 
+                onClick={() => setSelectedCategory('all')}
+                className={`p-6 rounded-3xl cursor-pointer transition-all border ${selectedCategory === 'all' ? 'bg-[#C1A68D] border-[#C1A68D] shadow-[0_0_30px_rgba(193,166,141,0.3)] scale-105' : 'bg-white/5 border-white/5 hover:bg-white/10'}`}
+            >
+                <div className={`text-[10px] font-black uppercase tracking-widest mb-3 ${selectedCategory === 'all' ? 'text-black' : 'text-gray-500'}`}>عرض الكل</div>
+                <div className={`text-5xl font-black ${selectedCategory === 'all' ? 'text-black' : 'text-white'}`}>∞</div>
+            </div>
+
             {inventoryStats.map((item, i) => (
-                <div key={i} className="bg-white/5 border border-white/5 p-6 rounded-3xl hover:bg-white/10 transition-all group">
-                    <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 group-hover:text-[#C1A68D] transition-colors">{item.label}</div>
+                <div 
+                    key={i} 
+                    onClick={() => setSelectedCategory(item.id)}
+                    className={`p-6 rounded-3xl cursor-pointer transition-all border group ${selectedCategory === item.id ? 'bg-white border-white shadow-[0_0_30px_rgba(255,255,255,0.2)] scale-105' : 'bg-white/5 border-white/5 hover:bg-white/10'}`}
+                >
+                    <div className={`text-[10px] font-black uppercase tracking-widest mb-3 transition-colors ${selectedCategory === item.id ? 'text-black' : 'text-gray-500 group-hover:text-[#C1A68D]'}`}>{item.label}</div>
                     <div className="flex items-end gap-2">
-                        <div className={`text-5xl font-black ${item.count > 0 ? item.color : 'text-gray-700'}`}>{item.count}</div>
-                        <div className="text-[10px] font-bold text-gray-500 mb-2">متاح حالياً</div>
+                        <div className={`text-5xl font-black ${selectedCategory === item.id ? 'text-black' : (item.count > 0 ? item.color : 'text-gray-700')}`}>{item.count}</div>
+                        <div className={`text-[10px] font-bold mb-2 ${selectedCategory === item.id ? 'text-black/60' : 'text-gray-500'}`}>متاح</div>
                     </div>
                 </div>
             ))}
