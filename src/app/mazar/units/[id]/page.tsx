@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const title = `${unit.title.ar} | مزار`;
-  const description = unit.description.ar;
+  const description = unit.description?.ar || '';
   const image = unit.images?.[0] || '/images/logo-en.jpg';
 
   return {

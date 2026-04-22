@@ -257,6 +257,7 @@ export default function ContentManagement() {
               <button onClick={loadData} className="bg-[#2A2723] text-white px-10 py-4 rounded-full font-black hover:bg-black transition-all">إعادة المحاولة 🔄</button>
           </div>
       ) : (
+        <>
         <div className="flex flex-col lg:flex-row gap-10">
         {/* Navigation Sidebar */}
         <div className="w-full lg:w-72 space-y-3">
@@ -417,7 +418,7 @@ export default function ContentManagement() {
           )}
         </div>
       </div>
-
+      
       <div className="bg-[#C1A68D]/10 border border-[#C1A68D]/30 flex gap-10 p-10 rounded-[3rem] items-center shadow-sm">
         <span className="text-5xl">💡</span>
         <div>
@@ -427,6 +428,8 @@ export default function ContentManagement() {
             </p>
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 }
