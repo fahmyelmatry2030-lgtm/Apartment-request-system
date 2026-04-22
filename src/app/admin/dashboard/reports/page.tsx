@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { getBookings, getSystemUnits, updateBookingStatus, saveBooking, deleteBooking } from '@/lib/data-init';
+import ExpensesTab from './ExpensesTab';
+import FinancialSummaryTab from './FinancialSummaryTab';
 
 // Units will be fetched dynamically from the database
 const LAYOUT_VERSION = 'v1.9.0'; // Auto-increment this to force-clear client caches
@@ -86,6 +88,7 @@ export default function ReportsPage() {
   const [saveStatus, setSaveStatus] = useState('');
   const [editingBooking, setEditingBooking] = useState<any>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'operational' | 'expenses' | 'financial'>('operational');
 
   // AUTO-RESET LOGIC: Clears stale localStorage once per version update
   useEffect(() => {
@@ -525,7 +528,34 @@ export default function ReportsPage() {
       `}</style>
 
       <div className="space-y-8 animate-fade-in relative z-0">
-        {/* Header */}
+        {/* Tab Navigation */}
+        <div className="no-print bg-[#2A2723] p-2 rounded-[2rem] flex gap-2 w-full max-w-2xl mx-auto shadow-2xl border border-white/5 overflow-x-auto scrollbar-hide" dir="rtl">
+          <button 
+            onClick={() => setActiveTab('operational')}
+            className={`flex-1 px-8 py-4 rounded-2xl text-[10px] md:text-xs font-black transition-all whitespace-nowrap ${activeTab === 'operational' ? 'bg-[#C1A68D] text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+          >
+            📋 جدول الحجوزات التشغيلي
+          </button>
+          <button 
+            onClick={() => setActiveTab('expenses')}
+            className={`flex-1 px-8 py-4 rounded-2xl text-[10px] md:text-xs font-black transition-all whitespace-nowrap ${activeTab === 'expenses' ? 'bg-[#C1A68D] text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+          >
+            💸 إدارة المصروفات
+          </button>
+          <button 
+            onClick={() => setActiveTab('financial')}
+            className={`flex-1 px-8 py-4 rounded-2xl text-[10px] md:text-xs font-black transition-all whitespace-nowrap ${activeTab === 'financial' ? 'bg-[#C1A68D] text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+          >
+            📉 التقرير المالي الشامل
+          </button>
+        </div>
+
+        {activeTab === 'expenses' && <ExpensesTab />}
+        {activeTab === 'financial' && <FinancialSummaryTab bookings={bookings} />}
+        
+        {activeTab === 'operational' && (
+          <>
+            {/* Header */}
         <header className="no-print flex justify-between items-center flex-wrap gap-4">
           <div>
             <div className="flex items-center gap-3 mb-1">
@@ -1058,6 +1088,8 @@ export default function ReportsPage() {
               </form>
             </div>
           </div>
+        )}
+          </>
         )}
       </div>
     </>
