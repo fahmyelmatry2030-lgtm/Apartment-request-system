@@ -313,7 +313,6 @@ export default function DashboardOverview() {
             )}
           </div>
         </div>
-      </div>
 
       {/* Today Schedule */}
       <div className="bg-white p-8 rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm">
