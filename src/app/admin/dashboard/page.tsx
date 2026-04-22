@@ -29,6 +29,7 @@ export default function DashboardOverview() {
 
   const [todaySchedule, setTodaySchedule] = useState<{in: any[], out: any[]}>({ in: [], out: [] });
   const [tomorrowPlans, setTomorrowPlans] = useState<{in: any[], out: any[]}>({ in: [], out: [] });
+  const [nextDayPlans, setNextDayPlans] = useState<{in: any[], out: any[]}>({ in: [], out: [] });
   const [apartmentMap, setApartmentMap] = useState<any[]>([]);
 
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -46,6 +47,10 @@ export default function DashboardOverview() {
     const nextDay = new Date(selectedDate);
     nextDay.setDate(nextDay.getDate() + 1);
     const nextDayStr = nextDay.toISOString().split('T')[0];
+
+    const dayAfter = new Date(selectedDate);
+    dayAfter.setDate(dayAfter.getDate() + 2);
+    const dayAfterStr = dayAfter.toISOString().split('T')[0];
 
     const confirmed = bookings.filter((b: any) => CONFIRMED_STATUSES.includes(b.status));
     const pending = bookings.filter((b: any) => PENDING_STATUSES.includes(b.status));
@@ -119,6 +124,11 @@ export default function DashboardOverview() {
     setTomorrowPlans({
       in: confirmed.filter((b: any) => b.checkIn === nextDayStr),
       out: confirmed.filter((b: any) => b.checkOut === nextDayStr),
+    });
+
+    setNextDayPlans({
+      in: confirmed.filter((b: any) => b.checkIn === dayAfterStr),
+      out: confirmed.filter((b: any) => b.checkOut === dayAfterStr),
     });
 
     setLastUpdated(new Date());
@@ -278,89 +288,142 @@ export default function DashboardOverview() {
         )}
       </div>
 
-        {/* Tomorrow Preview */}
-        <div className="bg-[#2A2723] p-8 rounded-[2.5rem] shadow-xl flex flex-col">
-          <h3 className="font-black text-lg mb-2 text-white flex items-center justify-between">
-            <span>📅 غداً</span>
-            <span className="text-[10px] text-[#C1A68D] font-black uppercase tracking-widest bg-[#C1A68D]/10 px-3 py-1 rounded-full border border-[#C1A68D]/20">
-              {tomorrowPlans.in.length} وصول · {tomorrowPlans.out.length} مغادرة
-            </span>
-          </h3>
-          <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest mb-6">خطة الغد</p>
-          <div className="space-y-3 flex-1">
-            {tomorrowPlans.in.length === 0 && tomorrowPlans.out.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-center opacity-20 pt-8">
-                <span className="text-4xl mb-3">🌙</span>
-                <p className="text-[10px] font-black uppercase tracking-widest text-white">لا توجد عمليات غداً</p>
+      {/* 3-DAY OPERATIONAL PREVIEW */}
+      <div className="bg-[#1A1816] p-8 rounded-[2.5rem] shadow-2xl border border-white/5 relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#C1A68D] to-transparent opacity-20" />
+        
+        <div className="grid md:grid-cols-3 gap-8 divide-x divide-white/5 rtl:divide-x-reverse">
+          {/* DAY 1: TODAY */}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-xl">📅</span>
+                <div>
+                  <h4 className="text-white font-black text-sm">اليوم</h4>
+                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{selectedDate}</p>
+                </div>
               </div>
-            ) : (
-              <>
-                {tomorrowPlans.in.map((b, i) => (
-                  <div key={`in-${i}`} className="p-3 bg-green-500/10 border border-green-500/20 rounded-2xl flex items-center gap-3">
-                    <span className="text-green-400 text-sm">🛬</span>
-                    <div>
-                      <div className="text-xs font-black text-white">{b.name}</div>
-                      <div className="text-[9px] text-green-400 font-black">{b.studio || b.apartmentId}</div>
+              <span className="bg-green-500/10 text-green-400 px-3 py-1 rounded-full text-[9px] font-black border border-green-500/20">
+                {todaySchedule.in.length} وصول · {todaySchedule.out.length} مغادرة
+              </span>
+            </div>
+            
+            <div className="space-y-2 max-h-[150px] overflow-y-auto custom-scrollbar pr-2">
+              {todaySchedule.in.length === 0 && todaySchedule.out.length === 0 ? (
+                <div className="py-8 text-center opacity-20"><p className="text-[10px] font-black text-white">لا عمليات اليوم</p></div>
+              ) : (
+                <>
+                  {todaySchedule.in.map((b, i) => (
+                    <div key={`t-in-${i}`} className="p-2.5 bg-green-500/5 border border-green-500/10 rounded-xl flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px]">🛬</span>
+                        <span className="text-[11px] font-black text-white truncate max-w-[100px]">{b.name}</span>
+                      </div>
+                      <span className="text-[9px] font-black text-green-400">{b.studio || b.apartmentId}</span>
                     </div>
-                  </div>
-                ))}
-                {tomorrowPlans.out.map((b, i) => (
-                  <div key={`out-${i}`} className="p-3 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3">
-                    <span className="text-red-400 text-sm">🛫</span>
-                    <div>
-                      <div className="text-xs font-black text-white">{b.name}</div>
-                      <div className="text-[9px] text-red-400 font-black">{b.studio || b.apartmentId}</div>
+                  ))}
+                  {todaySchedule.out.map((b, i) => (
+                    <div key={`t-out-${i}`} className="p-2.5 bg-red-500/5 border border-red-500/10 rounded-xl flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px]">🛫</span>
+                        <span className="text-[11px] font-black text-white truncate max-w-[100px]">{b.name}</span>
+                      </div>
+                      <span className="text-[9px] font-black text-red-400">{b.studio || b.apartmentId}</span>
                     </div>
-                  </div>
-                ))}
-              </>
-            )}
+                  ))}
+                </>
+              )}
+            </div>
           </div>
-        </div>
 
-      {/* Today Schedule */}
-      <div className="bg-white p-8 rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm">
-        <h3 className="font-black text-lg mb-8 text-[#2A2723] flex items-center gap-3">
-          ⌚ جدول اليوم
-          <span className="text-[10px] text-[#7A7061] font-bold opacity-60">{new Date().toLocaleDateString('ar-EG')}</span>
-        </h3>
-        <div className="grid md:grid-cols-2 gap-8">
-          <div className="space-y-3">
-            <h4 className="text-[10px] font-black text-green-600 uppercase tracking-widest pb-2 border-b-2 border-green-100 flex items-center gap-2">
-              🛬 وصول اليوم
-              <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-[8px]">{todaySchedule.in.length}</span>
-            </h4>
-            {todaySchedule.in.length === 0 ? (
-              <p className="text-[10px] text-[#7A7061] font-bold italic opacity-30 pt-2">لا عمليات وصول اليوم.</p>
-            ) : todaySchedule.in.map((b, i) => (
-              <div key={i} className="p-4 bg-green-50 rounded-2xl border border-green-100 flex items-center gap-4 hover:shadow-md transition-all">
-                <div className="w-9 h-9 rounded-full bg-green-100 text-green-700 flex items-center justify-center text-[9px] font-black border border-green-200 shrink-0">{b.apartmentId || '?'}</div>
+          {/* DAY 2: TOMORROW */}
+          <div className="space-y-6 px-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-xl">☀️</span>
                 <div>
-                  <div className="text-xs font-black text-[#2A2723]">{b.name}</div>
-                  <div className="text-[9px] text-[#7A7061] font-bold">{b.studio} {b.guestsCount > 1 ? `· ${b.guestsCount} أشخاص` : ''}</div>
+                  <h4 className="text-white font-black text-sm">غداً</h4>
+                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{new Date(new Date(selectedDate).setDate(new Date(selectedDate).getDate() + 1)).toISOString().split('T')[0]}</p>
                 </div>
               </div>
-            ))}
+              <span className="bg-[#C1A68D]/10 text-[#C1A68D] px-3 py-1 rounded-full text-[9px] font-black border border-[#C1A68D]/20">
+                {tomorrowPlans.in.length} وصول · {tomorrowPlans.out.length} مغادرة
+              </span>
+            </div>
+            
+            <div className="space-y-2 max-h-[150px] overflow-y-auto custom-scrollbar pr-2">
+              {tomorrowPlans.in.length === 0 && tomorrowPlans.out.length === 0 ? (
+                <div className="py-8 text-center opacity-20"><p className="text-[10px] font-black text-white">لا عمليات غداً</p></div>
+              ) : (
+                <>
+                  {tomorrowPlans.in.map((b, i) => (
+                    <div key={`tom-in-${i}`} className="p-2.5 bg-[#C1A68D]/5 border border-[#C1A68D]/10 rounded-xl flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px]">🛬</span>
+                        <span className="text-[11px] font-black text-white truncate max-w-[100px]">{b.name}</span>
+                      </div>
+                      <span className="text-[9px] font-black text-[#C1A68D]">{b.studio || b.apartmentId}</span>
+                    </div>
+                  ))}
+                  {tomorrowPlans.out.map((b, i) => (
+                    <div key={`tom-out-${i}`} className="p-2.5 bg-red-500/5 border border-red-500/10 rounded-xl flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px]">🛫</span>
+                        <span className="text-[11px] font-black text-white truncate max-w-[100px]">{b.name}</span>
+                      </div>
+                      <span className="text-[9px] font-black text-red-400">{b.studio || b.apartmentId}</span>
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
           </div>
-          <div className="space-y-3">
-            <h4 className="text-[10px] font-black text-red-600 uppercase tracking-widest pb-2 border-b-2 border-red-100 flex items-center gap-2">
-              🛫 مغادرة اليوم
-              <span className="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-[8px]">{todaySchedule.out.length}</span>
-            </h4>
-            {todaySchedule.out.length === 0 ? (
-              <p className="text-[10px] text-[#7A7061] font-bold italic opacity-30 pt-2">لا عمليات مغادرة اليوم.</p>
-            ) : todaySchedule.out.map((b, i) => (
-              <div key={i} className="p-4 bg-red-50 rounded-2xl border border-red-100 flex items-center gap-4 hover:shadow-md transition-all">
-                <div className="w-9 h-9 rounded-full bg-red-100 text-red-700 flex items-center justify-center text-[9px] font-black border border-red-200 shrink-0">{b.apartmentId || '?'}</div>
+
+          {/* DAY 3: DAY AFTER */}
+          <div className="space-y-6 px-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-xl">⏳</span>
                 <div>
-                  <div className="text-xs font-black text-[#2A2723]">{b.name}</div>
-                  <div className="text-[9px] text-[#7A7061] font-bold">{b.studio} {b.guestsCount > 1 ? `· ${b.guestsCount} أشخاص` : ''}</div>
+                  <h4 className="text-white font-black text-sm">بعد غد</h4>
+                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{new Date(new Date(selectedDate).setDate(new Date(selectedDate).getDate() + 2)).toISOString().split('T')[0]}</p>
                 </div>
               </div>
-            ))}
+              <span className="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full text-[9px] font-black border border-blue-500/20">
+                {nextDayPlans.in.length} وصول · {nextDayPlans.out.length} مغادرة
+              </span>
+            </div>
+            
+            <div className="space-y-2 max-h-[150px] overflow-y-auto custom-scrollbar pr-2">
+              {nextDayPlans.in.length === 0 && nextDayPlans.out.length === 0 ? (
+                <div className="py-8 text-center opacity-20"><p className="text-[10px] font-black text-white">لا عمليات بعد غد</p></div>
+              ) : (
+                <>
+                  {nextDayPlans.in.map((b, i) => (
+                    <div key={`next-in-${i}`} className="p-2.5 bg-blue-500/5 border border-blue-500/10 rounded-xl flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px]">🛬</span>
+                        <span className="text-[11px] font-black text-white truncate max-w-[100px]">{b.name}</span>
+                      </div>
+                      <span className="text-[9px] font-black text-blue-400">{b.studio || b.apartmentId}</span>
+                    </div>
+                  ))}
+                  {nextDayPlans.out.map((b, i) => (
+                    <div key={`next-out-${i}`} className="p-2.5 bg-red-500/5 border border-red-500/10 rounded-xl flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px]">🛫</span>
+                        <span className="text-[11px] font-black text-white truncate max-w-[100px]">{b.name}</span>
+                      </div>
+                      <span className="text-[9px] font-black text-red-400">{b.studio || b.apartmentId}</span>
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
+
     </div>
   );
 }
