@@ -141,7 +141,7 @@ export default function DashboardOverview() {
   useEffect(() => {
     if (fullMap.length === 0) return;
     const filtered = selectedCategory === 'all'
-      ? fullMap.filter((u: any) => !u.id.startsWith('b1-s') && !u.id.startsWith('b2-s'))
+      ? fullMap.filter((u: any) => u.id.startsWith('b1-s') || u.id.startsWith('b2-s'))
       : fullMap.filter((u: any) => u.category === selectedCategory);
     setApartmentMap(filtered);
   }, [selectedCategory, fullMap]);
