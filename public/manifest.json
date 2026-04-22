@@ -1,0 +1,23 @@
+{
+  "name": "Mazar Booking",
+  "short_name": "Mazar",
+  "description": "نظام مزار لإدارة الاستوديوهات الفندقية",
+  "start_url": "/admin/dashboard",
+  "display": "standalone",
+  "background_color": "#FDFBF7",
+  "theme_color": "#2A2723",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
