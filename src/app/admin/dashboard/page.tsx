@@ -40,9 +40,7 @@ export default function DashboardOverview() {
     setIsLoading(true);
     const bookings = await getBookings(Date.now().toString());
     const apts = await getSystemUnits();
-    
-    const today = new Date();
-    const todayStr = today.toISOString().split('T')[0];
+
     const targetDateStr = selectedDate;
     const nextDay = new Date(selectedDate);
     nextDay.setDate(nextDay.getDate() + 1);
@@ -58,76 +56,61 @@ export default function DashboardOverview() {
     // Helper to map 1-24 to b1-sX or b2-sX
     const getFullId = (n: number) => n <= 12 ? `b1-s${n}` : `b2-s${n-12}`;
 
-    // Hardcoded IDs mapping for filtering
-    const singleIds = [2, 3, 6, 7, 8, 17].map(getFullId);
-    const doubleIds = [1, 5, 9, 10, 11, 12, 13, 18, 20, 24].map(getFullId);
-    const tripleIds = [4, 14, 15, 22, 23].map(getFullId);
+    const singleIds  = [2, 3, 6, 7, 8, 17].map(getFullId);
+    const doubleIds  = [1, 5, 9, 10, 11, 12, 13, 18, 20, 24].map(getFullId);
+    const tripleIds  = [4, 14, 15, 22, 23].map(getFullId);
     const twoRoomIds = [16, 19, 21].map(getFullId);
 
-    // 1. Map units based on SELECTED DATE and CATEGORY
     const map = apts.map((apt: any) => {
-      const activeBooking = confirmed.find((b: any) => {
-        const bIn = b.checkIn;
-        const bOut = b.checkOut;
-        return b.apartmentId === apt.id && targetDateStr >= bIn && targetDateStr < bOut;
-      });
-
-      // Categorization logic
+      const activeBooking = confirmed.find((b: any) =>
+        b.apartmentId === apt.id && targetDateStr >= b.checkIn && targetDateStr < b.checkOut
+      );
       let cat = 'apartment';
       if (singleIds.includes(apt.id)) cat = 'single';
       else if (doubleIds.includes(apt.id)) cat = 'double';
       else if (tripleIds.includes(apt.id)) cat = 'triple';
       else if (twoRoomIds.includes(apt.id)) cat = 'two-room';
 
-      return { 
-        ...apt, 
+      return {
+        ...apt,
         category: cat,
-        isOccupied: !!activeBooking || apt.status === 'مشغول', 
-        guest: activeBooking?.name, 
-        guestsCount: activeBooking?.guestsCount 
+        isOccupied: !!activeBooking || apt.status === 'مشغول',
+        guest: activeBooking?.name,
+        guestsCount: activeBooking?.guestsCount,
       };
     });
 
-    // Apply UI Filter
-    const filteredMap = selectedCategory === 'all' 
-      ? map 
-      : map.filter(u => u.category === selectedCategory);
-
+    const filteredMap = selectedCategory === 'all' ? map : map.filter((u: any) => u.category === selectedCategory);
     setApartmentMap(filteredMap);
 
-    // 2. Calculate Category Availability for SELECTED DATE using both branches
     const physicalStudios = map.filter((u: any) => u.id.startsWith('b1-s') || u.id.startsWith('b2-s'));
-
-    const categories = [
-      { id: 'single', label: 'سنجل', count: physicalStudios.filter(u => singleIds.includes(u.id) && !u.isOccupied).length, total: 6, color: 'text-green-500' },
-      { id: 'double', label: 'دبل', count: physicalStudios.filter(u => doubleIds.includes(u.id) && !u.isOccupied).length, total: 10, color: 'text-blue-400' },
-      { id: 'triple', label: 'تريبل', count: physicalStudios.filter(u => tripleIds.includes(u.id) && !u.isOccupied).length, total: 5, color: 'text-orange-400' },
-      { id: 'two-room', label: 'غرفتين', count: physicalStudios.filter(u => twoRoomIds.includes(u.id) && !u.isOccupied).length, total: 3, color: 'text-purple-400' }
-    ];
-    setInventoryStats(categories);
+    setInventoryStats([
+      { id: 'single',   label: 'سنجل',    count: physicalStudios.filter((u: any) => singleIds.includes(u.id)  && !u.isOccupied).length, total: 6,  color: 'text-green-500'  },
+      { id: 'double',   label: 'دبل',      count: physicalStudios.filter((u: any) => doubleIds.includes(u.id)  && !u.isOccupied).length, total: 10, color: 'text-blue-400'   },
+      { id: 'triple',   label: 'تريبل',    count: physicalStudios.filter((u: any) => tripleIds.includes(u.id)  && !u.isOccupied).length, total: 5,  color: 'text-orange-400' },
+      { id: 'two-room', label: 'غرفتين',   count: physicalStudios.filter((u: any) => twoRoomIds.includes(u.id) && !u.isOccupied).length, total: 3,  color: 'text-purple-400' },
+    ]);
 
     setStats({
       totalBookings: bookings.length,
       pendingBookings: pending.length,
       approvedBookings: confirmed.length,
-      checkInToday: confirmed.filter((b: any) => b.checkIn === targetDateStr).length,
-      checkOutToday: confirmed.filter((b: any) => b.checkOut === targetDateStr).length,
-      checkInTomorrow: confirmed.filter((b: any) => b.checkIn === nextDayStr).length,
-      checkOutTomorrow: confirmed.filter((b: any) => b.checkOut === nextDayStr).length,
+      checkInToday:    confirmed.filter((b: any) => b.checkIn  === targetDateStr).length,
+      checkOutToday:   confirmed.filter((b: any) => b.checkOut === targetDateStr).length,
+      checkInTomorrow: confirmed.filter((b: any) => b.checkIn  === nextDayStr).length,
+      checkOutTomorrow:confirmed.filter((b: any) => b.checkOut === nextDayStr).length,
     });
 
     setTodaySchedule({
-      in: confirmed.filter((b: any) => b.checkIn === targetDateStr),
+      in:  confirmed.filter((b: any) => b.checkIn  === targetDateStr),
       out: confirmed.filter((b: any) => b.checkOut === targetDateStr),
     });
-
     setTomorrowPlans({
-      in: confirmed.filter((b: any) => b.checkIn === nextDayStr),
+      in:  confirmed.filter((b: any) => b.checkIn  === nextDayStr),
       out: confirmed.filter((b: any) => b.checkOut === nextDayStr),
     });
-
     setNextDayPlans({
-      in: confirmed.filter((b: any) => b.checkIn === dayAfterStr),
+      in:  confirmed.filter((b: any) => b.checkIn  === dayAfterStr),
       out: confirmed.filter((b: any) => b.checkOut === dayAfterStr),
     });
 
@@ -137,35 +120,32 @@ export default function DashboardOverview() {
 
   useEffect(() => {
     loadOverviewData();
-
     const supabase = getSupabaseBrowserClient();
     if (!supabase) return;
-
     const channel = supabase
       .channel('dashboard-realtime')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'bookings' }, (payload: any) => {
-        const newB = payload.new;
         if (audioRef.current) audioRef.current.play().catch(() => {});
-        setNewBookingToast(newB);
+        setNewBookingToast(payload.new);
         loadOverviewData();
         setTimeout(() => setNewBookingToast(null), 8000);
       })
       .subscribe();
-
     return () => { supabase.removeChannel(channel); };
   }, [loadOverviewData]);
 
   const kpis = [
-    { label: 'إجمالي الطلبات', value: stats.totalBookings, icon: '📊', gradient: 'from-[#2A2723] to-[#3D3530]', text: 'text-white' },
-    { label: 'قيد المراجعة', value: stats.pendingBookings, icon: '⏳', gradient: 'from-amber-500 to-orange-500', text: 'text-white' },
-    { label: 'مؤكدة', value: stats.approvedBookings, icon: '✅', gradient: 'from-green-500 to-emerald-600', text: 'text-white' },
-    { label: 'وصول اليوم', value: stats.checkInToday, icon: '🛬', gradient: 'from-blue-500 to-blue-600', text: 'text-white' },
-    { label: 'مغادرة اليوم', value: stats.checkOutToday, icon: '🛫', gradient: 'from-rose-500 to-red-600', text: 'text-white' },
+    { label: 'إجمالي الطلبات', value: stats.totalBookings,   icon: '📊', gradient: 'from-[#2A2723] to-[#3D3530]',   text: 'text-white' },
+    { label: 'قيد المراجعة',   value: stats.pendingBookings,  icon: '⏳', gradient: 'from-amber-500 to-orange-500', text: 'text-white' },
+    { label: 'مؤكدة',          value: stats.approvedBookings, icon: '✅', gradient: 'from-green-500 to-emerald-600', text: 'text-white' },
+    { label: 'وصول اليوم',     value: stats.checkInToday,    icon: '🛬', gradient: 'from-blue-500 to-blue-600',     text: 'text-white' },
+    { label: 'مغادرة اليوم',   value: stats.checkOutToday,   icon: '🛫', gradient: 'from-rose-500 to-red-600',      text: 'text-white' },
   ];
 
   return (
-    <div className="space-y-10 animate-fade-in" dir="rtl">
-      {/* Header */}
+    <div className="space-y-8 animate-fade-in" dir="rtl">
+
+      {/* ── HEADER ── */}
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-4xl font-black mb-1 tracking-tight text-[#2A2723]">
@@ -185,14 +165,11 @@ export default function DashboardOverview() {
           <button
             onClick={loadOverviewData}
             className="w-10 h-10 bg-[#C1A68D]/10 hover:bg-[#C1A68D] text-[#C1A68D] hover:text-white rounded-full flex items-center justify-center transition-all border border-[#C1A68D]/30"
-            title="تحديث البيانات"
-          >
-            🔄
-          </button>
+          >🔄</button>
         </div>
       </header>
 
-      {/* Realtime Toast */}
+      {/* ── REALTIME TOAST ── */}
       {newBookingToast && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] bg-[#2A2723] border-2 border-green-400 p-5 rounded-2xl shadow-2xl animate-fade-in w-80">
           <div className="flex items-start gap-4">
@@ -207,7 +184,7 @@ export default function DashboardOverview() {
         </div>
       )}
 
-      {/* KPI Cards */}
+      {/* ── KPI CARDS ── */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         {kpis.map((kpi, i) => (
           <div key={i} className={`bg-gradient-to-br ${kpi.gradient} p-6 rounded-[2rem] shadow-lg hover:scale-105 transition-all overflow-hidden relative`}>
@@ -218,57 +195,149 @@ export default function DashboardOverview() {
         ))}
       </div>
 
-      {/* CLEAN INVENTORY SEARCH & STATS */}
+      {/* ── COMMAND CENTER: 3-DAY PREVIEW + QUICK SEARCH ── */}
+      <div className="grid lg:grid-cols-4 gap-6">
+
+        {/* 3-DAY OPERATIONAL PREVIEW (3/4 width) */}
+        <div className="lg:col-span-3 bg-[#1A1816] p-8 rounded-[2.5rem] shadow-2xl border border-white/5 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#C1A68D] to-transparent opacity-20" />
+          <div className="grid md:grid-cols-3 gap-6 divide-x divide-white/5 rtl:divide-x-reverse">
+
+            {/* TODAY */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2"><span className="text-lg">📅</span><h4 className="text-white font-black text-sm">اليوم</h4></div>
+                <span className="bg-green-500/10 text-green-400 px-2 py-0.5 rounded-full text-[8px] font-black border border-green-500/20">
+                  {todaySchedule.in.length} وصول · {todaySchedule.out.length} مغادرة
+                </span>
+              </div>
+              <div className="space-y-1.5 max-h-[140px] overflow-y-auto pr-1">
+                {todaySchedule.in.length === 0 && todaySchedule.out.length === 0 ? (
+                  <p className="text-[10px] text-gray-600 text-center py-6">لا عمليات اليوم</p>
+                ) : (<>
+                  {todaySchedule.in.map((b, i) => (
+                    <div key={`t-in-${i}`} className="p-2 bg-green-500/5 border border-green-500/10 rounded-xl flex items-center justify-between">
+                      <span className="text-[10px] font-black text-white truncate max-w-[90px]">🛬 {b.name}</span>
+                      <span className="text-[8px] font-black text-green-400">{b.studio || b.apartmentId}</span>
+                    </div>
+                  ))}
+                  {todaySchedule.out.map((b, i) => (
+                    <div key={`t-out-${i}`} className="p-2 bg-red-500/5 border border-red-500/10 rounded-xl flex items-center justify-between">
+                      <span className="text-[10px] font-black text-white truncate max-w-[90px]">🛫 {b.name}</span>
+                      <span className="text-[8px] font-black text-red-400">{b.studio || b.apartmentId}</span>
+                    </div>
+                  ))}
+                </>)}
+              </div>
+            </div>
+
+            {/* TOMORROW */}
+            <div className="space-y-4 px-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2"><span className="text-lg">☀️</span><h4 className="text-white font-black text-sm">غداً</h4></div>
+                <span className="bg-[#C1A68D]/10 text-[#C1A68D] px-2 py-0.5 rounded-full text-[8px] font-black border border-[#C1A68D]/20">
+                  {tomorrowPlans.in.length} وصول · {tomorrowPlans.out.length} مغادرة
+                </span>
+              </div>
+              <div className="space-y-1.5 max-h-[140px] overflow-y-auto pr-1">
+                {tomorrowPlans.in.length === 0 && tomorrowPlans.out.length === 0 ? (
+                  <p className="text-[10px] text-gray-600 text-center py-6">لا عمليات غداً</p>
+                ) : (<>
+                  {tomorrowPlans.in.map((b, i) => (
+                    <div key={`tom-in-${i}`} className="p-2 bg-[#C1A68D]/5 border border-[#C1A68D]/10 rounded-xl flex items-center justify-between">
+                      <span className="text-[10px] font-black text-white truncate max-w-[90px]">🛬 {b.name}</span>
+                      <span className="text-[8px] font-black text-[#C1A68D]">{b.studio || b.apartmentId}</span>
+                    </div>
+                  ))}
+                  {tomorrowPlans.out.map((b, i) => (
+                    <div key={`tom-out-${i}`} className="p-2 bg-red-500/5 border border-red-500/10 rounded-xl flex items-center justify-between">
+                      <span className="text-[10px] font-black text-white truncate max-w-[90px]">🛫 {b.name}</span>
+                      <span className="text-[8px] font-black text-red-400">{b.studio || b.apartmentId}</span>
+                    </div>
+                  ))}
+                </>)}
+              </div>
+            </div>
+
+            {/* DAY AFTER TOMORROW */}
+            <div className="space-y-4 px-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2"><span className="text-lg">⏳</span><h4 className="text-white font-black text-sm">بعد غد</h4></div>
+                <span className="bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-full text-[8px] font-black border border-blue-500/20">
+                  {nextDayPlans.in.length} وصول · {nextDayPlans.out.length} مغادرة
+                </span>
+              </div>
+              <div className="space-y-1.5 max-h-[140px] overflow-y-auto pr-1">
+                {nextDayPlans.in.length === 0 && nextDayPlans.out.length === 0 ? (
+                  <p className="text-[10px] text-gray-600 text-center py-6">لا عمليات بعد غد</p>
+                ) : (<>
+                  {nextDayPlans.in.map((b, i) => (
+                    <div key={`next-in-${i}`} className="p-2 bg-blue-500/5 border border-blue-500/10 rounded-xl flex items-center justify-between">
+                      <span className="text-[10px] font-black text-white truncate max-w-[90px]">🛬 {b.name}</span>
+                      <span className="text-[8px] font-black text-blue-400">{b.studio || b.apartmentId}</span>
+                    </div>
+                  ))}
+                  {nextDayPlans.out.map((b, i) => (
+                    <div key={`next-out-${i}`} className="p-2 bg-red-500/5 border border-red-500/10 rounded-xl flex items-center justify-between">
+                      <span className="text-[10px] font-black text-white truncate max-w-[90px]">🛫 {b.name}</span>
+                      <span className="text-[8px] font-black text-red-400">{b.studio || b.apartmentId}</span>
+                    </div>
+                  ))}
+                </>)}
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* QUICK SEARCH (1/4 width) */}
+        <div className="bg-white p-6 rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm flex flex-col gap-3">
+          <div>
+            <h3 className="font-black text-sm text-[#2A2723]">🔍 بحث سريع</h3>
+            <p className="text-[9px] text-[#7A7061] font-bold opacity-60 mt-0.5">اختر التاريخ والفئة</p>
+          </div>
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            className="w-full bg-[#F8F5F0] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-black text-[#2A2723] focus:ring-2 focus:ring-[#C1A68D] transition-all outline-none"
+          />
+          <div className="flex flex-col gap-2">
+            <button
+              onClick={() => setSelectedCategory('all')}
+              className={`w-full px-4 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-between ${selectedCategory === 'all' ? 'bg-[#2A2723] text-white shadow-lg' : 'bg-gray-50 text-[#7A7061] hover:bg-gray-100'}`}
+            >
+              <span>🗺️ الكل</span>
+              <span className="text-[9px] opacity-50">{apartmentMap.length}</span>
+            </button>
+            {inventoryStats.map((item, i) => (
+              <button
+                key={i}
+                onClick={() => setSelectedCategory(item.id)}
+                className={`w-full px-4 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-between ${selectedCategory === item.id ? 'bg-[#C1A68D] text-white shadow-lg' : 'bg-gray-50 text-[#7A7061] hover:bg-gray-100'}`}
+              >
+                <span>{item.label}</span>
+                <span className="font-black text-[10px] bg-white/20 px-2 py-0.5 rounded-lg">{item.count}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── UNIT MAP ── */}
       <div className="bg-white p-8 rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-10 pb-6 border-b border-[#EAE4D9]/30">
-            <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-[#C1A68D]/10 rounded-2xl flex items-center justify-center text-2xl">🏢</div>
-                <div>
-                    <h3 className="font-black text-lg text-[#2A2723]">البحث السريع عن المتاح</h3>
-                    <p className="text-[10px] text-[#7A7061] font-bold uppercase tracking-widest">اختر التاريخ والفئة لعرض الوحدات</p>
-                </div>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3 bg-[#FDFBF7] p-2 rounded-2xl border border-[#EAE4D9]">
-                <input 
-                    type="date"
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                    className="bg-white text-[#2A2723] px-4 py-2 rounded-xl outline-none border border-[#EAE4D9] focus:border-[#C1A68D] font-bold text-sm shadow-sm transition-all"
-                />
-                <div className="w-px h-6 bg-[#EAE4D9]" />
-                <button 
-                    onClick={() => setSelectedCategory('all')}
-                    className={`px-5 py-2 rounded-xl text-xs font-black transition-all ${selectedCategory === 'all' ? 'bg-[#2A2723] text-white' : 'text-[#7A7061] hover:bg-[#EAE4D9]/30'}`}
-                >
-                    الكل
-                </button>
-                {inventoryStats.map((item, i) => (
-                    <button 
-                        key={i}
-                        onClick={() => setSelectedCategory(item.id)}
-                        className={`px-5 py-2 rounded-xl text-xs font-black transition-all ${selectedCategory === item.id ? 'bg-[#C1A68D] text-white shadow-md' : 'text-[#7A7061] hover:bg-[#EAE4D9]/30'}`}
-                    >
-                        {item.label} ({item.count})
-                    </button>
-                ))}
-            </div>
-        </div>
-
-        {/* Dynamic Unit Map Title based on Filter */}
         <div className="flex items-center justify-between mb-6">
-            <h4 className="text-sm font-black text-[#2A2723]">
-                {selectedCategory === 'all' ? '🗺️ جميع الوحدات' : `🟢 وحدات ${inventoryStats.find(i => i.id === selectedCategory)?.label} المتاحة`}
-            </h4>
-            <span className="text-[10px] font-bold text-[#7A7061] opacity-60">تاريخ العرض: {selectedDate}</span>
+          <h4 className="font-black text-sm text-[#2A2723]">
+            {selectedCategory === 'all' ? '🗺️ جميع الوحدات' : `🟢 وحدات ${inventoryStats.find(i => i.id === selectedCategory)?.label} المتاحة`}
+          </h4>
+          <span className="text-[10px] font-bold text-[#7A7061] opacity-60">تاريخ العرض: {selectedDate}</span>
         </div>
-
         {apartmentMap.length === 0 ? (
           <div className="h-40 flex items-center justify-center text-gray-300 animate-pulse font-black text-sm italic">لا يوجد وحدات مطابقة للبحث...</div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
             {apartmentMap.map((apt) => (
-              <div key={apt.id} className={`p-4 rounded-2xl border transition-all duration-500 ${
+              <div key={apt.id} className={`p-4 rounded-2xl border transition-all duration-300 ${
                 apt.status === 'maintenance' || apt.status === 'صيانة'
                   ? 'bg-gray-50 border-gray-100 opacity-60'
                   : apt.isOccupied
@@ -277,151 +346,15 @@ export default function DashboardOverview() {
               }`}>
                 <div className="text-[9px] font-black text-[#7A7061] uppercase mb-1 opacity-60">{apt.id}</div>
                 <div className={`text-[11px] font-black mb-1 ${apt.status === 'صيانة' ? 'text-gray-400' : apt.isOccupied ? 'text-red-500' : 'text-green-600'}`}>
-                   {apt.isOccupied ? '🔴 مشغول' : apt.status === 'صيانة' ? '🔧 صيانة' : '🟢 متاح'}
+                  {apt.isOccupied ? '🔴 مشغول' : apt.status === 'صيانة' ? '🔧 صيانة' : '🟢 متاح'}
                 </div>
                 {!apt.isOccupied && (
-                   <div className="text-[10px] font-bold text-[#2A2723] mt-1">{apt.title?.ar}</div>
+                  <div className="text-[10px] font-bold text-[#2A2723] mt-1">{apt.title?.ar}</div>
                 )}
               </div>
             ))}
           </div>
         )}
-      </div>
-
-      {/* 3-DAY OPERATIONAL PREVIEW */}
-      <div className="bg-[#1A1816] p-8 rounded-[2.5rem] shadow-2xl border border-white/5 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#C1A68D] to-transparent opacity-20" />
-        
-        <div className="grid md:grid-cols-3 gap-8 divide-x divide-white/5 rtl:divide-x-reverse">
-          {/* DAY 1: TODAY */}
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-xl">📅</span>
-                <div>
-                  <h4 className="text-white font-black text-sm">اليوم</h4>
-                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{selectedDate}</p>
-                </div>
-              </div>
-              <span className="bg-green-500/10 text-green-400 px-3 py-1 rounded-full text-[9px] font-black border border-green-500/20">
-                {todaySchedule.in.length} وصول · {todaySchedule.out.length} مغادرة
-              </span>
-            </div>
-            
-            <div className="space-y-2 max-h-[150px] overflow-y-auto custom-scrollbar pr-2">
-              {todaySchedule.in.length === 0 && todaySchedule.out.length === 0 ? (
-                <div className="py-8 text-center opacity-20"><p className="text-[10px] font-black text-white">لا عمليات اليوم</p></div>
-              ) : (
-                <>
-                  {todaySchedule.in.map((b, i) => (
-                    <div key={`t-in-${i}`} className="p-2.5 bg-green-500/5 border border-green-500/10 rounded-xl flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px]">🛬</span>
-                        <span className="text-[11px] font-black text-white truncate max-w-[100px]">{b.name}</span>
-                      </div>
-                      <span className="text-[9px] font-black text-green-400">{b.studio || b.apartmentId}</span>
-                    </div>
-                  ))}
-                  {todaySchedule.out.map((b, i) => (
-                    <div key={`t-out-${i}`} className="p-2.5 bg-red-500/5 border border-red-500/10 rounded-xl flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px]">🛫</span>
-                        <span className="text-[11px] font-black text-white truncate max-w-[100px]">{b.name}</span>
-                      </div>
-                      <span className="text-[9px] font-black text-red-400">{b.studio || b.apartmentId}</span>
-                    </div>
-                  ))}
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* DAY 2: TOMORROW */}
-          <div className="space-y-6 px-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-xl">☀️</span>
-                <div>
-                  <h4 className="text-white font-black text-sm">غداً</h4>
-                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{new Date(new Date(selectedDate).setDate(new Date(selectedDate).getDate() + 1)).toISOString().split('T')[0]}</p>
-                </div>
-              </div>
-              <span className="bg-[#C1A68D]/10 text-[#C1A68D] px-3 py-1 rounded-full text-[9px] font-black border border-[#C1A68D]/20">
-                {tomorrowPlans.in.length} وصول · {tomorrowPlans.out.length} مغادرة
-              </span>
-            </div>
-            
-            <div className="space-y-2 max-h-[150px] overflow-y-auto custom-scrollbar pr-2">
-              {tomorrowPlans.in.length === 0 && tomorrowPlans.out.length === 0 ? (
-                <div className="py-8 text-center opacity-20"><p className="text-[10px] font-black text-white">لا عمليات غداً</p></div>
-              ) : (
-                <>
-                  {tomorrowPlans.in.map((b, i) => (
-                    <div key={`tom-in-${i}`} className="p-2.5 bg-[#C1A68D]/5 border border-[#C1A68D]/10 rounded-xl flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px]">🛬</span>
-                        <span className="text-[11px] font-black text-white truncate max-w-[100px]">{b.name}</span>
-                      </div>
-                      <span className="text-[9px] font-black text-[#C1A68D]">{b.studio || b.apartmentId}</span>
-                    </div>
-                  ))}
-                  {tomorrowPlans.out.map((b, i) => (
-                    <div key={`tom-out-${i}`} className="p-2.5 bg-red-500/5 border border-red-500/10 rounded-xl flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px]">🛫</span>
-                        <span className="text-[11px] font-black text-white truncate max-w-[100px]">{b.name}</span>
-                      </div>
-                      <span className="text-[9px] font-black text-red-400">{b.studio || b.apartmentId}</span>
-                    </div>
-                  ))}
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* DAY 3: DAY AFTER */}
-          <div className="space-y-6 px-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-xl">⏳</span>
-                <div>
-                  <h4 className="text-white font-black text-sm">بعد غد</h4>
-                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{new Date(new Date(selectedDate).setDate(new Date(selectedDate).getDate() + 2)).toISOString().split('T')[0]}</p>
-                </div>
-              </div>
-              <span className="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full text-[9px] font-black border border-blue-500/20">
-                {nextDayPlans.in.length} وصول · {nextDayPlans.out.length} مغادرة
-              </span>
-            </div>
-            
-            <div className="space-y-2 max-h-[150px] overflow-y-auto custom-scrollbar pr-2">
-              {nextDayPlans.in.length === 0 && nextDayPlans.out.length === 0 ? (
-                <div className="py-8 text-center opacity-20"><p className="text-[10px] font-black text-white">لا عمليات بعد غد</p></div>
-              ) : (
-                <>
-                  {nextDayPlans.in.map((b, i) => (
-                    <div key={`next-in-${i}`} className="p-2.5 bg-blue-500/5 border border-blue-500/10 rounded-xl flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px]">🛬</span>
-                        <span className="text-[11px] font-black text-white truncate max-w-[100px]">{b.name}</span>
-                      </div>
-                      <span className="text-[9px] font-black text-blue-400">{b.studio || b.apartmentId}</span>
-                    </div>
-                  ))}
-                  {nextDayPlans.out.map((b, i) => (
-                    <div key={`next-out-${i}`} className="p-2.5 bg-red-500/5 border border-red-500/10 rounded-xl flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px]">🛫</span>
-                        <span className="text-[11px] font-black text-white truncate max-w-[100px]">{b.name}</span>
-                      </div>
-                      <span className="text-[9px] font-black text-red-400">{b.studio || b.apartmentId}</span>
-                    </div>
-                  ))}
-                </>
-              )}
-            </div>
-          </div>
-        </div>
       </div>
 
     </div>
