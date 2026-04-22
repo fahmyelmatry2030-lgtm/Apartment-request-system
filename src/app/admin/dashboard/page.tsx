@@ -395,9 +395,53 @@ export default function DashboardOverview() {
             </div>
           </div>
 
-          {/* Unit Grid */}
+          {/* Unit Grid or Table */}
           {apartmentMap.length === 0 ? (
             <div className="h-40 flex items-center justify-center text-gray-300 animate-pulse font-black text-sm italic">لا يوجد وحدات مطابقة للبحث...</div>
+          ) : selectedCategory === 'all' ? (
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse text-right">
+                <thead>
+                  <tr className="bg-[#2A2723] text-white">
+                    <th className="px-4 py-3 text-[10px] font-black text-center w-12">#</th>
+                    <th className="px-4 py-3 text-[10px] font-black">اسم الوحدة</th>
+                    <th className="px-4 py-3 text-[10px] font-black">النوع</th>
+                    <th className="px-4 py-3 text-[10px] font-black text-center">الحالة</th>
+                    <th className="px-4 py-3 text-[10px] font-black">الضيف</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#EAE4D9]/30">
+                  {[...apartmentMap]
+                    .sort((a, b) => {
+                      const n = (u: any) => u.id.startsWith('b1-s') ? parseInt(u.id.replace('b1-s',''),10) : u.id.startsWith('b2-s') ? parseInt(u.id.replace('b2-s',''),10)+12 : 99;
+                      return n(a) - n(b);
+                    })
+                    .map((apt) => {
+                      const isB1 = apt.id.startsWith('b1-s');
+                      const isB2 = apt.id.startsWith('b2-s');
+                      const num = isB1 ? parseInt(apt.id.replace('b1-s',''),10) : isB2 ? parseInt(apt.id.replace('b2-s',''),10)+12 : 0;
+                      const rowBg = isB1 ? 'bg-blue-50/50 hover:bg-blue-50' : isB2 ? 'bg-emerald-50/50 hover:bg-emerald-50' : 'bg-amber-50/50 hover:bg-amber-50';
+                      const badgeColor = isB1 ? 'bg-blue-600 text-white' : isB2 ? 'bg-emerald-600 text-white' : 'bg-[#C1A68D] text-white';
+                      const typeLabel: Record<string,string> = { single:'سنجل', double:'دبل', triple:'تريبل', 'two-room':'غرفتين', apartment:'شقة' };
+                      return (
+                        <tr key={apt.id} className={`${rowBg} transition-colors`}>
+                          <td className="px-4 py-2.5 text-center">
+                            <span className={`${badgeColor} w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-black mx-auto`}>{num}</span>
+                          </td>
+                          <td className="px-4 py-2.5 font-black text-[#2A2723] text-xs">{apt.title?.ar || apt.id}</td>
+                          <td className="px-4 py-2.5 text-[10px] text-[#7A7061] font-bold">{typeLabel[apt.category] || apt.category}</td>
+                          <td className="px-4 py-2.5 text-center">
+                            <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${apt.status === 'صيانة' ? 'bg-gray-100 text-gray-500' : apt.isOccupied ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-700'}`}>
+                              {apt.isOccupied ? 'مشغول' : apt.status === 'صيانة' ? 'صيانة' : 'متاح'}
+                            </span>
+                          </td>
+                          <td className="px-4 py-2.5 text-[10px] text-[#7A7061] font-bold">{apt.guest || '—'}</td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
+            </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
               {apartmentMap.map((apt) => (

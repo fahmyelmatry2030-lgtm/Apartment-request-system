@@ -689,44 +689,59 @@ export default function ReportsPage() {
 
         {/* Unit Tabs */}
         <div className="no-print bg-white p-4 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm space-y-4" dir="rtl">
+          {/* Color Legend */}
+          <div className="flex items-center gap-4 px-3 pb-2 border-b border-[#EAE4D9]/40">
+            <span className="text-[9px] font-black text-[#7A7061] uppercase tracking-wider">دليل الألوان:</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-blue-500 inline-block"/><span className="text-[9px] font-black text-blue-700">استديوهات 1-12 (مبنى 1)</span></span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-emerald-500 inline-block"/><span className="text-[9px] font-black text-emerald-700">استديوهات 13-24 (مبنى 2)</span></span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#C1A68D] inline-block"/><span className="text-[9px] font-black text-[#C1A68D]">الشقق الفندقية</span></span>
+          </div>
           <div>
             <div className="text-[9px] font-black text-[#C1A68D] uppercase tracking-[0.25em] px-3 mb-2">الاستديوهات الفندقية</div>
             <div className="flex flex-wrap gap-1.5">
               {units
                 .filter(u => u.type === 'studio' && !u.id.startsWith('s-'))
                 .sort((a, b) => {
-                  const numA = parseInt((a.title?.ar || a.id).match(/\d+/)?.[0] || '0', 10);
-                  const numB = parseInt((b.title?.ar || b.id).match(/\d+/)?.[0] || '0', 10);
-                  return numA - numB;
+                  const getNum = (u: any) => {
+                    if (u.id.startsWith('b1-s')) return parseInt(u.id.replace('b1-s',''), 10);
+                    if (u.id.startsWith('b2-s')) return parseInt(u.id.replace('b2-s',''), 10) + 12;
+                    return 99;
+                  };
+                  return getNum(a) - getNum(b);
                 })
-                .map(u => (
-                  <button
-                    key={u.id}
-                    onClick={() => setSelectedUnit(u.id)}
-                    className={`px-3 py-2 rounded-xl text-[10px] font-black transition-all ${
-                      selectedUnit === u.id
-                        ? 'bg-[#2A2723] text-white shadow-lg shadow-black/10'
-                        : 'bg-[#FDFBF7] text-[#7A7061] hover:bg-[#EAE4D9]/50 hover:text-[#2A2723] border border-[#EAE4D9]/40'
-                    }`}
-                  >
-                    {u.title?.ar || u.id}
-                  </button>
-                ))}
+                .map(u => {
+                  const isB1 = u.id.startsWith('b1-s');
+                  const isB2 = u.id.startsWith('b2-s');
+                  const isActive = selectedUnit === u.id;
+                  let cls = '';
+                  if (isActive) {
+                    cls = isB1 ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                               : isB2 ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                               : 'bg-[#2A2723] text-white';
+                  } else {
+                    cls = isB1 ? 'bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200'
+                               : isB2 ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'
+                               : 'bg-[#FDFBF7] text-[#7A7061] hover:bg-[#EAE4D9]/50 border border-[#EAE4D9]/40';
+                  }
+                  return (
+                    <button key={u.id} onClick={() => setSelectedUnit(u.id)}
+                      className={`px-3 py-2 rounded-xl text-[10px] font-black transition-all ${cls}`}>
+                      {u.title?.ar || u.id}
+                    </button>
+                  );
+                })}
             </div>
           </div>
           <div>
             <div className="text-[9px] font-black text-[#C1A68D] uppercase tracking-[0.25em] px-3 mb-2">الشقق الفندقية</div>
             <div className="flex flex-wrap gap-1.5">
               {units.filter(u => u.type === 'apartment').map(u => (
-                <button
-                  key={u.id}
-                  onClick={() => setSelectedUnit(u.id)}
+                <button key={u.id} onClick={() => setSelectedUnit(u.id)}
                   className={`px-3 py-2 rounded-xl text-[10px] font-black transition-all ${
                     selectedUnit === u.id
                       ? 'bg-[#C1A68D] text-white shadow-lg shadow-[#C1A68D]/20'
-                      : 'bg-[#FDFBF7] text-[#7A7061] hover:bg-[#EAE4D9]/50 hover:text-[#2A2723] border border-[#EAE4D9]/40'
-                  }`}
-                >
+                      : 'bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200'
+                  }`}>
                   {u.title?.ar || u.id}
                 </button>
               ))}
