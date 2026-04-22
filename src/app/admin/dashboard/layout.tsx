@@ -23,10 +23,10 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
 
   const loadData = useCallback(async () => {
     const bookings = await getBookings();
-    
+
     // Notifications logic (Daily Reminders)
     let notifs: any[] = [];
-    
+
     if (typeof window !== 'undefined') {
       try {
         notifs = JSON.parse(localStorage.getItem('admin_notifs') || '[]');
@@ -34,12 +34,12 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
         const tomorrow = new Date(today);
         tomorrow.setDate(today.getDate() + 1);
         const tomorrowStr = tomorrow.toISOString().split('T')[0];
-        
+
         const lastCheck = localStorage.getItem('last_notif_check');
         if (lastCheck !== tomorrowStr) {
           const checkIns = bookings.filter((b: any) => b.status === 'approved' && b.checkIn === tomorrowStr);
           const checkOuts = bookings.filter((b: any) => b.status === 'approved' && b.checkOut === tomorrowStr);
-          
+
           if (checkIns.length > 0) {
             notifs.unshift({ id: Date.now(), msg: `🔔 تنبيه: غداً يوجد ${checkIns.length} عملية وصول (Check-in).`, read: false });
           }
@@ -86,23 +86,23 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
       // Role Guard Logic
       const isBookingsAdmin = info?.role === 'مدير الحجوزات';
       const isUnitsAdmin = info?.role === 'مدير الوحدات';
-      
+
       const restrictedForBookings = ['/admin/dashboard/units', '/admin/dashboard/reports', '/admin/dashboard/admins'];
       const restrictedForUnits = ['/admin/dashboard/bookings', '/admin/dashboard/reports', '/admin/dashboard/admins'];
-      
+
       if (isBookingsAdmin && restrictedForBookings.includes(pathname)) {
-         router.push('/admin/dashboard/bookings');
-         return;
+        router.push('/admin/dashboard/bookings');
+        return;
       }
-      
+
       if (isUnitsAdmin && restrictedForUnits.includes(pathname)) {
-         router.push('/admin/dashboard/units');
-         return;
+        router.push('/admin/dashboard/units');
+        return;
       }
 
       setIsAuthorized(true);
       loadData();
-      
+
       // REAL-TIME NOTIFICATIONS
       const supabase = require('@/lib/supabase/client').getSupabaseBrowserClient();
       let channel: any;
@@ -116,12 +116,12 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
             (payload: any) => {
               console.log('New booking received!', payload);
               loadData(); // Refresh all stats
-              
+
               // Play sound or show browser notification if possible
               try {
                 const audio = new Audio('/notification-sound.mp3');
-                audio.play().catch(() => {});
-              } catch (e) {}
+                audio.play().catch(() => { });
+              } catch (e) { }
             }
           )
           .on(
@@ -135,7 +135,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
           .subscribe();
       } else {
         // Fallback to polling if Supabase is offline
-        const interval = setInterval(loadData, 30000); 
+        const interval = setInterval(loadData, 30000);
         return () => clearInterval(interval);
       }
 
@@ -193,17 +193,17 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
         <div className="p-6 md:p-8 flex flex-col items-center justify-between border-b border-[#EAE4D9]/50 mb-6 gap-4">
           <div className="w-full flex justify-between items-center">
             <Link href="/admin/dashboard" className="transition-all hover:scale-105" title="الرئيسية للوحة التحكم">
-               <Logo size={25} className="!justify-start" imageClassName="max-h-[50px]" />
+              <Logo size={25} className="!justify-start" imageClassName="max-h-[50px]" />
             </Link>
             {/* Close button for mobile */}
-            <button 
+            <button
               onClick={() => setIsMobileMenuOpen(false)}
               className="lg:hidden p-2 text-[#7A7061] hover:bg-[#EAE4D9]/50 rounded-lg transition-colors"
             >
               ✖️
             </button>
           </div>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="flex items-center justify-center w-full py-3 rounded-2xl bg-[#2A2723] text-white hover:bg-black transition-all shadow-xl shadow-black/20 active:scale-95 group border border-white/10"
             title="تحديث بيانات النظام"
@@ -220,11 +220,10 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-4 px-6 py-4 rounded-2xl font-black transition-all duration-300 ${
-                  isActive 
-                  ? 'bg-[#2A2723] text-white shadow-xl shadow-black/10' 
-                  : 'text-[#7A7061] hover:text-[#2A2723] hover:bg-[#FDFBF7]'
-                }`}
+                className={`flex items-center gap-4 px-6 py-4 rounded-2xl font-black transition-all duration-300 ${isActive
+                    ? 'bg-[#2A2723] text-white shadow-xl shadow-black/10'
+                    : 'text-[#7A7061] hover:text-[#2A2723] hover:bg-[#FDFBF7]'
+                  }`}
               >
                 <span className="text-xl">{item.icon}</span>
                 <span className="text-sm">{item.name}</span>
@@ -239,19 +238,19 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
         </nav>
 
         <div className="p-4 md:p-8 border-t border-[#EAE4D9]/50 space-y-4 bg-white/50">
-           {/* Quick Action: WhatsApp Owner */}
-          <a 
-            href="https://wa.me/201108109969" 
-            target="_blank" 
+          {/* Quick Action: WhatsApp Owner */}
+          <a
+            href="https://wa.me/201026107134"
+            target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-4 px-6 py-3 rounded-2xl bg-green-500/10 text-green-600 hover:bg-green-500 hover:text-white transition-all font-black text-xs"
           >
-            <span>💬</span> تواصل مع المالك
+            <span>👨‍💻</span> تواصل مع المبرمج
           </a>
 
           {/* PWA Install Button */}
           {isInstallable && (
-            <button 
+            <button
               onClick={handleInstallClick}
               className="flex items-center gap-4 px-6 py-3 rounded-2xl bg-[#C1A68D]/10 text-[#C1A68D] hover:bg-[#C1A68D] hover:text-white transition-all font-black text-xs w-full"
             >
@@ -259,7 +258,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
             </button>
           )}
 
-          <button 
+          <button
             onClick={() => {
               sessionStorage.removeItem('isAdmin');
               router.push('/admin/login');
@@ -276,7 +275,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
         {/* Top Header */}
         <header className="h-20 bg-white/60 backdrop-blur-xl border-b border-[#EAE4D9]/50 flex items-center justify-between lg:justify-end px-6 md:px-8 gap-6 z-30 sticky top-0">
           {/* Hamburger Menu for Mobile */}
-          <button 
+          <button
             onClick={() => setIsMobileMenuOpen(true)}
             className="lg:hidden p-3 bg-[#2A2723] text-white rounded-xl shadow-lg active:scale-95 transition-all"
           >
@@ -284,7 +283,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
           </button>
 
           <div className="flex items-center gap-4 md:gap-6">
-            <button 
+            <button
               onClick={() => { setShowSent(!showSent); setShowNotifs(false); }}
               className={`p-3 rounded-xl transition-all relative ${showSent ? 'bg-[#2A2723] text-white' : 'bg-[#FDFBF7] text-[#7A7061] hover:text-[#2A2723] border border-[#EAE4D9]'}`}
               title="سجل الرسائل المرسلة"
@@ -300,11 +299,11 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
                 <div className="space-y-4">
                   {sentMessages.map((m, i) => (
                     <div key={i} className="p-3 rounded-xl bg-[#FDFBF7] border border-[#EAE4D9]/50 space-y-2">
-                       <div className="flex justify-between items-center text-[10px] font-black">
-                         <span className="text-[#C1A68D]">{m.name}</span>
-                         <span className="text-[#7A7061] font-bold">{m.time}</span>
-                       </div>
-                       <p className="text-[10px] text-[#2A2723] leading-relaxed font-bold italic opacity-80 group-hover:opacity-100 transition-opacity">"{m.msg}"</p>
+                      <div className="flex justify-between items-center text-[10px] font-black">
+                        <span className="text-[#C1A68D]">{m.name}</span>
+                        <span className="text-[#7A7061] font-bold">{m.time}</span>
+                      </div>
+                      <p className="text-[10px] text-[#2A2723] leading-relaxed font-bold italic opacity-80 group-hover:opacity-100 transition-opacity">"{m.msg}"</p>
                     </div>
                   ))}
                 </div>
@@ -313,7 +312,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
           </div>
 
           <div className="relative">
-            <button 
+            <button
               onClick={() => { setShowNotifs(!showNotifs); setShowSent(false); }}
               className={`p-3 rounded-xl transition-all relative ${showNotifs ? 'bg-[#2A2723] text-white' : 'bg-[#FDFBF7] text-[#7A7061] hover:text-[#2A2723] border border-[#EAE4D9]'}`}
               title="التنبيهات"
@@ -339,46 +338,46 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
 
           <div className="h-10 w-px bg-[#EAE4D9] mx-2" />
           <div className="relative">
-             <button 
-                 onClick={() => { setShowProfile(!showProfile); setShowNotifs(false); setShowSent(false); }}
-                 className="flex items-center gap-3 bg-[#FDFBF7] hover:bg-[#F5F2EA] px-4 py-2 rounded-2xl transition-all outline-none border border-[#EAE4D9]"
-             >
-                <div className="text-right hidden sm:block">
-                  <div className="text-xs font-black text-[#2A2723]">{adminName}</div>
-                  <div className="text-[10px] text-[#C1A68D] uppercase tracking-tighter font-black">{adminRole}</div>
-                </div>
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#C1A68D] to-[#D5C5B3] flex items-center justify-center text-white font-black shadow-lg shadow-[#C1A68D]/20">
-                   {adminName.substring(0, 1).toUpperCase()}
-                </div>
-             </button>
+            <button
+              onClick={() => { setShowProfile(!showProfile); setShowNotifs(false); setShowSent(false); }}
+              className="flex items-center gap-3 bg-[#FDFBF7] hover:bg-[#F5F2EA] px-4 py-2 rounded-2xl transition-all outline-none border border-[#EAE4D9]"
+            >
+              <div className="text-right hidden sm:block">
+                <div className="text-xs font-black text-[#2A2723]">{adminName}</div>
+                <div className="text-[10px] text-[#C1A68D] uppercase tracking-tighter font-black">{adminRole}</div>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#C1A68D] to-[#D5C5B3] flex items-center justify-center text-white font-black shadow-lg shadow-[#C1A68D]/20">
+                {adminName.substring(0, 1).toUpperCase()}
+              </div>
+            </button>
 
-             {showProfile && (
-               <div className="absolute top-16 left-0 w-56 bg-white border border-[#EAE4D9] rounded-2xl shadow-2xl overflow-hidden animate-scale-in">
-                  <div className="p-4 border-b border-[#EAE4D9]/50 bg-[#FDFBF7] text-center sm:hidden">
-                      <div className="text-xs font-black text-[#2A2723]">{adminName}</div>
-                      <div className="text-[10px] text-[#C1A68D] uppercase font-black">{adminRole}</div>
-                  </div>
-                  {adminRole === 'Super Admin' && (
-                    <Link 
-                      href="/admin/dashboard/admins" 
-                      onClick={() => setShowProfile(false)}
-                      className="block px-5 py-3.5 text-xs font-bold text-[#2A2723] hover:bg-[#FDFBF7] hover:text-[#C1A68D] transition-colors text-right border-b border-[#EAE4D9]/50"
-                    >
-                      إدارة الصلاحيات (Admin Roles) ⚙️
-                    </Link>
-                  )}
-                  <button 
-                    onClick={() => {
-                      sessionStorage.removeItem('isAdmin');
-                      sessionStorage.removeItem('adminInfo');
-                      router.push('/admin/login');
-                    }}
-                    className="w-full text-right px-5 py-3.5 text-xs font-bold text-[#E63946] hover:bg-[#FDFBF7] transition-colors outline-none"
+            {showProfile && (
+              <div className="absolute top-16 left-0 w-56 bg-white border border-[#EAE4D9] rounded-2xl shadow-2xl overflow-hidden animate-scale-in">
+                <div className="p-4 border-b border-[#EAE4D9]/50 bg-[#FDFBF7] text-center sm:hidden">
+                  <div className="text-xs font-black text-[#2A2723]">{adminName}</div>
+                  <div className="text-[10px] text-[#C1A68D] uppercase font-black">{adminRole}</div>
+                </div>
+                {adminRole === 'Super Admin' && (
+                  <Link
+                    href="/admin/dashboard/admins"
+                    onClick={() => setShowProfile(false)}
+                    className="block px-5 py-3.5 text-xs font-bold text-[#2A2723] hover:bg-[#FDFBF7] hover:text-[#C1A68D] transition-colors text-right border-b border-[#EAE4D9]/50"
                   >
-                    تسجيل الخروج 🚪
-                  </button>
-               </div>
-             )}
+                    إدارة الصلاحيات (Admin Roles) ⚙️
+                  </Link>
+                )}
+                <button
+                  onClick={() => {
+                    sessionStorage.removeItem('isAdmin');
+                    sessionStorage.removeItem('adminInfo');
+                    router.push('/admin/login');
+                  }}
+                  className="w-full text-right px-5 py-3.5 text-xs font-bold text-[#E63946] hover:bg-[#FDFBF7] transition-colors outline-none"
+                >
+                  تسجيل الخروج 🚪
+                </button>
+              </div>
+            )}
           </div>
         </header>
 
