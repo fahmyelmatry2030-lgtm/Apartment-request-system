@@ -107,14 +107,7 @@ export default function BookingPage() {
      }
   }, [selectedUnitId]);
 
-  useEffect(() => {
-    if (isSuccess && redirectCountdown > 0) {
-      const timer = setTimeout(() => setRedirectCountdown(prev => prev - 1), 1000);
-      return () => clearTimeout(timer);
-    } else if (isSuccess && redirectCountdown === 0) {
-      openWhatsAppAdmin();
-    }
-  }, [isSuccess, redirectCountdown, openWhatsAppAdmin]);
+  // Redirect logic handled directly in handleSubmitBooking for immediacy
 
   const isDateOverlap = (start1: string, end1: string, start2: string, end2: string) => {
     return (start1 < end2 && end1 > start2);
@@ -172,6 +165,15 @@ export default function BookingPage() {
       await saveBooking(bookingData);
       setIsSubmitting(false);
       setIsSuccess(true);
+      
+      // Immediate WhatsApp Redirect
+      const start = new Date(checkIn).getTime();
+      const end = new Date(checkOut).getTime();
+      const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+      const adminMsg = `🔔 *طلب حجز جديد من الموقع!*\n\n👤 *العميل:* ${name}\n📱 *الموبايل:* ${phone}\n👥 *عدد الأشخاص:* ${guestsCount}\n🏠 *الوحدة:* ${selectedUnit ? selectedUnit.title['ar'] : selectedUnitId}\n📅 *الفترة:* من ${checkIn} إلى ${checkOut} (إجمالي ${nights} ليالي)\n\nيرجى تأكيد الحجز معي.`;
+      const waUrl = `https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(adminMsg)}`;
+      window.location.href = waUrl;
+      
     } catch (err) {
       console.error(err);
       setIsSubmitting(false);
@@ -222,8 +224,8 @@ export default function BookingPage() {
             <br />
             <span className="text-[#25D366] font-black p-2 block animate-pulse">
               {isRTL
-                ? `جاري تحويلك للواتساب للتأكيد تلقائياً خلال ${redirectCountdown}...`
-                : `Redirecting to WhatsApp for confirmation in ${redirectCountdown}...`}
+                ? 'جاري تحويلك للواتساب للتأكيد الآن...'
+                : 'Redirecting to WhatsApp for confirmation now...'}
             </span>
           </p>
 
