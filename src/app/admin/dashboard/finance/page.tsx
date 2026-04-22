@@ -1,125 +1,391 @@
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
-import { getBookings, getSystemUnits } from '@/lib/data-init';
+import { getBookings } from '@/lib/data-init';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
 const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 
+const PARTNERS = [
+  { key: 'MH', label: 'M.H', percentage: 35 },
+  { key: 'MM', label: 'M.M', percentage: 23.5 },
+  { key: 'ME', label: 'M.E', percentage: 23.5 },
+  { key: 'MO', label: 'M.O', percentage: 18 },
+];
+
 export default function FinancePage() {
   const [bookings, setBookings] = useState<any[]>([]);
+  const [expenses, setExpenses] = useState<any[]>([]);
+  const [salaries, setSalaries] = useState<any[]>([]);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [isLoading, setIsLoading] = useState(true);
+  const [rent1Input, setRent1Input] = useState('');
+  const [rent2Input, setRent2Input] = useState('');
+  const [newExpense, setNewExpense] = useState({ category: '', amount: '', description: '' });
+  const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true);
-      const b = await getBookings();
-      setBookings(b);
-      setIsLoading(false);
-    };
-    loadData();
-  }, []);
+  const loadData = async () => {
+    setIsLoading(true);
+    const supabase = getSupabaseBrowserClient();
+    const [b] = await Promise.all([getBookings()]);
+    setBookings(b);
 
-  const totals = useMemo(() => {
-    // Filter bookings for the selected month/year
-    const monthlyBookings = bookings.filter((b: any) => {
-      if (b.status === 'deleted' || (b.status !== 'approved' && b.status !== 'مؤكد')) return false;
+    const { data: expData } = await supabase
+      .from('expenses')
+      .select('*')
+      .order('date', { ascending: false });
+    setExpenses(expData || []);
+
+    const { data: salData } = await supabase.from('salaries').select('*');
+    setSalaries(salData || []);
+
+    setIsLoading(false);
+  };
+
+  useEffect(() => { loadData(); }, []);
+
+  const monthlyBookings = useMemo(() => {
+    return bookings.filter((b: any) => {
+      if (b.status === 'deleted') return false;
+      if (b.status !== 'approved' && b.status !== 'مؤكد') return false;
       const parts = b.checkIn?.split('-');
       if (!parts || parts.length < 2) return false;
-      const year = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1;
-      return month === selectedMonth && year === selectedYear;
+      return parseInt(parts[1], 10) - 1 === selectedMonth && parseInt(parts[0], 10) === selectedYear;
     });
-
-    const revenue = monthlyBookings.reduce((sum, b) => sum + (parseFloat(b.totalAmount || 0)), 0);
-    const commissions = monthlyBookings.reduce((sum, b) => sum + (parseFloat(b.commission || 0)), 0);
-    
-    return { revenue, commissions };
   }, [bookings, selectedMonth, selectedYear]);
+
+  const monthlyExpenses = useMemo(() => {
+    return expenses.filter((e: any) => {
+      if (!e.date) return false;
+      const d = new Date(e.date);
+      return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
+    });
+  }, [expenses, selectedMonth, selectedYear]);
+
+  const monthlySalaries = useMemo(() => {
+    return salaries.filter((s: any) =>
+      Number(s.month) - 1 === selectedMonth && Number(s.year) === selectedYear
+    );
+  }, [salaries, selectedMonth, selectedYear]);
+
+  const revenue = monthlyBookings.reduce((sum, b) => sum + parseFloat(b.totalAmount || 0), 0);
+  const commissions = monthlyBookings.reduce((sum, b) => sum + parseFloat(b.commission || 0), 0);
+  const totalNights = monthlyBookings.reduce((sum, b) => sum + (Number(b.numberOfDays) || 0), 0);
+  const avgNightlyRate = totalNights > 0 ? revenue / totalNights : 0;
+  const rent1Total = monthlyExpenses.filter(e => e.category === 'إيجار 1').reduce((s, e) => s + (e.amount || 0), 0);
+  const rent2Total = monthlyExpenses.filter(e => e.category === 'إيجار 2').reduce((s, e) => s + (e.amount || 0), 0);
+  const otherExpenses = monthlyExpenses.filter(e => e.category !== 'إيجار 1' && e.category !== 'إيجار 2').reduce((s, e) => s + (e.amount || 0), 0);
+  const salariesTotal = monthlySalaries.reduce((sum, s) => sum + (s.amount || 0), 0);
+  const netProfit = revenue - commissions - rent1Total - rent2Total - otherExpenses - salariesTotal;
+
+  const handleAddRent = async (rentType: '1' | '2') => {
+    const val = rentType === '1' ? rent1Input : rent2Input;
+    const amount = parseFloat(val);
+    if (!amount || isNaN(amount)) return;
+    setSaving(true);
+    const supabase = getSupabaseBrowserClient();
+    const dateStr = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-01`;
+    await supabase.from('expenses').insert([{
+      category: `إيجار ${rentType}`,
+      amount,
+      date: dateStr,
+      branch: parseInt(rentType),
+      description: `إيجار ${MONTHS_AR[selectedMonth]} ${selectedYear}`,
+    }]);
+    if (rentType === '1') setRent1Input(''); else setRent2Input('');
+    await loadData();
+    setSaving(false);
+  };
+
+  const handleAddExpense = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newExpense.category || !newExpense.amount) return;
+    setSaving(true);
+    const supabase = getSupabaseBrowserClient();
+    const dateStr = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-01`;
+    await supabase.from('expenses').insert([{
+      category: newExpense.category,
+      amount: parseFloat(newExpense.amount),
+      date: dateStr,
+      description: newExpense.description,
+    }]);
+    setNewExpense({ category: '', amount: '', description: '' });
+    await loadData();
+    setSaving(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('هل أنت متأكد من الحذف؟')) return;
+    const supabase = getSupabaseBrowserClient();
+    await supabase.from('expenses').delete().eq('id', id);
+    await loadData();
+  };
 
   return (
     <div className="space-y-8 animate-fade-in" dir="rtl">
-      {/* Header */}
+
+      {/* ── HEADER ── */}
       <header className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
         <div>
-          <h1 className="text-4xl font-black text-[#2A2723]">كشف <span className="text-[#C1A68D]">المصاريف والتحصيل</span></h1>
-          <p className="text-[#7A7061] font-bold opacity-70 text-sm">إدارة المصاريف الشهرية ومطابقتها مع إجمالي دخل الـ 24 استديو.</p>
+          <h1 className="text-4xl font-black text-[#2A2723]">الإدارة <span className="text-[#C1A68D]">المالية الشاملة</span></h1>
+          <p className="text-[#7A7061] font-bold opacity-70 text-sm mt-1">ملخص الإيرادات، المصروفات، وتوزيع الأرباح</p>
         </div>
-
         <div className="flex gap-3 bg-white p-2 rounded-[1.5rem] border border-[#EAE4D9]/50 shadow-sm">
-          <select
-            value={selectedMonth}
-            onChange={e => setSelectedMonth(Number(e.target.value))}
-            className="bg-[#FDFBF7] border-none rounded-xl px-4 py-2 text-xs font-black outline-none"
-          >
+          <select value={selectedMonth} onChange={e => setSelectedMonth(Number(e.target.value))}
+            className="bg-[#FDFBF7] border-none rounded-xl px-4 py-2 text-xs font-black outline-none">
             {MONTHS_AR.map((m, i) => <option key={i} value={i}>{m}</option>)}
           </select>
-          <select
-            value={selectedYear}
-            onChange={e => setSelectedYear(Number(e.target.value))}
-            className="bg-[#FDFBF7] border-none rounded-xl px-4 py-2 text-xs font-black outline-none"
-          >
+          <select value={selectedYear} onChange={e => setSelectedYear(Number(e.target.value))}
+            className="bg-[#FDFBF7] border-none rounded-xl px-4 py-2 text-xs font-black outline-none">
             {[2025, 2026, 2027].map(y => <option key={y} value={y}>{y}</option>)}
           </select>
         </div>
       </header>
 
-      {/* Summary Section: The 2 Main Numbers from Reports */}
+      {/* ── SUM TABLE (Excel Layout) ── */}
+      <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
+        <div className="bg-[#2A2723] px-8 py-4 flex items-center gap-3">
+          <span className="text-white font-black text-sm tracking-widest uppercase">SUM</span>
+          <span className="text-[#C1A68D] text-xs font-bold">— ملخص الدورة المالية لشهر {MONTHS_AR[selectedMonth]} {selectedYear}</span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-center">
+            <thead>
+              <tr>
+                <th className="px-6 py-4 font-black text-xs bg-[#F97316] text-white border border-orange-300">Rent (1)</th>
+                <th className="px-6 py-4 font-black text-xs bg-[#F97316] text-white border border-orange-300">Rent (2)</th>
+                <th className="px-6 py-4 font-black text-xs bg-[#F97316] text-white border border-orange-300">Expenses</th>
+                <th className="px-6 py-4 font-black text-xs bg-[#F97316] text-white border border-orange-300">Salaries</th>
+                <th className="px-6 py-4 font-black text-sm bg-[#FACC15] text-[#2A2723] border border-yellow-300">Final</th>
+              </tr>
+              <tr>
+                <th className="px-4 py-1 text-[10px] font-bold text-[#7A7061] bg-orange-50 border border-orange-100">الإيجار الأول</th>
+                <th className="px-4 py-1 text-[10px] font-bold text-[#7A7061] bg-orange-50 border border-orange-100">الإيجار الثاني</th>
+                <th className="px-4 py-1 text-[10px] font-bold text-[#7A7061] bg-orange-50 border border-orange-100">المصروفات</th>
+                <th className="px-4 py-1 text-[10px] font-bold text-[#7A7061] bg-orange-50 border border-orange-100">الرواتب</th>
+                <th className="px-4 py-1 text-[10px] font-bold text-[#2A2723] bg-yellow-50 border border-yellow-100">الصافي النهائي</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="px-6 py-8 border border-[#EAE4D9]/40">
+                  <div className="text-2xl font-black text-[#2A2723]">{isLoading ? '...' : rent1Total.toLocaleString()}</div>
+                  <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
+                </td>
+                <td className="px-6 py-8 border border-[#EAE4D9]/40">
+                  <div className="text-2xl font-black text-[#2A2723]">{isLoading ? '...' : rent2Total.toLocaleString()}</div>
+                  <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
+                </td>
+                <td className="px-6 py-8 border border-[#EAE4D9]/40">
+                  <div className="text-2xl font-black text-red-600">{isLoading ? '...' : otherExpenses.toLocaleString()}</div>
+                  <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
+                </td>
+                <td className="px-6 py-8 border border-[#EAE4D9]/40">
+                  <div className="text-2xl font-black text-orange-600">{isLoading ? '...' : salariesTotal.toLocaleString()}</div>
+                  <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
+                </td>
+                <td className={`px-6 py-8 border border-yellow-200 bg-[#FACC15]/10 ${netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  <div className="text-3xl font-black">{isLoading ? '...' : netProfit.toLocaleString()}</div>
+                  <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* ── KPI CARDS ── */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white p-6 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm text-center">
+          <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">إجمالي الإيرادات</p>
+          <div className="text-3xl font-black text-green-600">{isLoading ? '...' : revenue.toLocaleString()} <small className="text-sm">ج.م</small></div>
+          <p className="text-[10px] text-[#7A7061] mt-2">{monthlyBookings.length} حجز مؤكد</p>
+        </div>
+        <div className="bg-white p-6 rounded-[2rem] border-2 border-[#C1A68D]/30 shadow-sm text-center">
+          <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">معدل سعر الليلة الواحدة</p>
+          <div className="text-3xl font-black text-[#C1A68D]">{isLoading ? '...' : Math.round(avgNightlyRate).toLocaleString()} <small className="text-sm">ج.م</small></div>
+          <p className="text-[10px] text-[#7A7061] mt-2">{totalNights} ليلة إجمالاً</p>
+        </div>
+        <div className="bg-white p-6 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm text-center">
+          <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">إجمالي العمولات</p>
+          <div className="text-3xl font-black text-orange-500">{isLoading ? '...' : commissions.toLocaleString()} <small className="text-sm">ج.م</small></div>
+          <p className="text-[10px] text-[#7A7061] mt-2">مخصومة من الإيرادات</p>
+        </div>
+      </div>
+
+      {/* ── PROFIT DISTRIBUTION TABLE (Excel Layout) ── */}
+      <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
+        <div className="bg-[#2A2723] px-8 py-4 flex items-center justify-between">
+          <h2 className="text-white font-black text-sm tracking-widest uppercase">توزيع الأرباح بين الشركاء</h2>
+          <span className="text-[#C1A68D] text-xs font-black bg-white/10 px-4 py-1.5 rounded-full">
+            صافي الربح: {netProfit.toLocaleString()} ج.م
+          </span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-center">
+            <thead>
+              <tr className="bg-[#FDFBF7]">
+                <th className="px-8 py-4 font-black text-xs text-[#7A7061] border border-[#EAE4D9]/60 w-32">Name</th>
+                {PARTNERS.map(p => (
+                  <th key={p.key} className="px-8 py-4 font-black text-sm text-[#2A2723] border border-[#EAE4D9]/60">
+                    {p.label}
+                    <span className="block text-[10px] font-bold text-[#C1A68D]">({p.percentage}%)</span>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="px-8 py-6 font-black text-[#7A7061] text-sm border border-[#EAE4D9]/40 bg-[#FDFBF7]/60">Value</td>
+                {PARTNERS.map(p => (
+                  <td key={p.key} className="px-8 py-6 border border-[#EAE4D9]/40">
+                    <div className={`text-2xl font-black ${netProfit >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                      {isLoading ? '...' : Math.round(netProfit * p.percentage / 100).toLocaleString()}
+                    </div>
+                    <div className="text-[10px] text-[#7A7061] font-bold mt-1">ج.م</div>
+                  </td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* ── RENT ENTRY ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-         <div className="bg-white p-8 rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-green-500/5 rounded-full blur-3xl -mr-12 -mt-12" />
-            <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-2">إجمالي دخل الـ 24 استديو (من التقارير)</p>
-            <div className="text-4xl font-black text-green-600">
-                {isLoading ? '...' : totals.revenue.toLocaleString()} <small className="text-sm">ج.م</small>
+        <div className="bg-white p-6 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm">
+          <h3 className="font-black text-[#2A2723] mb-4 flex items-center gap-3">
+            <span className="w-9 h-9 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center font-black">1</span>
+            إيجار الفرع الأول — Rent (1)
+          </h3>
+          <div className="flex gap-3">
+            <input type="number" placeholder="المبلغ بالجنيه" value={rent1Input}
+              onChange={e => setRent1Input(e.target.value)}
+              className="flex-1 bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#C1A68D] transition-colors" />
+            <button onClick={() => handleAddRent('1')} disabled={saving || !rent1Input}
+              className="bg-[#2A2723] text-white font-black px-5 py-3 rounded-xl hover:bg-black transition-all disabled:opacity-40 active:scale-95">
+              تسجيل
+            </button>
+          </div>
+          {rent1Total > 0 && (
+            <div className="mt-3 flex items-center gap-2 text-orange-600">
+              <span className="text-sm">✓</span>
+              <span className="text-xs font-black">مسجل: {rent1Total.toLocaleString()} ج.م</span>
             </div>
-         </div>
-         <div className="bg-white p-8 rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-orange-500/5 rounded-full blur-3xl -mr-12 -mt-12" />
-            <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-2">إجمالي العمولات (من التقارير)</p>
-            <div className="text-4xl font-black text-orange-500">
-                {isLoading ? '...' : totals.commissions.toLocaleString()} <small className="text-sm">ج.م</small>
+          )}
+        </div>
+        <div className="bg-white p-6 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm">
+          <h3 className="font-black text-[#2A2723] mb-4 flex items-center gap-3">
+            <span className="w-9 h-9 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-black">2</span>
+            إيجار الفرع الثاني — Rent (2)
+          </h3>
+          <div className="flex gap-3">
+            <input type="number" placeholder="المبلغ بالجنيه" value={rent2Input}
+              onChange={e => setRent2Input(e.target.value)}
+              className="flex-1 bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#C1A68D] transition-colors" />
+            <button onClick={() => handleAddRent('2')} disabled={saving || !rent2Input}
+              className="bg-[#2A2723] text-white font-black px-5 py-3 rounded-xl hover:bg-black transition-all disabled:opacity-40 active:scale-95">
+              تسجيل
+            </button>
+          </div>
+          {rent2Total > 0 && (
+            <div className="mt-3 flex items-center gap-2 text-blue-600">
+              <span className="text-sm">✓</span>
+              <span className="text-xs font-black">مسجل: {rent2Total.toLocaleString()} ج.م</span>
             </div>
-         </div>
-      </div>
-
-      {/* Expenses Management Section */}
-      <div className="mt-12">
-        <div className="flex items-center gap-4 mb-6">
-           <div className="h-px bg-[#EAE4D9] flex-1" />
-           <h3 className="text-sm font-black text-[#C1A68D] uppercase tracking-[0.3em]">بند المصروفات الشهرية التفصيلية</h3>
-           <div className="h-px bg-[#EAE4D9] flex-1" />
-        </div>
-        
-        <div className="bg-white p-12 rounded-[3rem] border border-[#EAE4D9]/50 shadow-sm mb-8 text-center">
-           <div className="text-5xl mb-6">📝</div>
-           <h4 className="text-xl font-black text-[#2A2723] mb-3">بانتظار نموذج المصاريف من العميل</h4>
-           <p className="text-sm text-[#7A7061] font-bold max-w-lg mx-auto leading-relaxed">
-              بمجرد تزويدنا بشكل ملف الإكسيل، سنقوم بإنشاء الجداول هنا لتتمكن من إدخال (الكهرباء، المياه، النظافة، الصيانة) وغيرها من المصاريف يدوياً.
-           </p>
+          )}
         </div>
       </div>
 
-      {/* Final Calculation Bar */}
-      <div className="bg-[#2A2723] p-10 rounded-[3rem] shadow-2xl flex flex-col md:flex-row justify-between items-center gap-8">
-         <div className="text-center md:text-right">
-            <p className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest mb-1">صافي الربح النهائي (بعد خصم كافة المصاريف)</p>
-            <p className="text-xs text-gray-400 font-bold italic">هذا الرقم يتم تحديثه لحظياً بناءً على إجمالي الدخل والمصاريف المدخلة.</p>
-         </div>
-         <div className="text-5xl font-black text-white">
-            {isLoading ? '...' : (totals.revenue - totals.commissions).toLocaleString()} <small className="text-sm">ج.م</small>
-         </div>
+      {/* ── ADD EXPENSE FORM ── */}
+      <div className="bg-white p-8 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm">
+        <h3 className="font-black text-[#2A2723] mb-6 text-lg flex items-center gap-3">
+          <span className="w-9 h-9 bg-[#C1A68D]/10 text-[#C1A68D] rounded-xl flex items-center justify-center">➕</span>
+          إضافة مصروف — Expenses
+        </h3>
+        <form onSubmit={handleAddExpense} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+          <div className="space-y-2">
+            <label className="text-xs font-black text-[#C1A68D]">الفئة (كهرباء، مياه، نظافة...)</label>
+            <input required value={newExpense.category}
+              onChange={e => setNewExpense({ ...newExpense, category: e.target.value })}
+              className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#C1A68D] transition-colors" />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-black text-[#C1A68D]">المبلغ (ج.م)</label>
+            <input type="number" required value={newExpense.amount}
+              onChange={e => setNewExpense({ ...newExpense, amount: e.target.value })}
+              className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#C1A68D] transition-colors" />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-black text-[#C1A68D]">ملاحظات (اختياري)</label>
+            <input value={newExpense.description}
+              onChange={e => setNewExpense({ ...newExpense, description: e.target.value })}
+              className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#C1A68D] transition-colors" />
+          </div>
+          <button type="submit" disabled={saving}
+            className="bg-[#C1A68D] text-white font-black px-6 py-3.5 rounded-xl hover:bg-[#a08060] transition-all disabled:opacity-40 active:scale-95 shadow-sm">
+            {saving ? 'جاري الحفظ...' : 'إضافة المصروف'}
+          </button>
+        </form>
       </div>
 
-      {/* Admin Note */}
-      <div className="bg-[#C1A68D]/10 border border-[#C1A68D]/30 p-8 rounded-[2.5rem] flex items-center gap-6">
-        <span className="text-3xl">ℹ️</span>
-        <div>
-           <p className="text-xs text-[#7A7061] font-bold leading-relaxed">
-              هذه الصفحة مخصصة لـ <strong>إدارة المصاريف</strong>. يتم سحب "إجمالي الدخل" و "العمولات" آلياً من صفحة التقارير لضمان الدقة، بينما سيتم إدخال باقي التفاصيل هنا يدوياً.
-           </p>
+      {/* ── MONTHLY EXPENSES TABLE ── */}
+      {monthlyExpenses.length > 0 && (
+        <div className="bg-white rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-[#EAE4D9]/50 bg-[#FDFBF7]/50 flex justify-between items-center">
+            <h3 className="font-black text-[#2A2723]">
+              تفاصيل مصروفات {MONTHS_AR[selectedMonth]} {selectedYear}
+            </h3>
+            <span className="text-[10px] font-black bg-red-50 text-red-500 px-4 py-1.5 rounded-full">
+              الإجمالي: {monthlyExpenses.reduce((s, e) => s + (e.amount || 0), 0).toLocaleString()} ج.م
+            </span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-right border-collapse">
+              <thead>
+                <tr className="bg-[#2A2723] text-white text-[10px] font-black uppercase tracking-widest">
+                  <th className="px-6 py-4">الفئة</th>
+                  <th className="px-6 py-4">المبلغ</th>
+                  <th className="px-6 py-4">الوصف</th>
+                  <th className="px-6 py-4 text-center">حذف</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#EAE4D9]/30">
+                {monthlyExpenses.map(exp => (
+                  <tr key={exp.id} className="hover:bg-[#FDFBF7] transition-colors">
+                    <td className="px-6 py-4 font-black text-[#2A2723]">{exp.category}</td>
+                    <td className="px-6 py-4 font-black text-red-600">- {exp.amount?.toLocaleString()} ج.م</td>
+                    <td className="px-6 py-4 text-xs text-[#7A7061] font-bold">{exp.description || '—'}</td>
+                    <td className="px-6 py-4 text-center">
+                      <button onClick={() => handleDelete(exp.id)}
+                        className="w-8 h-8 rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all text-sm">
+                        🗑️
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* ── FINAL NET BAR ── */}
+      <div className={`p-10 rounded-[3rem] shadow-2xl flex flex-col md:flex-row justify-between items-center gap-8 ${netProfit >= 0 ? 'bg-[#2A2723]' : 'bg-red-900'}`}>
+        <div className="text-center md:text-right">
+          <p className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest mb-2">
+            صافي الربح النهائي — {MONTHS_AR[selectedMonth]} {selectedYear}
+          </p>
+          <p className="text-xs text-gray-400 font-bold">
+            الإيرادات ({revenue.toLocaleString()}) − العمولات − الإيجارات − المصروفات − الرواتب
+          </p>
+        </div>
+        <div className={`text-5xl font-black ${netProfit >= 0 ? 'text-white' : 'text-red-200'}`}>
+          {isLoading ? '...' : netProfit.toLocaleString()} <small className="text-sm">ج.م</small>
         </div>
       </div>
+
     </div>
   );
 }
