@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { getBookings, getPublicSystemUnits } from '@/lib/data-init';
+import { getBookings, getSystemUnits } from '@/lib/data-init';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
 const CONFIRMED_STATUSES = ['مؤكد', 'approved', 'مؤكد/دخول', 'مغادر/تنظيف', 'مغادر/تم'];
@@ -38,7 +38,7 @@ export default function DashboardOverview() {
   const loadOverviewData = useCallback(async () => {
     setIsLoading(true);
     const bookings = await getBookings(Date.now().toString());
-    const apts = await getPublicSystemUnits();
+    const apts = await getSystemUnits();
     
     const today = new Date();
     const todayStr = today.toISOString().split('T')[0];
