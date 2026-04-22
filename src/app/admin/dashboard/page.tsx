@@ -204,93 +204,75 @@ export default function DashboardOverview() {
         ))}
       </div>
 
-      {/* LIVE INVENTORY SEARCH */}
-      <div className="bg-[#2A2723] p-8 rounded-[2.5rem] shadow-2xl border border-white/5 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#C1A68D] to-transparent opacity-30" />
-        
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 relative z-10">
-            <div className="space-y-2">
-                <h3 className="text-xl font-black text-white flex items-center gap-3">
-                    🏢 التوافر اللحظي <span className="text-[#C1A68D]">Inventory</span>
-                </h3>
-                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.2em]">عرض الوحدات المتاحة بالتاريخ</p>
+      {/* CLEAN INVENTORY SEARCH & STATS */}
+      <div className="bg-white p-8 rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-10 pb-6 border-b border-[#EAE4D9]/30">
+            <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-[#C1A68D]/10 rounded-2xl flex items-center justify-center text-2xl">🏢</div>
+                <div>
+                    <h3 className="font-black text-lg text-[#2A2723]">البحث السريع عن المتاح</h3>
+                    <p className="text-[10px] text-[#7A7061] font-bold uppercase tracking-widest">اختر التاريخ والفئة لعرض الوحدات</p>
+                </div>
             </div>
 
-            <div className="flex items-center gap-4 bg-white/5 p-2 rounded-2xl border border-white/10">
-                <span className="text-xs font-black text-[#C1A68D] mr-2">ابحث عن تاريخ:</span>
+            <div className="flex flex-wrap items-center gap-3 bg-[#FDFBF7] p-2 rounded-2xl border border-[#EAE4D9]">
                 <input 
                     type="date"
                     value={selectedDate}
                     onChange={(e) => setSelectedDate(e.target.value)}
-                    className="bg-[#1A1816] text-white px-4 py-2 rounded-xl outline-none border border-white/10 focus:border-[#C1A68D] font-bold text-sm transition-all"
+                    className="bg-white text-[#2A2723] px-4 py-2 rounded-xl outline-none border border-[#EAE4D9] focus:border-[#C1A68D] font-bold text-sm shadow-sm transition-all"
                 />
-            </div>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-10">
-            <div 
-                onClick={() => setSelectedCategory('all')}
-                className={`p-6 rounded-3xl cursor-pointer transition-all border ${selectedCategory === 'all' ? 'bg-[#C1A68D] border-[#C1A68D] shadow-[0_0_30px_rgba(193,166,141,0.3)] scale-105' : 'bg-white/5 border-white/5 hover:bg-white/10'}`}
-            >
-                <div className={`text-[10px] font-black uppercase tracking-widest mb-3 ${selectedCategory === 'all' ? 'text-black' : 'text-gray-500'}`}>عرض الكل</div>
-                <div className={`text-5xl font-black ${selectedCategory === 'all' ? 'text-black' : 'text-white'}`}>∞</div>
-            </div>
-
-            {inventoryStats.map((item, i) => (
-                <div 
-                    key={i} 
-                    onClick={() => setSelectedCategory(item.id)}
-                    className={`p-6 rounded-3xl cursor-pointer transition-all border group ${selectedCategory === item.id ? 'bg-white border-white shadow-[0_0_30px_rgba(255,255,255,0.2)] scale-105' : 'bg-white/5 border-white/5 hover:bg-white/10'}`}
+                <div className="w-px h-6 bg-[#EAE4D9]" />
+                <button 
+                    onClick={() => setSelectedCategory('all')}
+                    className={`px-5 py-2 rounded-xl text-xs font-black transition-all ${selectedCategory === 'all' ? 'bg-[#2A2723] text-white' : 'text-[#7A7061] hover:bg-[#EAE4D9]/30'}`}
                 >
-                    <div className={`text-[10px] font-black uppercase tracking-widest mb-3 transition-colors ${selectedCategory === item.id ? 'text-black' : 'text-gray-500 group-hover:text-[#C1A68D]'}`}>{item.label}</div>
-                    <div className="flex items-end gap-2">
-                        <div className={`text-5xl font-black ${selectedCategory === item.id ? 'text-black' : (item.count > 0 ? item.color : 'text-gray-700')}`}>{item.count}</div>
-                        <div className={`text-[10px] font-bold mb-2 ${selectedCategory === item.id ? 'text-black/60' : 'text-gray-500'}`}>متاح</div>
-                    </div>
-                </div>
-            ))}
+                    الكل
+                </button>
+                {inventoryStats.map((item, i) => (
+                    <button 
+                        key={i}
+                        onClick={() => setSelectedCategory(item.id)}
+                        className={`px-5 py-2 rounded-xl text-xs font-black transition-all ${selectedCategory === item.id ? 'bg-[#C1A68D] text-white shadow-md' : 'text-[#7A7061] hover:bg-[#EAE4D9]/30'}`}
+                    >
+                        {item.label} ({item.count})
+                    </button>
+                ))}
+            </div>
         </div>
-      </div>
 
-      {/* Main Grid */}
-      <div className="grid lg:grid-cols-3 gap-8">
-        {/* Unit Status Map */}
-        <div className="lg:col-span-2 bg-white p-8 rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm">
-          <div className="flex justify-between items-center mb-8">
-            <h3 className="font-black text-lg text-[#2A2723]">🗺️ خريطة الوحدات <span className="text-[#C1A68D]">Live</span></h3>
-            <div className="flex gap-4">
-              <span className="flex items-center gap-1.5 text-[8px] font-black text-green-600 uppercase"><span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"/>متاح</span>
-              <span className="flex items-center gap-1.5 text-[8px] font-black text-red-600 uppercase"><span className="w-2 h-2 rounded-full bg-red-500"/>مشغول</span>
-              <span className="flex items-center gap-1.5 text-[8px] font-black text-gray-400 uppercase"><span className="w-2 h-2 rounded-full bg-gray-400"/>صيانة</span>
-            </div>
-          </div>
-          {apartmentMap.length === 0 ? (
-            <div className="h-40 flex items-center justify-center text-gray-300 animate-pulse font-black text-sm">جاري التحميل...</div>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {apartmentMap.map((apt) => (
-                <div key={apt.id} className={`p-4 rounded-2xl border transition-all ${
-                  apt.status === 'maintenance' || apt.status === 'صيانة'
-                    ? 'bg-gray-50 border-gray-100 opacity-60'
-                    : apt.isOccupied
-                    ? 'bg-red-50 border-red-200 shadow-sm shadow-red-100'
-                    : 'bg-green-50 border-green-200'
-                }`}>
-                  <div className="text-[9px] font-black text-[#7A7061] uppercase mb-1 opacity-60">{apt.id}</div>
-                  <div className={`text-xs font-black mb-1 ${apt.status === 'صيانة' ? 'text-gray-400' : apt.isOccupied ? 'text-red-600' : 'text-green-600'}`}>
-                    {apt.status === 'صيانة' ? '🔧 صيانة' : apt.isOccupied ? '🔴 مشغول' : '🟢 متاح'}
-                  </div>
-                  {apt.isOccupied && (
-                    <div className="text-[8px] text-[#2A2723] truncate font-black opacity-50">{apt.guest}</div>
-                  )}
-                  {apt.isOccupied && apt.guestsCount > 1 && (
-                    <div className="text-[8px] text-blue-500 font-black">👥 {apt.guestsCount} أشخاص</div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+        {/* Dynamic Unit Map Title based on Filter */}
+        <div className="flex items-center justify-between mb-6">
+            <h4 className="text-sm font-black text-[#2A2723]">
+                {selectedCategory === 'all' ? '🗺️ جميع الوحدات' : `🟢 وحدات ${inventoryStats.find(i => i.id === selectedCategory)?.label} المتاحة`}
+            </h4>
+            <span className="text-[10px] font-bold text-[#7A7061] opacity-60">تاريخ العرض: {selectedDate}</span>
         </div>
+
+        {apartmentMap.length === 0 ? (
+          <div className="h-40 flex items-center justify-center text-gray-300 animate-pulse font-black text-sm italic">لا يوجد وحدات مطابقة للبحث...</div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+            {apartmentMap.map((apt) => (
+              <div key={apt.id} className={`p-4 rounded-2xl border transition-all duration-500 ${
+                apt.status === 'maintenance' || apt.status === 'صيانة'
+                  ? 'bg-gray-50 border-gray-100 opacity-60'
+                  : apt.isOccupied
+                  ? 'bg-red-50 border-red-100 opacity-40 grayscale'
+                  : 'bg-white border-[#EAE4D9] shadow-sm hover:border-[#C1A68D] hover:scale-105'
+              }`}>
+                <div className="text-[9px] font-black text-[#7A7061] uppercase mb-1 opacity-60">{apt.id}</div>
+                <div className={`text-[11px] font-black mb-1 ${apt.status === 'صيانة' ? 'text-gray-400' : apt.isOccupied ? 'text-red-500' : 'text-green-600'}`}>
+                   {apt.isOccupied ? '🔴 مشغول' : apt.status === 'صيانة' ? '🔧 صيانة' : '🟢 متاح'}
+                </div>
+                {!apt.isOccupied && (
+                   <div className="text-[10px] font-bold text-[#2A2723] mt-1">{apt.title?.ar}</div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
         {/* Tomorrow Preview */}
         <div className="bg-[#2A2723] p-8 rounded-[2.5rem] shadow-xl flex flex-col">
