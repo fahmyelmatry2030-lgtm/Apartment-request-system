@@ -35,6 +35,8 @@ export default function DashboardOverview() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [inventoryStats, setInventoryStats] = useState<any[]>([]);
+  const [allBookings, setAllBookings] = useState<any[]>([]);
+  const [selectedKpi, setSelectedKpi] = useState<string | null>(null);
 
   const loadOverviewData = useCallback(async () => {
     setIsLoading(true);
@@ -91,6 +93,7 @@ export default function DashboardOverview() {
       { id: 'two-room', label: 'غرفتين',   count: physicalStudios.filter((u: any) => twoRoomIds.includes(u.id) && !u.isOccupied).length, total: 3,  color: 'text-purple-400' },
     ]);
 
+    setAllBookings(bookings);
     setStats({
       totalBookings: bookings.length,
       pendingBookings: pending.length,
@@ -134,13 +137,26 @@ export default function DashboardOverview() {
     return () => { supabase.removeChannel(channel); };
   }, [loadOverviewData]);
 
+  const targetDateStr = selectedDate;
+
   const kpis = [
-    { label: 'إجمالي الطلبات', value: stats.totalBookings,   icon: '📊', gradient: 'from-[#2A2723] to-[#3D3530]',   text: 'text-white' },
-    { label: 'قيد المراجعة',   value: stats.pendingBookings,  icon: '⏳', gradient: 'from-amber-500 to-orange-500', text: 'text-white' },
-    { label: 'مؤكدة',          value: stats.approvedBookings, icon: '✅', gradient: 'from-green-500 to-emerald-600', text: 'text-white' },
-    { label: 'وصول اليوم',     value: stats.checkInToday,    icon: '🛬', gradient: 'from-blue-500 to-blue-600',     text: 'text-white' },
-    { label: 'مغادرة اليوم',   value: stats.checkOutToday,   icon: '🛫', gradient: 'from-rose-500 to-red-600',      text: 'text-white' },
+    { key: 'total',    label: 'إجمالي الطلبات', value: stats.totalBookings,   icon: '📊', gradient: 'from-[#2A2723] to-[#3D3530]',   text: 'text-white' },
+    { key: 'pending',  label: 'قيد المراجعة',   value: stats.pendingBookings,  icon: '⏳', gradient: 'from-amber-500 to-orange-500', text: 'text-white' },
+    { key: 'approved', label: 'مؤكدة',           value: stats.approvedBookings, icon: '✅', gradient: 'from-green-500 to-emerald-600', text: 'text-white' },
+    { key: 'checkin',  label: 'وصول اليوم',      value: stats.checkInToday,    icon: '🛬', gradient: 'from-blue-500 to-blue-600',     text: 'text-white' },
+    { key: 'checkout', label: 'مغادرة اليوم',    value: stats.checkOutToday,   icon: '🛫', gradient: 'from-rose-500 to-red-600',      text: 'text-white' },
   ];
+
+  const getKpiBookings = (key: string) => {
+    const confirmed = allBookings.filter((b: any) => CONFIRMED_STATUSES.includes(b.status));
+    const pending   = allBookings.filter((b: any) => PENDING_STATUSES.includes(b.status));
+    if (key === 'total')    return allBookings;
+    if (key === 'pending')  return pending;
+    if (key === 'approved') return confirmed;
+    if (key === 'checkin')  return confirmed.filter((b: any) => b.checkIn  === targetDateStr);
+    if (key === 'checkout') return confirmed.filter((b: any) => b.checkOut === targetDateStr);
+    return [];
+  };
 
   return (
     <div className="space-y-8 animate-fade-in" dir="rtl">
@@ -187,13 +203,60 @@ export default function DashboardOverview() {
       {/* ── KPI CARDS ── */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         {kpis.map((kpi, i) => (
-          <div key={i} className={`bg-gradient-to-br ${kpi.gradient} p-6 rounded-[2rem] shadow-lg hover:scale-105 transition-all overflow-hidden relative`}>
+          <button
+            key={i}
+            onClick={() => setSelectedKpi(selectedKpi === kpi.key ? null : kpi.key)}
+            className={`bg-gradient-to-br ${kpi.gradient} p-6 rounded-[2rem] shadow-lg hover:scale-105 transition-all overflow-hidden relative text-right cursor-pointer ring-offset-2 ${
+              selectedKpi === kpi.key ? 'ring-4 ring-white/60 scale-105' : ''
+            }`}
+          >
             <div className="absolute -bottom-3 -left-3 text-5xl opacity-10 rotate-12">{kpi.icon}</div>
             <div className={`text-4xl font-black mb-2 ${kpi.text}`}>{kpi.value}</div>
             <div className={`text-[9px] font-black uppercase tracking-widest opacity-70 ${kpi.text}`}>{kpi.label}</div>
-          </div>
+            <div className={`text-[8px] mt-2 opacity-50 ${kpi.text}`}>اضغط للتفاصيل ▾</div>
+          </button>
         ))}
       </div>
+
+      {/* ── KPI DETAIL PANEL ── */}
+      {selectedKpi && (() => {
+        const list = getKpiBookings(selectedKpi);
+        const kpi  = kpis.find(k => k.key === selectedKpi)!;
+        return (
+          <div className={`bg-gradient-to-br ${kpi.gradient} rounded-[2rem] overflow-hidden shadow-2xl transition-all`}>
+            <div className="p-6 flex items-center justify-between border-b border-white/10">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">{kpi.icon}</span>
+                <div>
+                  <h3 className="font-black text-white text-sm">{kpi.label}</h3>
+                  <p className="text-[10px] text-white/60 font-bold">{list.length} حجز</p>
+                </div>
+              </div>
+              <button onClick={() => setSelectedKpi(null)} className="text-white/60 hover:text-white text-lg font-black">✕</button>
+            </div>
+            {list.length === 0 ? (
+              <div className="py-10 text-center text-white/40 font-black text-sm">لا توجد بيانات</div>
+            ) : (
+              <div className="p-4 grid gap-2 max-h-64 overflow-y-auto">
+                {list.map((b: any, i: number) => (
+                  <div key={i} className="bg-white/10 backdrop-blur rounded-xl p-3 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-[11px] font-black text-white shrink-0">
+                        {b.apartmentId?.replace('b1-s','').replace('b2-s','').replace('apt-','ش') || '?'}
+                      </div>
+                      <div>
+                        <div className="text-xs font-black text-white">{b.name}</div>
+                        <div className="text-[9px] text-white/60 font-bold">{b.checkIn} ← {b.checkOut}</div>
+                      </div>
+                    </div>
+                    <span className="text-[9px] font-black bg-white/20 px-2 py-0.5 rounded-full text-white shrink-0">{b.status}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* ── COMMAND CENTER: 3-DAY PREVIEW FULL WIDTH ── */}
       <div className="grid lg:grid-cols-1 gap-6">
