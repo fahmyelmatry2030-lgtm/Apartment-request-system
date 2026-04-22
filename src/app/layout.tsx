@@ -106,7 +106,7 @@ export default async function RootLayout({
       addressRegion: 'Cairo',
       addressCountry: 'EG',
     },
-    telephone: '+201554788708', // Personal client number
+    telephone: '+201108109969', // Personal client number
     starRating: {
       '@type': 'Rating',
       ratingValue: '5',
