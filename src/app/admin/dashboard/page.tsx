@@ -31,6 +31,7 @@ export default function DashboardOverview() {
   const [tomorrowPlans, setTomorrowPlans] = useState<{in: any[], out: any[]}>({ in: [], out: [] });
   const [nextDayPlans, setNextDayPlans] = useState<{in: any[], out: any[]}>({ in: [], out: [] });
   const [apartmentMap, setApartmentMap] = useState<any[]>([]);
+  const [fullMap, setFullMap] = useState<any[]>([]);
 
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -82,10 +83,7 @@ export default function DashboardOverview() {
       };
     });
 
-    const filteredMap = selectedCategory === 'all'
-      ? map.filter((u: any) => !u.id.startsWith('b1-s') && !u.id.startsWith('b2-s'))
-      : map.filter((u: any) => u.category === selectedCategory);
-    setApartmentMap(filteredMap);
+    setFullMap(map);
 
     const physicalStudios = map.filter((u: any) => u.id.startsWith('b1-s') || u.id.startsWith('b2-s'));
     setInventoryStats([
@@ -138,6 +136,15 @@ export default function DashboardOverview() {
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [loadOverviewData]);
+
+  // Reactive filter: recompute whenever category or data changes
+  useEffect(() => {
+    if (fullMap.length === 0) return;
+    const filtered = selectedCategory === 'all'
+      ? fullMap.filter((u: any) => !u.id.startsWith('b1-s') && !u.id.startsWith('b2-s'))
+      : fullMap.filter((u: any) => u.category === selectedCategory);
+    setApartmentMap(filtered);
+  }, [selectedCategory, fullMap]);
 
   const targetDateStr = selectedDate;
 
