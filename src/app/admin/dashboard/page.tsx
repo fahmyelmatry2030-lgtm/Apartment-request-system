@@ -195,11 +195,11 @@ export default function DashboardOverview() {
         ))}
       </div>
 
-      {/* ── COMMAND CENTER: 3-DAY PREVIEW + QUICK SEARCH ── */}
-      <div className="grid lg:grid-cols-4 gap-6">
+      {/* ── COMMAND CENTER: 3-DAY PREVIEW FULL WIDTH ── */}
+      <div className="grid lg:grid-cols-1 gap-6">
 
-        {/* 3-DAY OPERATIONAL PREVIEW (3/4 width) */}
-        <div className="lg:col-span-3 bg-[#1A1816] p-8 rounded-[2.5rem] shadow-2xl border border-white/5 relative overflow-hidden">
+        {/* 3-DAY OPERATIONAL PREVIEW */}
+        <div className="bg-[#1A1816] p-8 rounded-[2.5rem] shadow-2xl border border-white/5 relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#C1A68D] to-transparent opacity-20" />
           <div className="grid md:grid-cols-3 gap-6 divide-x divide-white/5 rtl:divide-x-reverse">
 
@@ -290,71 +290,64 @@ export default function DashboardOverview() {
           </div>
         </div>
 
-        {/* QUICK SEARCH (1/4 width) */}
-        <div className="bg-white p-6 rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm flex flex-col gap-3">
-          <div>
-            <h3 className="font-black text-sm text-[#2A2723]">🔍 بحث سريع</h3>
-            <p className="text-[9px] text-[#7A7061] font-bold opacity-60 mt-0.5">اختر التاريخ والفئة</p>
-          </div>
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="w-full bg-[#F8F5F0] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-black text-[#2A2723] focus:ring-2 focus:ring-[#C1A68D] transition-all outline-none"
-          />
-          <div className="flex flex-col gap-2">
-            <button
-              onClick={() => setSelectedCategory('all')}
-              className={`w-full px-4 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-between ${selectedCategory === 'all' ? 'bg-[#2A2723] text-white shadow-lg' : 'bg-gray-50 text-[#7A7061] hover:bg-gray-100'}`}
-            >
-              <span>🗺️ الكل</span>
-              <span className="text-[9px] opacity-50">{apartmentMap.length}</span>
-            </button>
-            {inventoryStats.map((item, i) => (
+        {/* QUICK SEARCH merged into Unit Map */}
+        <div className="bg-white p-8 rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm">
+          {/* Header row: title + date + filters */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-5 border-b border-[#EAE4D9]/30">
+            <h4 className="font-black text-sm text-[#2A2723]">
+              {selectedCategory === 'all' ? '🗺️ جميع الوحدات' : `🟢 وحدات ${inventoryStats.find(i => i.id === selectedCategory)?.label} المتاحة`}
+            </h4>
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Date picker */}
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                className="bg-[#F8F5F0] border border-[#EAE4D9] rounded-xl px-3 py-1.5 text-xs font-black text-[#2A2723] focus:ring-2 focus:ring-[#C1A68D] transition-all outline-none"
+              />
+              <div className="w-px h-5 bg-[#EAE4D9]" />
+              {/* Category filters */}
               <button
-                key={i}
-                onClick={() => setSelectedCategory(item.id)}
-                className={`w-full px-4 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-between ${selectedCategory === item.id ? 'bg-[#C1A68D] text-white shadow-lg' : 'bg-gray-50 text-[#7A7061] hover:bg-gray-100'}`}
-              >
-                <span>{item.label}</span>
-                <span className="font-black text-[10px] bg-white/20 px-2 py-0.5 rounded-lg">{item.count}</span>
-              </button>
-            ))}
+                onClick={() => setSelectedCategory('all')}
+                className={`px-4 py-1.5 rounded-xl text-xs font-black transition-all ${selectedCategory === 'all' ? 'bg-[#2A2723] text-white shadow-md' : 'bg-gray-50 text-[#7A7061] hover:bg-gray-100'}`}
+              >الكل ({apartmentMap.length})</button>
+              {inventoryStats.map((item, i) => (
+                <button
+                  key={i}
+                  onClick={() => setSelectedCategory(item.id)}
+                  className={`px-4 py-1.5 rounded-xl text-xs font-black transition-all ${selectedCategory === item.id ? 'bg-[#C1A68D] text-white shadow-md' : 'bg-gray-50 text-[#7A7061] hover:bg-gray-100'}`}
+                >
+                  {item.label} ({item.count})
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* ── UNIT MAP ── */}
-      <div className="bg-white p-8 rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm">
-        <div className="flex items-center justify-between mb-6">
-          <h4 className="font-black text-sm text-[#2A2723]">
-            {selectedCategory === 'all' ? '🗺️ جميع الوحدات' : `🟢 وحدات ${inventoryStats.find(i => i.id === selectedCategory)?.label} المتاحة`}
-          </h4>
-          <span className="text-[10px] font-bold text-[#7A7061] opacity-60">تاريخ العرض: {selectedDate}</span>
-        </div>
-        {apartmentMap.length === 0 ? (
-          <div className="h-40 flex items-center justify-center text-gray-300 animate-pulse font-black text-sm italic">لا يوجد وحدات مطابقة للبحث...</div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            {apartmentMap.map((apt) => (
-              <div key={apt.id} className={`p-4 rounded-2xl border transition-all duration-300 ${
-                apt.status === 'maintenance' || apt.status === 'صيانة'
-                  ? 'bg-gray-50 border-gray-100 opacity-60'
-                  : apt.isOccupied
-                  ? 'bg-red-50 border-red-100 opacity-40 grayscale'
-                  : 'bg-white border-[#EAE4D9] shadow-sm hover:border-[#C1A68D] hover:scale-105'
-              }`}>
-                <div className="text-[9px] font-black text-[#7A7061] uppercase mb-1 opacity-60">{apt.id}</div>
-                <div className={`text-[11px] font-black mb-1 ${apt.status === 'صيانة' ? 'text-gray-400' : apt.isOccupied ? 'text-red-500' : 'text-green-600'}`}>
-                  {apt.isOccupied ? '🔴 مشغول' : apt.status === 'صيانة' ? '🔧 صيانة' : '🟢 متاح'}
+          {/* Unit Grid */}
+          {apartmentMap.length === 0 ? (
+            <div className="h-40 flex items-center justify-center text-gray-300 animate-pulse font-black text-sm italic">لا يوجد وحدات مطابقة للبحث...</div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+              {apartmentMap.map((apt) => (
+                <div key={apt.id} className={`p-4 rounded-2xl border transition-all duration-300 ${
+                  apt.status === 'maintenance' || apt.status === 'صيانة'
+                    ? 'bg-gray-50 border-gray-100 opacity-60'
+                    : apt.isOccupied
+                    ? 'bg-red-50 border-red-100 opacity-40 grayscale'
+                    : 'bg-white border-[#EAE4D9] shadow-sm hover:border-[#C1A68D] hover:scale-105'
+                }`}>
+                  <div className="text-[9px] font-black text-[#7A7061] uppercase mb-1 opacity-60">{apt.id}</div>
+                  <div className={`text-[11px] font-black mb-1 ${apt.status === 'صيانة' ? 'text-gray-400' : apt.isOccupied ? 'text-red-500' : 'text-green-600'}`}>
+                    {apt.isOccupied ? '🔴 مشغول' : apt.status === 'صيانة' ? '🔧 صيانة' : '🟢 متاح'}
+                  </div>
+                  {!apt.isOccupied && (
+                    <div className="text-[10px] font-bold text-[#2A2723] mt-1">{apt.title?.ar}</div>
+                  )}
                 </div>
-                {!apt.isOccupied && (
-                  <div className="text-[10px] font-bold text-[#2A2723] mt-1">{apt.title?.ar}</div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
     </div>
