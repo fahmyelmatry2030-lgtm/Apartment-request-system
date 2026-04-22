@@ -87,13 +87,14 @@ export default function DashboardOverview() {
 
     setApartmentMap(filteredMap);
 
-    // 2. Calculate Category Availability for SELECTED DATE
-    const physicalStudios = map.filter((u: any) => u.id.startsWith('b1-s'));
+    // 2. Calculate Category Availability for SELECTED DATE using both branches
+    const physicalStudios = map.filter((u: any) => u.id.startsWith('b1-s') || u.id.startsWith('b2-s'));
+
     const categories = [
-      { id: 'single', label: 'سنجل', count: physicalStudios.filter(u => singleIds.includes(u.id) && !u.isOccupied).length, color: 'text-green-500' },
-      { id: 'double', label: 'دبل', count: physicalStudios.filter(u => doubleIds.includes(u.id) && !u.isOccupied).length, color: 'text-blue-400' },
-      { id: 'triple', label: 'تريبل', count: physicalStudios.filter(u => tripleIds.includes(u.id) && !u.isOccupied).length, color: 'text-orange-400' },
-      { id: 'two-room', label: 'غرفتين', count: physicalStudios.filter(u => twoRoomIds.includes(u.id) && !u.isOccupied).length, color: 'text-purple-400' }
+      { id: 'single', label: 'سنجل', count: physicalStudios.filter(u => singleIds.includes(u.id) && !u.isOccupied).length, total: singleIds.length, color: 'text-green-500' },
+      { id: 'double', label: 'دبل', count: physicalStudios.filter(u => doubleIds.includes(u.id) && !u.isOccupied).length, total: doubleIds.length, color: 'text-blue-400' },
+      { id: 'triple', label: 'تريبل', count: physicalStudios.filter(u => tripleIds.includes(u.id) && !u.isOccupied).length, total: tripleIds.length, color: 'text-orange-400' },
+      { id: 'two-room', label: 'غرفتين', count: physicalStudios.filter(u => twoRoomIds.includes(u.id) && !u.isOccupied).length, total: twoRoomIds.length, color: 'text-purple-400' }
     ];
     setInventoryStats(categories);
 
