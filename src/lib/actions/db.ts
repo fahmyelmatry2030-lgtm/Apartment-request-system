@@ -80,7 +80,7 @@ export async function getFreshDbBookings(nonce?: string) {
   const pendingStatuses = ['جديد', 'قيد المراجعة', 'pending', 'رد جديد'];
   
   const expiredIds = data
-    .filter((b: any) => pendingStatuses.includes(b.status) && b.check_in <= today)
+    .filter((b: any) => pendingStatuses.includes(b.status) && b.check_in < today)
     .map((b: any) => b.id);
 
   if (expiredIds.length > 0) {
@@ -462,14 +462,15 @@ import initialTranslations from '@/data/translations.json';
 
 export async function getDbTranslations() {
   const supabase = getSupabaseServerClient();
-  if (!supabase) return initialTranslations;
+  if (!supabase) return null; // Return null instead of old fallback
 
   const { data, error } = await supabase.from('translations').select('data').eq('id', 1).single();
   if (error || !data?.data) {
-    if (error && error.code !== 'PGRST116') { // PGRST116 is 'no rows found'
+    if (error && error.code !== 'PGRST116') {
       console.error('Error reading translations:', error);
+      return null; // Fail fast on real errors
     }
-    return initialTranslations;
+    return initialTranslations; // Only fallback if DB is empty but connected
   }
   return data.data;
 }

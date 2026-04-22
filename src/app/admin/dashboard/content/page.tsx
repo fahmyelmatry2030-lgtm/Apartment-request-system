@@ -78,9 +78,18 @@ export default function ContentManagement() {
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
-    const data = await getDbTranslations();
-    setTranslations(data);
-    setIsLoading(false);
+    setStatus(null);
+    try {
+        const data = await getDbTranslations();
+        setTranslations(data);
+        if (!data) {
+            setStatus({ type: 'error', msg: '⚠️ فشل الاتصال بقاعدة البيانات. لا يمكنك التعديل الآن لحماية بياناتك.' });
+        }
+    } catch (e) {
+        setStatus({ type: 'error', msg: '⚠️ حدث خطأ أثناء جلب البيانات.' });
+    } finally {
+        setIsLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -98,6 +107,10 @@ export default function ContentManagement() {
   };
 
   const saveChanges = async () => {
+    if (!translations) {
+        alert('لا يمكن الحفظ بسبب فشل الاتصال بقاعدة البيانات!');
+        return;
+    }
     setIsSaving(true);
     setStatus(null);
     try {
@@ -223,13 +236,28 @@ export default function ContentManagement() {
       </header>
 
       {status && (
-        <div className={`p-5 rounded-[2rem] border animate-scale-in text-sm font-black flex items-center gap-4 ${status.type === 'success' ? 'bg-green-50 border-green-100 text-green-600' : 'bg-red-50 border-red-100 text-red-600 shadow-lg'}`}>
-          <span className="text-xl">{status.type === 'success' ? '✔' : '✖'}</span>
+        <div className={`p-5 rounded-2xl border mb-6 animate-scale-in font-black text-sm ${status.type === 'success' ? 'bg-green-50 border-green-100 text-green-600' : 'bg-red-50 border-red-100 text-red-600'}`}>
           {status.msg}
+          {status.type === 'error' && (
+              <button onClick={loadData} className="mr-4 underline text-xs">إعادة المحاولة 🔄</button>
+          )}
         </div>
       )}
 
-      <div className="flex flex-col lg:flex-row gap-10">
+      {isLoading ? (
+          <div className="py-40 text-center space-y-4">
+              <div className="w-12 h-12 border-4 border-[#C1A68D] border-t-transparent rounded-full animate-spin mx-auto" />
+              <p className="text-[#C1A68D] font-black text-xs uppercase tracking-widest">جاري جلب البيانات بأمان...</p>
+          </div>
+      ) : !translations ? (
+          <div className="py-40 text-center bg-white rounded-[3rem] border border-red-100 shadow-sm">
+              <span className="text-6xl block mb-6">🔌</span>
+              <h3 className="text-2xl font-black text-[#2A2723] mb-2">انقطع الاتصال بالقاعدة</h3>
+              <p className="text-[#7A7061] font-bold mb-8">تم إيقاف وضع التعديل مؤقتاً لضمان عدم ضياع شغلك القديم.</p>
+              <button onClick={loadData} className="bg-[#2A2723] text-white px-10 py-4 rounded-full font-black hover:bg-black transition-all">إعادة المحاولة 🔄</button>
+          </div>
+      ) : (
+        <div className="flex flex-col lg:flex-row gap-10">
         {/* Navigation Sidebar */}
         <div className="w-full lg:w-72 space-y-3">
           <div className="bg-white/50 p-2 rounded-[2.5rem] border border-[#EAE4D9] shadow-sm">
