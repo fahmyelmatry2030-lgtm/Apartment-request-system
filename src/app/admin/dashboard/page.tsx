@@ -89,12 +89,20 @@ export default function DashboardOverview() {
 
     // 2. Calculate Category Availability for SELECTED DATE using both branches
     const physicalStudios = map.filter((u: any) => u.id.startsWith('b1-s') || u.id.startsWith('b2-s'));
+    
+    // Helper to map 1-24 to b1-sX or b2-sX
+    const getFullId = (n: number) => n <= 12 ? `b1-s${n}` : `b2-s${n-12}`;
+
+    const singleIds = [2, 3, 6, 7, 8, 17].map(getFullId);
+    const doubleIds = [1, 5, 9, 10, 11, 12, 13, 18, 20, 24].map(getFullId);
+    const tripleIds = [4, 14, 15, 22, 23].map(getFullId);
+    const twoRoomIds = [16, 19, 21].map(getFullId);
 
     const categories = [
-      { id: 'single', label: 'سنجل', count: physicalStudios.filter(u => singleIds.includes(u.id) && !u.isOccupied).length, total: singleIds.length, color: 'text-green-500' },
-      { id: 'double', label: 'دبل', count: physicalStudios.filter(u => doubleIds.includes(u.id) && !u.isOccupied).length, total: doubleIds.length, color: 'text-blue-400' },
-      { id: 'triple', label: 'تريبل', count: physicalStudios.filter(u => tripleIds.includes(u.id) && !u.isOccupied).length, total: tripleIds.length, color: 'text-orange-400' },
-      { id: 'two-room', label: 'غرفتين', count: physicalStudios.filter(u => twoRoomIds.includes(u.id) && !u.isOccupied).length, total: twoRoomIds.length, color: 'text-purple-400' }
+      { id: 'single', label: 'سنجل', count: physicalStudios.filter(u => singleIds.includes(u.id) && !u.isOccupied).length, total: 6, color: 'text-green-500' },
+      { id: 'double', label: 'دبل', count: physicalStudios.filter(u => doubleIds.includes(u.id) && !u.isOccupied).length, total: 10, color: 'text-blue-400' },
+      { id: 'triple', label: 'تريبل', count: physicalStudios.filter(u => tripleIds.includes(u.id) && !u.isOccupied).length, total: 5, color: 'text-orange-400' },
+      { id: 'two-room', label: 'غرفتين', count: physicalStudios.filter(u => twoRoomIds.includes(u.id) && !u.isOccupied).length, total: 3, color: 'text-purple-400' }
     ];
     setInventoryStats(categories);
 
