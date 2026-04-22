@@ -9,6 +9,7 @@ import Logo from '@/components/Logo';
 export default function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [unreadNotifs, setUnreadNotifs] = useState(0);
+  const [pendingBookingsCount, setPendingBookingsCount] = useState(0);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [sentMessages, setSentMessages] = useState<any[]>([]);
   const [showNotifs, setShowNotifs] = useState(false);
@@ -54,7 +55,8 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
     }
 
     const pendingCount = bookings.filter((b: any) => b.status === 'رد جديد' || b.status === 'pending').length;
-    setUnreadNotifs(pendingCount + notifs.filter((n: any) => !n.read).length);
+    setPendingBookingsCount(pendingCount);
+    setUnreadNotifs(notifs.filter((n: any) => !n.read).length);
     setNotifications(notifs);
 
     // Sent Messages Log
@@ -225,9 +227,9 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
               >
                 <span className="text-xl">{item.icon}</span>
                 <span className="text-sm">{item.name}</span>
-                {item.name === 'طلبات الحجز' && unreadNotifs > 0 && (
+                {item.name === 'طلبات الحجز' && pendingBookingsCount > 0 && (
                   <span className={`mr-auto w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${isActive ? 'bg-[#C1A68D] text-[#2A2723]' : 'bg-[#C1A68D] text-white'}`}>
-                    {unreadNotifs}
+                    {pendingBookingsCount}
                   </span>
                 )}
               </Link>
