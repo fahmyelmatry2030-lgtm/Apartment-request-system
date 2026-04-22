@@ -1,283 +1,969 @@
-export interface Unit {
-  id: string;
-  branch: 1 | 2;
-  type: 'studio' | 'apartment';
-  title: {
-    ar: string;
-    en: string;
-  };
-  description: {
-    ar: string;
-    en: string;
-  };
-  images: string[];
-  video?: string;
-  features: {
-    ar: string[];
-    en: string[];
-  };
-  price?: string;
-  status?: string;
-}
-
-// Sample images from the folders
-const mazar1Images = [
-  "/images/Mazar%201%20Pictures/2026%201.jpeg",
-  "/images/Mazar%201%20Pictures/2026.jpeg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Imag6e%202025-12-31%20at%203.00.24%20PM.jpeg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.16_ff8ccd08.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.17_3a943570.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.17_41aa1043.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.18_61f75a9f.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.19_03fc3d1e.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.20_0887eed0.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.23_69ff6c33.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.23_bae97d5a.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.24_989640c4.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.24_cbc5045f.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.25_2995ad23.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.25_916d0a49.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.26_283075f9.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.26_4887d74a.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.27_7dd977ec.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.28_84e0b4be.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.28_fb417a23.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.29_8c81234c.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.29_e2a135bf.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.30_02c2b262.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.30_95fead93.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.31_dcc4de82.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.32_811870e6.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.32_e0da995c.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.33_07bc59b5.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.33_2004b57f.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.33_361d04a7.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.33_6c3c1bda.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.34_02003b20.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.34_b66b6098.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.35_043b205e.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.35_8ae4078a.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.36_a209e979.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.37_46a06ccb.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.37_c073a78c.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.37_df17e0be.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.38_58d7840e.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.38_6f7ec759.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.38_e7c5836c.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.39_9b4da674.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.40_5586b607.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.40_789a6fdb.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.40_aac2c107.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.40_ebec746d.jpg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-31%20at%203.00.24%20PM.jpeg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-1%D8%AE%D9%85%D8%AC%D8%AF2-31%20at%203.00.24%20PM.jpeg",
-  "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-%D9%85%D9%8312-31%20at%203.00.25%20PM.jpeg"
-];
-const mazar2Images = [
-  "/images/Mazar%202%20Pictures/1.jpeg",
-  "/images/Mazar%202%20Pictures/20260218_015423.jpg",
-  "/images/Mazar%202%20Pictures/20260218_015425.jpg",
-  "/images/Mazar%202%20Pictures/20260218_023924.jpg",
-  "/images/Mazar%202%20Pictures/20260218_171702.jpg",
-  "/images/Mazar%202%20Pictures/20260218_171710.jpg",
-  "/images/Mazar%202%20Pictures/20260218_171720.jpg",
-  "/images/Mazar%202%20Pictures/20260218_183029.jpg",
-  "/images/Mazar%202%20Pictures/20260218_183033.jpg",
-  "/images/Mazar%202%20Pictures/20260218_183154.jpg",
-  "/images/Mazar%202%20Pictures/20260218_183159.jpg",
-  "/images/Mazar%202%20Pictures/20260218_184901.jpg",
-  "/images/Mazar%202%20Pictures/20260218_184903.jpg",
-  "/images/Mazar%202%20Pictures/20260218_184917.jpg",
-  "/images/Mazar%202%20Pictures/20260218_184928.jpg",
-  "/images/Mazar%202%20Pictures/20260218_184935(0).jpg",
-  "/images/Mazar%202%20Pictures/20260218_184935.jpg",
-  "/images/Mazar%202%20Pictures/20260218_184943.jpg",
-  "/images/Mazar%202%20Pictures/20260218_185035.jpg",
-  "/images/Mazar%202%20Pictures/20260218_185045.jpg",
-  "/images/Mazar%202%20Pictures/20260218_185052.jpg",
-  "/images/Mazar%202%20Pictures/20260218_185108.jpg",
-  "/images/Mazar%202%20Pictures/20260218_185113.jpg",
-  "/images/Mazar%202%20Pictures/20260218_185116.jpg",
-  "/images/Mazar%202%20Pictures/20260218_185122.jpg",
-  "/images/Mazar%202%20Pictures/20260218_185432.jpg",
-  "/images/Mazar%202%20Pictures/20260218_185441.jpg",
-  "/images/Mazar%202%20Pictures/20260218_185509.jpg",
-  "/images/Mazar%202%20Pictures/20260218_185512.jpg",
-  "/images/Mazar%202%20Pictures/20260218_185519.jpg",
-  "/images/Mazar%202%20Pictures/20260218_185525.jpg",
-  "/images/Mazar%202%20Pictures/20260218_185535.jpg",
-  "/images/Mazar%202%20Pictures/20260218_185858.jpg",
-  "/images/Mazar%202%20Pictures/20260218_185901.jpg",
-  "/images/Mazar%202%20Pictures/20260218_185904.jpg",
-  "/images/Mazar%202%20Pictures/20260218_185913.jpg",
-  "/images/Mazar%202%20Pictures/20260218_185919.jpg",
-  "/images/Mazar%202%20Pictures/20260218_185922.jpg",
-  "/images/Mazar%202%20Pictures/20260218_185931.jpg",
-  "/images/Mazar%202%20Pictures/20260218_185945.jpg",
-  "/images/Mazar%202%20Pictures/20260218_185952.jpg",
-  "/images/Mazar%202%20Pictures/20260218_185959.jpg",
-  "/images/Mazar%202%20Pictures/20260218_190028.jpg",
-  "/images/Mazar%202%20Pictures/20260218_190038.jpg",
-  "/images/Mazar%202%20Pictures/20260218_190050.jpg",
-  "/images/Mazar%202%20Pictures/20260218_190054.jpg",
-  "/images/Mazar%202%20Pictures/20260218_190056.jpg",
-  "/images/Mazar%202%20Pictures/20260218_190124.jpg",
-  "/images/Mazar%202%20Pictures/20260218_191332.jpg",
-  "/images/Mazar%202%20Pictures/20260218_191339.jpg",
-  "/images/Mazar%202%20Pictures/20260218_194957.jpg",
-  "/images/Mazar%202%20Pictures/20260218_195002.jpg",
-  "/images/Mazar%202%20Pictures/20260218_195006.jpg",
-  "/images/Mazar%202%20Pictures/20260218_195026.jpg",
-  "/images/Mazar%202%20Pictures/20260218_195036.jpg",
-  "/images/Mazar%202%20Pictures/20260218_195049.jpg",
-  "/images/Mazar%202%20Pictures/20260218_195101.jpg",
-  "/images/Mazar%202%20Pictures/20260218_195108.jpg",
-  "/images/Mazar%202%20Pictures/20260218_195119.jpg",
-  "/images/Mazar%202%20Pictures/20260218_195129.jpg",
-  "/images/Mazar%202%20Pictures/20260218_195710.jpg",
-  "/images/Mazar%202%20Pictures/20260218_195720.jpg",
-  "/images/Mazar%202%20Pictures/20260218_195727.jpg",
-  "/images/Mazar%202%20Pictures/20260218_195742.jpg",
-  "/images/Mazar%202%20Pictures/20260218_195747.jpg",
-  "/images/Mazar%202%20Pictures/20260218_195750.jpg",
-  "/images/Mazar%202%20Pictures/20260218_195756.jpg",
-  "/images/Mazar%202%20Pictures/20260218_195807.jpg",
-  "/images/Mazar%202%20Pictures/20260218_195811.jpg",
-  "/images/Mazar%202%20Pictures/20260218_195824.jpg",
-  "/images/Mazar%202%20Pictures/20260218_195828.jpg",
-  "/images/Mazar%202%20Pictures/20260218_204912.jpg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Image%202026-02-19%20at%209.16.09%20AM.jpeg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Image%202026-02-19%20at%209.16.10%20AM.jpeg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Image%202026-02-19%20at%209.16.11%20AM.jpeg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Image%202026-02-19%20at%209.16.15%20AM.jpeg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Image%202026-02-19%20at%209.16.17%20AM.jpeg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Image%202026-02-19%20at%209.16.21%20AM.jpeg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Image%202026-02-19%20at%209.16.22%20AM.jpeg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Image%202026-02-19%20at%209.16.25%20AM.jpeg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Image%202026-02-19%20at%209.16.26%20AM.jpeg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Image%202026-02-19%20at%209.16.27%20AM.jpeg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Image%202026-02-19%20at%209.16.28%20AM.jpeg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Image%202026-02-19%20at%209.16.29%20AM.jpeg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Image%202026-02-19%20at%209.16.43%20AM.jpeg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Image%202026-02-19%20at%209.16.44%20AM.jpeg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Image%202026-02-19%20at%209.34.49%20AM.jpeg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Image%202026-02-19%20at%209.34.50%20AM.jpeg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Image%202026-02-19%20at%209.34.51%20AM.jpeg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Image%202026-02-19%20at%209.34.52%20AM.jpeg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Image%202026-02-19%20at%209.34.56%20AM.jpeg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Image%202026-02-19%20at%209.34.57%20AM.jpeg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Image%202026-02-19%20at%209.34.59%20AM.jpeg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Image%202026-02-19%20at%209.35.00%20AM.jpeg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Image%202026-02-19%20at%209.35.01%20AM.jpeg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Image%202026-02-19%20at%209.35.03%20AM.jpeg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Image%202026-02-19%20at%209.35.04%20AM.jpeg",
-  "/images/Mazar%202%20Pictures/WhatsApp%20Video%202026-02-19%20at%209.16.14%20AM.mp4"
-];
-
-const getVideoPath = (index: number) => {
-  // Try to use a sensible video mapping for 1-24 based on the directory
-  return `/images/video/studio ${index}.mp4`;
-}; // (The actual browser will handle 404s gracefully, or we could map them exactly)
-
-export const units: Unit[] = [
+export const units = [
   {
-    id: "s-single",
-    branch: 1 as const,
-    type: "studio" as const,
-    title: {
-      ar: "استوديو سنجل",
-      en: "Single Studio"
+    "id": "b2-s2",
+    "branch": 2,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو بريميوم 14",
+      "en": "Premium Studio 14"
     },
-    description: {
-      ar: "استوديو فندقي مريح مجهز بكافة الخدمات لقضاء إقامة هادئة.",
-      en: "A comfortable hotel studio equipped with all services for a quiet stay."
-    },
-    images: mazar1Images.slice(0, 5),
-    video: "/images/video/studio 1.mp4",
-    features: {
-      ar: ["تكييف", "واي فاي سريع", "شاشة سمارت", "مطبخ مجهز"],
-      en: ["AC", "Fast WiFi", "Smart TV", "Equipped Kitchen"]
-    },
-    price: "150"
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": null,
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-04-19T22:11:50.093424+00:00"
   },
   {
-    id: "s-double",
-    branch: 1 as const,
-    type: "studio" as const,
-    title: {
-      ar: "استوديو دبل",
-      en: "Double Studio"
+    "id": "b2-s5",
+    "branch": 2,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو بريميوم 17",
+      "en": "Premium Studio 17"
     },
-    description: {
-      ar: "استوديو فندقي واسع يناسب شخصين بأحدث التجهيزات العصرية.",
-      en: "A spacious hotel studio suitable for two people with modern amenities."
-    },
-    images: mazar1Images.slice(5, 10),
-    video: "/images/video/studio 2.mp4",
-    features: {
-      ar: ["سرير مزدوج", "تكييف", "واي فاي سريع", "دخول ذكي", "شاشة سمارت"],
-      en: ["Double Bed", "AC", "Fast WiFi", "Smart Entry", "Smart TV"]
-    },
-    price: "200"
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": null,
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-04-19T22:11:50.856663+00:00"
   },
   {
-    id: "s-triple",
-    branch: 1 as const,
-    type: "studio" as const,
-    title: {
-      ar: "استوديو تريبل",
-      en: "Triple Studio"
+    "id": "b2-s8",
+    "branch": 2,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو بريميوم 20",
+      "en": "Premium Studio 20"
     },
-    description: {
-      ar: "استوديو فندقي واسع جداً مجهز لثلاثة أشخاص بكل وسائل الراحة.",
-      en: "A very spacious hotel studio equipped for three people with all comforts."
-    },
-    images: mazar2Images.slice(0, 5),
-    video: "/images/video/studio 3.mp4",
-    features: {
-      ar: ["٣ أسرة فردية", "تكييف", "واي فاي سريع", "مطبخ مجهز"],
-      en: ["3 Single Beds", "AC", "Fast WiFi", "Equipped Kitchen"]
-    },
-    price: "250"
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": null,
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-04-19T22:11:51.337142+00:00"
   },
   {
-    id: "s-tworoom",
-    branch: 1 as const,
-    type: "studio" as const,
-    title: {
-      ar: "استوديو غرفتين",
-      en: "Two-room Studio"
+    "id": "b2-s11",
+    "branch": 2,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو بريميوم 23",
+      "en": "Premium Studio 23"
     },
-    description: {
-      ar: "استوديو عائلي فندقي مكون من غرفتين، خيار مثالي للعائلات.",
-      en: "A family hotel studio consisting of two rooms, an ideal choice for families."
-    },
-    images: mazar2Images.slice(5, 10),
-    video: "/images/video/studio 4.mp4",
-    features: {
-      ar: ["غرفتين", "تكييف", "دخول ذكي", "شاشة سمارت", "مطبخ مجهز"],
-      en: ["Two Rooms", "AC", "Smart Entry", "Smart TV", "Equipped Kitchen"]
-    },
-    price: "350"
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": null,
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-04-19T22:11:51.870352+00:00"
   },
-  // Apartments (3)
-  ...Array.from({ length: 3 }, (_, i) => ({
-    id: `apt-${i + 1}`,
-    branch: 1 as const, 
-    type: 'apartment' as const,
-    title: {
-      ar: `شقة فندقية فاخرة ${i + 1}`,
-      en: `Luxury Hotel Apartment ${i + 1}`
+  {
+    "id": "b2-s3",
+    "branch": 2,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو بريميوم 15",
+      "en": "Premium Studio 15"
     },
-    description: {
-      ar: 'شقة فندقية واسعة متكاملة الخدمات للعائلات والباحثين عن الرقي في مدينة نصر.',
-      en: 'Spacious hotel apartment with complete services for families and luxury seekers in Nasr City.'
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": null,
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-04-19T22:11:50.249953+00:00"
+  },
+  {
+    "id": "b2-s6",
+    "branch": 2,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو بريميوم 18",
+      "en": "Premium Studio 18"
     },
-    images: mazar1Images.slice(((i + 2) * 5) % mazar1Images.length, ((i + 2) * 5) % mazar1Images.length + 5), 
-    video: `/images/video/studio 1.mp4`,
-    features: {
-      ar: ['غرفتين نوم', 'ريسبشن واسع', 'واي فاي فايبر', 'خدمة نظافة', 'موقف سيارات'],
-      en: ['2 Bedrooms', 'Spacious Reception', 'Fiber WiFi', 'Housekeeping', 'Parking']
-    }
-  }))
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": null,
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-04-19T22:11:51.016174+00:00"
+  },
+  {
+    "id": "b2-s9",
+    "branch": 2,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو بريميوم 21",
+      "en": "Premium Studio 21"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": null,
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-04-19T22:11:51.503714+00:00"
+  },
+  {
+    "id": "b2-s12",
+    "branch": 2,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو بريميوم 24",
+      "en": "Premium Studio 24"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": null,
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-04-19T22:11:52.032842+00:00"
+  },
+  {
+    "id": "b2-s1",
+    "branch": 2,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو بريميوم 13",
+      "en": "Premium Studio 13"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": null,
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-04-19T22:11:49.896185+00:00"
+  },
+  {
+    "id": "b2-s4",
+    "branch": 2,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو بريميوم 16",
+      "en": "Premium Studio 16"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": null,
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-04-19T22:11:50.429159+00:00"
+  },
+  {
+    "id": "b2-s7",
+    "branch": 2,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو بريميوم 19",
+      "en": "Premium Studio 19"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": null,
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-04-19T22:11:51.161179+00:00"
+  },
+  {
+    "id": "b2-s10",
+    "branch": 2,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو بريميوم 22",
+      "en": "Premium Studio 22"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": null,
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-04-19T22:11:51.717765+00:00"
+  },
+  {
+    "id": "s-single",
+    "branch": 1,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو سنجل ( سرير كينج )",
+      "en": "Single Studio"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": {
+      "ar": "استوديو فندقي مريح مجهز بكافة الخدمات لقضاء إقامة هادئة.",
+      "en": "A comfortable hotel studio equipped with all services for a quiet stay."
+    },
+    "images": [
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776799762260-20260218_195727.jpg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776799792663-20260218_195828.jpg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776799815081-WhatsApp-Image-2026-02-19-at-9.16.09-AM.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776799902588-1.jpeg"
+    ],
+    "video": "/images/video/studio 1.mp4",
+    "features": {
+      "ar": [
+        "سرير كينج",
+        "مكيف بالكامل",
+        "واي فاي سريع",
+        "كنبة سرير",
+        "مطبخ مجهز بالكامل",
+        "دخول ذكي"
+      ],
+      "en": [
+        "King Bed",
+        "Air Conditioned",
+        "WiFi",
+        "Sofa Bed",
+        "Kitchen Fully Equipped",
+        "Smart Lock"
+      ]
+    },
+    "original_price": "2500",
+    "price": "2350",
+    "updated_at": "2026-04-21T19:52:59.169+00:00"
+  },
+  {
+    "id": "b1-s6",
+    "branch": 1,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو 6",
+      "en": "Studio 6"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": {
+      "ar": [
+        "تكييف",
+        "واي فاي سريع",
+        "شاشة سمارت",
+        "مطبخ مجهز"
+      ],
+      "en": [
+        "AC",
+        "Fast WiFi",
+        "Smart TV",
+        "Equipped Kitchen"
+      ]
+    },
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-04-19T22:11:48.35257+00:00"
+  },
+  {
+    "id": "b1-s7",
+    "branch": 1,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو 7",
+      "en": "Studio 7"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": {
+      "ar": [
+        "تكييف",
+        "واي فاي سريع",
+        "شاشة سمارت",
+        "مطبخ مجهز"
+      ],
+      "en": [
+        "AC",
+        "Fast WiFi",
+        "Smart TV",
+        "Equipped Kitchen"
+      ]
+    },
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-04-19T22:11:48.684024+00:00"
+  },
+  {
+    "id": "b1-s2",
+    "branch": 1,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو 2",
+      "en": "Studio 2"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": {
+      "ar": [
+        "تكييف",
+        "واي فاي سريع",
+        "شاشة سمارت",
+        "مطبخ مجهز"
+      ],
+      "en": [
+        "AC",
+        "Fast WiFi",
+        "Smart TV",
+        "Equipped Kitchen"
+      ]
+    },
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-04-19T22:11:47.557825+00:00"
+  },
+  {
+    "id": "s-tworoom",
+    "branch": 1,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو غرفتين",
+      "en": "Two-room Studio"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": {
+      "ar": "استوديو عائلي فندقي مكون من غرفتين، خيار مثالي للعائلات.",
+      "en": "A family hotel studio consisting of two rooms, an ideal choice for families."
+    },
+    "images": [
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776800876511-WhatsApp-Image-2026-04-21-at-9.45.49-PM.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776800881191-WhatsApp-Image-2026-04-21-at-9.41.57-PM-.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776800884832-WhatsApp-Image-2026-04-21-at-9.41.57-PM.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776800891868-WhatsApp-2026-04-21-at-9.41.57-PM.jpeg"
+    ],
+    "video": "/images/video/studio 4.mp4",
+    "features": {
+      "ar": [
+        "غرفتين",
+        "تكييف",
+        "دخول ذكي",
+        "شاشة سمارت",
+        "مطبخ مجهز",
+        "كنبة سرير"
+      ],
+      "en": [
+        "Two Rooms",
+        "AC",
+        "Smart Entry",
+        "Smart TV",
+        "Equipped Kitchen",
+        "Sofa Bed"
+      ]
+    },
+    "original_price": "2500",
+    "price": "2650",
+    "updated_at": "2026-04-21T19:48:52.008+00:00"
+  },
+  {
+    "id": "b1-s10",
+    "branch": 1,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو 10",
+      "en": "Studio 10"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": {
+      "ar": [
+        "سرير مزدوج",
+        "تكييف",
+        "واي فاي سريع",
+        "دخول ذكي",
+        "شاشة سمارت"
+      ],
+      "en": [
+        "Double Bed",
+        "AC",
+        "Fast WiFi",
+        "Smart Entry",
+        "Smart TV"
+      ]
+    },
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-04-19T22:11:49.293832+00:00"
+  },
+  {
+    "id": "b1-s11",
+    "branch": 1,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو 11",
+      "en": "Studio 11"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": {
+      "ar": [
+        "سرير مزدوج",
+        "تكييف",
+        "واي فاي سريع",
+        "دخول ذكي",
+        "شاشة سمارت"
+      ],
+      "en": [
+        "Double Bed",
+        "AC",
+        "Fast WiFi",
+        "Smart Entry",
+        "Smart TV"
+      ]
+    },
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-04-19T22:11:49.459151+00:00"
+  },
+  {
+    "id": "b1-s12",
+    "branch": 1,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو 12",
+      "en": "Studio 12"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": {
+      "ar": [
+        "سرير مزدوج",
+        "تكييف",
+        "واي فاي سريع",
+        "دخول ذكي",
+        "شاشة سمارت"
+      ],
+      "en": [
+        "Double Bed",
+        "AC",
+        "Fast WiFi",
+        "Smart Entry",
+        "Smart TV"
+      ]
+    },
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-04-19T22:11:49.728235+00:00"
+  },
+  {
+    "id": "b1-s3",
+    "branch": 1,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو 3",
+      "en": "Studio 3"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": {
+      "ar": [
+        "تكييف",
+        "واي فاي سريع",
+        "شاشة سمارت",
+        "مطبخ مجهز"
+      ],
+      "en": [
+        "AC",
+        "Fast WiFi",
+        "Smart TV",
+        "Equipped Kitchen"
+      ]
+    },
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-04-19T22:11:47.762525+00:00"
+  },
+  {
+    "id": "b1-s8",
+    "branch": 1,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو 8",
+      "en": "Studio 8"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": {
+      "ar": [
+        "تكييف",
+        "واي فاي سريع",
+        "شاشة سمارت",
+        "مطبخ مجهز"
+      ],
+      "en": [
+        "AC",
+        "Fast WiFi",
+        "Smart TV",
+        "Equipped Kitchen"
+      ]
+    },
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-04-19T22:11:48.908529+00:00"
+  },
+  {
+    "id": "b1-s9",
+    "branch": 1,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو 9",
+      "en": "Studio 9"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": {
+      "ar": [
+        "سرير مزدوج",
+        "تكييف",
+        "واي فاي سريع",
+        "دخول ذكي",
+        "شاشة سمارت"
+      ],
+      "en": [
+        "Double Bed",
+        "AC",
+        "Fast WiFi",
+        "Smart Entry",
+        "Smart TV"
+      ]
+    },
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-04-19T22:11:49.11541+00:00"
+  },
+  {
+    "id": "b1-s4",
+    "branch": 1,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو 4",
+      "en": "Studio 4"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": {
+      "ar": [
+        "٣ أسرة فردية",
+        "تكييف",
+        "واي فاي سريع",
+        "مطبخ مجهز"
+      ],
+      "en": [
+        "3 Single Beds",
+        "AC",
+        "Fast WiFi",
+        "Equipped Kitchen"
+      ]
+    },
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-04-19T22:11:47.934572+00:00"
+  },
+  {
+    "id": "b1-s5",
+    "branch": 1,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو 5",
+      "en": "Studio 5"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": {
+      "ar": [
+        "سرير مزدوج",
+        "تكييف",
+        "واي فاي سريع",
+        "دخول ذكي",
+        "شاشة سمارت"
+      ],
+      "en": [
+        "Double Bed",
+        "AC",
+        "Fast WiFi",
+        "Smart Entry",
+        "Smart TV"
+      ]
+    },
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-04-19T22:11:48.127201+00:00"
+  },
+  {
+    "id": "s-double",
+    "branch": 1,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو دبل (2 سرير)",
+      "en": "Double Studio"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": {
+      "ar": "استوديو فندقي واسع يناسب شخصين بأحدث التجهيزات العصرية.",
+      "en": "A spacious hotel studio suitable for two people with modern amenities."
+    },
+    "images": [
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776800611155-WhatsApp-Image-2026-04-21-at-9.41.57-PM-.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776800650226-WhatsApp-Image-2026-04-21-at-9.41.57-PM.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776800656581-WhatsApp-Image-2026-04-21-at-9.41.57-PM-.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776800676699-WhatsApp-2026-04-21-at-9.41.57-PM.jpeg"
+    ],
+    "video": "/images/video/studio 2.mp4",
+    "features": {
+      "ar": [
+        "سرير مزدوج",
+        "تكييف",
+        "واي فاي سريع",
+        "دخول ذكي",
+        "شاشة سمارت"
+      ],
+      "en": [
+        "Double Bed",
+        "AC",
+        "Fast WiFi",
+        "Smart Entry",
+        "Smart TV"
+      ]
+    },
+    "original_price": "2700",
+    "price": "2500",
+    "updated_at": "2026-04-21T19:49:17.229+00:00"
+  },
+  {
+    "id": "s-triple",
+    "branch": 1,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو تريبل",
+      "en": "Triple Studio"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": {
+      "ar": "استوديو فندقي واسع جداً مجهز لثلاثة أشخاص بكل وسائل الراحة.",
+      "en": "A very spacious hotel studio equipped for three people with all comforts."
+    },
+    "images": [
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776800104324-20260218_185913.jpg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776800186575-20260218_190028.jpg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776800222170-20260218_195119.jpg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776800274163-20260218_195101.jpg"
+    ],
+    "video": "/images/video/studio 3.mp4",
+    "features": {
+      "ar": [
+        "٣ أسرة فردية",
+        "تكييف",
+        "واي فاي سريع",
+        "مطبخ مجهز"
+      ],
+      "en": [
+        "3 Single Beds",
+        "AC",
+        "Fast WiFi",
+        "Equipped Kitchen"
+      ]
+    },
+    "original_price": "2800",
+    "price": "2650",
+    "updated_at": "2026-04-21T19:38:20.23+00:00"
+  },
+  {
+    "id": "apt-2",
+    "branch": 1,
+    "type": "apartment",
+    "title": {
+      "ar": "شقة فندقية فاخرة ( 2 )",
+      "en": "Luxury Hotel Apartment ( 2 )"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": {
+      "ar": "شقة فندقية واسعة متكاملة الخدمات للعائلات والباحثين عن الرقي في مدينة نصر أمام سيتي ستارز",
+      "en": "Spacious hotel apartment with complete services for families and luxury seekers in Nasr City."
+    },
+    "images": [
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814571969-631.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814591993-13.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814605272-63.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814636652-89.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814643426-6321.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814653858-521.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814693094-55.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814701884-2.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814712344-33.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814720647-99.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814733944-5.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814757737-66.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814770007-321.jpeg"
+    ],
+    "video": "/images/video/studio 1.mp4",
+    "features": {
+      "ar": [
+        "غرفتين نوم",
+        "ريسبشن واسع",
+        "واي فاي فايبر",
+        "خدمة نظافة",
+        "موقف سيارات"
+      ],
+      "en": [
+        "2 Bedrooms",
+        "Spacious Reception",
+        "Fiber WiFi",
+        "Housekeeping",
+        "Parking"
+      ]
+    },
+    "original_price": null,
+    "price": "   3400",
+    "updated_at": "2026-04-21T23:40:05.659+00:00"
+  },
+  {
+    "id": "apt-1",
+    "branch": 1,
+    "type": "apartment",
+    "title": {
+      "ar": "شقة فندقية فاخرة ( 1 )",
+      "en": "Luxury Apartment ( 1 )"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": {
+      "ar": "شقة فندقية واسعة متكاملة الخدمات للعائلات والباحثين عن الرقي في مدينة نصر في شارع عباس العقاد",
+      "en": "Spacious hotel apartment with complete services for families and luxury seekers in Nasr City."
+    },
+    "images": [
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776806205219-1.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776806209335-2.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776806212877-3.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776806217855-4.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776806221482-5.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776806227788-6.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776806241768-7.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776806246271-8.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776806252149-12.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776806524295-15.jpeg"
+    ],
+    "video": "/images/video/studio 1.mp4",
+    "features": {
+      "ar": [
+        "ريسبشن 3 قطع",
+        "حمام راقي",
+        "مكيفة بالكامل",
+        "دخول بالبصمة",
+        "نظام صوتي مركزي",
+        "مطبخ مستكمل بالكامل",
+        "شاشة سمارت",
+        "انترنت سريع"
+      ],
+      "en": [
+        "Reception",
+        "Bathroom",
+        "Air Conditioned",
+        "Finger print entry",
+        "Centeral sound system",
+        "Fuly Equipped kitchen",
+        "Smart Tv",
+        "Wifi"
+      ]
+    },
+    "original_price": null,
+    "price": "3000",
+    "updated_at": "2026-04-21T23:40:39.733+00:00"
+  },
+  {
+    "id": "apt-3",
+    "branch": 1,
+    "type": "apartment",
+    "title": {
+      "ar": "شقة فندقية فاخرة 3",
+      "en": "Luxury Hotel Apartment ( 3 )"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": {
+      "ar": "شقة فندقية واسعة متكاملة الخدمات للعائلات والباحثين عن الرقي في مدينة نصر في شارع عباس العقاد الرئيسي",
+      "en": "Spacious hotel apartment with complete services for families and luxury seekers in Nasr City."
+    },
+    "images": [
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776813438830-1.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776813458568-12.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776813462462-15.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776813467691-10.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776813481815-9.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776813487822-7.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776813491943-6.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776813526993-14.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776813540060-112.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776813547906-65.jpeg",
+      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776813551134-56.jpeg"
+    ],
+    "video": "/images/video/studio 1.mp4",
+    "features": {
+      "ar": [
+        "ريسبشن فندقي 3 قطع",
+        "3غرف نوم",
+        "مكيفة بالكامل",
+        "مطبخ مستكمل بالكامل",
+        "بلكونة منفصلة لكل غرفة",
+        "2 حمام",
+        "سمارت لوك بالبصمة",
+        "شاشة سمارت",
+        "شارع عباس العقاد الرئيسي",
+        "خدمة نظافة مجانية"
+      ],
+      "en": [
+        "Luxury Reception",
+        "3 Luxury Rooms",
+        "Air Conditioned",
+        "Fully Equipped kitchen",
+        "4 separated balcons",
+        "2 Bathrooms",
+        "Finger print lock",
+        "Smart Tv",
+        "Abbas El Akkad street view",
+        "Free house keeping"
+      ]
+    },
+    "original_price": null,
+    "price": "3400",
+    "updated_at": "2026-04-21T23:41:03.354+00:00"
+  },
+  {
+    "id": "b1-s1",
+    "branch": 1,
+    "type": "studio",
+    "title": {
+      "ar": "استوديو 1",
+      "en": "Studio 1"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": "لا يوجد",
+    "description": {
+      "ar": "استوديو فندقي فاخر مجهز بأحدث الخدمات الذكية في قلب مدينة نصر.",
+      "en": "Luxury hotel studio equipped with the latest smart services in the heart of Nasr City."
+    },
+    "images": [
+      "/images/Mazar%201%20Pictures/2026%201.jpeg",
+      "/images/Mazar%201%20Pictures/2026.jpeg",
+      "/images/Mazar%201%20Pictures/WhatsApp%20Imag6e%202025-12-31%20at%203.00.24%20PM.jpeg",
+      "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.16_ff8ccd08.jpg",
+      "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.17_3a943570.jpg"
+    ],
+    "video": "/images/video/studio 1.mp4",
+    "features": {
+      "ar": [
+        "سرير مزدوج",
+        "تكييف",
+        "واي فاي سريع",
+        "دخول ذكي",
+        "شاشة سمارت"
+      ],
+      "en": [
+        "Double Bed",
+        "AC",
+        "Fast WiFi",
+        "Smart Entry",
+        "Smart TV"
+      ]
+    },
+    "original_price": "350",
+    "price": "200",
+    "updated_at": "2026-04-19T22:11:47.153348+00:00"
+  }
 ];
