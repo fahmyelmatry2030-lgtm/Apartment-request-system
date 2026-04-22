@@ -153,8 +153,13 @@ export default function BookingsManagement() {
   };
 
   const openWhatsAppChat = (booking: any) => {
-    const phone = booking.phone.replace(/[^0-9]/g, '');
-    const cleanPhone = phone.startsWith('2') ? phone : `2${phone}`;
+    let phone = booking.phone.replace(/[^0-9]/g, '');
+    if (phone.startsWith('0')) {
+      phone = '20' + phone.substring(1);
+    } else if (!phone.startsWith('20')) {
+      phone = '20' + phone;
+    }
+    const cleanPhone = phone;
     const msg = `مرحباً أ/ *${booking.name}*،\nبخصوص طلب الحجز الخاص بكم بمجمع مزار للوحدة (*${booking.studio}*) من فترة *${booking.checkIn}* إلى *${booking.checkOut}*.\n\n_نود إبلاغكم بـ..._`;
     window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
   };

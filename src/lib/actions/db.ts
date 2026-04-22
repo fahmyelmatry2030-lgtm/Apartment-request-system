@@ -12,8 +12,13 @@ async function sendTelegramNotification(booking: any) {
   try {
     if (!TG_TOKEN || !TG_CHAT_ID) return;
 
-    // Clean phone for WhatsApp link
-    const cleanPhone = booking.phone.replace(/[^0-9]/g, '');
+    // Clean phone for WhatsApp link: Ensure international format for Egypt (20)
+    let cleanPhone = booking.phone.replace(/[^0-9]/g, '');
+    if (cleanPhone.startsWith('0')) {
+      cleanPhone = '20' + cleanPhone.substring(1);
+    } else if (!cleanPhone.startsWith('20')) {
+      cleanPhone = '20' + cleanPhone;
+    }
     
     // Using HTML format as it's more stable than Markdown for special characters
     const htmlMessage = `
