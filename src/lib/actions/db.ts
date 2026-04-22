@@ -69,6 +69,46 @@ export async function getFreshDbBookings(nonce?: string) {
     return [];
   }
 
+  // --- AUTO-CLEANUP: Delete expired pending requests ---
+  // If a booking is still 'pending' and its check-in day has arrived, delete it.
+  const today = new Date().toISOString().split('T')[0];
+  const pendingStatuses = ['جديد', 'قيد المراجعة', 'pending', 'رد جديد'];
+  
+  const expiredIds = data
+    .filter((b: any) => pendingStatuses.includes(b.status) && b.check_in <= today)
+    .map((b: any) => b.id);
+
+  if (expiredIds.length > 0) {
+    console.log(`[CLEANUP] Automatically deleting ${expiredIds.length} expired pending requests:`, expiredIds);
+    // Hard delete from DB
+    await supabase.from('bookings').delete().in('id', expiredIds);
+    
+    // Filter them out of the current result set
+    return data
+      .filter((b: any) => !expiredIds.includes(b.id))
+      .map((b: any) => ({
+        id: b.id,
+        name: b.name,
+        phone: b.phone,
+        checkIn: b.check_in,
+        checkOut: b.check_out,
+        apartmentId: b.apartment_id,
+        studio: b.studio,
+        status: b.status,
+        paymentInfo: b.payment_info,
+        totalAmount: Number(b.total_amount || 0),
+        numberOfDays: Number(b.number_of_days || 0),
+        nationality: b.nationality,
+        idNumber: b.id_number,
+        commission: Number(b.commission || 0),
+        brokerName: b.broker_name,
+        guestsCount: Number(b.guests_count || 1),
+        clientStatus: b.client_status || 'انتظار',
+        notes: b.notes,
+        timestamp: b.timestamp,
+      }));
+  }
+
   return (data || []).map((b: any) => ({
     id: b.id,
     name: b.name,

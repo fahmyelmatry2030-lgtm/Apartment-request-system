@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from 'react';
-import { getSystemUnits, updateBookingStatus, getBookings } from '@/lib/data-init';
+import { getSystemUnits, updateBookingStatus, getBookings, deleteBooking } from '@/lib/data-init';
 
 export default function BookingsManagement() {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -164,7 +164,6 @@ export default function BookingsManagement() {
     if (activeTab === 'all') return true;
     if (activeTab === 'pending') return b.status === 'رد جديد' || b.status === 'pending';
     if (activeTab === 'approved') return b.status === 'approved' || b.status === 'مؤكد';
-    if (activeTab === 'rejected') return b.status === 'rejected' || b.status === 'مرفوض';
     return true;
   });
 
@@ -205,7 +204,6 @@ export default function BookingsManagement() {
             {[
               { id: 'pending', label: 'الطلبات الجديدة', icon: '📩' },
               { id: 'approved', label: 'المؤكدة', icon: '✅' },
-              { id: 'rejected', label: 'الأرشيف (مرفوض)', icon: '📁' },
               { id: 'all', label: 'الكل', icon: '📊' }
             ].map((tab) => (
               <button
@@ -568,13 +566,19 @@ export default function BookingsManagement() {
             <div className="flex gap-4 pt-4">
               <button 
                 onClick={async () => {
-                   await updateStatus(selectedBooking.id, 'rejected');
+                   setIsLoading(true);
+                   try {
+                     await deleteBooking(selectedBooking.id);
+                   } catch (err) {
+                     setError('فشل حذف الطلب المرفوض.');
+                   }
                    setShowRejectModal(false);
                    setSelectedBooking(null);
+                   await refreshBookings();
                 }}
                 className="flex-[2] py-5 bg-red-600 text-white font-black rounded-2xl hover:bg-red-700 hover:scale-[1.02] transition-all shadow-xl shadow-red-600/30 text-sm"
               >
-                تأكيد الرفض ✖
+                تأكيد الرفض (مسح نهائي) ✖
               </button>
               <button 
                 onClick={() => { setShowRejectModal(false); setSelectedBooking(null); }}
