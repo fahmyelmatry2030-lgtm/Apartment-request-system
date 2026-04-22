@@ -50,11 +50,14 @@ export default function DashboardOverview() {
     const confirmed = bookings.filter((b: any) => CONFIRMED_STATUSES.includes(b.status));
     const pending = bookings.filter((b: any) => PENDING_STATUSES.includes(b.status));
 
+    // Helper to map 1-24 to b1-sX or b2-sX
+    const getFullId = (n: number) => n <= 12 ? `b1-s${n}` : `b2-s${n-12}`;
+
     // Hardcoded IDs mapping for filtering
-    const singleIds = [2, 3, 6, 7, 8, 17].map(n => `b1-s${n}`);
-    const doubleIds = [1, 5, 9, 10, 11, 12, 13, 18, 20, 24].map(n => `b1-s${n}`);
-    const tripleIds = [4, 14, 15, 22, 23].map(n => `b1-s${n}`);
-    const twoRoomIds = [16, 19, 21].map(n => `b1-s${n}`);
+    const singleIds = [2, 3, 6, 7, 8, 17].map(getFullId);
+    const doubleIds = [1, 5, 9, 10, 11, 12, 13, 18, 20, 24].map(getFullId);
+    const tripleIds = [4, 14, 15, 22, 23].map(getFullId);
+    const twoRoomIds = [16, 19, 21].map(getFullId);
 
     // 1. Map units based on SELECTED DATE and CATEGORY
     const map = apts.map((apt: any) => {
@@ -89,14 +92,6 @@ export default function DashboardOverview() {
 
     // 2. Calculate Category Availability for SELECTED DATE using both branches
     const physicalStudios = map.filter((u: any) => u.id.startsWith('b1-s') || u.id.startsWith('b2-s'));
-    
-    // Helper to map 1-24 to b1-sX or b2-sX
-    const getFullId = (n: number) => n <= 12 ? `b1-s${n}` : `b2-s${n-12}`;
-
-    const singleIds = [2, 3, 6, 7, 8, 17].map(getFullId);
-    const doubleIds = [1, 5, 9, 10, 11, 12, 13, 18, 20, 24].map(getFullId);
-    const tripleIds = [4, 14, 15, 22, 23].map(getFullId);
-    const twoRoomIds = [16, 19, 21].map(getFullId);
 
     const categories = [
       { id: 'single', label: 'سنجل', count: physicalStudios.filter(u => singleIds.includes(u.id) && !u.isOccupied).length, total: 6, color: 'text-green-500' },
