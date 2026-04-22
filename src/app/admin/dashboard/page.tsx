@@ -82,7 +82,9 @@ export default function DashboardOverview() {
       };
     });
 
-    const filteredMap = selectedCategory === 'all' ? map : map.filter((u: any) => u.category === selectedCategory);
+    const filteredMap = selectedCategory === 'all'
+      ? map.filter((u: any) => !u.id.startsWith('b1-s') && !u.id.startsWith('b2-s'))
+      : map.filter((u: any) => u.category === selectedCategory);
     setApartmentMap(filteredMap);
 
     const physicalStudios = map.filter((u: any) => u.id.startsWith('b1-s') || u.id.startsWith('b2-s'));
