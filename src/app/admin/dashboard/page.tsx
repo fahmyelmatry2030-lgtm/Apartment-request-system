@@ -42,8 +42,8 @@ export default function DashboardOverview() {
     const today = new Date();
     const todayStr = today.toISOString().split('T')[0];
     const targetDateStr = selectedDate;
-    const nextDay = new Date(targetDate);
-    nextDay.setDate(targetDate.getDate() + 1);
+    const nextDay = new Date(selectedDate);
+    nextDay.setDate(nextDay.getDate() + 1);
     const nextDayStr = nextDay.toISOString().split('T')[0];
 
     const confirmed = bookings.filter((b: any) => CONFIRMED_STATUSES.includes(b.status));

@@ -100,11 +100,11 @@ export const getPublicUnitsWithAvailability = async () => {
 
   // 2. Identify occupied physical units for today
   const occupiedIds = bookings
-    .filter(b => {
+    .filter((b: any) => {
       // Logic: If today is within [checkIn, checkOut-1]
       return b.checkIn <= today && today < b.checkOut && (b.status === 'approved' || b.status.includes('مؤكد'));
     })
-    .map(b => b.apartmentId);
+    .map((b: any) => b.apartmentId);
 
   // 3. Map physical units to their categories and calculate availability
   // Physical units are identified by b1-s1 to b1-s24
