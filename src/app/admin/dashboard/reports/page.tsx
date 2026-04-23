@@ -452,16 +452,27 @@ export default function ReportsPage() {
     };
   });
 
+  // Sort dataRows by status: 1. غادر, 2. انتظار, 3. متواجد
+  const sortedDataRows = [...dataRows].sort((a, b) => {
+    const priority: any = { 'غادر': 1, 'انتظار': 2, 'متواجد': 3 };
+    const pA = priority[a.clientStatus] || 99;
+    const pB = priority[b.clientStatus] || 99;
+    return pA - pB;
+  });
+
+  // Re-assign 'no' after sorting
+  const renumberedRows = sortedDataRows.map((r, i) => ({ ...r, no: i + 1 }));
+
   // Fill empty rows to always show 31
-  const emptyRowsCount = Math.max(0, 31 - dataRows.length);
+  const emptyRowsCount = Math.max(0, 31 - renumberedRows.length);
   const emptyRows = Array.from({ length: emptyRowsCount }, (_, i) => ({
-    no: dataRows.length + i + 1,
+    no: renumberedRows.length + i + 1,
     id: '', date: '', name: '', nationality: '', idNumber: '', phone: '',
     checkIn: '', checkOut: '', days: 0, pricePerNight: 0, total: 0,
     commission: 0, brokerName: '', netValue: 0, clientStatus: '', notes: '', hasData: false,
   }));
 
-  const allRows = [...dataRows, ...emptyRows];
+  const allRows = [...renumberedRows, ...emptyRows];
 
   // Export CSV
   const exportCSV = () => {
