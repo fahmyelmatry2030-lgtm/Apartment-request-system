@@ -452,12 +452,18 @@ export default function ReportsPage() {
     };
   });
 
-  // Sort dataRows by status: 1. غادر, 2. انتظار, 3. متواجد
+  // Sort dataRows by status: 1. غادر, 2. انتظار, 3. متواجد, then by check-in date
   const sortedDataRows = [...dataRows].sort((a, b) => {
     const priority: any = { 'غادر': 1, 'انتظار': 2, 'متواجد': 3 };
     const pA = priority[a.clientStatus] || 99;
     const pB = priority[b.clientStatus] || 99;
-    return pA - pB;
+    
+    if (pA !== pB) return pA - pB;
+    
+    // Secondary sort by date
+    const timeA = new Date(a.checkIn || 0).getTime();
+    const timeB = new Date(b.checkIn || 0).getTime();
+    return timeA - timeB;
   });
 
   // Re-assign 'no' after sorting
