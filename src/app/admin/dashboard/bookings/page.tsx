@@ -241,6 +241,7 @@ export default function BookingsManagement() {
               <thead>
                 <tr className="bg-[#FDFBF7] text-[#7A7061] text-[9px] uppercase tracking-[0.2em] font-black border-b border-[#EAE4D9]/50">
                   <th className="px-8 py-6">العميل والاتصال</th>
+                  <th className="px-8 py-6">وقت الطلب</th>
                   <th className="px-8 py-6">التواريخ</th>
                   <th className="px-8 py-6">الوحدة المطلوبة</th>
                   <th className="px-8 py-6">الحالة</th>
@@ -250,7 +251,7 @@ export default function BookingsManagement() {
               <tbody className="text-xs">
                 {filteredBookings.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-8 py-24 text-center text-[#7A7061] italic font-bold opacity-40 uppercase tracking-widest">
+                    <td colSpan={6} className="px-8 py-24 text-center text-[#7A7061] italic font-bold opacity-40 uppercase tracking-widest">
                       {isLoading ? 'جاري تحميل البيانات...' : 'لا توجد طلبات حجز حالياً في هذا القسم.'}
                     </td>
                   </tr>
@@ -266,6 +267,16 @@ export default function BookingsManagement() {
                           >
                               <span className="text-sm">💬</span> {booking.phone}
                           </button>
+                        </div>
+                      </td>
+                      <td className="px-8 py-6">
+                        <div className="bg-[#FDFBF7] px-3 py-1.5 rounded-lg border border-[#EAE4D9]/50 inline-block">
+                          <span className="text-[11px] font-black text-[#2A2723]">
+                            {booking.timestamp ? new Date(booking.timestamp).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '—'}
+                          </span>
+                        </div>
+                        <div className="text-[9px] text-[#7A7061] mt-1 font-bold opacity-50">
+                          {booking.timestamp ? new Date(booking.timestamp).toLocaleDateString('ar-EG', { day: '2-digit', month: '2-digit' }) : ''}
                         </div>
                       </td>
                       <td className="px-8 py-6 font-black">
@@ -290,29 +301,12 @@ export default function BookingsManagement() {
                       </td>
                       <td className="px-8 py-6">
                         <div className="flex justify-end gap-3 opacity-40 group-hover:opacity-100 transition-opacity">
-                           {booking.status === 'رد جديد' || booking.status === 'pending' ? (
-                              <>
-                                <button 
-                                  onClick={() => { setSelectedBooking(booking); setShowApproveModal(true); }}
-                                  className="px-5 py-2.5 rounded-xl bg-green-600 text-white flex items-center gap-2 hover:bg-green-700 transition-all font-black text-[10px] shadow-lg shadow-green-600/20"
-                                >
-                                  <span>✓</span> قبول
-                                </button>
-                                <button 
-                                  onClick={() => { setSelectedBooking(booking); setShowRejectModal(true); }}
-                                  className="px-5 py-2.5 rounded-xl bg-red-600 text-white flex items-center gap-2 hover:bg-red-700 transition-all font-black text-[10px] shadow-lg shadow-red-600/20"
-                                >
-                                  <span>✕</span> رفض
-                                </button>
-                              </>
-                           ) : (
-                              <button 
-                                  onClick={() => { setSelectedBooking(booking); setShowDeleteModal(true); }}
-                                  className="text-[#7A7061] hover:text-red-600 transition-colors font-black text-[10px] uppercase tracking-tighter"
-                              >
-                                  حذف السجل
-                              </button>
-                           )}
+                            <button 
+                                onClick={() => { setSelectedBooking(booking); setShowDeleteModal(true); }}
+                                className="text-[#7A7061] hover:text-red-600 transition-colors font-black text-[10px] uppercase tracking-tighter"
+                            >
+                                حذف السجل
+                            </button>
                         </div>
                       </td>
                     </tr>
@@ -342,7 +336,7 @@ export default function BookingsManagement() {
                         <p className="text-[9px] text-gray-500 font-black uppercase mt-1 tracking-widest">مجمع مزار الفندقي</p>
                       </div>
                       <div className="text-right">
-                         <div className="text-[10px] text-gray-400 font-bold uppercase">{new Date(b.timestamp).toLocaleDateString('ar-EG', {month:'long', year:'numeric'})}</div>
+                         <div className="text-[10px] text-gray-400 font-bold uppercase">{b.timestamp ? new Date(b.timestamp).toLocaleDateString('ar-EG', {month:'long', year:'numeric'}) : ''}</div>
                          <div className="text-[8px] text-[#C1A68D] font-black tracking-widest border-t border-[#C1A68D]/20 mt-1 pt-1 opacity-60">M Z A R</div>
                       </div>
                   </div>
@@ -401,37 +395,20 @@ export default function BookingsManagement() {
                      )}
 
                      <div className="pt-6 border-t border-white/5 flex gap-3">
-                         {b.status === 'رد جديد' || b.status === 'pending' ? (
-                            <>
-                                <button 
-                                    onClick={() => { setSelectedBooking(b); setShowApproveModal(true); }}
-                                    className="flex-1 py-4 bg-green-600 text-white rounded-2xl text-[10px] font-black hover:bg-green-700 transition-all shadow-lg shadow-green-600/10"
-                                >
-                                    تسكين الوحدة ✓
-                                </button>
-                                <button 
-                                    onClick={() => { setSelectedBooking(b); setShowRejectModal(true); }}
-                                    className="px-6 py-4 bg-red-600/10 text-red-400 rounded-2xl text-[10px] font-black hover:bg-red-600 hover:text-white transition-all border border-red-600/20"
-                                >
-                                    ✖
-                                </button>
-                            </>
-                         ) : (
-                            <div className="flex w-full gap-3">
-                                <button 
-                                    onClick={() => openWhatsAppChat(b)}
-                                    className="flex-1 py-4 bg-green-600/10 text-green-400 border border-green-600/20 rounded-2xl text-[10px] font-black hover:bg-green-600 hover:text-white transition-all"
-                                >
-                                    واتساب الضيف
-                                </button>
-                                <button 
-                                    onClick={() => { setSelectedBooking(b); setShowDeleteModal(true); }}
-                                    className="px-6 py-4 bg-white/5 text-gray-500 rounded-2xl text-[10px] font-black hover:bg-red-600 hover:text-white transition-all"
-                                >
-                                    🗑️
-                                </button>
-                            </div>
-                         )}
+                        <div className="flex w-full gap-3">
+                            <button 
+                                onClick={() => openWhatsAppChat(b)}
+                                className="flex-1 py-4 bg-green-600/10 text-green-400 border border-green-600/20 rounded-2xl text-[10px] font-black hover:bg-green-600 hover:text-white transition-all"
+                            >
+                                واتساب الضيف
+                            </button>
+                            <button 
+                                onClick={() => { setSelectedBooking(b); setShowDeleteModal(true); }}
+                                className="px-6 py-4 bg-white/5 text-gray-500 rounded-2xl text-[10px] font-black hover:bg-red-600 hover:text-white transition-all"
+                            >
+                                🗑️
+                            </button>
+                        </div>
                      </div>
                   </div>
                 </div>
