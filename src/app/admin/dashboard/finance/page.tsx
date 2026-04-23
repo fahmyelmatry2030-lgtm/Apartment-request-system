@@ -162,43 +162,6 @@ export default function FinancePage() {
         </div>
       </div>
 
-      {/* ── PROFIT DISTRIBUTION TABLE (Excel Layout) ── */}
-      <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
-        <div className="bg-[#2A2723] px-8 py-4 flex items-center justify-between">
-          <h2 className="text-white font-black text-sm tracking-widest uppercase">توزيع الأرباح بين الشركاء</h2>
-          <span className="text-[#C1A68D] text-xs font-black bg-white/10 px-4 py-1.5 rounded-full">
-            صافي الربح: {netProfit.toLocaleString()} ج.م
-          </span>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-center">
-            <thead>
-              <tr className="bg-[#FDFBF7]">
-                <th className="px-8 py-4 font-black text-xs text-[#7A7061] border border-[#EAE4D9]/60 w-32">Name</th>
-                {PARTNERS.map(p => (
-                  <th key={p.key} className="px-8 py-4 font-black text-sm text-[#2A2723] border border-[#EAE4D9]/60">
-                    {p.label}
-                    <span className="block text-[10px] font-bold text-[#C1A68D]">({p.percentage}%)</span>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="px-8 py-6 font-black text-[#7A7061] text-sm border border-[#EAE4D9]/40 bg-[#FDFBF7]/60">Value</td>
-                {PARTNERS.map(p => (
-                  <td key={p.key} className="px-8 py-6 border border-[#EAE4D9]/40">
-                    <div className={`text-2xl font-black ${netProfit >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                      {isLoading ? '...' : Math.round(netProfit * p.percentage / 100).toLocaleString()}
-                    </div>
-                    <div className="text-[10px] text-[#7A7061] font-bold mt-1">ج.م</div>
-                  </td>
-                ))}
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
 
       {/* ── RENT ENTRY ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -365,6 +328,44 @@ export default function FinancePage() {
                   <div className="text-3xl font-black">{isLoading ? '...' : netProfit.toLocaleString()}</div>
                   <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
                 </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* ── PROFIT DISTRIBUTION TABLE (Excel Layout) ── */}
+      <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
+        <div className="bg-[#2A2723] px-8 py-4 flex items-center justify-between">
+          <h2 className="text-white font-black text-sm tracking-widest uppercase">توزيع الأرباح بين الشركاء</h2>
+          <span className="text-[#C1A68D] text-xs font-black bg-white/10 px-4 py-1.5 rounded-full">
+            صافي الربح: {netProfit.toLocaleString()} ج.م
+          </span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-center">
+            <thead>
+              <tr className="bg-[#FDFBF7]">
+                <th className="px-8 py-4 font-black text-xs text-[#7A7061] border border-[#EAE4D9]/60 w-32">Name</th>
+                {PARTNERS.map(p => (
+                  <th key={p.key} className="px-8 py-4 font-black text-sm text-[#2A2723] border border-[#EAE4D9]/60">
+                    {p.label}
+                    <span className="block text-[10px] font-bold text-[#C1A68D]">({p.percentage}%)</span>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="px-8 py-6 font-black text-[#7A7061] text-sm border border-[#EAE4D9]/40 bg-[#FDFBF7]/60">Value</td>
+                {PARTNERS.map(p => (
+                  <td key={p.key} className="px-8 py-6 border border-[#EAE4D9]/40">
+                    <div className={`text-2xl font-black ${netProfit >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                      {isLoading ? '...' : Math.round(netProfit * p.percentage / 100).toLocaleString()}
+                    </div>
+                    <div className="text-[10px] text-[#7A7061] font-bold mt-1">ج.م</div>
+                  </td>
+                ))}
               </tr>
             </tbody>
           </table>
