@@ -240,7 +240,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
         <div className="p-4 md:p-8 border-t border-[#EAE4D9]/50 space-y-4 bg-white/50">
           {/* Quick Action: WhatsApp Owner */}
           <a
-            href="https://wa.me/201026107134"
+            href="https://api.whatsapp.com/send?phone=201026107134"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-4 px-6 py-3 rounded-2xl bg-green-500/10 text-green-600 hover:bg-green-500 hover:text-white transition-all font-black text-xs"

@@ -78,7 +78,7 @@ export default function BookingPage() {
     const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
     
     const adminMsg = `🔔 *طلب حجز جديد من الموقع!*\n\n👤 *العميل:* ${name}\n📱 *الموبايل:* ${phone}\n👥 *عدد الأشخاص:* ${guestsCount}\n🏠 *الوحدة:* ${selectedUnit ? selectedUnit.title['ar'] : selectedUnitId}\n📅 *الفترة:* من ${checkIn} إلى ${checkOut} (إجمالي ${nights} ليالي)\n\nيرجى تأكيد الحجز معي.`;
-    const waUrl = `https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(adminMsg)}`;
+    const waUrl = `https://api.whatsapp.com/send?phone=${ADMIN_WHATSAPP}&text=${encodeURIComponent(adminMsg)}`;
     window.open(waUrl, '_blank');
   }, [availableUnits, checkIn, checkOut, name, phone, selectedUnitId]);
 
@@ -171,7 +171,7 @@ export default function BookingPage() {
       const end = new Date(checkOut).getTime();
       const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
       const adminMsg = `🔔 *طلب حجز جديد من الموقع!*\n\n👤 *العميل:* ${name}\n📱 *الموبايل:* ${phone}\n👥 *عدد الأشخاص:* ${guestsCount}\n🏠 *الوحدة:* ${selectedUnit ? selectedUnit.title['ar'] : selectedUnitId}\n📅 *الفترة:* من ${checkIn} إلى ${checkOut} (إجمالي ${nights} ليالي)\n\nيرجى تأكيد الحجز معي.`;
-      const waUrl = `https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(adminMsg)}`;
+      const waUrl = `https://api.whatsapp.com/send?phone=${ADMIN_WHATSAPP}&text=${encodeURIComponent(adminMsg)}`;
       window.location.href = waUrl;
       
     } catch (err) {

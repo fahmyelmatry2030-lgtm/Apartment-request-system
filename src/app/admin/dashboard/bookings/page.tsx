@@ -161,7 +161,7 @@ export default function BookingsManagement() {
     }
     const cleanPhone = phone;
     const msg = `مرحباً أ/ *${booking.name}*،\nبخصوص طلب الحجز الخاص بكم بمجمع مزار للوحدة (*${booking.studio}*) من فترة *${booking.checkIn}* إلى *${booking.checkOut}*.\n\n_نود إبلاغكم بـ..._`;
-    window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+    window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   const filteredBookings = bookings.filter((b: any) => {
