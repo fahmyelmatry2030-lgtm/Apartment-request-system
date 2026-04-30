@@ -681,8 +681,8 @@ export default function BookingPage() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className={`block text-[9px] md:text-[10px] font-black text-[#5C554B] uppercase px-2 ${isRTL ? 'text-right' : 'text-left'}`}>
-                          📱 {isRTL ? 'رقم الواتساب للتأكيد' : 'WhatsApp Number'}
+                        <label className={`block text-[18px] md:text-[20px] font-black text-[#E63946] uppercase px-2 mb-2 ${isRTL ? 'text-right' : 'text-left'}`}>
+                          📱 {isRTL ? 'رقم الواتس اب للتواصل' : 'WhatsApp Number for Contact'}
                         </label>
                         <input
                           type="tel"
@@ -690,7 +690,7 @@ export default function BookingPage() {
                           value={phone}
                           onChange={e => setPhone(e.target.value)}
                           placeholder="+20 1..."
-                          className={`w-full bg-[#F7F5F0] border-2 border-transparent focus:border-[#C1A68D] focus:bg-white rounded-2xl md:rounded-3xl px-6 md:px-8 py-4 md:py-5 outline-none font-bold transition-all ${isRTL ? 'text-right' : 'text-left'}`}
+                          className={`w-full bg-[#F7F5F0] border-2 border-transparent focus:border-[#E63946] focus:bg-white rounded-2xl md:rounded-3xl px-6 md:px-8 py-4 md:py-5 outline-none font-black text-xl md:text-2xl transition-all ${isRTL ? 'text-right' : 'text-left'}`}
                         />
                       </div>
                       
