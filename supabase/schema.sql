@@ -70,3 +70,20 @@ on conflict (id) do nothing;
 -- values ('uploads', 'uploads', true)
 -- on conflict (id) do update set public = true;
 
+
+-- EXPENSES
+create table if not exists public.expenses (
+  id uuid default gen_random_uuid() primary key,
+  category text not null,
+  amount numeric not null,
+  date date not null default current_date,
+  description text,
+  branch integer default 1,
+  from_entity text,
+  to_entity text,
+  ordered_by text,
+  created_at timestamptz default now()
+);
+
+alter table public.expenses enable row level security;
+create policy " Allow all access\ on public.expenses for all using (true) with check (true);

@@ -22,7 +22,7 @@ export default function FinancePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [rent1Input, setRent1Input] = useState('');
   const [rent2Input, setRent2Input] = useState('');
-  const [newExpense, setNewExpense] = useState({ category: '', amount: '', description: '' });
+  const [newExpense, setNewExpense] = useState({ category: '', amount: '', description: '', from_entity: '', to_entity: '', ordered_by: '' });
   const [saving, setSaving] = useState(false);
 
   const loadData = async () => {
@@ -109,8 +109,11 @@ export default function FinancePage() {
       amount: parseFloat(newExpense.amount),
       date: dateStr,
       description: newExpense.description,
+      from_entity: newExpense.from_entity,
+      to_entity: newExpense.to_entity,
+      ordered_by: newExpense.ordered_by
     }]);
-    setNewExpense({ category: '', amount: '', description: '' });
+    setNewExpense({ category: '', amount: '', description: '', from_entity: '', to_entity: '', ordered_by: '' });
     await loadData();
     setSaving(false);
   };
@@ -215,9 +218,9 @@ export default function FinancePage() {
           <span className="w-9 h-9 bg-[#C1A68D]/10 text-[#C1A68D] rounded-xl flex items-center justify-center">➕</span>
           إضافة مصروف — Expenses
         </h3>
-        <form onSubmit={handleAddExpense} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <form onSubmit={handleAddExpense} className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 items-end">
           <div className="space-y-2">
-            <label className="text-xs font-black text-[#C1A68D]">الفئة (كهرباء، مياه، نظافة...)</label>
+            <label className="text-xs font-black text-[#C1A68D]">الفئة</label>
             <input required value={newExpense.category}
               onChange={e => setNewExpense({ ...newExpense, category: e.target.value })}
               className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#C1A68D] transition-colors" />
@@ -229,15 +232,35 @@ export default function FinancePage() {
               className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#C1A68D] transition-colors" />
           </div>
           <div className="space-y-2">
-            <label className="text-xs font-black text-[#C1A68D]">ملاحظات (اختياري)</label>
+            <label className="text-xs font-black text-[#C1A68D]">من</label>
+            <input value={newExpense.from_entity}
+              onChange={e => setNewExpense({ ...newExpense, from_entity: e.target.value })}
+              className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#C1A68D] transition-colors" />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-black text-[#C1A68D]">إلى</label>
+            <input value={newExpense.to_entity}
+              onChange={e => setNewExpense({ ...newExpense, to_entity: e.target.value })}
+              className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#C1A68D] transition-colors" />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-black text-[#C1A68D]">الآمر بالصرف</label>
+            <input value={newExpense.ordered_by}
+              onChange={e => setNewExpense({ ...newExpense, ordered_by: e.target.value })}
+              className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#C1A68D] transition-colors" />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-black text-[#C1A68D]">ملاحظات</label>
             <input value={newExpense.description}
               onChange={e => setNewExpense({ ...newExpense, description: e.target.value })}
               className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#C1A68D] transition-colors" />
           </div>
-          <button type="submit" disabled={saving}
-            className="bg-[#C1A68D] text-white font-black px-6 py-3.5 rounded-xl hover:bg-[#a08060] transition-all disabled:opacity-40 active:scale-95 shadow-sm">
-            {saving ? 'جاري الحفظ...' : 'إضافة المصروف'}
-          </button>
+          <div className="lg:col-span-6 flex justify-end">
+            <button type="submit" disabled={saving}
+              className="bg-[#C1A68D] text-white font-black px-12 py-3.5 rounded-xl hover:bg-[#a08060] transition-all disabled:opacity-40 active:scale-95 shadow-sm">
+              {saving ? 'جاري الحفظ...' : 'إضافة المصروف'}
+            </button>
+          </div>
         </form>
       </div>
 
@@ -258,6 +281,9 @@ export default function FinancePage() {
                 <tr className="bg-[#2A2723] text-white text-[10px] font-black uppercase tracking-widest">
                   <th className="px-6 py-4">الفئة</th>
                   <th className="px-6 py-4">المبلغ</th>
+                  <th className="px-6 py-4">من</th>
+                  <th className="px-6 py-4">إلى</th>
+                  <th className="px-6 py-4">الآمر بالصرف</th>
                   <th className="px-6 py-4">الوصف</th>
                   <th className="px-6 py-4 text-center">حذف</th>
                 </tr>
@@ -267,6 +293,9 @@ export default function FinancePage() {
                   <tr key={exp.id} className="hover:bg-[#FDFBF7] transition-colors">
                     <td className="px-6 py-4 font-black text-[#2A2723]">{exp.category}</td>
                     <td className="px-6 py-4 font-black text-red-600">- {exp.amount?.toLocaleString()} ج.م</td>
+                    <td className="px-6 py-4 text-xs text-[#7A7061] font-bold">{exp.from_entity || '—'}</td>
+                    <td className="px-6 py-4 text-xs text-[#7A7061] font-bold">{exp.to_entity || '—'}</td>
+                    <td className="px-6 py-4 text-xs text-[#2A2723] font-black">{exp.ordered_by || '—'}</td>
                     <td className="px-6 py-4 text-xs text-[#7A7061] font-bold">{exp.description || '—'}</td>
                     <td className="px-6 py-4 text-center">
                       <button onClick={() => handleDelete(exp.id)}

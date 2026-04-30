@@ -12,7 +12,10 @@ export default function ExpensesTab() {
     amount: '',
     description: '',
     date: new Date().toISOString().split('T')[0],
-    branch: '1'
+    branch: '1',
+    from_entity: '',
+    to_entity: '',
+    ordered_by: ''
   });
 
   const loadExpenses = async () => {
@@ -45,7 +48,10 @@ export default function ExpensesTab() {
       amount: parseFloat(newExpense.amount),
       description: newExpense.description,
       date: newExpense.date,
-      branch: parseInt(newExpense.branch)
+      branch: parseInt(newExpense.branch),
+      from_entity: newExpense.from_entity,
+      to_entity: newExpense.to_entity,
+      ordered_by: newExpense.ordered_by
     }]);
 
     if (error) {
@@ -56,7 +62,10 @@ export default function ExpensesTab() {
         amount: '',
         description: '',
         date: new Date().toISOString().split('T')[0],
-        branch: '1'
+        branch: '1',
+        from_entity: '',
+        to_entity: '',
+        ordered_by: ''
       });
       loadExpenses();
     }
@@ -70,7 +79,7 @@ export default function ExpensesTab() {
     else loadExpenses();
   };
 
-  if (error && error.includes('Could not find the table')) {
+  if (error && (error.includes('Could not find the table') || error.includes('relation "public.expenses" does not exist'))) {
     return (
       <div className="p-12 text-center bg-white rounded-[2rem] border border-red-100">
         <span className="text-4xl mb-4 block">⚠️</span>
@@ -84,6 +93,9 @@ export default function ExpensesTab() {
   date date not null default current_date,
   description text,
   branch integer default 1,
+  from_entity text,
+  to_entity text,
+  ordered_by text,
   created_at timestamptz default now()
 );
 alter table public.expenses enable row level security;
@@ -141,9 +153,35 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
               <option value="2">فرع 2</option>
             </select>
           </div>
-          <button type="submit" className="bg-[#2A2723] text-white font-black px-6 py-3.5 rounded-xl hover:bg-black transition-all shadow-lg active:scale-95">
-            إضافة مصروف
-          </button>
+          <div className="space-y-2">
+            <label className="text-xs font-black text-[#C1A68D]">من</label>
+            <input 
+              value={newExpense.from_entity}
+              onChange={e => setNewExpense({...newExpense, from_entity: e.target.value})}
+              className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#C1A68D]" 
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-black text-[#C1A68D]">إلى</label>
+            <input 
+              value={newExpense.to_entity}
+              onChange={e => setNewExpense({...newExpense, to_entity: e.target.value})}
+              className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#C1A68D]" 
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-black text-[#C1A68D]">الآمر بالصرف</label>
+            <input 
+              value={newExpense.ordered_by}
+              onChange={e => setNewExpense({...newExpense, ordered_by: e.target.value})}
+              className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#C1A68D]" 
+            />
+          </div>
+          <div className="md:col-span-1">
+            <button type="submit" className="w-full bg-[#2A2723] text-white font-black px-6 py-3.5 rounded-xl hover:bg-black transition-all shadow-lg active:scale-95">
+              إضافة مصروف
+            </button>
+          </div>
           <div className="md:col-span-5 space-y-2">
             <label className="text-xs font-black text-[#C1A68D]">الوصف / ملاحظات</label>
             <textarea 
@@ -169,6 +207,9 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                 <th className="px-6 py-4">الفئة</th>
                 <th className="px-6 py-4">المبلغ</th>
                 <th className="px-6 py-4">الفرع</th>
+                <th className="px-6 py-4">من</th>
+                <th className="px-6 py-4">إلى</th>
+                <th className="px-6 py-4">الآمر بالصرف</th>
                 <th className="px-6 py-4">الوصف</th>
                 <th className="px-6 py-4 text-center">إجراءات</th>
               </tr>
@@ -184,6 +225,9 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                   <td className="px-6 py-4 font-black text-[#2A2723] text-sm">{exp.category}</td>
                   <td className="px-6 py-4 font-black text-red-600 text-sm">-{exp.amount?.toLocaleString()} ج.م</td>
                   <td className="px-6 py-4 text-xs font-bold text-[#C1A68D]">فرع {exp.branch}</td>
+                  <td className="px-6 py-4 text-xs font-bold text-[#7A7061]">{exp.from_entity || '---'}</td>
+                  <td className="px-6 py-4 text-xs font-bold text-[#7A7061]">{exp.to_entity || '---'}</td>
+                  <td className="px-6 py-4 text-xs font-bold text-[#2A2723]">{exp.ordered_by || '---'}</td>
                   <td className="px-6 py-4 text-xs font-bold text-[#7A7061] opacity-70">{exp.description || '---'}</td>
                   <td className="px-6 py-4 text-center">
                     <button onClick={() => handleDelete(exp.id)} className="w-8 h-8 rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all">🗑️</button>
