@@ -228,6 +228,26 @@ export default function BookingPage() {
                 : 'Redirecting to WhatsApp for confirmation now...'}
             </span>
           </p>
+          
+          {/* Copy Number Section */}
+          <div className="mb-10 p-6 bg-[#FDFBF7] rounded-[30px] border border-dashed border-[#EAE4D9] flex flex-col items-center gap-3">
+            <p className="text-[10px] font-black text-[#C1A68D] uppercase tracking-[0.2em]">
+              {isRTL ? 'أو يمكنك نسخ الرقم والتواصل يدوياً' : 'Or copy number & contact manually'}
+            </p>
+            <div className="flex items-center gap-4 bg-white px-6 py-3 rounded-2xl border border-[#EAE4D9] shadow-sm">
+              <span className="text-2xl font-black text-[#2A2723] tracking-wider select-all">01108109969</span>
+              <button 
+                onClick={() => {
+                  navigator.clipboard.writeText('01108109969');
+                  alert(isRTL ? '✅ تم نسخ الرقم بنجاح!' : '✅ Number copied successfully!');
+                }}
+                className="w-10 h-10 flex items-center justify-center bg-[#FDFBF7] rounded-xl hover:bg-[#2A2723] hover:text-white transition-all shadow-inner border border-[#EAE4D9]"
+                title={isRTL ? 'نسخ الرقم' : 'Copy Number'}
+              >
+                📋
+              </button>
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <button
