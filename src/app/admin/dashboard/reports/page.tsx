@@ -157,7 +157,7 @@ export default function ReportsPage() {
     loadData();
   }, [loadData]);
 
-  // Inline Edit & Save to DB
+  const handleCellSave = async (bookingId: string, field: string, value: any) => {
     try {
       setSaveStatus('جاري الحفظ...');
       
