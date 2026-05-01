@@ -399,10 +399,12 @@ export default function ReportsPage() {
     const commission = booking.commission || 0;
     const netValue = total - commission;
 
-    // Automatic Status Calculation based on LOCAL Dates
+    // Manual Status takes precedence if it's not the default 'انتظار' or if it was manually changed
     let rawStatus = (booking.clientStatus || 'انتظار').trim();
     let clientStatus = rawStatus;
 
+    // Only apply automatic transitions if the status is currently 'انتظار' or 'متواجد'
+    // This allows 'غادر' to be set manually and stick, and allows manual overrides.
     if (booking.checkIn && booking.checkOut) {
       const now = new Date();
       const y = now.getFullYear();
@@ -413,20 +415,17 @@ export default function ReportsPage() {
       const checkInStr = booking.checkIn.trim();
       const checkOutStr = booking.checkOut.trim();
 
-      // Priority 1: If check-out date has passed, it is ALWAYS "غادر"
-      if (todayStr >= checkOutStr) {
-        clientStatus = 'غادر';
-      } 
-      // Priority 2: If we are in the stay period
-      else if (todayStr >= checkInStr && todayStr < checkOutStr) {
-        // Only move to "متواجد" if they were in any waiting state
-        if (rawStatus.includes('انتظار') || rawStatus.includes('منتظر')) {
+      // If we haven't manually changed it to something else, or if it's still 'انتظار'
+      if (rawStatus === 'انتظار' || !rawStatus) {
+        if (todayStr >= checkOutStr) {
+          clientStatus = 'غادر';
+        } else if (todayStr >= checkInStr) {
           clientStatus = 'متواجد';
         }
       } 
-      // Priority 3: If before check-in
-      else if (todayStr < checkInStr) {
-        clientStatus = 'انتظار';
+      // If it's 'متواجد', auto-move to 'غادر' if checkout passed
+      else if (rawStatus === 'متواجد' && todayStr >= checkOutStr) {
+        clientStatus = 'غادر';
       }
     }
 
@@ -709,8 +708,7 @@ export default function ReportsPage() {
           {/* Color Legend */}
           <div className="flex items-center gap-4 px-3 pb-2 border-b border-[#EAE4D9]/40">
             <span className="text-[9px] font-black text-[#7A7061] uppercase tracking-wider">دليل الألوان:</span>
-            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-blue-500 inline-block"/><span className="text-[9px] font-black text-blue-700">استديوهات 1-12 (مبنى 1)</span></span>
-            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-emerald-500 inline-block"/><span className="text-[9px] font-black text-emerald-700">استديوهات 13-24 (مبنى 2)</span></span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-blue-500 inline-block"/><span className="text-[9px] font-black text-blue-700">جميع الاستديوهات الفندقية</span></span>
             <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#C1A68D] inline-block"/><span className="text-[9px] font-black text-[#C1A68D]">الشقق الفندقية</span></span>
           </div>
           <div>
@@ -732,13 +730,9 @@ export default function ReportsPage() {
                   const isActive = selectedUnit === u.id;
                   let cls = '';
                   if (isActive) {
-                    cls = isB1 ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                               : isB2 ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
-                               : 'bg-[#2A2723] text-white';
+                    cls = 'bg-blue-600 text-white shadow-lg shadow-blue-500/20';
                   } else {
-                    cls = isB1 ? 'bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200'
-                               : isB2 ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'
-                               : 'bg-[#FDFBF7] text-[#7A7061] hover:bg-[#EAE4D9]/50 border border-[#EAE4D9]/40';
+                    cls = 'bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200';
                   }
                   return (
                     <button key={u.id} onClick={() => setSelectedUnit(u.id)}

@@ -42,6 +42,13 @@ export default function BookingPage() {
 
   const ADMIN_WHATSAPP = '201108109969';
 
+  const formatDate = (dateStr: string) => {
+    if (!dateStr) return '';
+    const parts = dateStr.split('-');
+    if (parts.length !== 3) return dateStr;
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  };
+
   useEffect(() => {
     const init = async () => {
       await initializeData();
@@ -77,7 +84,7 @@ export default function BookingPage() {
     const end = new Date(checkOut).getTime();
     const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
     
-    const adminMsg = `🔔 *طلب حجز جديد من الموقع!*\n\n👤 *العميل:* ${name}\n📱 *الموبايل:* ${phone}\n👥 *عدد الأشخاص:* ${guestsCount}\n🏠 *الوحدة:* ${selectedUnit ? selectedUnit.title['ar'] : selectedUnitId}\n📅 *الفترة:* من ${checkIn} إلى ${checkOut} (إجمالي ${nights} ليالي)\n\nيرجى تأكيد الحجز معي.`;
+    const adminMsg = `🔔 *طلب حجز جديد من الموقع!*\n\n👤 *العميل:* ${name}\n📱 *الموبايل:* ${phone}\n👥 *عدد الأشخاص:* ${guestsCount}\n🏠 *الوحدة:* ${selectedUnit ? selectedUnit.title['ar'] : selectedUnitId}\n📅 *الفترة:* من ${formatDate(checkIn)} إلى ${formatDate(checkOut)} (إجمالي ${nights} ليالي)\n\nيرجى تأكيد الحجز معي.`;
     const waUrl = `https://api.whatsapp.com/send?phone=${ADMIN_WHATSAPP}&text=${encodeURIComponent(adminMsg)}`;
     window.open(waUrl, '_blank');
   }, [availableUnits, checkIn, checkOut, name, phone, selectedUnitId]);
@@ -170,7 +177,7 @@ export default function BookingPage() {
       const start = new Date(checkIn).getTime();
       const end = new Date(checkOut).getTime();
       const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-      const adminMsg = `🔔 *طلب حجز جديد من الموقع!*\n\n👤 *العميل:* ${name}\n📱 *الموبايل:* ${phone}\n👥 *عدد الأشخاص:* ${guestsCount}\n🏠 *الوحدة:* ${selectedUnit ? selectedUnit.title['ar'] : selectedUnitId}\n📅 *الفترة:* من ${checkIn} إلى ${checkOut} (إجمالي ${nights} ليالي)\n\nيرجى تأكيد الحجز معي.`;
+      const adminMsg = `🔔 *طلب حجز جديد من الموقع!*\n\n👤 *العميل:* ${name}\n📱 *الموبايل:* ${phone}\n👥 *عدد الأشخاص:* ${guestsCount}\n🏠 *الوحدة:* ${selectedUnit ? selectedUnit.title['ar'] : selectedUnitId}\n📅 *الفترة:* من ${formatDate(checkIn)} إلى ${formatDate(checkOut)} (إجمالي ${nights} ليالي)\n\nيرجى تأكيد الحجز معي.`;
       const waUrl = `https://api.whatsapp.com/send?phone=${ADMIN_WHATSAPP}&text=${encodeURIComponent(adminMsg)}`;
       window.location.href = waUrl;
       
@@ -208,11 +215,11 @@ export default function BookingPage() {
             <div className="flex justify-center gap-6 mt-4">
               <div className="text-center">
                 <p className="text-[9px] font-bold text-gray-400 uppercase">{isRTL ? 'من' : 'From'}</p>
-                <p className="text-xs font-black">{checkIn}</p>
+                <p className="text-xs font-black">{formatDate(checkIn)}</p>
               </div>
               <div className="text-center">
                 <p className="text-[9px] font-bold text-gray-400 uppercase">{isRTL ? 'إلى' : 'To'}</p>
-                <p className="text-xs font-black">{checkOut}</p>
+                <p className="text-xs font-black">{formatDate(checkOut)}</p>
               </div>
             </div>
           </div>
@@ -738,7 +745,7 @@ export default function BookingPage() {
                       <div className="bg-[#2A2723] p-5 md:p-6 rounded-3xl text-white space-y-3 shadow-lg">
                         <div className="flex justify-between items-center opacity-60 text-[7px] md:text-[8px] font-black uppercase tracking-widest">
                           <span>{isRTL ? 'تفاصيل الحجز' : 'Selection Detail'}</span>
-                          <span>{checkIn} → {checkOut}</span>
+                          <span>{formatDate(checkIn)} → {formatDate(checkOut)}</span>
                         </div>
                         <p className="text-lg md:text-xl font-bold">{availableUnits.find(u => u.id === selectedUnitId)?.title[language]}</p>
                       </div>
