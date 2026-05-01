@@ -53,6 +53,19 @@ export default function ExpensesTab() {
     ordered_by: ''
   });
 
+  const formatDate = (dateStr: string) => {
+    if (!dateStr || !dateStr.includes('-')) return dateStr;
+    const [y, m, d] = dateStr.split('-');
+    return `${d}/${m}/${y}`;
+  };
+
+  const parseDate = (displayStr: string) => {
+    if (!displayStr || !displayStr.includes('/')) return displayStr;
+    const [d, m, y] = displayStr.split('/');
+    if (y && m && d) return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+    return displayStr;
+  };
+
   const loadExpenses = async () => {
     setLoading(true);
     try {
@@ -279,12 +292,18 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                 />
               </div>
               <div className="space-y-3 group">
-                <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">التاريخ</label>
+                <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">التاريخ (يوم/شهر/سنة)</label>
                 <input 
-                  type="date"
+                  type="text"
                   required
-                  value={newExpense.date}
-                  onChange={e => setNewExpense({...newExpense, date: e.target.value})}
+                  placeholder="DD/MM/YYYY"
+                  value={formatDate(newExpense.date)}
+                  onChange={e => {
+                    const val = e.target.value;
+                    // Simple auto-formatting for DD/MM/YYYY
+                    let clean = val.replace(/[^0-9/]/g, '');
+                    setNewExpense({...newExpense, date: parseDate(clean)});
+                  }}
                   className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all" 
                 />
               </div>
@@ -374,8 +393,7 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
             >
               <div className="flex items-center gap-8 w-full md:w-auto">
                 <div className="w-16 h-16 rounded-3xl bg-[#FDFBF7] border border-[#EAE4D9] flex flex-col items-center justify-center flex-shrink-0 group-hover:bg-mazar-coffee group-hover:text-white transition-all duration-500 shadow-sm">
-                  <span className="text-[12px] font-black leading-none">{new Date(exp.date).toLocaleDateString('ar-EG', { day: '2-digit' })}</span>
-                  <span className="text-[10px] font-black leading-none mt-1 opacity-40 uppercase">{new Date(exp.date).toLocaleDateString('ar-EG', { month: 'short' })}</span>
+                  <span className="text-[11px] font-black leading-none">{formatDate(exp.date)}</span>
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">

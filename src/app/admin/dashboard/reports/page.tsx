@@ -10,6 +10,19 @@ const LAYOUT_VERSION = 'v1.9.0'; // Auto-increment this to force-clear client ca
 
 const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 
+const formatDate = (dateStr: string) => {
+  if (!dateStr || !dateStr.includes('-')) return dateStr;
+  const [y, m, d] = dateStr.split('-');
+  return `${d}/${m}/${y}`;
+};
+
+const parseDate = (displayStr: string) => {
+  if (!displayStr || !displayStr.includes('/')) return displayStr;
+  const [d, m, y] = displayStr.split('/');
+  if (y && m && d) return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+  return displayStr;
+};
+
 // Editable cell component
 function EditableCell({ 
   value, 
@@ -145,19 +158,23 @@ export default function ReportsPage() {
   }, [loadData]);
 
   // Inline Edit & Save to DB
-  const handleCellSave = async (bookingId: string, field: string, value: any) => {
     try {
       setSaveStatus('جاري الحفظ...');
       
       const currentBooking = bookings.find(b => b.id === bookingId);
       if (!currentBooking) return;
 
-      const updates: any = { [field]: value };
+      let finalValue = value;
+      if (field === 'checkIn' || field === 'checkOut') {
+        finalValue = parseDate(value);
+      }
+
+      const updates: any = { [field]: finalValue };
       
       // Auto-calculate dependencies
       if (['checkIn', 'checkOut', 'pricePerNight'].includes(field)) {
-        const cIn = field === 'checkIn' ? value : currentBooking.checkIn;
-        const cOut = field === 'checkOut' ? value : currentBooking.checkOut;
+        const cIn = field === 'checkIn' ? finalValue : currentBooking.checkIn;
+        const cOut = field === 'checkOut' ? finalValue : currentBooking.checkOut;
         
         let pNight = field === 'pricePerNight' ? (parseInt(value, 10) || 0) : null;
         
@@ -673,11 +690,11 @@ export default function ReportsPage() {
               </div>
               <div className="space-y-1">
                 <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">دخول</label>
-                <input type="date" required value={newRecord.checkIn} onChange={e => setNewRecord({...newRecord, checkIn: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-[#C1A68D]" />
+                <input type="text" placeholder="DD/MM/YYYY" required value={formatDate(newRecord.checkIn)} onChange={e => setNewRecord({...newRecord, checkIn: parseDate(e.target.value)})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-[#C1A68D]" />
               </div>
               <div className="space-y-1">
                 <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">خروج</label>
-                <input type="date" required value={newRecord.checkOut} onChange={e => setNewRecord({...newRecord, checkOut: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-[#C1A68D]" />
+                <input type="text" placeholder="DD/MM/YYYY" required value={formatDate(newRecord.checkOut)} onChange={e => setNewRecord({...newRecord, checkOut: parseDate(e.target.value)})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-[#C1A68D]" />
               </div>
               <div className="space-y-1">
                 <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">سعر الليلة</label>
@@ -835,7 +852,7 @@ export default function ReportsPage() {
                       }`}
                     >
                       <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-black text-[#C1A68D]">{row.no}</td>
-                      <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-bold text-[#2A2723] whitespace-nowrap">{row.date}</td>
+                      <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-bold text-[#2A2723] whitespace-nowrap">{formatDate(row.date)}</td>
                       <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-black text-[#2A2723]">
                         {row.hasData ? (
                           <div className="flex flex-col items-center">
@@ -860,10 +877,10 @@ export default function ReportsPage() {
                       <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-bold text-[#7A7061] font-mono text-[9px] whitespace-nowrap">{row.phone}</td>
                       
                       <td className="px-1 py-2.5 border-l border-[#EAE4D9]/20">
-                        {row.hasData ? <EditableCell value={row.checkIn} bookingId={row.id} field="checkIn" onSave={handleCellSave} className="text-[#2A2723] font-bold whitespace-nowrap" /> : <span className="text-[#EAE4D9]">—</span>}
+                        {row.hasData ? <EditableCell value={formatDate(row.checkIn)} bookingId={row.id} field="checkIn" onSave={handleCellSave} className="text-[#2A2723] font-bold whitespace-nowrap" /> : <span className="text-[#EAE4D9]">—</span>}
                       </td>
                       <td className="px-1 py-2.5 border-l border-[#EAE4D9]/20">
-                        {row.hasData ? <EditableCell value={row.checkOut} bookingId={row.id} field="checkOut" onSave={handleCellSave} className="text-[#2A2723] font-bold whitespace-nowrap" /> : <span className="text-[#EAE4D9]">—</span>}
+                        {row.hasData ? <EditableCell value={formatDate(row.checkOut)} bookingId={row.id} field="checkOut" onSave={handleCellSave} className="text-[#2A2723] font-bold whitespace-nowrap" /> : <span className="text-[#EAE4D9]">—</span>}
                       </td>
                       
                       <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-black text-[#2A2723]">{row.hasData ? row.days : 0}</td>
@@ -1030,18 +1047,18 @@ export default function ReportsPage() {
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest px-2">تاريخ الدخول</label>
                     <input 
-                      type="date" required
-                      value={editingBooking.checkIn || ''}
-                      onChange={e => setEditingBooking({...editingBooking, checkIn: e.target.value})}
+                      type="text" placeholder="DD/MM/YYYY" required
+                      value={formatDate(editingBooking.checkIn || '')}
+                      onChange={e => setEditingBooking({...editingBooking, checkIn: parseDate(e.target.value)})}
                       className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C1A68D] font-bold"
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest px-2">تاريخ الخروج</label>
                     <input 
-                      type="date" required
-                      value={editingBooking.checkOut || ''}
-                      onChange={e => setEditingBooking({...editingBooking, checkOut: e.target.value})}
+                      type="text" placeholder="DD/MM/YYYY" required
+                      value={formatDate(editingBooking.checkOut || '')}
+                      onChange={e => setEditingBooking({...editingBooking, checkOut: parseDate(e.target.value)})}
                       className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C1A68D] font-bold"
                     />
                   </div>
