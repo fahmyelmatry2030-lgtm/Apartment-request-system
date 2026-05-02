@@ -1,8 +1,3 @@
-
-/**
- * Formats a phone number for use in a WhatsApp link.
- * Handles Egypt (20) and Saudi Arabia (966) specifically, and defaults to international format.
- */
 export function formatWhatsAppNumber(phone: string): string {
   if (!phone) return '';
   
@@ -12,6 +7,12 @@ export function formatWhatsAppNumber(phone: string): string {
   // Handle double zero prefix
   if (cleanPhone.startsWith('00')) {
     cleanPhone = cleanPhone.substring(2);
+  }
+
+  // SELF-HEALING: If it starts with 20966, it's almost certainly a Saudi number 
+  // that was incorrectly prefixed with Egyptian 20 (20 + 966...)
+  if (cleanPhone.startsWith('20966')) {
+    return cleanPhone.substring(2);
   }
 
   // Handle leading zero
@@ -30,13 +31,17 @@ export function formatWhatsAppNumber(phone: string): string {
     return '20' + cleanPhone.substring(1);
   }
 
-  // If it already starts with a known country code, return as is
-  if (cleanPhone.startsWith('966') || cleanPhone.startsWith('20')) {
+  // If it starts with 966, return as is (Saudi)
+  if (cleanPhone.startsWith('966')) {
+    return cleanPhone;
+  }
+
+  // If it starts with 20, return as is (Egypt)
+  if (cleanPhone.startsWith('20')) {
     return cleanPhone;
   }
 
   // Fallback: If no known prefix and not starting with 0, assume Egypt for this application
-  // but only if it's a plausible length
   if (cleanPhone.length >= 8 && cleanPhone.length <= 12) {
     return '20' + cleanPhone;
   }
