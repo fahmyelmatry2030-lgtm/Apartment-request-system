@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { getSystemUnits, updateBookingStatus, getBookings, deleteBooking } from '@/lib/data-init';
+import { formatWhatsAppNumber } from '@/lib/utils';
 
 export default function BookingsManagement() {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -153,13 +154,7 @@ export default function BookingsManagement() {
   };
 
   const openWhatsAppChat = (booking: any) => {
-    let phone = booking.phone.replace(/[^0-9]/g, '');
-    if (phone.startsWith('0')) {
-      phone = '20' + phone.substring(1);
-    } else if (!phone.startsWith('20')) {
-      phone = '20' + phone;
-    }
-    const cleanPhone = phone;
+    const cleanPhone = formatWhatsAppNumber(booking.phone);
     const msg = `مرحباً أ/ *${booking.name}*،\nبخصوص طلب الحجز الخاص بكم بمجمع مزار للوحدة (*${booking.studio}*) من فترة *${booking.checkIn}* إلى *${booking.checkOut}*.\n\n_نود إبلاغكم بـ..._`;
     window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(msg)}`, '_blank');
   };

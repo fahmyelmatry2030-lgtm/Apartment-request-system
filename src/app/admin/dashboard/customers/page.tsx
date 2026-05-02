@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { getBookings, deleteBookingsByPhone } from '@/lib/data-init';
+import { formatWhatsAppNumber } from '@/lib/utils';
 
 export default function CustomersDatabase() {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -186,7 +187,7 @@ export default function CustomersDatabase() {
                   <td className="px-8 py-6">
                     <div className="flex items-center justify-center gap-2">
                         <a 
-                        href={`https://wa.me/${c.phone.replace(/[^0-9]/g, '').startsWith('0') ? '20' + c.phone.replace(/[^0-9]/g, '').substring(1) : (c.phone.replace(/[^0-9]/g, '').startsWith('20') ? c.phone.replace(/[^0-9]/g, '') : '20' + c.phone.replace(/[^0-9]/g, ''))}`} 
+                        href={`https://wa.me/${formatWhatsAppNumber(c.phone)}`} 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="w-10 h-10 bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366] hover:text-white rounded-full flex items-center justify-center transition-all border border-[#25D366]/20"

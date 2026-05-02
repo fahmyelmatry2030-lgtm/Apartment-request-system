@@ -2,6 +2,7 @@
 
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { formatWhatsAppNumber } from '@/lib/utils';
 
 
 // --- TELEGRAM CONFIG ---
@@ -12,13 +13,8 @@ async function sendTelegramNotification(booking: any) {
   try {
     if (!TG_TOKEN || !TG_CHAT_ID) return;
 
-    // Clean phone for WhatsApp link: Ensure international format for Egypt (20)
-    let cleanPhone = booking.phone.replace(/[^0-9]/g, '');
-    if (cleanPhone.startsWith('0')) {
-      cleanPhone = '20' + cleanPhone.substring(1);
-    } else if (!cleanPhone.startsWith('20')) {
-      cleanPhone = '20' + cleanPhone;
-    }
+    // Clean phone for WhatsApp link: Ensure international format
+    const cleanPhone = formatWhatsAppNumber(booking.phone);
     
     // Using HTML format as it's more stable than Markdown for special characters
     const htmlMessage = `
