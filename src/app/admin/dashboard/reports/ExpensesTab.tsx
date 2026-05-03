@@ -203,13 +203,17 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-10">
             <div className="space-y-3 group">
               <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">الفئة الأساسية</label>
-              <input 
+              <select 
                 required
-                placeholder="مثال: غسيل، صيانة"
                 value={newExpense.category}
                 onChange={e => setNewExpense({...newExpense, category: e.target.value})}
-                className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all placeholder:text-gray-300" 
-              />
+                className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all appearance-none cursor-pointer"
+              >
+                <option value="" disabled>اختر الفئة</option>
+                {categories.map(cat => (
+                  <option key={cat.name} value={cat.name}>{cat.name}</option>
+                ))}
+              </select>
             </div>
             <div className="space-y-3 group">
               <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">المبلغ (ج.م)</label>
