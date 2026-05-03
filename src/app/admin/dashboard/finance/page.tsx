@@ -16,6 +16,7 @@ const PARTNERS = [
 export default function FinancePage() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [expenses, setExpenses] = useState<any[]>([]);
+  const [salaries, setSalaries] = useState<any[]>([]);
   const [units, setUnits] = useState<any[]>([]);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
