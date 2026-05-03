@@ -21,7 +21,6 @@ export default function FinancePage() {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [isLoading, setIsLoading] = useState(true);
-  const [rentInput, setRentInput] = useState('');
   const [newExpense, setNewExpense] = useState({ category: '', amount: '', description: '', from_entity: '', to_entity: '', ordered_by: '' });
   const [saving, setSaving] = useState(false);
 
@@ -78,27 +77,6 @@ export default function FinancePage() {
   const salariesTotal = monthlySalaries.reduce((sum, s) => sum + (s.amount || 0), 0);
   const netProfit = revenue - commissions - rentTotal - otherExpenses - salariesTotal;
 
-  const handleAddRent = async () => {
-    const amount = parseFloat(rentInput);
-    if (!amount || isNaN(amount)) return;
-    setSaving(true);
-    const dateStr = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-01`;
-    try {
-      await saveDbExpense({
-        category: 'إيجار',
-        amount,
-        date: dateStr,
-        branch: 1,
-        description: `إيجار ${MONTHS_AR[selectedMonth]} ${selectedYear}`,
-      });
-      setRentInput('');
-      await loadData();
-    } catch (err) {
-      console.error(err);
-      alert('خطأ في الإضافة');
-    }
-    setSaving(false);
-  };
 
   const handleAddExpense = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -176,30 +154,6 @@ export default function FinancePage() {
       </div>
 
 
-      {/* ── RENT ENTRY ── */}
-      <div className="grid grid-cols-1 gap-6">
-        <div className="bg-white p-6 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm">
-          <h3 className="font-black text-[#2A2723] mb-4 flex items-center gap-3">
-            <span className="w-9 h-9 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center font-black">🏢</span>
-            الإيجار — Rent
-          </h3>
-          <div className="flex gap-3">
-            <input type="number" placeholder="المبلغ بالجنيه" value={rentInput}
-              onChange={e => setRentInput(e.target.value)}
-              className="flex-1 bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#C1A68D] transition-colors" />
-            <button onClick={() => handleAddRent()} disabled={saving || !rentInput}
-              className="bg-[#2A2723] text-white font-black px-5 py-3 rounded-xl hover:bg-black transition-all disabled:opacity-40 active:scale-95">
-              تسجيل
-            </button>
-          </div>
-          {rentTotal > 0 && (
-            <div className="mt-3 flex items-center gap-2 text-orange-600">
-              <span className="text-sm">✓</span>
-              <span className="text-xs font-black">مسجل: {rentTotal.toLocaleString()} ج.م</span>
-            </div>
-          )}
-        </div>
-      </div>
 
       {/* ── ADD EXPENSE FORM ── */}
       <div className="bg-white p-8 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm">
