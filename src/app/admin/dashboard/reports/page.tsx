@@ -91,6 +91,60 @@ function EditableCell({
   );
 }
 
+const AdminDatePicker = ({ label, value, onChange, icon, color }: any) => {
+  const parts = value ? value.split('-') : [new Date().getFullYear().toString(), (new Date().getMonth() + 1).toString().padStart(2, '0'), new Date().getDate().toString().padStart(2, '0')];
+  const [year, month, day] = parts;
+
+  const daysInMonth = new Date(Number(year), Number(month), 0).getDate();
+  const days = Array.from({length: daysInMonth || 31}, (_, i) => (i+1).toString().padStart(2, '0'));
+  const months = Array.from({length: 12}, (_, i) => (i+1).toString().padStart(2, '0'));
+  const years = [new Date().getFullYear().toString(), (new Date().getFullYear() + 1).toString(), (new Date().getFullYear() - 1).toString()];
+
+  const update = (y: string, m: string, d: string) => {
+    const max = new Date(Number(y), Number(m), 0).getDate();
+    const safeD = Number(d) > max ? max.toString().padStart(2, '0') : d;
+    onChange(`${y}-${m}-${safeD}`);
+  };
+
+  return (
+    <div className={`bg-white p-3 md:p-4 rounded-[20px] border border-[#EAE4D9]/50 shadow-sm relative overflow-visible ${color === 'red' ? 'shadow-red-500/5' : 'shadow-[#C1A68D]/5'}`}>
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-lg md:text-xl">{icon}</span>
+        <h3 className={`text-[10px] md:text-xs font-black uppercase tracking-widest ${color === 'red' ? 'text-[#E63946]' : 'text-[#C1A68D]'}`}>{label}</h3>
+      </div>
+      <div className="grid grid-cols-3 gap-2">
+        <div className="space-y-1 text-center">
+          <label className="block text-[8px] font-bold text-gray-400 uppercase">اليوم</label>
+          <div className="relative">
+            <select value={day} onChange={e => update(year, month, e.target.value)} className="w-full bg-[#F7F5F0] border border-transparent focus:border-[#C1A68D] rounded-xl p-2 text-xs font-black appearance-none text-center outline-none cursor-pointer">
+              {days.map(d => <option key={d} value={d}>{d}</option>)}
+            </select>
+            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[8px] opacity-30 pointer-events-none">▼</span>
+          </div>
+        </div>
+        <div className="space-y-1 text-center">
+          <label className="block text-[8px] font-bold text-gray-400 uppercase">الشهر</label>
+          <div className="relative">
+            <select value={month} onChange={e => update(year, e.target.value, day)} className="w-full bg-[#F7F5F0] border border-transparent focus:border-[#C1A68D] rounded-xl p-2 text-xs font-black appearance-none text-center outline-none cursor-pointer">
+              {months.map(m => <option key={m} value={m}>{m}</option>)}
+            </select>
+            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[8px] opacity-30 pointer-events-none">▼</span>
+          </div>
+        </div>
+        <div className="space-y-1 text-center">
+          <label className="block text-[8px] font-bold text-gray-400 uppercase">السنة</label>
+          <div className="relative">
+            <select value={year} onChange={e => update(e.target.value, month, day)} className="w-full bg-[#F7F5F0] border border-transparent focus:border-[#C1A68D] rounded-xl p-2 text-xs font-black appearance-none text-center outline-none cursor-pointer">
+              {years.map(y => <option key={y} value={y}>{y}</option>)}
+            </select>
+            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[8px] opacity-30 pointer-events-none">▼</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function ReportsPage() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [units, setUnits] = useState<any[]>([]);
@@ -686,13 +740,23 @@ export default function ReportsPage() {
                 <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">الهاتف</label>
                 <input type="text" value={newRecord.phone} onChange={e => setNewRecord({...newRecord, phone: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-[#C1A68D]" />
               </div>
-              <div className="space-y-1">
-                <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">دخول</label>
-                <input type="text" placeholder="DD/MM/YYYY" required value={formatDate(newRecord.checkIn)} onChange={e => setNewRecord({...newRecord, checkIn: parseDate(e.target.value)})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-[#C1A68D]" />
+              <div className="col-span-2 xl:col-span-2 space-y-1">
+                <AdminDatePicker 
+                  label="تاريخ الدخول" 
+                  value={newRecord.checkIn} 
+                  onChange={(v: string) => setNewRecord({...newRecord, checkIn: v})} 
+                  icon="🛬" 
+                  color="gold" 
+                />
               </div>
-              <div className="space-y-1">
-                <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">خروج</label>
-                <input type="text" placeholder="DD/MM/YYYY" required value={formatDate(newRecord.checkOut)} onChange={e => setNewRecord({...newRecord, checkOut: parseDate(e.target.value)})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-[#C1A68D]" />
+              <div className="col-span-2 xl:col-span-2 space-y-1">
+                <AdminDatePicker 
+                  label="تاريخ الخروج" 
+                  value={newRecord.checkOut} 
+                  onChange={(v: string) => setNewRecord({...newRecord, checkOut: v})} 
+                  icon="🛫" 
+                  color="red" 
+                />
               </div>
               <div className="space-y-1">
                 <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">سعر الليلة</label>
@@ -1042,22 +1106,22 @@ export default function ReportsPage() {
                       className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C1A68D] font-bold"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest px-2">تاريخ الدخول</label>
-                    <input 
-                      type="text" placeholder="DD/MM/YYYY" required
-                      value={formatDate(editingBooking.checkIn || '')}
-                      onChange={e => setEditingBooking({...editingBooking, checkIn: parseDate(e.target.value)})}
-                      className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C1A68D] font-bold"
+                  <div className="space-y-2 col-span-1">
+                    <AdminDatePicker 
+                      label="تاريخ الدخول" 
+                      value={editingBooking.checkIn} 
+                      onChange={(v: string) => setEditingBooking({...editingBooking, checkIn: v})} 
+                      icon="🛬" 
+                      color="gold" 
                     />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest px-2">تاريخ الخروج</label>
-                    <input 
-                      type="text" placeholder="DD/MM/YYYY" required
-                      value={formatDate(editingBooking.checkOut || '')}
-                      onChange={e => setEditingBooking({...editingBooking, checkOut: parseDate(e.target.value)})}
-                      className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C1A68D] font-bold"
+                  <div className="space-y-2 col-span-1">
+                    <AdminDatePicker 
+                      label="تاريخ الخروج" 
+                      value={editingBooking.checkOut} 
+                      onChange={(v: string) => setEditingBooking({...editingBooking, checkOut: v})} 
+                      icon="🛫" 
+                      color="red" 
                     />
                   </div>
                   <div className="space-y-2">
