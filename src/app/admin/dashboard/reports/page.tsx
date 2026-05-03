@@ -101,7 +101,7 @@ export default function ReportsPage() {
   const [saveStatus, setSaveStatus] = useState('');
   const [editingBooking, setEditingBooking] = useState<any>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'operational' | 'expenses' | 'financial'>('operational');
+  const [activeTab, setActiveTab] = useState<'operational' | 'expenses' | 'financial'>('expenses');
 
   // AUTO-RESET LOGIC: Clears stale localStorage once per version update
   useEffect(() => {
@@ -420,29 +420,34 @@ export default function ReportsPage() {
     let rawStatus = (booking.clientStatus || 'انتظار').trim();
     let clientStatus = rawStatus;
 
-    // Only apply automatic transitions if the status is currently 'انتظار' or 'متواجد'
-    // This allows 'غادر' to be set manually and stick, and allows manual overrides.
+    // Only apply automatic transitions if the status is currently 'انتظار' أو 'متواجد'
     if (booking.checkIn && booking.checkOut) {
       const now = new Date();
       const y = now.getFullYear();
       const m = String(now.getMonth() + 1).padStart(2, '0');
       const d = String(now.getDate()).padStart(2, '0');
       const todayStr = `${y}-${m}-${d}`;
+      const currentHour = now.getHours(); // 0 to 23
       
       const checkInStr = booking.checkIn.trim();
       const checkOutStr = booking.checkOut.trim();
 
       // If we haven't manually changed it to something else, or if it's still 'انتظار'
       if (rawStatus === 'انتظار' || !rawStatus) {
-        if (todayStr >= checkOutStr) {
+        // Checkout at 12 PM (hour 12)
+        if (todayStr > checkOutStr || (todayStr === checkOutStr && currentHour >= 12)) {
           clientStatus = 'غادر';
-        } else if (todayStr >= checkInStr) {
+        } 
+        // Checkin at 2 PM (hour 14)
+        else if (todayStr > checkInStr || (todayStr === checkInStr && currentHour >= 14)) {
           clientStatus = 'متواجد';
         }
       } 
-      // If it's 'متواجد', auto-move to 'غادر' if checkout passed
-      else if (rawStatus === 'متواجد' && todayStr >= checkOutStr) {
-        clientStatus = 'غادر';
+      // If it's 'متواجد', auto-move to 'غادر' if checkout passed (after 12 PM on checkout day)
+      else if (rawStatus === 'متواجد') {
+        if (todayStr > checkOutStr || (todayStr === checkOutStr && currentHour >= 12)) {
+          clientStatus = 'غادر';
+        }
       }
     }
 
@@ -468,15 +473,8 @@ export default function ReportsPage() {
     };
   });
 
-  // Sort dataRows by status: 1. غادر, 2. انتظار, 3. متواجد, then by check-in date
+  // Sort dataRows by check-in date
   const sortedDataRows = [...dataRows].sort((a, b) => {
-    const priority: any = { 'غادر': 1, 'انتظار': 2, 'متواجد': 3 };
-    const pA = priority[a.clientStatus] || 99;
-    const pB = priority[b.clientStatus] || 99;
-    
-    if (pA !== pB) return pA - pB;
-    
-    // Secondary sort by date
     const timeA = new Date(a.checkIn || 0).getTime();
     const timeB = new Date(b.checkIn || 0).getTime();
     return timeA - timeB;
@@ -564,16 +562,16 @@ export default function ReportsPage() {
         {/* Tab Navigation */}
         <div className="no-print bg-[#2A2723] p-2 rounded-[2rem] flex gap-2 w-full max-w-2xl mx-auto shadow-2xl border border-white/5 overflow-x-auto scrollbar-hide" dir="rtl">
           <button 
-            onClick={() => setActiveTab('operational')}
-            className={`flex-1 px-8 py-4 rounded-2xl text-[10px] md:text-xs font-black transition-all whitespace-nowrap ${activeTab === 'operational' ? 'bg-[#C1A68D] text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-          >
-            📋 جدول الحجوزات التشغيلي
-          </button>
-          <button 
             onClick={() => setActiveTab('expenses')}
             className={`flex-1 px-8 py-4 rounded-2xl text-[10px] md:text-xs font-black transition-all whitespace-nowrap ${activeTab === 'expenses' ? 'bg-[#C1A68D] text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
           >
             💸 إدارة المصروفات
+          </button>
+          <button 
+            onClick={() => setActiveTab('operational')}
+            className={`flex-1 px-8 py-4 rounded-2xl text-[10px] md:text-xs font-black transition-all whitespace-nowrap ${activeTab === 'operational' ? 'bg-[#C1A68D] text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+          >
+            📋 جدول الحجوزات التشغيلي
           </button>
           <button 
             onClick={() => setActiveTab('financial')}

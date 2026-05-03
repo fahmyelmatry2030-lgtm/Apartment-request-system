@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { getBookings } from '@/lib/data-init';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
+import { saveDbExpense, deleteDbExpense } from '@/lib/actions/db';
 
 const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 
@@ -20,8 +21,7 @@ export default function FinancePage() {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [isLoading, setIsLoading] = useState(true);
-  const [rent1Input, setRent1Input] = useState('');
-  const [rent2Input, setRent2Input] = useState('');
+  const [rentInput, setRentInput] = useState('');
   const [newExpense, setNewExpense] = useState({ category: '', amount: '', description: '', from_entity: '', to_entity: '', ordered_by: '' });
   const [saving, setSaving] = useState(false);
 
@@ -73,28 +73,30 @@ export default function FinancePage() {
   const commissions = monthlyBookings.reduce((sum, b) => sum + parseFloat(b.commission || 0), 0);
   const totalNights = monthlyBookings.reduce((sum, b) => sum + (Number(b.numberOfDays) || 0), 0);
   const avgNightlyRate = totalNights > 0 ? revenue / totalNights : 0;
-  const rent1Total = monthlyExpenses.filter(e => e.category === 'إيجار 1').reduce((s, e) => s + (e.amount || 0), 0);
-  const rent2Total = monthlyExpenses.filter(e => e.category === 'إيجار 2').reduce((s, e) => s + (e.amount || 0), 0);
-  const otherExpenses = monthlyExpenses.filter(e => e.category !== 'إيجار 1' && e.category !== 'إيجار 2').reduce((s, e) => s + (e.amount || 0), 0);
+  const rentTotal = monthlyExpenses.filter(e => e.category === 'إيجار').reduce((s, e) => s + (e.amount || 0), 0);
+  const otherExpenses = monthlyExpenses.filter(e => e.category !== 'إيجار' && !e.category.startsWith('إيجار')).reduce((s, e) => s + (e.amount || 0), 0);
   const salariesTotal = monthlySalaries.reduce((sum, s) => sum + (s.amount || 0), 0);
-  const netProfit = revenue - commissions - rent1Total - rent2Total - otherExpenses - salariesTotal;
+  const netProfit = revenue - commissions - rentTotal - otherExpenses - salariesTotal;
 
-  const handleAddRent = async (rentType: '1' | '2') => {
-    const val = rentType === '1' ? rent1Input : rent2Input;
-    const amount = parseFloat(val);
+  const handleAddRent = async () => {
+    const amount = parseFloat(rentInput);
     if (!amount || isNaN(amount)) return;
     setSaving(true);
-    const supabase = getSupabaseBrowserClient();
     const dateStr = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-01`;
-    await supabase.from('expenses').insert([{
-      category: `إيجار ${rentType}`,
-      amount,
-      date: dateStr,
-      branch: parseInt(rentType),
-      description: `إيجار ${MONTHS_AR[selectedMonth]} ${selectedYear}`,
-    }]);
-    if (rentType === '1') setRent1Input(''); else setRent2Input('');
-    await loadData();
+    try {
+      await saveDbExpense({
+        category: 'إيجار',
+        amount,
+        date: dateStr,
+        branch: 1,
+        description: `إيجار ${MONTHS_AR[selectedMonth]} ${selectedYear}`,
+      });
+      setRentInput('');
+      await loadData();
+    } catch (err) {
+      console.error(err);
+      alert('خطأ في الإضافة');
+    }
     setSaving(false);
   };
 
@@ -102,27 +104,35 @@ export default function FinancePage() {
     e.preventDefault();
     if (!newExpense.category || !newExpense.amount) return;
     setSaving(true);
-    const supabase = getSupabaseBrowserClient();
     const dateStr = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-01`;
-    await supabase.from('expenses').insert([{
-      category: newExpense.category,
-      amount: parseFloat(newExpense.amount),
-      date: dateStr,
-      description: newExpense.description,
-      from_entity: newExpense.from_entity,
-      to_entity: newExpense.to_entity,
-      ordered_by: newExpense.ordered_by
-    }]);
-    setNewExpense({ category: '', amount: '', description: '', from_entity: '', to_entity: '', ordered_by: '' });
-    await loadData();
+    try {
+      await saveDbExpense({
+        category: newExpense.category,
+        amount: parseFloat(newExpense.amount),
+        date: dateStr,
+        description: newExpense.description,
+        from_entity: newExpense.from_entity,
+        to_entity: newExpense.to_entity,
+        ordered_by: newExpense.ordered_by
+      });
+      setNewExpense({ category: '', amount: '', description: '', from_entity: '', to_entity: '', ordered_by: '' });
+      await loadData();
+    } catch (err) {
+      console.error(err);
+      alert('خطأ في الإضافة');
+    }
     setSaving(false);
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm('هل أنت متأكد من الحذف؟')) return;
-    const supabase = getSupabaseBrowserClient();
-    await supabase.from('expenses').delete().eq('id', id);
-    await loadData();
+    try {
+      await deleteDbExpense(id);
+      await loadData();
+    } catch (err) {
+      console.error(err);
+      alert('خطأ في الحذف');
+    }
   };
 
   return (
@@ -167,46 +177,25 @@ export default function FinancePage() {
 
 
       {/* ── RENT ENTRY ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         <div className="bg-white p-6 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm">
           <h3 className="font-black text-[#2A2723] mb-4 flex items-center gap-3">
-            <span className="w-9 h-9 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center font-black">1</span>
-            إيجار الفرع الأول — Rent (1)
+            <span className="w-9 h-9 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center font-black">🏢</span>
+            الإيجار — Rent
           </h3>
           <div className="flex gap-3">
-            <input type="number" placeholder="المبلغ بالجنيه" value={rent1Input}
-              onChange={e => setRent1Input(e.target.value)}
+            <input type="number" placeholder="المبلغ بالجنيه" value={rentInput}
+              onChange={e => setRentInput(e.target.value)}
               className="flex-1 bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#C1A68D] transition-colors" />
-            <button onClick={() => handleAddRent('1')} disabled={saving || !rent1Input}
+            <button onClick={() => handleAddRent()} disabled={saving || !rentInput}
               className="bg-[#2A2723] text-white font-black px-5 py-3 rounded-xl hover:bg-black transition-all disabled:opacity-40 active:scale-95">
               تسجيل
             </button>
           </div>
-          {rent1Total > 0 && (
+          {rentTotal > 0 && (
             <div className="mt-3 flex items-center gap-2 text-orange-600">
               <span className="text-sm">✓</span>
-              <span className="text-xs font-black">مسجل: {rent1Total.toLocaleString()} ج.م</span>
-            </div>
-          )}
-        </div>
-        <div className="bg-white p-6 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm">
-          <h3 className="font-black text-[#2A2723] mb-4 flex items-center gap-3">
-            <span className="w-9 h-9 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-black">2</span>
-            إيجار الفرع الثاني — Rent (2)
-          </h3>
-          <div className="flex gap-3">
-            <input type="number" placeholder="المبلغ بالجنيه" value={rent2Input}
-              onChange={e => setRent2Input(e.target.value)}
-              className="flex-1 bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#C1A68D] transition-colors" />
-            <button onClick={() => handleAddRent('2')} disabled={saving || !rent2Input}
-              className="bg-[#2A2723] text-white font-black px-5 py-3 rounded-xl hover:bg-black transition-all disabled:opacity-40 active:scale-95">
-              تسجيل
-            </button>
-          </div>
-          {rent2Total > 0 && (
-            <div className="mt-3 flex items-center gap-2 text-blue-600">
-              <span className="text-sm">✓</span>
-              <span className="text-xs font-black">مسجل: {rent2Total.toLocaleString()} ج.م</span>
+              <span className="text-xs font-black">مسجل: {rentTotal.toLocaleString()} ج.م</span>
             </div>
           )}
         </div>
@@ -321,15 +310,13 @@ export default function FinancePage() {
           <table className="w-full border-collapse text-center">
             <thead>
               <tr>
-                <th className="px-6 py-4 font-black text-xs bg-[#F97316] text-white border border-orange-300">Rent (1)</th>
-                <th className="px-6 py-4 font-black text-xs bg-[#F97316] text-white border border-orange-300">Rent (2)</th>
+                <th className="px-6 py-4 font-black text-xs bg-[#F97316] text-white border border-orange-300">Rent</th>
                 <th className="px-6 py-4 font-black text-xs bg-[#F97316] text-white border border-orange-300">Expenses</th>
                 <th className="px-6 py-4 font-black text-xs bg-[#F97316] text-white border border-orange-300">Salaries</th>
                 <th className="px-6 py-4 font-black text-sm bg-[#FACC15] text-[#2A2723] border border-yellow-300">Final</th>
               </tr>
               <tr>
-                <th className="px-4 py-1 text-[10px] font-bold text-[#7A7061] bg-orange-50 border border-orange-100">الإيجار الأول</th>
-                <th className="px-4 py-1 text-[10px] font-bold text-[#7A7061] bg-orange-50 border border-orange-100">الإيجار الثاني</th>
+                <th className="px-4 py-1 text-[10px] font-bold text-[#7A7061] bg-orange-50 border border-orange-100">الإيجار</th>
                 <th className="px-4 py-1 text-[10px] font-bold text-[#7A7061] bg-orange-50 border border-orange-100">المصروفات</th>
                 <th className="px-4 py-1 text-[10px] font-bold text-[#7A7061] bg-orange-50 border border-orange-100">الرواتب</th>
                 <th className="px-4 py-1 text-[10px] font-bold text-[#2A2723] bg-yellow-50 border border-yellow-100">الصافي النهائي</th>
@@ -338,11 +325,7 @@ export default function FinancePage() {
             <tbody>
               <tr>
                 <td className="px-6 py-8 border border-[#EAE4D9]/40">
-                  <div className="text-2xl font-black text-[#2A2723]">{isLoading ? '...' : rent1Total.toLocaleString()}</div>
-                  <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
-                </td>
-                <td className="px-6 py-8 border border-[#EAE4D9]/40">
-                  <div className="text-2xl font-black text-[#2A2723]">{isLoading ? '...' : rent2Total.toLocaleString()}</div>
+                  <div className="text-2xl font-black text-[#2A2723]">{isLoading ? '...' : rentTotal.toLocaleString()}</div>
                   <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
                 </td>
                 <td className="px-6 py-8 border border-[#EAE4D9]/40">

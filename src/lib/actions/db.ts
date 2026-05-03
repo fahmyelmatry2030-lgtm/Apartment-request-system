@@ -599,3 +599,33 @@ export async function deleteDbVacation(id: string) {
   if (error) throw error;
 }
 
+// --- EXPENSES ---
+
+export async function saveDbExpense(expense: any) {
+  const supabase = getSupabaseServerClient();
+  if (!supabase) return expense;
+
+  const { error } = await supabase.from('expenses').insert([expense]);
+  if (error) {
+    console.error('Error saving expense:', error);
+    throw error;
+  }
+  
+  revalidatePath('/admin/dashboard/reports');
+  revalidatePath('/admin/dashboard/finance');
+  return expense;
+}
+
+export async function deleteDbExpense(id: string) {
+  const supabase = getSupabaseServerClient();
+  if (!supabase) return;
+
+  const { error } = await supabase.from('expenses').delete().eq('id', id);
+  if (error) {
+    console.error('Error deleting expense:', error);
+    throw error;
+  }
+  
+  revalidatePath('/admin/dashboard/reports');
+  revalidatePath('/admin/dashboard/finance');
+}

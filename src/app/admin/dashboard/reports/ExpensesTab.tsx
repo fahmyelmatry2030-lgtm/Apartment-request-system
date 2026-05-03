@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
+import { saveDbExpense, deleteDbExpense } from '@/lib/actions/db';
 
 // ── Custom CountUp Component (No external lib needed) ──
 function AnimatedNumber({ value }: { value: number }) {
@@ -41,7 +42,6 @@ export default function ExpensesTab() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [isFormOpen, setIsFormOpen] = useState(false);
   const [newExpense, setNewExpense] = useState({
     category: '',
     amount: '',
@@ -118,21 +118,17 @@ export default function ExpensesTab() {
 
   const handleAddExpense = async (e: React.FormEvent) => {
     e.preventDefault();
-    const supabase = getSupabaseBrowserClient();
-    const { error } = await supabase.from('expenses').insert([{
-      category: newExpense.category,
-      amount: parseFloat(newExpense.amount),
-      description: newExpense.description,
-      date: newExpense.date,
-      branch: parseInt(newExpense.branch),
-      from_entity: newExpense.from_entity,
-      to_entity: newExpense.to_entity,
-      ordered_by: newExpense.ordered_by
-    }]);
-
-    if (error) {
-      alert('خطأ في الإضافة: ' + error.message);
-    } else {
+    try {
+      await saveDbExpense({
+        category: newExpense.category,
+        amount: parseFloat(newExpense.amount),
+        description: newExpense.description,
+        date: newExpense.date,
+        branch: parseInt(newExpense.branch),
+        from_entity: newExpense.from_entity,
+        to_entity: newExpense.to_entity,
+        ordered_by: newExpense.ordered_by
+      });
       setNewExpense({
         category: '',
         amount: '',
@@ -143,17 +139,20 @@ export default function ExpensesTab() {
         to_entity: '',
         ordered_by: ''
       });
-      setIsFormOpen(false);
       loadExpenses();
+    } catch (error: any) {
+      alert('خطأ في الإضافة: ' + error.message);
     }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm('هل أنت متأكد من الحذف؟')) return;
-    const supabase = getSupabaseBrowserClient();
-    const { error } = await supabase.from('expenses').delete().eq('id', id);
-    if (error) alert(error.message);
-    else loadExpenses();
+    try {
+      await deleteDbExpense(id);
+      loadExpenses();
+    } catch (error: any) {
+      alert(error.message);
+    }
   };
 
   if (error && (error.includes('Could not find the table') || error.includes('relation "public.expenses" does not exist'))) {
@@ -195,15 +194,99 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
              <p className="text-mazar-gray font-bold uppercase tracking-widest text-[10px]">إدارة السجلات المالية الذكية</p>
           </div>
         </div>
-        <div className="flex gap-4 w-full md:w-auto animate-in slide-in-from-left duration-700">
-          <button 
-            onClick={() => setIsFormOpen(!isFormOpen)}
-            className={`flex-1 md:flex-none px-10 py-5 rounded-full font-black text-xs uppercase tracking-widest transition-all shadow-2xl flex items-center justify-center gap-3 ${isFormOpen ? 'bg-red-500 text-white' : 'bg-mazar-coffee text-white hover:scale-105 active:scale-95'}`}
-          >
-            {isFormOpen ? 'إغلاق النموذج' : 'إضافة مصروف جديد'}
-            <span className="text-lg">{isFormOpen ? '✕' : '➕'}</span>
-          </button>
+      </div>
+
+      {/* Add Form (Modernized) */}
+      <div className="glass-card animate-in slide-in-from-bottom duration-500 border-mazar-gold/40 p-10 shadow-3xl">
+        <div className="flex items-center gap-4 mb-10 pb-6 border-b border-gray-100">
+          <div className="w-12 h-12 rounded-2xl bg-mazar-coffee text-white flex items-center justify-center font-black shadow-lg">01</div>
+          <div>
+             <h3 className="text-2xl font-black text-mazar-coffee uppercase">تسجيل مصروف جديد</h3>
+             <p className="text-[10px] font-black text-mazar-gray uppercase tracking-widest mt-1">يرجى تعبئة كافة الحقول المطلوبة بدقة</p>
+          </div>
         </div>
+
+        <form onSubmit={handleAddExpense} className="space-y-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-10">
+            <div className="space-y-3 group">
+              <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">الفئة الأساسية</label>
+              <input 
+                required
+                placeholder="مثال: غسيل، صيانة"
+                value={newExpense.category}
+                onChange={e => setNewExpense({...newExpense, category: e.target.value})}
+                className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all placeholder:text-gray-300" 
+              />
+            </div>
+            <div className="space-y-3 group">
+              <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">المبلغ (ج.م)</label>
+              <input 
+                type="number"
+                required
+                placeholder="0.00"
+                value={newExpense.amount}
+                onChange={e => setNewExpense({...newExpense, amount: e.target.value})}
+                className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all placeholder:text-gray-300" 
+              />
+            </div>
+            <div className="space-y-3 group">
+              <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">التاريخ (يوم/شهر/سنة)</label>
+              <input 
+                type="text"
+                required
+                placeholder="DD/MM/YYYY"
+                value={formatDate(newExpense.date)}
+                onChange={e => {
+                  const val = e.target.value;
+                  // Simple auto-formatting for DD/MM/YYYY
+                  let clean = val.replace(/[^0-9/]/g, '');
+                  setNewExpense({...newExpense, date: parseDate(clean)});
+                }}
+                className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all" 
+              />
+            </div>
+            <div className="space-y-3 group">
+              <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">الآمر بالصرف</label>
+              <input 
+                placeholder="اسم المسؤول"
+                value={newExpense.ordered_by}
+                onChange={e => setNewExpense({...newExpense, ordered_by: e.target.value})}
+                className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all placeholder:text-gray-300" 
+              />
+            </div>
+            <div className="space-y-3 group">
+              <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">من (الجهة)</label>
+              <input 
+                placeholder="مصدر المبلغ"
+                value={newExpense.from_entity}
+                onChange={e => setNewExpense({...newExpense, from_entity: e.target.value})}
+                className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all placeholder:text-gray-300" 
+              />
+            </div>
+            <div className="space-y-3 group">
+              <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">إلى (الجهة)</label>
+              <input 
+                placeholder="المستلم"
+                value={newExpense.to_entity}
+                onChange={e => setNewExpense({...newExpense, to_entity: e.target.value})}
+                className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all placeholder:text-gray-300" 
+              />
+            </div>
+            <div className="space-y-3 lg:col-span-2 group">
+              <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">ملاحظات إضافية</label>
+              <input 
+                placeholder="اكتب تفاصيل إضافية للعملية..."
+                value={newExpense.description}
+                onChange={e => setNewExpense({...newExpense, description: e.target.value})}
+                className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all placeholder:text-gray-300" 
+              />
+            </div>
+          </div>
+          
+          <button type="submit" className="w-full bg-mazar-coffee text-white font-black py-6 rounded-2xl hover:bg-mazar-gold hover:text-mazar-coffee transition-all shadow-2xl active:scale-95 uppercase tracking-[0.3em] text-xs">
+            تأكيد وإدراج المصروف في النظام
+          </button>
+        </form>
       </div>
 
       {/* Categories Horizontal Scroll / Grid */}
@@ -257,101 +340,6 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
         </div>
       </div>
 
-      {/* Add Form (Modernized) */}
-      {isFormOpen && (
-        <div className="glass-card animate-in slide-in-from-bottom duration-500 border-mazar-gold/40 p-10 shadow-3xl">
-          <div className="flex items-center gap-4 mb-10 pb-6 border-b border-gray-100">
-            <div className="w-12 h-12 rounded-2xl bg-mazar-coffee text-white flex items-center justify-center font-black shadow-lg">01</div>
-            <div>
-               <h3 className="text-2xl font-black text-mazar-coffee uppercase">تسجيل مصروف جديد</h3>
-               <p className="text-[10px] font-black text-mazar-gray uppercase tracking-widest mt-1">يرجى تعبئة كافة الحقول المطلوبة بدقة</p>
-            </div>
-          </div>
-
-          <form onSubmit={handleAddExpense} className="space-y-10">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-10">
-              <div className="space-y-3 group">
-                <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">الفئة الأساسية</label>
-                <input 
-                  required
-                  placeholder="مثال: غسيل، صيانة"
-                  value={newExpense.category}
-                  onChange={e => setNewExpense({...newExpense, category: e.target.value})}
-                  className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all placeholder:text-gray-300" 
-                />
-              </div>
-              <div className="space-y-3 group">
-                <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">المبلغ (ج.م)</label>
-                <input 
-                  type="number"
-                  required
-                  placeholder="0.00"
-                  value={newExpense.amount}
-                  onChange={e => setNewExpense({...newExpense, amount: e.target.value})}
-                  className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all placeholder:text-gray-300" 
-                />
-              </div>
-              <div className="space-y-3 group">
-                <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">التاريخ (يوم/شهر/سنة)</label>
-                <input 
-                  type="text"
-                  required
-                  placeholder="DD/MM/YYYY"
-                  value={formatDate(newExpense.date)}
-                  onChange={e => {
-                    const val = e.target.value;
-                    // Simple auto-formatting for DD/MM/YYYY
-                    let clean = val.replace(/[^0-9/]/g, '');
-                    setNewExpense({...newExpense, date: parseDate(clean)});
-                  }}
-                  className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all" 
-                />
-              </div>
-              <div className="space-y-3 group">
-                <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">الآمر بالصرف</label>
-                <input 
-                  placeholder="اسم المسؤول"
-                  value={newExpense.ordered_by}
-                  onChange={e => setNewExpense({...newExpense, ordered_by: e.target.value})}
-                  className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all placeholder:text-gray-300" 
-                />
-              </div>
-              <div className="space-y-3 group">
-                <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">من (الجهة)</label>
-                <input 
-                  placeholder="مصدر المبلغ"
-                  value={newExpense.from_entity}
-                  onChange={e => setNewExpense({...newExpense, from_entity: e.target.value})}
-                  className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all placeholder:text-gray-300" 
-                />
-              </div>
-              <div className="space-y-3 group">
-                <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">إلى (الجهة)</label>
-                <input 
-                  placeholder="المستلم"
-                  value={newExpense.to_entity}
-                  onChange={e => setNewExpense({...newExpense, to_entity: e.target.value})}
-                  className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all placeholder:text-gray-300" 
-                />
-              </div>
-              <div className="space-y-3 lg:col-span-2 group">
-                <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">ملاحظات إضافية</label>
-                <input 
-                  placeholder="اكتب تفاصيل إضافية للعملية..."
-                  value={newExpense.description}
-                  onChange={e => setNewExpense({...newExpense, description: e.target.value})}
-                  className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all placeholder:text-gray-300" 
-                />
-              </div>
-            </div>
-            
-            <button type="submit" className="w-full bg-mazar-coffee text-white font-black py-6 rounded-2xl hover:bg-mazar-gold hover:text-mazar-coffee transition-all shadow-2xl active:scale-95 uppercase tracking-[0.3em] text-xs">
-              تأكيد وإدراج المصروف في النظام
-            </button>
-          </form>
-        </div>
-      )}
-
       {/* Records Section (Dynamic Filtering) */}
       <div className="space-y-8">
         <div className="flex justify-between items-end px-4 border-b border-gray-100 pb-4">
@@ -401,7 +389,7 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                     <h4 className="font-black text-xl text-mazar-coffee uppercase tracking-tight">{exp.category}</h4>
                   </div>
                   <p className="text-[9px] font-black text-mazar-gray uppercase tracking-[0.2em]">
-                    بواسطة: <span className="text-mazar-coffee">{exp.ordered_by || '---'}</span> • فرع {exp.branch}
+                    بواسطة: <span className="text-mazar-coffee">{exp.ordered_by || '---'}</span>
                   </p>
                 </div>
               </div>
