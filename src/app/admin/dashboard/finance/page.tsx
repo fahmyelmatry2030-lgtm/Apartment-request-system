@@ -78,29 +78,6 @@ export default function FinancePage() {
   const netProfit = revenue - commissions - rentTotal - otherExpenses - salariesTotal;
 
 
-  const handleAddExpense = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newExpense.category || !newExpense.amount) return;
-    setSaving(true);
-    const dateStr = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-01`;
-    try {
-      await saveDbExpense({
-        category: newExpense.category,
-        amount: parseFloat(newExpense.amount),
-        date: dateStr,
-        description: newExpense.description,
-        from_entity: newExpense.from_entity,
-        to_entity: newExpense.to_entity,
-        ordered_by: newExpense.ordered_by
-      });
-      setNewExpense({ category: '', amount: '', description: '', from_entity: '', to_entity: '', ordered_by: '' });
-      await loadData();
-    } catch (err) {
-      console.error(err);
-      alert('خطأ في الإضافة');
-    }
-    setSaving(false);
-  };
 
   const handleDelete = async (id: string) => {
     if (!confirm('هل أنت متأكد من الحذف؟')) return;
@@ -154,58 +131,6 @@ export default function FinancePage() {
       </div>
 
 
-
-      {/* ── ADD EXPENSE FORM ── */}
-      <div className="bg-white p-8 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm">
-        <h3 className="font-black text-[#2A2723] mb-6 text-lg flex items-center gap-3">
-          <span className="w-9 h-9 bg-[#C1A68D]/10 text-[#C1A68D] rounded-xl flex items-center justify-center">➕</span>
-          إضافة مصروف — Expenses
-        </h3>
-        <form onSubmit={handleAddExpense} className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 items-end">
-          <div className="space-y-2">
-            <label className="text-xs font-black text-[#C1A68D]">الفئة</label>
-            <input required value={newExpense.category}
-              onChange={e => setNewExpense({ ...newExpense, category: e.target.value })}
-              className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#C1A68D] transition-colors" />
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-black text-[#C1A68D]">المبلغ (ج.م)</label>
-            <input type="number" required value={newExpense.amount}
-              onChange={e => setNewExpense({ ...newExpense, amount: e.target.value })}
-              className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#C1A68D] transition-colors" />
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-black text-[#C1A68D]">من</label>
-            <input value={newExpense.from_entity}
-              onChange={e => setNewExpense({ ...newExpense, from_entity: e.target.value })}
-              className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#C1A68D] transition-colors" />
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-black text-[#C1A68D]">إلى</label>
-            <input value={newExpense.to_entity}
-              onChange={e => setNewExpense({ ...newExpense, to_entity: e.target.value })}
-              className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#C1A68D] transition-colors" />
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-black text-[#C1A68D]">الآمر بالصرف</label>
-            <input value={newExpense.ordered_by}
-              onChange={e => setNewExpense({ ...newExpense, ordered_by: e.target.value })}
-              className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#C1A68D] transition-colors" />
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-black text-[#C1A68D]">ملاحظات</label>
-            <input value={newExpense.description}
-              onChange={e => setNewExpense({ ...newExpense, description: e.target.value })}
-              className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-[#C1A68D] transition-colors" />
-          </div>
-          <div className="lg:col-span-6 flex justify-end">
-            <button type="submit" disabled={saving}
-              className="bg-[#C1A68D] text-white font-black px-12 py-3.5 rounded-xl hover:bg-[#a08060] transition-all disabled:opacity-40 active:scale-95 shadow-sm">
-              {saving ? 'جاري الحفظ...' : 'إضافة المصروف'}
-            </button>
-          </div>
-        </form>
-      </div>
 
       {/* ── MONTHLY EXPENSES TABLE ── */}
       {monthlyExpenses.length > 0 && (
