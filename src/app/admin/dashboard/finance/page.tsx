@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
-import { getBookings } from '@/lib/data-init';
+import { getBookings, getSystemUnits } from '@/lib/data-init';
 import { saveDbExpense, deleteDbExpense, getDbExpenses, getDbSalaries } from '@/lib/actions/db';
 
 const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
@@ -16,7 +16,7 @@ const PARTNERS = [
 export default function FinancePage() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [expenses, setExpenses] = useState<any[]>([]);
-  const [salaries, setSalaries] = useState<any[]>([]);
+  const [units, setUnits] = useState<any[]>([]);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [isLoading, setIsLoading] = useState(true);
@@ -26,14 +26,16 @@ export default function FinancePage() {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const [b, expData, salData] = await Promise.all([
+      const [b, expData, salData, unitsData] = await Promise.all([
         getBookings(),
         getDbExpenses(),
-        getDbSalaries()
+        getDbSalaries(),
+        getSystemUnits()
       ]);
       setBookings(b);
       setExpenses(expData || []);
       setSalaries(salData || []);
+      setUnits(unitsData || []);
     } catch (err) {
       console.error('Error loading finance data:', err);
     } finally {
@@ -75,6 +77,15 @@ export default function FinancePage() {
   const commissions = monthlyBookings.reduce((sum, b) => sum + parseFloat(b.commission || 0), 0);
   const totalNights = monthlyBookings.reduce((sum, b) => sum + (Number(b.numberOfDays) || 0), 0);
   const avgNightlyRate = totalNights > 0 ? revenue / totalNights : 0;
+  
+  // Grouped Revenue
+  const studioRevenue = monthlyBookings
+    .filter(b => units.find(u => u.id === b.apartmentId)?.type === 'studio')
+    .reduce((sum, b) => sum + parseFloat(b.totalAmount || 0), 0);
+    
+  const apartmentRevenue = monthlyBookings
+    .filter(b => units.find(u => u.id === b.apartmentId)?.type === 'apartment')
+    .reduce((sum, b) => sum + parseFloat(b.totalAmount || 0), 0);
   
   // Smart Categorization:
   const rentTotal = monthlyExpenses
@@ -133,20 +144,30 @@ export default function FinancePage() {
       </header>
 
       {/* ── KPI CARDS ── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-4">
         <div className="bg-white p-6 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm text-center">
           <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">إجمالي الإيرادات</p>
           <div className="text-3xl font-black text-green-600">{isLoading ? '...' : revenue.toLocaleString()} <small className="text-sm">ج.م</small></div>
           <p className="text-[10px] text-[#7A7061] mt-2">{monthlyBookings.length} حجز مؤكد</p>
         </div>
-        <div className="bg-white p-6 rounded-[2rem] border-2 border-[#C1A68D]/30 shadow-sm text-center">
-          <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">معدل سعر الليلة الواحدة</p>
-          <div className="text-3xl font-black text-[#C1A68D]">{isLoading ? '...' : Math.round(avgNightlyRate).toLocaleString()} <small className="text-sm">ج.م</small></div>
+        <div className="bg-white p-6 rounded-[2rem] border-2 border-blue-500/30 shadow-sm text-center">
+          <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">إيراد الاستديوهات</p>
+          <div className="text-2xl font-black text-blue-600">{isLoading ? '...' : studioRevenue.toLocaleString()} <small className="text-xs">ج.م</small></div>
+          <p className="text-[9px] text-blue-400 mt-2 font-bold">جميع الاستديوهات</p>
+        </div>
+        <div className="bg-white p-6 rounded-[2rem] border-2 border-amber-500/30 shadow-sm text-center">
+          <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">إيراد الشقق</p>
+          <div className="text-2xl font-black text-amber-600">{isLoading ? '...' : apartmentRevenue.toLocaleString()} <small className="text-xs">ج.م</small></div>
+          <p className="text-[9px] text-amber-500 mt-2 font-bold">جميع الشقق</p>
+        </div>
+        <div className="bg-white p-6 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm text-center">
+          <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">معدل سعر الليلة</p>
+          <div className="text-2xl font-black text-[#2A2723]">{isLoading ? '...' : Math.round(avgNightlyRate).toLocaleString()} <small className="text-xs">ج.م</small></div>
           <p className="text-[10px] text-[#7A7061] mt-2">{totalNights} ليلة إجمالاً</p>
         </div>
         <div className="bg-white p-6 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm text-center">
           <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">إجمالي العمولات</p>
-          <div className="text-3xl font-black text-orange-500">{isLoading ? '...' : commissions.toLocaleString()} <small className="text-sm">ج.م</small></div>
+          <div className="text-2xl font-black text-orange-500">{isLoading ? '...' : commissions.toLocaleString()} <small className="text-xs">ج.م</small></div>
           <p className="text-[10px] text-[#7A7061] mt-2">مخصومة من الإيرادات</p>
         </div>
       </div>

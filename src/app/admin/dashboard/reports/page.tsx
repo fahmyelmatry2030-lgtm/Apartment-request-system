@@ -360,7 +360,13 @@ export default function ReportsPage() {
           return;
         }
       }
-      
+
+      if (!selectedUnit) {
+        alert('⚠️ يرجى اختيار الوحدة أولاً من القائمة أو التبويبات');
+        setSaveStatus('');
+        return;
+      }
+
       const newBooking = {
         name: newRecord.name,
         nationality: newRecord.nationality,
@@ -765,6 +771,27 @@ export default function ReportsPage() {
               <div className="space-y-1">
                 <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">العمولة</label>
                 <input type="number" value={newRecord.commission} onChange={e => setNewRecord({...newRecord, commission: Number(e.target.value)})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-black text-orange-500 outline-none focus:border-[#C1A68D]" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">الوحدة</label>
+                <select 
+                  required 
+                  value={selectedUnit} 
+                  onChange={e => setSelectedUnit(e.target.value)} 
+                  className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-black text-[#2A2723] outline-none focus:border-[#C1A68D]"
+                >
+                  <option value="" disabled>اختر الوحدة</option>
+                  <optgroup label="الاستديوهات الفندقية">
+                    {units.filter(u => u.type === 'studio').sort((a,b) => a.id.localeCompare(b.id)).map(u => (
+                      <option key={u.id} value={u.id}>{u.title?.ar || u.id}</option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="الشقق الفندقية">
+                    {units.filter(u => u.type === 'apartment').sort((a,b) => a.id.localeCompare(b.id)).map(u => (
+                      <option key={u.id} value={u.id}>{u.title?.ar || u.id}</option>
+                    ))}
+                  </optgroup>
+                </select>
               </div>
               <div className="space-y-1">
                 <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">حالة العميل</label>
