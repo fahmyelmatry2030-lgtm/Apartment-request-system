@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
-import { getSupabaseBrowserClient } from '@/lib/supabase/client';
-import { saveDbExpense, deleteDbExpense } from '@/lib/actions/db';
+import { saveDbExpense, deleteDbExpense, getDbExpenses } from '@/lib/actions/db';
 
 // ── Custom CountUp Component (No external lib needed) ──
 function AnimatedNumber({ value }: { value: number }) {
@@ -69,13 +68,7 @@ export default function ExpensesTab() {
   const loadExpenses = async () => {
     setLoading(true);
     try {
-      const supabase = getSupabaseBrowserClient();
-      const { data, error } = await supabase
-        .from('expenses')
-        .select('*')
-        .order('date', { ascending: false });
-
-      if (error) throw error;
+      const data = await getDbExpenses();
       setExpenses(data || []);
       setError(null);
     } catch (err: any) {

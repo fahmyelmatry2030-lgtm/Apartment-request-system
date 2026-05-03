@@ -601,9 +601,25 @@ export async function deleteDbVacation(id: string) {
 
 // --- EXPENSES ---
 
+export async function getDbExpenses() {
+  const supabase = getSupabaseServerClient();
+  if (!supabase) throw new Error('Supabase configuration missing on server');
+
+  const { data, error } = await supabase
+    .from('expenses')
+    .select('*')
+    .order('date', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching expenses:', error);
+    throw error;
+  }
+  return data || [];
+}
+
 export async function saveDbExpense(expense: any) {
   const supabase = getSupabaseServerClient();
-  if (!supabase) return expense;
+  if (!supabase) throw new Error('Supabase configuration missing on server');
 
   const { error } = await supabase.from('expenses').insert([expense]);
   if (error) {
