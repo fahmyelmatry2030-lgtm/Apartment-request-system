@@ -646,4 +646,22 @@ export async function deleteDbExpense(id: string) {
   revalidatePath('/admin/dashboard/finance');
 }
 
+export async function updateDbExpense(id: string, updates: any) {
+  const supabase = getSupabaseServerClient();
+  if (!supabase) throw new Error('Supabase configuration missing on server');
+
+  const { error } = await supabase
+    .from('expenses')
+    .update(updates)
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error updating expense:', error);
+    throw error;
+  }
+  
+  revalidatePath('/admin/dashboard/reports');
+  revalidatePath('/admin/dashboard/finance');
+}
+
 

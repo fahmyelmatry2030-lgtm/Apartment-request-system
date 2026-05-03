@@ -1,7 +1,4 @@
-"use client";
-
-import { useState, useEffect, useMemo } from 'react';
-import { saveDbExpense, deleteDbExpense, getDbExpenses } from '@/lib/actions/db';
+import { saveDbExpense, deleteDbExpense, getDbExpenses, updateDbExpense } from '@/lib/actions/db';
 
 // ── Custom CountUp Component (No external lib needed) ──
 function AnimatedNumber({ value }: { value: number }) {
@@ -51,6 +48,9 @@ export default function ExpensesTab() {
     to_entity: '',
     ordered_by: ''
   });
+
+  const [editingExpense, setEditingExpense] = useState<any>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const formatDate = (dateStr: string) => {
     if (!dateStr || !dateStr.includes('-')) return dateStr;
@@ -135,6 +135,31 @@ export default function ExpensesTab() {
       loadExpenses();
     } catch (error: any) {
       alert('خطأ في الإضافة: ' + error.message);
+    }
+  };
+
+  const handleEdit = (expense: any) => {
+    setEditingExpense({ ...expense });
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await updateDbExpense(editingExpense.id, {
+        category: editingExpense.category,
+        amount: parseFloat(editingExpense.amount),
+        description: editingExpense.description,
+        date: editingExpense.date,
+        from_entity: editingExpense.from_entity,
+        to_entity: editingExpense.to_entity,
+        ordered_by: editingExpense.ordered_by
+      });
+      setIsEditModalOpen(false);
+      setEditingExpense(null);
+      loadExpenses();
+    } catch (error: any) {
+      alert('خطأ في التعديل: ' + error.message);
     }
   };
 
@@ -374,7 +399,7 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                   <th className="px-4 py-4 border-x border-white/10 w-32">To</th>
                   <th className="px-4 py-4 border-x border-white/10 w-32">Order By</th>
                   <th className="px-4 py-4 border-x border-white/10 w-32">Notes</th>
-                  <th className="px-4 py-4 border-x border-white/10 w-16">Action</th>
+                  <th className="px-4 py-4 border-x border-white/10 w-24">Action</th>
                 </tr>
               </thead>
               <tbody className="bg-white">
@@ -405,12 +430,20 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                     <td className="px-4 py-4 border border-[#EAE4D9]/40 text-[11px] font-bold text-mazar-coffee">{exp.ordered_by || '—'}</td>
                     <td className="px-4 py-4 border border-[#EAE4D9]/40 text-[11px] font-bold text-mazar-gray opacity-30">—</td>
                     <td className="px-4 py-4 border border-[#EAE4D9]/40">
-                      <button 
-                        onClick={() => handleDelete(exp.id)} 
-                        className="w-8 h-8 rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm opacity-0 group-hover:opacity-100"
-                      >
-                        🗑️
-                      </button>
+                      <div className="flex gap-2 justify-center opacity-0 group-hover:opacity-100 transition-all">
+                        <button 
+                          onClick={() => handleEdit(exp)} 
+                          className="w-8 h-8 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-all shadow-sm"
+                        >
+                          ✏️
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(exp.id)} 
+                          className="w-8 h-8 rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm"
+                        >
+                          🗑️
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -420,6 +453,96 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
         </div>
       </div>
 
+      {/* Edit Modal */}
+      {isEditModalOpen && editingExpense && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white w-full max-w-4xl rounded-[2.5rem] shadow-3xl border border-white/10 overflow-hidden animate-in zoom-in duration-300">
+            <div className="bg-mazar-coffee p-8 flex justify-between items-center text-white">
+              <div>
+                <h3 className="text-2xl font-black uppercase tracking-tight">تعديل سجل المصروف</h3>
+                <p className="text-[10px] font-black text-mazar-gold uppercase tracking-[0.2em] mt-1">تعديل البيانات المالية المسجلة</p>
+              </div>
+              <button onClick={() => setIsEditModalOpen(false)} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all">✕</button>
+            </div>
+            
+            <form onSubmit={handleSaveEdit} className="p-10 space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="space-y-2">
+                  <label className="text-[9px] font-black text-mazar-coffee uppercase tracking-widest opacity-60">الفئة</label>
+                  <input 
+                    required
+                    list="category-suggestions"
+                    value={editingExpense.category}
+                    onChange={e => setEditingExpense({...editingExpense, category: e.target.value})}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[9px] font-black text-mazar-coffee uppercase tracking-widest opacity-60">المبلغ</label>
+                  <input 
+                    type="number"
+                    required
+                    value={editingExpense.amount}
+                    onChange={e => setEditingExpense({...editingExpense, amount: e.target.value})}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[9px] font-black text-mazar-coffee uppercase tracking-widest opacity-60">التاريخ</label>
+                  <input 
+                    type="text"
+                    required
+                    value={formatDate(editingExpense.date)}
+                    onChange={e => {
+                      const val = e.target.value;
+                      let clean = val.replace(/[^0-9/]/g, '');
+                      setEditingExpense({...editingExpense, date: parseDate(clean)});
+                    }}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[9px] font-black text-mazar-coffee uppercase tracking-widest opacity-60">الآمر بالصرف</label>
+                  <input 
+                    value={editingExpense.ordered_by}
+                    onChange={e => setEditingExpense({...editingExpense, ordered_by: e.target.value})}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[9px] font-black text-mazar-coffee uppercase tracking-widest opacity-60">من</label>
+                  <input 
+                    value={editingExpense.from_entity}
+                    onChange={e => setEditingExpense({...editingExpense, from_entity: e.target.value})}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[9px] font-black text-mazar-coffee uppercase tracking-widest opacity-60">إلى</label>
+                  <input 
+                    value={editingExpense.to_entity}
+                    onChange={e => setEditingExpense({...editingExpense, to_entity: e.target.value})}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all"
+                  />
+                </div>
+                <div className="lg:col-span-3 space-y-2">
+                  <label className="text-[9px] font-black text-mazar-coffee uppercase tracking-widest opacity-60">السبب / البيان</label>
+                  <input 
+                    value={editingExpense.description}
+                    onChange={e => setEditingExpense({...editingExpense, description: e.target.value})}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex gap-4 pt-4">
+                <button type="submit" className="flex-1 bg-mazar-coffee text-white font-black py-5 rounded-2xl hover:bg-mazar-gold hover:text-mazar-coffee transition-all shadow-xl active:scale-95 uppercase tracking-widest text-[11px]">حفظ التعديلات</button>
+                <button type="button" onClick={() => setIsEditModalOpen(false)} className="px-10 bg-gray-100 text-gray-500 font-black py-5 rounded-2xl hover:bg-gray-200 transition-all uppercase tracking-widest text-[11px]">إلغاء</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
