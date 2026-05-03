@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect, useMemo } from 'react';
 import { saveDbExpense, deleteDbExpense, getDbExpenses, updateDbExpense } from '@/lib/actions/db';
 
 // ── Custom CountUp Component (No external lib needed) ──
