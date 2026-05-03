@@ -56,8 +56,12 @@ export default function FinancePage() {
   const monthlyExpenses = useMemo(() => {
     return expenses.filter((e: any) => {
       if (!e.date) return false;
-      const d = new Date(e.date);
-      return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
+      // Split "YYYY-MM-DD" to avoid timezone shifts
+      const parts = e.date.split('-');
+      if (parts.length < 2) return false;
+      const year = parseInt(parts[0]);
+      const month = parseInt(parts[1]) - 1;
+      return month === selectedMonth && year === selectedYear;
     });
   }, [expenses, selectedMonth, selectedYear]);
 
@@ -71,9 +75,27 @@ export default function FinancePage() {
   const commissions = monthlyBookings.reduce((sum, b) => sum + parseFloat(b.commission || 0), 0);
   const totalNights = monthlyBookings.reduce((sum, b) => sum + (Number(b.numberOfDays) || 0), 0);
   const avgNightlyRate = totalNights > 0 ? revenue / totalNights : 0;
-  const rentTotal = monthlyExpenses.filter(e => e.category === 'إيجار').reduce((s, e) => s + (e.amount || 0), 0);
-  const otherExpenses = monthlyExpenses.filter(e => e.category !== 'إيجار' && !e.category.startsWith('إيجار')).reduce((s, e) => s + (e.amount || 0), 0);
-  const salariesTotal = monthlySalaries.reduce((sum, s) => sum + (s.amount || 0), 0);
+  
+  // Smart Categorization:
+  const rentTotal = monthlyExpenses
+    .filter(e => e.category === 'إيجار')
+    .reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+    
+  const salariesFromExpenses = monthlyExpenses
+    .filter(e => e.category === 'رواتب' || e.category === 'مرتبات' || e.category === 'مرتب')
+    .reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+    
+  const salariesTotal = monthlySalaries.reduce((sum, s) => sum + (parseFloat(s.amount) || 0), 0) + salariesFromExpenses;
+  
+  const otherExpenses = monthlyExpenses
+    .filter(e => 
+      e.category !== 'إيجار' && 
+      e.category !== 'رواتب' && 
+      e.category !== 'مرتبات' && 
+      e.category !== 'مرتب'
+    )
+    .reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+
   const netProfit = revenue - commissions - rentTotal - otherExpenses - salariesTotal;
 
 
