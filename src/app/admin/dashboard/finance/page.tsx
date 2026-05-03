@@ -174,54 +174,6 @@ export default function FinancePage() {
       </div>
 
 
-
-      {/* ── MONTHLY EXPENSES TABLE ── */}
-      {monthlyExpenses.length > 0 && (
-        <div className="bg-white rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-[#EAE4D9]/50 bg-[#FDFBF7]/50 flex justify-between items-center">
-            <h3 className="font-black text-[#2A2723]">
-              تفاصيل مصروفات {MONTHS_AR[selectedMonth]} {selectedYear}
-            </h3>
-            <span className="text-[10px] font-black bg-red-50 text-red-500 px-4 py-1.5 rounded-full">
-              الإجمالي: {monthlyExpenses.reduce((s, e) => s + (e.amount || 0), 0).toLocaleString()} ج.م
-            </span>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-right border-collapse">
-              <thead>
-                <tr className="bg-[#2A2723] text-white text-[10px] font-black uppercase tracking-widest">
-                  <th className="px-6 py-4">الفئة</th>
-                  <th className="px-6 py-4">المبلغ</th>
-                  <th className="px-6 py-4">من</th>
-                  <th className="px-6 py-4">إلى</th>
-                  <th className="px-6 py-4">الآمر بالصرف</th>
-                  <th className="px-6 py-4">الوصف</th>
-                  <th className="px-6 py-4 text-center">حذف</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#EAE4D9]/30">
-                {monthlyExpenses.map(exp => (
-                  <tr key={exp.id} className="hover:bg-[#FDFBF7] transition-colors">
-                    <td className="px-6 py-4 font-black text-[#2A2723]">{exp.category}</td>
-                    <td className="px-6 py-4 font-black text-red-600">- {exp.amount?.toLocaleString()} ج.م</td>
-                    <td className="px-6 py-4 text-xs text-[#7A7061] font-bold">{exp.from_entity || '—'}</td>
-                    <td className="px-6 py-4 text-xs text-[#7A7061] font-bold">{exp.to_entity || '—'}</td>
-                    <td className="px-6 py-4 text-xs text-[#2A2723] font-black">{exp.ordered_by || '—'}</td>
-                    <td className="px-6 py-4 text-xs text-[#7A7061] font-bold">{exp.description || '—'}</td>
-                    <td className="px-6 py-4 text-center">
-                      <button onClick={() => handleDelete(exp.id)}
-                        className="w-8 h-8 rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all text-sm">
-                        🗑️
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
       {/* ── SUM TABLE (Excel Layout) ── */}
       <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
         <div className="bg-[#2A2723] px-8 py-4 flex items-center gap-3">
