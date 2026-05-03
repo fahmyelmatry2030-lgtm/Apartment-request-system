@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { getSupabaseBrowserClient } from '@/lib/supabase/client';
+import { getDbExpenses } from '@/lib/actions/db';
 
 export default function FinancialSummaryTab({ bookings }: { bookings: any[] }) {
   const [expenses, setExpenses] = useState<any[]>([]);
@@ -9,10 +9,14 @@ export default function FinancialSummaryTab({ bookings }: { bookings: any[] }) {
 
   useEffect(() => {
     const loadExpenses = async () => {
-      const supabase = getSupabaseBrowserClient();
-      const { data } = await supabase.from('expenses').select('*');
-      setExpenses(data || []);
-      setLoading(false);
+      try {
+        const data = await getDbExpenses();
+        setExpenses(data || []);
+      } catch (error) {
+        console.error('Error loading expenses in summary:', error);
+      } finally {
+        setLoading(false);
+      }
     };
     loadExpenses();
   }, []);
