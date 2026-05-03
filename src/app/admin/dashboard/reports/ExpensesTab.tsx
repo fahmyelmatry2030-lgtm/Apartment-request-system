@@ -270,9 +270,9 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
               />
             </div>
             <div className="space-y-3 lg:col-span-2 group">
-              <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">ملاحظات إضافية</label>
+              <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">السبب / البيان (Reason)</label>
               <input 
-                placeholder="اكتب تفاصيل إضافية للعملية..."
+                placeholder="مثلاً: إعلانات فيسبوك، شراء أدوات نظافة..."
                 value={newExpense.description}
                 onChange={e => setNewExpense({...newExpense, description: e.target.value})}
                 className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all placeholder:text-gray-300" 
@@ -337,11 +337,11 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
         </div>
       </div>
 
-      {/* Records Section (Dynamic Filtering) */}
+      {/* Records Section (Excel Style Table) */}
       <div className="space-y-8">
         <div className="flex justify-between items-end px-4 border-b border-gray-100 pb-4">
           <div>
-            <h3 className="text-2xl font-black text-mazar-coffee uppercase leading-none">سجلات القيود</h3>
+            <h3 className="text-2xl font-black text-mazar-coffee uppercase leading-none">سجلات القيود المالية</h3>
             <p className="text-[9px] font-black text-mazar-gray uppercase tracking-widest mt-2">
               عرض {filteredExpenses.length} عملية {selectedCategory ? `في فئة ${selectedCategory}` : ''}
             </p>
@@ -355,71 +355,69 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                  إلغاء الفلتر ✕
                </button>
              )}
-             <button className="text-[10px] font-black text-mazar-gold hover:text-mazar-coffee transition-colors uppercase tracking-[0.2em] border-b-2 border-mazar-gold">تصدير PDF ↓</button>
+             <button className="text-[10px] font-black text-mazar-gold hover:text-mazar-coffee transition-colors uppercase tracking-[0.2em] border-b-2 border-mazar-gold">تصدير EXCEL ↓</button>
           </div>
         </div>
         
-        <div className="grid grid-cols-1 gap-6">
-          {loading ? (
-            <div className="p-20 text-center">
-              <div className="inline-block w-12 h-12 border-4 border-mazar-gold border-t-transparent rounded-full animate-spin"></div>
-              <p className="mt-4 text-mazar-gray font-black uppercase tracking-widest text-xs">جاري جلب البيانات...</p>
-            </div>
-          ) : filteredExpenses.length === 0 ? (
-            <div className="p-32 text-center glass-card border-dashed border-gray-200">
-               <span className="text-4xl block mb-4 opacity-20">📂</span>
-               <div className="text-gray-400 font-black uppercase tracking-widest text-xs">لا توجد سجلات مطابقة لهذا البحث</div>
-            </div>
-          ) : filteredExpenses.map((exp, i) => (
-            <div 
-              key={exp.id} 
-              className="glass-card flex flex-col md:flex-row items-center justify-between gap-8 p-8 hover:border-mazar-gold/50 group transition-all animate-in slide-in-from-bottom duration-500"
-              style={{ animationDelay: `${i * 50}ms` }}
-            >
-              <div className="flex items-center gap-8 w-full md:w-auto">
-                <div className="w-16 h-16 rounded-3xl bg-[#FDFBF7] border border-[#EAE4D9] flex flex-col items-center justify-center flex-shrink-0 group-hover:bg-mazar-coffee group-hover:text-white transition-all duration-500 shadow-sm">
-                  <span className="text-[11px] font-black leading-none">{formatDate(exp.date)}</span>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs">{categories.find(c => c.name === exp.category)?.icon || '📦'}</span>
-                    <h4 className="font-black text-xl text-mazar-coffee uppercase tracking-tight">{exp.category}</h4>
-                  </div>
-                  <p className="text-[9px] font-black text-mazar-gray uppercase tracking-[0.2em]">
-                    بواسطة: <span className="text-mazar-coffee">{exp.ordered_by || '---'}</span>
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex flex-col md:flex-row items-center gap-10 w-full md:w-auto border-t md:border-t-0 pt-6 md:pt-0 border-gray-50">
-                <div className="text-center md:text-right">
-                  <p className="text-[9px] font-black text-mazar-gray uppercase tracking-widest mb-1 opacity-50">المسار (من / إلى)</p>
-                  <p className="text-xs font-bold text-mazar-coffee bg-gray-50 px-4 py-2 rounded-full border border-gray-100">
-                    {exp.from_entity || '---'} 
-                    <span className="mx-2 text-mazar-gold">←</span> 
-                    {exp.to_entity || '---'}
-                  </p>
-                </div>
-                <div className="text-center md:text-right min-w-[140px]">
-                  <p className="text-[9px] font-black text-mazar-gray uppercase tracking-widest mb-1 opacity-50">القيمة المالية</p>
-                  <p className="text-3xl font-black text-red-600 tracking-tighter">
-                    -{exp.amount?.toLocaleString()} 
-                    <span className="text-xs font-bold mr-2">ج.م</span>
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                   <button 
-                    onClick={() => handleDelete(exp.id)} 
-                    className="w-12 h-12 rounded-2xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm"
-                  >
-                    🗑️
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="glass-card overflow-hidden border-[#EAE4D9]/60 shadow-2xl rounded-[1.5rem]">
+          <div className="overflow-x-auto">
+            <table className="w-full text-center border-collapse">
+              <thead>
+                <tr className="bg-[#2A2723] text-white text-[10px] font-black uppercase tracking-widest">
+                  <th className="px-4 py-4 border-x border-white/10 w-12">No</th>
+                  <th className="px-4 py-4 border-x border-white/10 w-32">Date</th>
+                  <th className="px-4 py-4 border-x border-white/10 w-28">Price</th>
+                  <th className="px-4 py-4 border-x border-white/10">Reason</th>
+                  <th className="px-4 py-4 border-x border-white/10 w-32">From</th>
+                  <th className="px-4 py-4 border-x border-white/10 w-32">To</th>
+                  <th className="px-4 py-4 border-x border-white/10 w-32">Order By</th>
+                  <th className="px-4 py-4 border-x border-white/10 w-32">Notes</th>
+                  <th className="px-4 py-4 border-x border-white/10 w-16">Action</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white">
+                {loading ? (
+                  <tr>
+                    <td colSpan={9} className="p-20 text-center">
+                      <div className="inline-block w-8 h-8 border-4 border-mazar-gold border-t-transparent rounded-full animate-spin"></div>
+                    </td>
+                  </tr>
+                ) : filteredExpenses.length === 0 ? (
+                  <tr>
+                    <td colSpan={9} className="p-32 text-center text-gray-300 font-black uppercase tracking-widest text-xs">لا توجد سجلات</td>
+                  </tr>
+                ) : filteredExpenses.map((exp, i) => (
+                  <tr key={exp.id} className="hover:bg-[#FDFBF7] transition-colors group">
+                    <td className="px-4 py-4 border border-[#EAE4D9]/40 text-[11px] font-black text-mazar-gray">{i + 1}</td>
+                    <td className="px-4 py-4 border border-[#EAE4D9]/40 text-[11px] font-black whitespace-nowrap">{formatDate(exp.date)}</td>
+                    <td className="px-4 py-4 border border-[#EAE4D9]/40 text-sm font-black text-red-600">{exp.amount?.toLocaleString()}</td>
+                    <td className="px-4 py-4 border border-[#EAE4D9]/40 text-right">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] opacity-40">{categories.find(c => c.name === exp.category)?.icon || '📦'}</span>
+                        <span className="text-[11px] font-bold text-mazar-coffee">{exp.category}</span>
+                        {exp.description && <span className="text-[11px] text-mazar-gray font-medium">— {exp.description}</span>}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 border border-[#EAE4D9]/40 text-[11px] font-bold text-mazar-coffee">{exp.from_entity || '—'}</td>
+                    <td className="px-4 py-4 border border-[#EAE4D9]/40 text-[11px] font-bold text-mazar-coffee">{exp.to_entity || '—'}</td>
+                    <td className="px-4 py-4 border border-[#EAE4D9]/40 text-[11px] font-bold text-mazar-coffee">{exp.ordered_by || '—'}</td>
+                    <td className="px-4 py-4 border border-[#EAE4D9]/40 text-[11px] font-bold text-mazar-gray opacity-30">—</td>
+                    <td className="px-4 py-4 border border-[#EAE4D9]/40">
+                      <button 
+                        onClick={() => handleDelete(exp.id)} 
+                        className="w-8 h-8 rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm opacity-0 group-hover:opacity-100"
+                      >
+                        🗑️
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
+
     </div>
   );
 }
