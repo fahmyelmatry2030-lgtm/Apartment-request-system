@@ -525,12 +525,12 @@ export async function deleteDbStaff(id: string) {
 
 export async function getDbSalaries() {
   const supabase = getSupabaseServerClient();
-  if (!supabase) return [];
+  if (!supabase) throw new Error('Supabase configuration missing on server');
 
   const { data, error } = await supabase.from('salaries').select('*').order('year', { ascending: false }).order('month', { ascending: false });
   if (error) {
     console.error('Error reading salaries:', error);
-    return [];
+    throw error;
   }
   return data || [];
 }
@@ -646,16 +646,4 @@ export async function deleteDbExpense(id: string) {
   revalidatePath('/admin/dashboard/finance');
 }
 
-// --- SALARIES ---
 
-export async function getDbSalaries() {
-  const supabase = getSupabaseServerClient();
-  if (!supabase) throw new Error('Supabase configuration missing on server');
-
-  const { data, error } = await supabase.from('salaries').select('*');
-  if (error) {
-    console.error('Error fetching salaries:', error);
-    throw error;
-  }
-  return data || [];
-}
