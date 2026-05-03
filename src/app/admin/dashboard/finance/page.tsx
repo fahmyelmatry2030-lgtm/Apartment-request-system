@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { getBookings } from '@/lib/data-init';
-import { getSupabaseBrowserClient } from '@/lib/supabase/client';
-import { saveDbExpense, deleteDbExpense } from '@/lib/actions/db';
+import { saveDbExpense, deleteDbExpense, getDbExpenses, getDbSalaries } from '@/lib/actions/db';
 
 const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 
@@ -26,20 +25,20 @@ export default function FinancePage() {
 
   const loadData = async () => {
     setIsLoading(true);
-    const supabase = getSupabaseBrowserClient();
-    const [b] = await Promise.all([getBookings()]);
-    setBookings(b);
-
-    const { data: expData } = await supabase
-      .from('expenses')
-      .select('*')
-      .order('date', { ascending: false });
-    setExpenses(expData || []);
-
-    const { data: salData } = await supabase.from('salaries').select('*');
-    setSalaries(salData || []);
-
-    setIsLoading(false);
+    try {
+      const [b, expData, salData] = await Promise.all([
+        getBookings(),
+        getDbExpenses(),
+        getDbSalaries()
+      ]);
+      setBookings(b);
+      setExpenses(expData || []);
+      setSalaries(salData || []);
+    } catch (err) {
+      console.error('Error loading finance data:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => { loadData(); }, []);

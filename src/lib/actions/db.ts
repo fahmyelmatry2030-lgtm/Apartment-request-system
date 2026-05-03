@@ -645,3 +645,17 @@ export async function deleteDbExpense(id: string) {
   revalidatePath('/admin/dashboard/reports');
   revalidatePath('/admin/dashboard/finance');
 }
+
+// --- SALARIES ---
+
+export async function getDbSalaries() {
+  const supabase = getSupabaseServerClient();
+  if (!supabase) throw new Error('Supabase configuration missing on server');
+
+  const { data, error } = await supabase.from('salaries').select('*');
+  if (error) {
+    console.error('Error fetching salaries:', error);
+    throw error;
+  }
+  return data || [];
+}
