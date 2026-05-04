@@ -128,10 +128,15 @@ export default function FinancePage() {
     .filter(e => 
       e.category !== 'إيجار' && 
       e.category !== 'رواتب' && 
-      e.category !== 'مرتب�  const totalExpenses = (rentTotal || 0) + (otherExpenses || 0) + (salariesTotal || 0);
+      e.category !== 'مرتبات' && 
+      e.category !== 'مرتب'
+    )
+    .reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+
+  const totalExpenses = rentTotal + otherExpenses + salariesTotal;
   
   // Isolated profit for SUM table (Studio only)
-  const studioNetProfit = (studioRevenue || 0) - (commissions || 0) - (otherExpenses || 0) - (salariesTotal || 0);
+  const studioNetProfit = studioRevenue - commissions - otherExpenses - salariesTotal;
 
   const handleDelete = async (id: string) => {
     if (!confirm('هل أنت متأكد من الحذف؟')) return;
@@ -143,8 +148,6 @@ export default function FinancePage() {
       alert('خطأ في الحذف');
     }
   };
-
-  const safeLocale = (n: any) => (Number(n) || 0).toLocaleString();
 
   return (
     <div className="space-y-8 animate-fade-in" dir="rtl">
@@ -171,77 +174,36 @@ export default function FinancePage() {
       <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-4">
         <div className="bg-white p-6 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm text-center">
           <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">إجمالي الإيرادات</p>
-          <div className="text-3xl font-black text-green-600">{isLoading ? '...' : safeLocale(revenue)} <small className="text-sm">ج.م</small></div>
+          <div className="text-3xl font-black text-green-600">{isLoading ? '...' : revenue.toLocaleString()} <small className="text-sm">ج.م</small></div>
           <p className="text-[10px] text-[#7A7061] mt-2">{monthlyBookings.length} حجز مؤكد</p>
         </div>
         <div className="bg-white p-6 rounded-[2rem] border-2 border-blue-500/30 shadow-sm text-center">
           <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">إيراد الاستديوهات</p>
-          <div className="text-2xl font-black text-blue-600">{isLoading ? '...' : safeLocale(studioRevenue)} <small className="text-xs">ج.م</small></div>
+          <div className="text-2xl font-black text-blue-600">{isLoading ? '...' : studioRevenue.toLocaleString()} <small className="text-xs">ج.م</small></div>
           <p className="text-[9px] text-blue-400 mt-2 font-bold">جميع الاستديوهات</p>
         </div>
         <div className="bg-white p-6 rounded-[2rem] border-2 border-amber-500/30 shadow-sm text-center">
           <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">إيراد الشقق</p>
-          <div className="text-2xl font-black text-amber-600">{isLoading ? '...' : safeLocale(apartmentRevenue)} <small className="text-xs">ج.م</small></div>
+          <div className="text-2xl font-black text-amber-600">{isLoading ? '...' : apartmentRevenue.toLocaleString()} <small className="text-xs">ج.م</small></div>
           <p className="text-[9px] text-amber-500 mt-2 font-bold">جميع الشقق</p>
         </div>
         <div className="bg-white p-6 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm text-center">
           <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">معدل سعر الليلة</p>
-          <div className="text-2xl font-black text-[#2A2723]">{isLoading ? '...' : safeLocale(avgNightlyRate)} <small className="text-xs">ج.م</small></div>
+          <div className="text-2xl font-black text-[#2A2723]">{isLoading ? '...' : Math.round(avgNightlyRate).toLocaleString()} <small className="text-xs">ج.م</small></div>
           <p className="text-[10px] text-[#7A7061] mt-2">{totalNights} ليلة إجمالاً</p>
         </div>
         <div className="bg-white p-6 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm text-center">
           <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">إجمالي العمولات</p>
-          <div className="text-2xl font-black text-orange-500">{isLoading ? '...' : safeLocale(commissions)} <small className="text-xs">ج.م</small></div>
+          <div className="text-2xl font-black text-orange-500">{isLoading ? '...' : commissions.toLocaleString()} <small className="text-xs">ج.م</small></div>
           <p className="text-[10px] text-[#7A7061] mt-2">مخصومة من الإيرادات</p>
         </div>
         <div className="bg-white p-6 rounded-[2rem] border border-red-500/20 shadow-sm text-center">
           <p className="text-[10px] font-black text-red-500 uppercase tracking-widest mb-3">إجمالي المصروفات</p>
-          <div className="text-2xl font-black text-red-600">{isLoading ? '...' : safeLocale(totalExpenses)} <small className="text-xs">ج.م</small></div>
+          <div className="text-2xl font-black text-red-600">{isLoading ? '...' : totalExpenses.toLocaleString()} <small className="text-xs">ج.م</small></div>
           <p className="text-[10px] text-[#7A7061] mt-2">إيجارات + رواتب + تشغيل</p>
         </div>
       </div>
 
-      {/* ── EXPENSE SUBMISSION FORM (Admin Only) ── */}
-      {!isPartner && (
-        <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm p-8" dir="rtl">
-          <h2 className="text-[#2A2723] font-black text-xs uppercase tracking-widest mb-6 px-2 flex items-center gap-2">
-            <span>➕</span> إضافة مصروف جديد
-          </h2>
-          <form onSubmit={handleSaveExpense} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 items-end">
-            <div className="space-y-1">
-              <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">الفئة</label>
-              <select value={newExpense.category} onChange={e => setNewExpense({...newExpense, category: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-2 text-xs font-bold outline-none focus:border-[#C1A68D]">
-                <option value="">اختر الفئة</option>
-                <option value="إيجار">إيجار</option>
-                <option value="رواتب">رواتب</option>
-                <option value="عمولة">عمولة</option>
-                <option value="صيانة">صيانة</option>
-                <option value="خدمات">خدمات</option>
-                <option value="أخرى">أخرى</option>
-              </select>
-            </div>
-            <div className="space-y-1">
-              <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">المبلغ</label>
-              <input type="number" value={newExpense.amount} onChange={e => setNewExpense({...newExpense, amount: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-2 text-xs font-black outline-none focus:border-[#C1A68D]" />
-            </div>
-            <div className="space-y-1">
-              <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">البيان / الوصف</label>
-              <input type="text" value={newExpense.description} onChange={e => setNewExpense({...newExpense, description: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-2 text-xs font-bold outline-none focus:border-[#C1A68D]" />
-            </div>
-            <div className="space-y-1">
-              <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">الجهة المرسلة</label>
-              <input type="text" value={newExpense.from_entity} onChange={e => setNewExpense({...newExpense, from_entity: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-2 text-xs font-bold outline-none focus:border-[#C1A68D]" />
-            </div>
-            <div className="space-y-1">
-              <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">الجهة المستلمة</label>
-              <input type="text" value={newExpense.to_entity} onChange={e => setNewExpense({...newExpense, to_entity: e.target.value})} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-2 text-xs font-bold outline-none focus:border-[#C1A68D]" />
-            </div>
-            <button type="submit" disabled={saving} className="bg-[#2A2723] text-white font-black py-2.5 rounded-xl text-[10px] hover:bg-black transition-all shadow-lg active:scale-95 disabled:opacity-50">
-              {saving ? 'جاري الحفظ...' : 'حفظ المصروف'}
-            </button>
-          </form>
-        </div>
-      )}
 
       {/* ── SUM TABLE (Excel Layout) ── */}
       <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
@@ -268,19 +230,19 @@ export default function FinancePage() {
             <tbody>
               <tr>
                 <td className="px-6 py-8 border border-[#EAE4D9]/40 bg-green-50/20">
-                  <div className="text-2xl font-black text-green-700">{isLoading ? '...' : safeLocale(studioRevenue)}</div>
+                  <div className="text-2xl font-black text-green-700">{isLoading ? '...' : studioRevenue.toLocaleString()}</div>
                   <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
                 </td>
                 <td className="px-6 py-8 border border-[#EAE4D9]/40">
-                  <div className="text-2xl font-black text-red-600">{isLoading ? '...' : safeLocale(otherExpenses + commissions)}</div>
+                  <div className="text-2xl font-black text-red-600">{isLoading ? '...' : (otherExpenses + commissions).toLocaleString()}</div>
                   <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
                 </td>
                 <td className="px-6 py-8 border border-[#EAE4D9]/40">
-                  <div className="text-2xl font-black text-orange-600">{isLoading ? '...' : safeLocale(salariesTotal)}</div>
+                  <div className="text-2xl font-black text-orange-600">{isLoading ? '...' : salariesTotal.toLocaleString()}</div>
                   <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
                 </td>
                 <td className={`px-6 py-8 border border-yellow-200 bg-[#FACC15]/10 ${studioNetProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  <div className="text-3xl font-black">{isLoading ? '...' : safeLocale(studioNetProfit)}</div>
+                  <div className="text-3xl font-black">{isLoading ? '...' : studioNetProfit.toLocaleString()}</div>
                   <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
                 </td>
               </tr>
@@ -289,13 +251,13 @@ export default function FinancePage() {
         </div>
       </div>
 
-      {/* ── PROFIT DISTRIBUTION TABLE (Admin Only) ── */}
+      {/* ── PROFIT DISTRIBUTION TABLE (Excel Layout) ── */}
       {!isPartner && (
         <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
           <div className="bg-[#2A2723] px-8 py-4 flex items-center justify-between">
             <h2 className="text-white font-black text-sm tracking-widest uppercase">توزيع الأرباح بين الشركاء</h2>
             <span className="text-[#C1A68D] text-xs font-black bg-white/10 px-4 py-1.5 rounded-full">
-              صافي الربح: {safeLocale(studioNetProfit)} ج.م
+              صافي الربح: {studioNetProfit.toLocaleString()} ج.م
             </span>
           </div>
           <div className="overflow-x-auto">
@@ -317,7 +279,7 @@ export default function FinancePage() {
                   {PARTNERS.map(p => (
                     <td key={p.key} className="px-8 py-6 border border-[#EAE4D9]/40">
                       <div className={`text-2xl font-black ${studioNetProfit >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                        {isLoading ? '...' : safeLocale(Math.round(studioNetProfit * p.percentage / 100))}
+                        {isLoading ? '...' : Math.round(studioNetProfit * p.percentage / 100).toLocaleString()}
                       </div>
                       <div className="text-[10px] text-[#7A7061] font-bold mt-1">ج.م</div>
                     </td>
@@ -333,17 +295,6 @@ export default function FinancePage() {
       <div className={`p-10 rounded-[3rem] shadow-2xl flex flex-col md:flex-row justify-between items-center gap-8 ${studioNetProfit >= 0 ? 'bg-[#2A2723]' : 'bg-red-900'}`}>
         <div className="text-center md:text-right">
           <p className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest mb-2">
-            صافي الربح النهائي — {MONTHS_AR[selectedMonth]} {selectedYear}
-          </p>
-          <p className="text-xs text-gray-400 font-bold">
-            الإيرادات ({safeLocale(revenue)}) − العمولات { !isPartner && '− الإيجارات − المصروفات − الرواتب' }
-          </p>
-        </div>
-        <div className={`text-5xl font-black ${studioNetProfit >= 0 ? 'text-white' : 'text-red-200'}`}>
-          {isLoading ? '...' : safeLocale(isPartner ? partnerRevenue : studioNetProfit)} <small className="text-sm">ج.م</small>
-        </div>
-      </div>
-ng-widest mb-2">
             صافي الربح النهائي — {MONTHS_AR[selectedMonth]} {selectedYear}
           </p>
           <p className="text-xs text-gray-400 font-bold">

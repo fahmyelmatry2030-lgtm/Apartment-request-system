@@ -29,7 +29,7 @@ export default function CustomersDatabase() {
     
     setIsDeleting(phone);
     try {
-      await deleteBookingsByPhone(phone);
+      await deleteDbBookingsByPhone(phone);
       await loadData();
     } catch (err) {
       alert('فشل الحذف. يرجى المحاولة مرة أخرى.');
