@@ -110,28 +110,32 @@ export async function getFreshDbBookings(nonce?: string) {
       }));
   }
 
-    return (data || []).map((b: any) => ({
-    id: b.id,
-    name: b.name,
-    phone: b.phone,
-    checkIn: b.check_in,
-    checkOut: b.check_out,
-    apartmentId: b.apartment_id,
-    studio: b.studio,
-    status: b.status,
-    paymentInfo: b.payment_info,
-    totalAmount: Number(b.total_amount || 0),
-    numberOfDays: Number(b.number_of_days || 0),
-    pricePerNight: Number(b.price_per_night || 0),
-    nationality: b.nationality,
-    idNumber: b.id_number,
-    commission: Number(b.commission || 0),
-    brokerName: b.broker_name,
-    guestsCount: Number(b.guests_count || 1),
-    clientStatus: b.client_status || 'انتظار',
-    notes: b.notes,
-    timestamp: b.timestamp,
-  }));
+    return (data || []).map((b: any) => {
+      const totalAmount = Number(b.total_amount || 0);
+      const days = Number(b.number_of_days || 0);
+      return {
+        id: b.id,
+        name: b.name,
+        phone: b.phone,
+        checkIn: b.check_in,
+        checkOut: b.check_out,
+        apartmentId: b.apartment_id,
+        studio: b.studio,
+        status: b.status,
+        paymentInfo: b.payment_info,
+        totalAmount: totalAmount,
+        numberOfDays: days,
+        pricePerNight: days > 0 ? (totalAmount / days) : 0,
+        nationality: b.nationality,
+        idNumber: b.id_number,
+        commission: Number(b.commission || 0),
+        brokerName: b.broker_name,
+        guestsCount: Number(b.guests_count || 1),
+        clientStatus: b.client_status || 'انتظار',
+        notes: b.notes,
+        timestamp: b.timestamp,
+      };
+    });
 }
 
 export async function saveDbBooking(booking: any) {
@@ -161,7 +165,6 @@ export async function saveDbBooking(booking: any) {
       payment_info: newBookingWithId.paymentInfo ?? null,
       total_amount: newBookingWithId.totalAmount ?? null,
       number_of_days: newBookingWithId.numberOfDays ?? null,
-      price_per_night: newBookingWithId.pricePerNight ?? null,
       nationality: newBookingWithId.nationality ?? null,
       id_number: newBookingWithId.idNumber ?? null,
       commission: newBookingWithId.commission ?? null,
@@ -174,15 +177,7 @@ export async function saveDbBooking(booking: any) {
 
     if (error) {
       console.error('Supabase Insert Error:', error);
-      
-      // DEBUG: Try to find what columns actually exist
-      const { data: sample } = await supabase.from('bookings').select('*').limit(1);
-      const existingCols = sample && sample[0] ? Object.keys(sample[0]).join(', ') : 'unknown';
-      
-      return { 
-        success: false, 
-        error: `${error.message}. (Existing columns: ${existingCols})` 
-      };
+      return { success: false, error: error.message };
     }
 
     // Send Telegram Alert to Admin (Awaiting to ensure delivery)
@@ -219,7 +214,6 @@ export async function updateDbBookingStatus(id: string, updates: any) {
   if (updates.paymentInfo !== undefined) patch.payment_info = updates.paymentInfo;
   if (updates.totalAmount !== undefined) patch.total_amount = updates.totalAmount;
   if (updates.numberOfDays !== undefined) patch.number_of_days = updates.numberOfDays;
-  if (updates.pricePerNight !== undefined) patch.price_per_night = updates.pricePerNight;
   if (updates.nationality !== undefined) patch.nationality = updates.nationality;
   if (updates.idNumber !== undefined) patch.id_number = updates.idNumber;
   if (updates.commission !== undefined) patch.commission = updates.commission;
