@@ -110,7 +110,7 @@ export async function getFreshDbBookings(nonce?: string) {
       }));
   }
 
-  return (data || []).map((b: any) => ({
+    return (data || []).map((b: any) => ({
     id: b.id,
     name: b.name,
     phone: b.phone,
@@ -122,6 +122,7 @@ export async function getFreshDbBookings(nonce?: string) {
     paymentInfo: b.payment_info,
     totalAmount: Number(b.total_amount || 0),
     numberOfDays: Number(b.number_of_days || 0),
+    pricePerNight: Number(b.price_per_night || 0),
     nationality: b.nationality,
     idNumber: b.id_number,
     commission: Number(b.commission || 0),
@@ -160,6 +161,7 @@ export async function saveDbBooking(booking: any) {
       payment_info: newBooking.paymentInfo ?? null,
       total_amount: newBooking.totalAmount ?? null,
       number_of_days: newBooking.numberOfDays ?? null,
+      price_per_night: newBooking.pricePerNight ?? null,
       nationality: newBooking.nationality ?? null,
       id_number: newBooking.idNumber ?? null,
       commission: newBooking.commission ?? null,
@@ -204,6 +206,7 @@ export async function updateDbBookingStatus(id: string, updates: any) {
   if (updates.paymentInfo !== undefined) patch.payment_info = updates.paymentInfo;
   if (updates.totalAmount !== undefined) patch.total_amount = updates.totalAmount;
   if (updates.numberOfDays !== undefined) patch.number_of_days = updates.numberOfDays;
+  if (updates.pricePerNight !== undefined) patch.price_per_night = updates.pricePerNight;
   if (updates.nationality !== undefined) patch.nationality = updates.nationality;
   if (updates.idNumber !== undefined) patch.id_number = updates.idNumber;
   if (updates.commission !== undefined) patch.commission = updates.commission;
@@ -541,6 +544,40 @@ export async function saveDbSalary(salary: any) {
 
   const { error } = await supabase.from('salaries').upsert(salary);
   if (error) throw error;
+
+  // --- SMART CATEGORIZATION: Link to Expenses ---
+  // If a salary is marked as 'paid', automatically record it as an expense
+  if (salary.payment_status === 'paid') {
+    try {
+      const staffList = await getDbStaff();
+      const staffMember = staffList.find((s: any) => s.id === salary.staff_id);
+      const expenseDesc = `راتب شهر ${salary.month}/${salary.year} - الموظف: ${staffMember?.name || 'مجهول'}`;
+      
+      // Check if this expense already exists to avoid duplicates on multiple saves
+      const { data: existingExpenses } = await supabase
+        .from('expenses')
+        .select('id')
+        .eq('description', expenseDesc)
+        .limit(1);
+
+      if (!existingExpenses || existingExpenses.length === 0) {
+        const expenseData = {
+          category: 'رواتب',
+          amount: Number(salary.net_salary),
+          date: new Date().toISOString().split('T')[0],
+          description: expenseDesc,
+          from_entity: 'الخزينة الرئيسية',
+          to_entity: staffMember?.name || 'موظف',
+          ordered_by: 'النظام الآلي'
+        };
+        
+        await saveDbExpense(expenseData);
+      }
+    } catch (err) {
+      console.error('Failed to auto-categorize salary as expense:', err);
+    }
+  }
+
   return salary;
 }
 

@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { getBookings, getSystemUnits, updateBookingStatus, saveBooking, deleteBooking } from '@/lib/data-init';
+import { 
+  getFreshDbBookings, 
+  getDbUnits, 
+  updateDbBookingStatus, 
+  saveDbBooking, 
+  deleteDbBooking 
+} from '@/lib/actions/db';
 import ExpensesTab from './ExpensesTab';
 import FinancialSummaryTab from './FinancialSummaryTab';
 
@@ -198,13 +204,18 @@ export default function ReportsPage() {
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
-    const [b, u] = await Promise.all([getBookings(), getSystemUnits()]);
-    setBookings(b);
-    setUnits(u);
-    if (!selectedUnit && u.length > 0) {
-      setSelectedUnit(u[0].id);
+    try {
+      const [b, u] = await Promise.all([getFreshDbBookings(), getDbUnits()]);
+      setBookings(b || []);
+      setUnits(u || []);
+      if (!selectedUnit && u && u.length > 0) {
+        setSelectedUnit(u[0].id);
+      }
+    } catch (error) {
+      console.error('Error loading reports data:', error);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }, [selectedUnit]);
 
   useEffect(() => {
@@ -268,13 +279,11 @@ export default function ReportsPage() {
 
       // Removed manual discount logic
 
-      const freshData = await updateBookingStatus(bookingId, updates);
+      const freshData = await updateDbBookingStatus(bookingId, updates);
       
       // Update local state WITH THE FRESH DATA RETURNED FROM SERVER
       if (freshData && Array.isArray(freshData)) {
         setBookings(freshData);
-      } else {
-        setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, ...updates } : b));
       }
       
       setSaveStatus('✅ تم الحفظ');
@@ -292,7 +301,7 @@ export default function ReportsPage() {
     
     try {
       setSaveStatus('جاري حفظ التعديلات...');
-      const freshData = await updateBookingStatus(editingBooking.id, editingBooking);
+      const freshData = await updateDbBookingStatus(editingBooking.id, editingBooking);
       if (freshData && Array.isArray(freshData)) {
         setBookings(freshData);
       }
@@ -311,12 +320,10 @@ export default function ReportsPage() {
     
     try {
       setSaveStatus('جاري المسح...');
-      const freshData = await deleteBooking(id);
+      const freshData = await deleteDbBooking(id);
       
       if (freshData && Array.isArray(freshData)) {
         setBookings(freshData);
-      } else {
-        setBookings(prev => prev.filter(b => b.id !== id));
       }
       
       setSaveStatus('✅ تم المسح بنجاح');
@@ -387,7 +394,7 @@ export default function ReportsPage() {
         notes: newRecord.notes
       };
       
-      await saveBooking(newBooking);
+      await saveDbBooking(newBooking);
       await loadData();
       
       // Reset form
@@ -785,12 +792,12 @@ export default function ReportsPage() {
                 >
                   <option value="" disabled>اختر الوحدة</option>
                   <optgroup label="الاستديوهات الفندقية">
-                    {units.filter(u => u.type === 'studio').sort((a,b) => a.id.localeCompare(b.id)).map(u => (
+                    {units.filter(u => u.type === 'studio').sort((a,b) => a.id.localeCompare(b.id, undefined, { numeric: true })).map(u => (
                       <option key={u.id} value={u.id}>{u.title?.ar || u.id}</option>
                     ))}
                   </optgroup>
                   <optgroup label="الشقق الفندقية">
-                    {units.filter(u => u.type === 'apartment').sort((a,b) => a.id.localeCompare(b.id)).map(u => (
+                    {units.filter(u => u.type === 'apartment').sort((a,b) => a.id.localeCompare(b.id, undefined, { numeric: true })).map(u => (
                       <option key={u.id} value={u.id}>{u.title?.ar || u.id}</option>
                     ))}
                   </optgroup>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from 'react';
-import { getBookings, deleteBookingsByPhone } from '@/lib/data-init';
+import { getFreshDbBookings, deleteDbBookingsByPhone } from '@/lib/actions/db';
 import { formatWhatsAppNumber } from '@/lib/utils';
 
 export default function CustomersDatabase() {
@@ -13,7 +13,7 @@ export default function CustomersDatabase() {
   const loadData = async () => {
     setIsLoading(true);
     // Add cache buster
-    const data = await getBookings(Date.now().toString());
+    const data = await getFreshDbBookings(Date.now().toString());
     setBookings(data);
     setIsLoading(false);
   };
