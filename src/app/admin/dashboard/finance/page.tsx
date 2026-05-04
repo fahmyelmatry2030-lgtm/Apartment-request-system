@@ -188,26 +188,26 @@ export default function FinancePage() {
           <table className="w-full border-collapse text-center">
             <thead>
               <tr>
-                <th className="px-6 py-4 font-black text-xs bg-[#F97316] text-white border border-orange-300">Rent</th>
+                <th className="px-6 py-4 font-black text-xs bg-[#22C55E] text-white border border-green-300">Revenue</th>
                 <th className="px-6 py-4 font-black text-xs bg-[#F97316] text-white border border-orange-300">Expenses</th>
                 <th className="px-6 py-4 font-black text-xs bg-[#F97316] text-white border border-orange-300">Salaries</th>
                 <th className="px-6 py-4 font-black text-sm bg-[#FACC15] text-[#2A2723] border border-yellow-300">Final</th>
               </tr>
               <tr>
-                <th className="px-4 py-1 text-[10px] font-bold text-[#7A7061] bg-orange-50 border border-orange-100">الإيجار</th>
-                <th className="px-4 py-1 text-[10px] font-bold text-[#7A7061] bg-orange-50 border border-orange-100">المصروفات</th>
+                <th className="px-4 py-1 text-[10px] font-bold text-[#7A7061] bg-green-50 border border-green-100">الإيرادات (إيجارات)</th>
+                <th className="px-4 py-1 text-[10px] font-bold text-[#7A7061] bg-orange-50 border border-orange-100">المصروفات + العمولات</th>
                 <th className="px-4 py-1 text-[10px] font-bold text-[#7A7061] bg-orange-50 border border-orange-100">الرواتب</th>
                 <th className="px-4 py-1 text-[10px] font-bold text-[#2A2723] bg-yellow-50 border border-yellow-100">الصافي النهائي</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td className="px-6 py-8 border border-[#EAE4D9]/40">
-                  <div className="text-2xl font-black text-[#2A2723]">{isLoading ? '...' : rentTotal.toLocaleString()}</div>
+                <td className="px-6 py-8 border border-[#EAE4D9]/40 bg-green-50/20">
+                  <div className="text-2xl font-black text-green-700">{isLoading ? '...' : revenue.toLocaleString()}</div>
                   <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
                 </td>
                 <td className="px-6 py-8 border border-[#EAE4D9]/40">
-                  <div className="text-2xl font-black text-red-600">{isLoading ? '...' : otherExpenses.toLocaleString()}</div>
+                  <div className="text-2xl font-black text-red-600">{isLoading ? '...' : (otherExpenses + commissions).toLocaleString()}</div>
                   <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
                 </td>
                 <td className="px-6 py-8 border border-[#EAE4D9]/40">
