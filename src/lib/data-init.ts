@@ -64,7 +64,7 @@ export const getSystemUnits = async () => {
 // Returns only the 7 display categories (hides the 24 physical studios)
 export const getPublicSystemUnits = async () => {
   const allUnits = await getSystemUnits();
-  return allUnits.filter(u => !String(u.id).startsWith('b1-s') && !String(u.id).startsWith('b2-s'));
+  return allUnits.filter(u => !String(u.id).startsWith('b1-s') && !String(u.id).startsWith('b2-s') && u.branch !== 3);
 };
 
 export const updateUnitDetails = async (id: string, updates: any) => {
@@ -96,7 +96,7 @@ export const getPublicUnitsWithAvailability = async () => {
   const today = new Date().toISOString().split('T')[0];
 
   // 1. Get the 7 master categories
-  const masterUnits = allUnits.filter(u => !String(u.id).startsWith('b1-s') && !String(u.id).startsWith('b2-s'));
+  const masterUnits = allUnits.filter(u => !String(u.id).startsWith('b1-s') && !String(u.id).startsWith('b2-s') && u.branch !== 3);
 
   // 2. Identify occupied physical units for today
   const occupiedIds = bookings
