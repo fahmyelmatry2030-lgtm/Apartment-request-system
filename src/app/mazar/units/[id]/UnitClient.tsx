@@ -91,7 +91,7 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
                ) : (
                  <Image 
                     src={activeImage} 
-                    alt={unit.title[language]} 
+                    alt={unit?.title?.[language] || ''} 
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-700" 
@@ -100,13 +100,13 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
                )}
                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
                <div className={`absolute bottom-6 ${isRTL ? 'right-6' : 'left-6'} text-white`}>
-                  <div className="text-sm font-bold bg-[#E63946] px-3 py-1 rounded-full inline-block mb-2 shadow-sm">{unit.type === 'studio' ? (isRTL ? 'استوديو' : 'Studio') : (isRTL ? 'شقة فندقية' : 'Hotel Apartment')}</div>
+                  <div className="text-sm font-bold bg-[#E63946] px-3 py-1 rounded-full inline-block mb-2 shadow-sm">{unit?.type === 'studio' ? (isRTL ? 'استوديو' : 'Studio') : (isRTL ? 'شقة فندقية' : 'Hotel Apartment')}</div>
                </div>
             </div>
             
             {/* Thumbnail Grid (Media) */}
             <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
-               {unit.video && (
+               {unit?.video && (
                   <button 
                     onClick={() => setActiveImage(unit.video)}
                     className={`relative aspect-square rounded-2xl overflow-hidden border-2 transition-all bg-black flex items-center justify-center ${activeImage === unit.video ? 'border-[#C1A68D] scale-95 shadow-lg' : 'border-[#EAE4D9] hover:border-[#C1A68D]/40'}`}
@@ -114,7 +114,7 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
                      <span className="text-white text-2xl">▶</span>
                   </button>
                )}
-               {unit.images.map((img: string, i: number) => (
+               {unit?.images?.map((img: string, i: number) => (
                   <button 
                     key={i} 
                     onClick={() => setActiveImage(img)}
@@ -136,7 +136,7 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
           <div className={`flex flex-col ${isRTL ? 'text-right' : 'text-left'}`}>
              <div className="flex items-center gap-3 mb-4">
                 <div className="inline-block bg-[#F7F5F0] border border-[#C1A68D]/30 px-3 py-1 rounded-lg text-[10px] font-bold text-[#C1A68D] uppercase tracking-widest">
-                   {unit.type}
+                   {unit?.type || 'Unit'}
                 </div>
                 <div className={`inline-block px-3 py-1 rounded-lg text-white text-[10px] font-bold tracking-widest shadow-md ${status === 'متاح' ? 'bg-green-500' : status === 'مشغول' ? 'bg-blue-500' : 'bg-red-500'}`}>
                    {status}
@@ -144,10 +144,10 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
              </div>
              
              <h1 className="text-4xl md:text-5xl font-black text-[#2A2723] mb-6 leading-tight">
-                {unit.title[language]}
+                {unit?.title?.[language] || (isRTL ? 'وحدة بدون اسم' : 'Unnamed Unit')}
              </h1>
 
-             {unit.price && (
+             {unit?.price && (
                <div className="flex items-center gap-4 mb-8">
                  <div className="text-3xl font-black text-[#C1A68D]">
                     {unit.price} <span className="text-base font-bold">/ {isRTL ? 'الليلة' : 'Night'}</span>
@@ -161,7 +161,7 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
              )}
 
              <p className="text-lg text-[#5C554B] leading-loose mb-10 opacity-90">
-                {unit.description[language]}
+                {unit?.description?.[language] || ''}
              </p>
 
              <div className="bg-white p-8 rounded-[40px] border border-[#EAE4D9] shadow-sm mb-10">
@@ -170,7 +170,7 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
                    {t.unitsPage.unitFeatures}
                 </h3>
                 <div className="grid grid-cols-2 gap-y-4 gap-x-2">
-                   {unit.features[language].map((feat: string, i: number) => (
+                   {unit?.features?.[language]?.map((feat: string, i: number) => (
                       <div key={i} className="flex items-center gap-3 text-sm text-[#4A3F2F] font-bold">
                          <span className="text-green-500">✓</span>
                          {feat}
@@ -180,7 +180,7 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
              </div>
 
              <Link 
-               href={`/mazar/book?unit=${unit.id}`} 
+               href={`/mazar/book?unit=${unit?.id}`} 
                className="w-full bg-[#E63946] text-white text-lg font-black py-5 rounded-3xl text-center hover:bg-[#c1121f] transition-all shadow-2xl shadow-red-500/30 active:scale-95 transform flex items-center justify-center gap-4"
              >
                 <span className="text-2xl">🗓️</span>
@@ -206,7 +206,7 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
         <section className="mt-24 pt-20 border-t border-[#EAE4D9]">
            <h2 className="text-2xl font-black text-[#2A2723] mb-10">{t.unitsPage.gallery}</h2>
            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {unit.images.map((img: string, i: number) => (
+              {unit?.images?.map((img: string, i: number) => (
                  <div key={i} className={`relative rounded-3xl overflow-hidden border border-[#EAE4D9] h-80 ${i % 3 === 0 ? 'md:col-span-2' : ''}`}>
                     <Image 
                         src={img} 

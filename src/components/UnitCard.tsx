@@ -27,28 +27,34 @@ const UnitCard: React.FC<UnitCardProps> = ({ unit }) => {
   return (
     <div className={`bg-white rounded-3xl border border-[#EAE4D9] overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group`}>
       <div className="relative h-64 overflow-hidden">
-        <Image 
-          src={unit.images[0]} 
-          alt={unit.title[language]} 
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-cover group-hover:scale-110 transition-transform duration-700"
-          priority={false}
-        />
+        {unit?.images?.[0] ? (
+          <Image 
+            src={unit.images[0]} 
+            alt={unit.title?.[language] || ''} 
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover group-hover:scale-110 transition-transform duration-700"
+            priority={false}
+          />
+        ) : (
+          <div className="w-full h-full bg-[#F7F5F0] flex items-center justify-center text-[#7A7061]">
+             {isRTL ? 'لا توجد صورة' : 'No Image'}
+          </div>
+        )}
         <div className={`absolute top-4 ${isRTL ? 'right-4' : 'left-4'} bg-[#2A2723]/80 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full border border-white/10 flex gap-2`}>
-          <span>{unit.type === 'studio' ? (isRTL ? 'استوديو' : 'STUDIO') : (isRTL ? 'شقة' : 'APARTMENT')}</span>
+          <span>{unit?.type === 'studio' ? (isRTL ? 'استوديو' : 'STUDIO') : (isRTL ? 'شقة' : 'APARTMENT')}</span>
         </div>
         <div className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} ${status === 'متاح' ? 'bg-green-500/90' : status === 'مشغول' ? 'bg-blue-500/90' : 'bg-red-500/90'} backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-md`}>
           {status}
         </div>
       </div>
       <div className={`p-6 flex flex-col flex-1 ${isRTL ? 'text-right' : 'text-left'}`}>
-        <h3 className="text-xl font-bold text-[#2A2723] mb-2">{unit.title[language]}</h3>
+        <h3 className="text-xl font-bold text-[#2A2723] mb-2">{unit?.title?.[language] || (isRTL ? 'وحدة بدون اسم' : 'Unnamed Unit')}</h3>
         <p className="text-sm text-[#7A7061] mb-2 line-clamp-2 leading-relaxed">
-          {unit.description[language]}
+          {unit?.description?.[language] || ''}
         </p>
         
-        {unit.price && (
+        {unit?.price && (
           <div className="font-bold text-[#C1A68D] mb-4 flex items-center gap-2">
             <span>{unit.price} / {isRTL ? 'الليلة' : 'Night'}</span>
             {unit.originalPrice && (
@@ -58,7 +64,7 @@ const UnitCard: React.FC<UnitCardProps> = ({ unit }) => {
         )}
         
         <div className="flex flex-wrap gap-2 mb-8 mt-auto">          
-          {unit.features[language].slice(0, 3).map((feat: string, i: number) => (
+          {unit?.features?.[language]?.slice(0, 3).map((feat: string, i: number) => (
             <span key={i} className="text-[10px] font-bold text-[#5C554B] bg-[#F7F5F0] px-2.5 py-1 rounded-lg border border-[#EAE4D9]">
               {feat}
             </span>
@@ -66,10 +72,10 @@ const UnitCard: React.FC<UnitCardProps> = ({ unit }) => {
         </div>
 
         <Link 
-          href={`/mazar/units/${unit.id}`}
+          href={`/mazar/units/${unit?.id}`}
           className="mt-auto w-full bg-[#E63946] text-white text-sm font-bold py-3.5 rounded-xl text-center hover:bg-[#c1121f] transition-colors shadow-lg shadow-red-100"
         >
-          {t.unitsPage.viewDetails}
+          {t?.unitsPage?.viewDetails || 'Details'}
         </Link>
       </div>
     </div>

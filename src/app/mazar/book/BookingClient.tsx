@@ -165,7 +165,7 @@ export default function BookingPage() {
       dates: `${checkIn} - ${checkOut}`,
       guest: name,
       guestsCount: guestsCount,
-      studio: selectedUnit ? selectedUnit.title[language] : selectedUnitId,
+      studio: selectedUnit ? (selectedUnit.title?.[language] || selectedUnitId) : selectedUnitId,
     };
 
     try {
@@ -177,7 +177,7 @@ export default function BookingPage() {
       const start = new Date(checkIn).getTime();
       const end = new Date(checkOut).getTime();
       const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-      const adminMsg = `🔔 *طلب حجز جديد من الموقع!*\n\n👤 *العميل:* ${name}\n📱 *الموبايل:* ${phone}\n👥 *عدد الأشخاص:* ${guestsCount}\n🏠 *الوحدة:* ${selectedUnit ? selectedUnit.title['ar'] : selectedUnitId}\n📅 *الفترة:* من ${formatDate(checkIn)} إلى ${formatDate(checkOut)} (إجمالي ${nights} ليالي)\n\nيرجى تأكيد الحجز معي.`;
+      const adminMsg = `🔔 *طلب حجز جديد من الموقع!*\n\n👤 *العميل:* ${name}\n📱 *الموبايل:* ${phone}\n👥 *عدد الأشخاص:* ${guestsCount}\n🏠 *الوحدة:* ${selectedUnit ? (selectedUnit.title?.['ar'] || selectedUnitId) : selectedUnitId}\n📅 *الفترة:* من ${formatDate(checkIn)} إلى ${formatDate(checkOut)} (إجمالي ${nights} ليالي)\n\nيرجى تأكيد الحجز معي.`;
       const waUrl = `https://api.whatsapp.com/send?phone=${ADMIN_WHATSAPP}&text=${encodeURIComponent(adminMsg)}`;
       window.location.href = waUrl;
       
@@ -211,7 +211,7 @@ export default function BookingPage() {
 
           <div className="bg-[#F7F5F0] py-8 px-10 rounded-[40px] mb-8 border border-[#EAE4D9]">
             <p className="text-[11px] font-black text-[#C1A68D] uppercase tracking-widest mb-2">{isRTL ? 'الوحدة المختارة' : 'Selected Unit'}</p>
-            <p className="text-3xl font-black text-[#2A2723] mb-1">{selectedUnit ? selectedUnit.title[language] : selectedUnitId}</p>
+            <p className="text-3xl font-black text-[#2A2723] mb-1">{selectedUnit ? (selectedUnit.title?.[language] || selectedUnitId) : selectedUnitId}</p>
             <div className="flex justify-center gap-6 mt-4">
               <div className="text-center">
                 <p className="text-[9px] font-bold text-gray-400 uppercase">{isRTL ? 'من' : 'From'}</p>
@@ -633,7 +633,7 @@ export default function BookingPage() {
                                     )}
                                   </div>
                                   <h4 className={`text-xs md:text-sm font-black leading-snug transition-colors ${selectedUnitId === u.id ? 'text-white' : 'text-[#2A2723]'}`}>
-                                    {u.title[language]}
+                                    {u?.title?.[language] || u.id}
                                   </h4>
                                   <div className={`p-1.5 md:p-2 rounded-xl text-[7px] md:text-[8px] font-bold text-center transition-all ${selectedUnitId === u.id ? 'bg-white/10 text-white/70' : 'bg-[#F7F5F0] text-[#7A7061]'}`}>
                                     ✨ {isRTL ? 'إقامة بريميوم' : 'Premium Stay'}
@@ -747,7 +747,7 @@ export default function BookingPage() {
                           <span>{isRTL ? 'تفاصيل الحجز' : 'Selection Detail'}</span>
                           <span>{formatDate(checkIn)} → {formatDate(checkOut)}</span>
                         </div>
-                        <p className="text-lg md:text-xl font-bold">{availableUnits.find(u => u.id === selectedUnitId)?.title[language]}</p>
+                        <p className="text-lg md:text-xl font-bold">{availableUnits.find(u => u.id === selectedUnitId)?.title?.[language] || selectedUnitId}</p>
                       </div>
                     )}
 
@@ -861,7 +861,7 @@ export default function BookingPage() {
               </div>
 
               <h1 className="text-3xl md:text-5xl font-black text-[#2A2723] mb-6 leading-tight">
-                {quickViewUnit.title[language]}
+                {quickViewUnit?.title?.[language] || quickViewUnit?.id}
               </h1>
 
               {quickViewUnit.price && (
@@ -878,7 +878,7 @@ export default function BookingPage() {
               )}
 
               <p className="text-base md:text-lg text-[#5C554B] leading-loose mb-10 opacity-90">
-                {quickViewUnit.description[language]}
+                {quickViewUnit?.description?.[language] || ''}
               </p>
 
               <div className="bg-white p-6 md:p-8 rounded-[30px] md:rounded-[40px] border border-[#EAE4D9] shadow-sm mb-10 shrink-0">
@@ -887,7 +887,7 @@ export default function BookingPage() {
                   {isRTL ? 'مميزات الوحدة' : 'Unit Features'}
                 </h3>
                 <div className="grid grid-cols-2 gap-y-4 gap-x-2">
-                  {quickViewUnit.features && quickViewUnit.features[language] && quickViewUnit.features[language].map((feat: string, i: number) => (
+                  {quickViewUnit?.features?.[language]?.map((feat: string, i: number) => (
                     <div key={i} className="flex items-center gap-3 text-sm text-[#4A3F2F] font-bold">
                       <span className="text-green-500">✓</span>
                       {feat}
