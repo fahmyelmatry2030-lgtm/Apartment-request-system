@@ -547,7 +547,7 @@ export default function ReportsPage() {
       return (a.checkIn || '').localeCompare(b.checkIn || '');
     }
     // Secondary sort: earlier bookings first if same day
-    return (a.id || '').localeCompare(b.id || '');
+    return String(a.id || '').localeCompare(String(b.id || ''));
   });
 
   // Re-assign 'no' after sorting
@@ -792,12 +792,12 @@ export default function ReportsPage() {
                 >
                   <option value="" disabled>اختر الوحدة</option>
                   <optgroup label="الاستديوهات الفندقية">
-                    {units.filter(u => u.type === 'studio').sort((a,b) => a.id.localeCompare(b.id, undefined, { numeric: true })).map(u => (
+                    {units.filter(u => u.type === 'studio').sort((a,b) => String(a.id).localeCompare(String(b.id), undefined, { numeric: true })).map(u => (
                       <option key={u.id} value={u.id}>{u.title?.ar || u.id}</option>
                     ))}
                   </optgroup>
                   <optgroup label="الشقق الفندقية">
-                    {units.filter(u => u.type === 'apartment').sort((a,b) => a.id.localeCompare(b.id, undefined, { numeric: true })).map(u => (
+                    {units.filter(u => u.type === 'apartment').sort((a,b) => String(a.id).localeCompare(String(b.id), undefined, { numeric: true })).map(u => (
                       <option key={u.id} value={u.id}>{u.title?.ar || u.id}</option>
                     ))}
                   </optgroup>
