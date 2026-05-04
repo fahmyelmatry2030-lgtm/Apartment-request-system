@@ -446,12 +446,20 @@ export default function DashboardOverview() {
 
           {/* Unit Grid or Table */}
           {(() => {
-            const displayList = apartmentMap.filter(apt => 
-              !searchTerm || 
-              apt.guest?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-              apt.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-              apt.title?.ar?.toLowerCase().includes(searchTerm.toLowerCase())
-            );
+            const displayList = apartmentMap.filter(apt => {
+              if (!searchTerm) return true;
+              const s = searchTerm.toLowerCase();
+              const guestMatch = apt.guest?.toLowerCase().includes(s);
+              const idMatch = apt.id.toLowerCase().includes(s);
+              const titleMatch = apt.title?.ar?.toLowerCase().includes(s);
+              // Support searching by date in format YYYY-MM-DD or DD/MM
+              const dateMatch = apt.checkOut?.includes(s) || (apt.checkOut && (() => {
+                const [y, m, d] = apt.checkOut.split('-');
+                return `${d}/${m}`.includes(s);
+              })());
+              
+              return guestMatch || idMatch || titleMatch || dateMatch;
+            });
 
             if (displayList.length === 0) {
               return <div className="h-40 flex items-center justify-center text-gray-300 animate-pulse font-black text-sm italic">لا يوجد وحدات مطابقة للبحث...</div>;
