@@ -48,7 +48,7 @@ export default function CustomersDatabase() {
       const phone = b.phone?.trim();
       if (!phone) return;
       
-      const hasDiscountInThisBooking = b.notes && discountKeywords.some(kw => b.notes.toLowerCase().includes(kw));
+      const hasDiscountInThisBooking = b.notes && discountKeywords.some(kw => String(b.notes).toLowerCase().includes(kw));
       
       const existing = customerMap.get(phone);
       if (existing) {

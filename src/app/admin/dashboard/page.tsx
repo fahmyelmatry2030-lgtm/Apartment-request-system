@@ -112,15 +112,15 @@ export default function DashboardOverview() {
       { id: 'double',   label: 'دبل',      count: map.filter((u: any) => doubleIds.includes(u.id)  && !u.isOccupied).length, total: 10, color: 'text-blue-400'   },
       { id: 'triple',   label: 'تريبل',    count: map.filter((u: any) => tripleIds.includes(u.id)  && !u.isOccupied).length, total: 5,  color: 'text-orange-400' },
       { id: 'two-room', label: 'غرفتين',   count: map.filter((u: any) => twoRoomIds.includes(u.id) && !u.isOccupied).length, total: 3,  color: 'text-purple-400' },
-      { id: 'apartment', label: 'شقق',    count: map.filter((u: any) => u.id.startsWith('apt-') && !u.isOccupied).length, total: map.filter((u: any) => u.id.startsWith('apt-')).length, color: 'text-amber-500' },
+      { id: 'apartment', label: 'شقق',    count: map.filter((u: any) => String(u.id).startsWith('apt-') && !u.isOccupied).length, total: map.filter((u: any) => String(u.id).startsWith('apt-')).length, color: 'text-amber-500' },
     ]);
 
     setAllBookings(bookings);
 
-    const occupiedStudios = map.filter((u: any) => (u.id.startsWith('b1-s') || u.id.startsWith('b2-s')) && u.isOccupied).length;
-    const totalStudios = map.filter((u: any) => u.id.startsWith('b1-s') || u.id.startsWith('b2-s')).length;
-    const occupiedApartments = map.filter((u: any) => u.id.startsWith('apt-') && u.isOccupied).length;
-    const totalApartments = map.filter((u: any) => u.id.startsWith('apt-')).length;
+    const occupiedStudios = map.filter((u: any) => (String(u.id).startsWith('b1-s') || String(u.id).startsWith('b2-s')) && u.isOccupied).length;
+    const totalStudios = map.filter((u: any) => String(u.id).startsWith('b1-s') || String(u.id).startsWith('b2-s')).length;
+    const occupiedApartments = map.filter((u: any) => String(u.id).startsWith('apt-') && u.isOccupied).length;
+    const totalApartments = map.filter((u: any) => String(u.id).startsWith('apt-')).length;
 
     setStats({
       totalBookings: bookings.length,
@@ -514,9 +514,9 @@ export default function DashboardOverview() {
             const displayList = apartmentMap.filter(apt => {
               if (!searchTerm) return true;
               const s = searchTerm.toLowerCase();
-              const guestMatch = apt.guest?.toLowerCase().includes(s);
-              const idMatch = apt.id.toLowerCase().includes(s);
-              const titleMatch = apt.title?.ar?.toLowerCase().includes(s);
+              const guestMatch = String(apt.guest || '').toLowerCase().includes(s);
+              const idMatch = String(apt.id || '').toLowerCase().includes(s);
+              const titleMatch = String(apt.title?.ar || '').toLowerCase().includes(s);
               // Support searching by date in format YYYY-MM-DD or DD/MM
               const dateMatch = apt.checkOut?.includes(s) || (apt.checkOut && (() => {
                 const [y, m, d] = apt.checkOut.split('-');

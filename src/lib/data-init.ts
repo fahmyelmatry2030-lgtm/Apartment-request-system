@@ -64,7 +64,7 @@ export const getSystemUnits = async () => {
 // Returns only the 7 display categories (hides the 24 physical studios)
 export const getPublicSystemUnits = async () => {
   const allUnits = await getSystemUnits();
-  return allUnits.filter(u => !u.id.startsWith('b1-s') && !u.id.startsWith('b2-s'));
+  return allUnits.filter(u => !String(u.id).startsWith('b1-s') && !String(u.id).startsWith('b2-s'));
 };
 
 export const updateUnitDetails = async (id: string, updates: any) => {
@@ -96,7 +96,7 @@ export const getPublicUnitsWithAvailability = async () => {
   const today = new Date().toISOString().split('T')[0];
 
   // 1. Get the 7 master categories
-  const masterUnits = allUnits.filter(u => !u.id.startsWith('b1-s') && !u.id.startsWith('b2-s'));
+  const masterUnits = allUnits.filter(u => !String(u.id).startsWith('b1-s') && !String(u.id).startsWith('b2-s'));
 
   // 2. Identify occupied physical units for today
   const occupiedIds = bookings
@@ -108,7 +108,7 @@ export const getPublicUnitsWithAvailability = async () => {
 
   // 3. Map physical units to their categories and calculate availability
   // Physical units are identified by b1-s1 to b1-s24
-  const physicalStudios = allUnits.filter(u => u.id.startsWith('b1-s'));
+  const physicalStudios = allUnits.filter(u => String(u.id).startsWith('b1-s'));
 
   return masterUnits.map(master => {
     let physicalGroup: any[] = [];
