@@ -548,12 +548,12 @@ export default function DashboardOverview() {
                     <tbody className="divide-y divide-[#EAE4D9]/30">
                       {[...displayList]
                         .sort((a, b) => {
-                          const n = (u: any) => u.id.startsWith('b1-s') ? parseInt(u.id.replace('b1-s',''),10) : u.id.startsWith('b2-s') ? parseInt(u.id.replace('b2-s',''),10)+12 : 99;
+                          const n = (u: any) => String(u.id).startsWith('b1-s') ? parseInt(String(u.id).replace('b1-s',''),10) : String(u.id).startsWith('b2-s') ? parseInt(String(u.id).replace('b2-s',''),10)+12 : 99;
                           return n(a) - n(b);
                         })
                         .map((apt) => {
-                          const isB1 = apt.id.startsWith('b1-s');
-                          const isB2 = apt.id.startsWith('b2-s');
+                          const isB1 = String(apt.id).startsWith('b1-s');
+                          const isB2 = String(apt.id).startsWith('b2-s');
                           const num = isB1 ? parseInt(apt.id.replace('b1-s',''),10) : isB2 ? parseInt(apt.id.replace('b2-s',''),10)+12 : 0;
                           const rowBg = isB1 ? 'bg-blue-50/50 hover:bg-blue-50' : isB2 ? 'bg-emerald-50/50 hover:bg-emerald-50' : 'bg-amber-50/50 hover:bg-amber-50';
                           const badgeColor = isB1 ? 'bg-blue-600 text-white' : isB2 ? 'bg-emerald-600 text-white' : 'bg-[#C1A68D] text-white';

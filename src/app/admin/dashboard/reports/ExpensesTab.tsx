@@ -45,12 +45,19 @@ export default function ExpensesTab() {
     category: '',
     amount: '',
     description: '',
-    date: new Date().toISOString().split('T')[0],
+    date: '',
     branch: '1',
     from_entity: '',
     to_entity: '',
     ordered_by: ''
   });
+
+  useEffect(() => {
+    setNewExpense(prev => ({
+      ...prev,
+      date: new Date().toISOString().split('T')[0]
+    }));
+  }, []);
 
   const [editingExpense, setEditingExpense] = useState<any>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);

@@ -184,8 +184,8 @@ export default function ReportsPage() {
     nationality: '',
     idNumber: '',
     phone: '',
-    checkIn: safeDateStr,
-    checkOut: safeDateStr,
+    checkIn: '',
+    checkOut: '',
     pricePerNight: 0,
     commission: 0,
     clientStatus: 'انتظار',
@@ -831,18 +831,18 @@ export default function ReportsPage() {
             <div className="text-[9px] font-black text-[#C1A68D] uppercase tracking-[0.25em] px-3 mb-2">الاستديوهات الفندقية</div>
             <div className="flex flex-wrap gap-1.5">
               {units
-                .filter(u => u.type === 'studio' && !u.id.startsWith('s-'))
+                .filter(u => u.type === 'studio' && !String(u.id).startsWith('s-'))
                 .sort((a, b) => {
                   const getNum = (u: any) => {
-                    if (u.id.startsWith('b1-s')) return parseInt(u.id.replace('b1-s',''), 10);
-                    if (u.id.startsWith('b2-s')) return parseInt(u.id.replace('b2-s',''), 10) + 12;
+                    if (String(u.id).startsWith('b1-s')) return parseInt(String(u.id).replace('b1-s',''), 10);
+                    if (String(u.id).startsWith('b2-s')) return parseInt(String(u.id).replace('b2-s',''), 10) + 12;
                     return 99;
                   };
                   return getNum(a) - getNum(b);
                 })
                 .map(u => {
-                  const isB1 = u.id.startsWith('b1-s');
-                  const isB2 = u.id.startsWith('b2-s');
+                  const isB1 = String(u.id).startsWith('b1-s');
+                  const isB2 = String(u.id).startsWith('b2-s');
                   const isActive = selectedUnit === u.id;
                   let cls = '';
                   if (isActive) {
