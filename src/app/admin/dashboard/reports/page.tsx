@@ -533,11 +533,14 @@ export default function ReportsPage() {
     };
   });
 
-  // Sort dataRows by check-in date
+  // Sort dataRows by check-in date: OLD (Oldest) at TOP, NEW (Newest) at BOTTOM
   const sortedDataRows = [...dataRows].sort((a, b) => {
-    const timeA = new Date(a.checkIn || 0).getTime();
-    const timeB = new Date(b.checkIn || 0).getTime();
-    return timeA - timeB;
+    // String comparison works perfectly for YYYY-MM-DD
+    if (a.checkIn !== b.checkIn) {
+      return (a.checkIn || '').localeCompare(b.checkIn || '');
+    }
+    // Secondary sort: earlier bookings first if same day
+    return (a.id || '').localeCompare(b.id || '');
   });
 
   // Re-assign 'no' after sorting
