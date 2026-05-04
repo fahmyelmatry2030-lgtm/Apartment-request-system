@@ -94,6 +94,12 @@ export default function DashboardOverview() {
     ]);
 
     setAllBookings(bookings);
+
+    const occupiedStudios = map.filter((u: any) => (u.id.startsWith('b1-s') || u.id.startsWith('b2-s')) && u.isOccupied).length;
+    const totalStudios = map.filter((u: any) => u.id.startsWith('b1-s') || u.id.startsWith('b2-s')).length;
+    const occupiedApartments = map.filter((u: any) => u.id.startsWith('apt-') && u.isOccupied).length;
+    const totalApartments = map.filter((u: any) => u.id.startsWith('apt-')).length;
+
     setStats({
       totalBookings: bookings.length,
       pendingBookings: pending.length,
@@ -102,6 +108,11 @@ export default function DashboardOverview() {
       checkOutToday:   confirmed.filter((b: any) => b.checkOut === targetDateStr).length,
       checkInTomorrow: confirmed.filter((b: any) => b.checkIn  === nextDayStr).length,
       checkOutTomorrow:confirmed.filter((b: any) => b.checkOut === nextDayStr).length,
+      // @ts-ignore
+      occupiedStudios,
+      totalStudios,
+      occupiedApartments,
+      totalApartments
     });
 
     setTodaySchedule({
@@ -152,6 +163,7 @@ export default function DashboardOverview() {
     { key: 'total',    label: 'إجمالي الطلبات', value: stats.totalBookings,   icon: '📊', gradient: 'from-[#2A2723] to-[#3D3530]',   text: 'text-white' },
     { key: 'pending',  label: 'قيد المراجعة',   value: stats.pendingBookings,  icon: '⏳', gradient: 'from-amber-500 to-orange-500', text: 'text-white' },
     { key: 'approved', label: 'مؤكدة',           value: stats.approvedBookings, icon: '✅', gradient: 'from-green-500 to-emerald-600', text: 'text-white' },
+    { key: 'occupancy', label: 'نسبة الإشغال',    value: `${Math.round(((stats as any).occupiedStudios + (stats as any).occupiedApartments) / ((stats as any).totalStudios + (stats as any).totalApartments) * 100) || 0}%`, icon: '🏠', gradient: 'from-purple-500 to-indigo-600', text: 'text-white' },
     { key: 'checkin',  label: 'وصول اليوم',      value: stats.checkInToday,    icon: '🛬', gradient: 'from-blue-500 to-blue-600',     text: 'text-white' },
     { key: 'checkout', label: 'مغادرة اليوم',    value: stats.checkOutToday,   icon: '🛫', gradient: 'from-rose-500 to-red-600',      text: 'text-white' },
   ];
@@ -164,6 +176,7 @@ export default function DashboardOverview() {
     if (key === 'approved') return confirmed;
     if (key === 'checkin')  return confirmed.filter((b: any) => b.checkIn  === targetDateStr);
     if (key === 'checkout') return confirmed.filter((b: any) => b.checkOut === targetDateStr);
+    if (key === 'occupancy') return confirmed.filter((b: any) => targetDateStr >= b.checkIn && targetDateStr < b.checkOut);
     return [];
   };
 
@@ -238,11 +251,25 @@ export default function DashboardOverview() {
                 <span className="text-2xl">{kpi.icon}</span>
                 <div>
                   <h3 className="font-black text-white text-sm">{kpi.label}</h3>
-                  <p className="text-[10px] text-white/60 font-bold">{list.length} حجز</p>
+                  <p className="text-[10px] text-white/60 font-bold">{list.length} حجز نشط الآن</p>
                 </div>
               </div>
               <button onClick={() => setSelectedKpi(null)} className="text-white/60 hover:text-white text-lg font-black">✕</button>
             </div>
+            
+            {selectedKpi === 'occupancy' && (
+              <div className="px-6 py-4 grid grid-cols-2 gap-4 border-b border-white/5">
+                <div className="bg-white/5 p-4 rounded-2xl border border-white/10">
+                  <p className="text-[9px] font-black text-purple-200 uppercase mb-1">الاستديوهات</p>
+                  <div className="text-xl font-black text-white">{(stats as any).occupiedStudios} <span className="text-[10px] opacity-40">/ {(stats as any).totalStudios}</span></div>
+                </div>
+                <div className="bg-white/5 p-4 rounded-2xl border border-white/10">
+                  <p className="text-[9px] font-black text-purple-200 uppercase mb-1">الشقق</p>
+                  <div className="text-xl font-black text-white">{(stats as any).occupiedApartments} <span className="text-[10px] opacity-40">/ {(stats as any).totalApartments}</span></div>
+                </div>
+              </div>
+            )}
+
             {list.length === 0 ? (
               <div className="py-10 text-center text-white/40 font-black text-sm">لا توجد بيانات</div>
             ) : (
