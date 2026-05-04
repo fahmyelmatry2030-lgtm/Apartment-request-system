@@ -41,11 +41,27 @@ export default function DashboardOverview() {
   const [selectedKpi, setSelectedKpi] = useState<string | null>(null);
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [adminRole, setAdminRole] = useState<string>('Admin');
+
+  useEffect(() => {
+    const info = sessionStorage.getItem('adminInfo');
+    if (info) {
+      const admin = JSON.parse(info);
+      setAdminRole(admin.role);
+    }
+  }, []);
+
+  const isPartner = adminRole === 'Partner';
 
   const loadOverviewData = useCallback(async () => {
     setIsLoading(true);
     const bookings = await getBookings(Date.now().toString());
-    const apts = await getSystemUnits();
+    let apts = await getSystemUnits();
+
+    // Filter for Partner: Only show Branch 3 (Units 25-30)
+    if (isPartner) {
+      apts = apts.filter((u: any) => u.branch === 3);
+    }
 
     const targetDateStr = selectedDate;
     const nextDay = new Date(selectedDate);
@@ -565,9 +581,12 @@ export default function DashboardOverview() {
                               <td className="px-4 py-2.5">
                                 {apt.isOccupied && apt.bookingId ? (
                                   <select 
+                                    disabled={isPartner}
                                     value={apt.clientStatus} 
                                     onChange={(e) => handleStatusUpdate(apt.bookingId, e.target.value)}
                                     className={`text-[10px] font-black rounded-lg px-2 py-1 outline-none border transition-all ${
+                                      isPartner ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'
+                                    } ${
                                       apt.clientStatus === 'متواجد' ? 'bg-green-600 text-white border-green-700' :
                                       apt.clientStatus === 'غادر' ? 'bg-gray-600 text-white border-gray-700' :
                                       'bg-amber-100 text-amber-700 border-amber-200'

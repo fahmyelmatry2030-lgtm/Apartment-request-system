@@ -23,6 +23,17 @@ export default function FinancePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [newExpense, setNewExpense] = useState({ category: '', amount: '', description: '', from_entity: '', to_entity: '', ordered_by: '' });
   const [saving, setSaving] = useState(false);
+  const [adminRole, setAdminRole] = useState<string>('Admin');
+
+  useEffect(() => {
+    const info = sessionStorage.getItem('adminInfo');
+    if (info) {
+      const admin = JSON.parse(info);
+      setAdminRole(admin.role);
+    }
+  }, []);
+
+  const isPartner = adminRole === 'Partner';
 
   const loadData = async () => {
     setIsLoading(true);
@@ -50,45 +61,59 @@ export default function FinancePage() {
     return bookings.filter((b: any) => {
       if (b.status === 'deleted') return false;
       if (b.status !== 'approved' && b.status !== 'مؤكد') return false;
+      
+      const unit = units.find(u => u.id === b.apartmentId);
+      if (isPartner && unit?.branch !== 3) return false;
+      
       const parts = b.checkIn?.split('-');
       if (!parts || parts.length < 2) return false;
       return parseInt(parts[1], 10) - 1 === selectedMonth && parseInt(parts[0], 10) === selectedYear;
     });
-  }, [bookings, selectedMonth, selectedYear]);
+  }, [bookings, selectedMonth, selectedYear, units, isPartner]);
 
+  const studioRevenue = monthlyBookings
+    .filter(b => {
+      const u = units.find(unit => unit.id === b.apartmentId);
+      return u?.type === 'studio' && u?.branch !== 3;
+    })
+    .reduce((sum, b) => sum + parseFloat(b.totalAmount || 0), 0);
+    
+  const apartmentRevenue = monthlyBookings
+    .filter(b => {
+      const u = units.find(unit => unit.id === b.apartmentId);
+      return u?.type === 'apartment' && u?.branch !== 3;
+    })
+    .reduce((sum, b) => sum + parseFloat(b.totalAmount || 0), 0);
+
+  const partnerRevenue = monthlyBookings
+    .filter(b => units.find(u => u.id === b.apartmentId)?.branch === 3)
+    .reduce((sum, b) => sum + parseFloat(b.totalAmount || 0), 0);
+  
+  const revenue = isPartner ? partnerRevenue : (studioRevenue + apartmentRevenue);
+  const commissions = monthlyBookings.reduce((sum, b) => sum + parseFloat(b.commission || 0), 0);
+  const totalNights = monthlyBookings.reduce((sum, b) => sum + (Number(b.numberOfDays) || 0), 0);
+  const avgNightlyRate = totalNights > 0 ? revenue / totalNights : 0;
+  
   const monthlyExpenses = useMemo(() => {
     return expenses.filter((e: any) => {
       if (!e.date) return false;
-      // Split "YYYY-MM-DD" to avoid timezone shifts
+      if (isPartner) return false;
+      
       const parts = e.date.split('-');
       if (parts.length < 2) return false;
       const year = parseInt(parts[0]);
       const month = parseInt(parts[1]) - 1;
       return month === selectedMonth && year === selectedYear;
     });
-  }, [expenses, selectedMonth, selectedYear]);
+  }, [expenses, selectedMonth, selectedYear, isPartner]);
 
   const monthlySalaries = useMemo(() => {
-    return salaries.filter((s: any) =>
-      Number(s.month) - 1 === selectedMonth && Number(s.year) === selectedYear
-    );
-  }, [salaries, selectedMonth, selectedYear]);
+    return salaries.filter((s: any) => {
+      if (isPartner) return false;
+      return Number(s.month) - 1 === selectedMonth && Number(s.year) === selectedYear;
+    });
+  }, [salaries, selectedMonth, selectedYear, isPartner]);
 
-  const revenue = monthlyBookings.reduce((sum, b) => sum + parseFloat(b.totalAmount || 0), 0);
-  const commissions = monthlyBookings.reduce((sum, b) => sum + parseFloat(b.commission || 0), 0);
-  const totalNights = monthlyBookings.reduce((sum, b) => sum + (Number(b.numberOfDays) || 0), 0);
-  const avgNightlyRate = totalNights > 0 ? revenue / totalNights : 0;
-  
-  // Grouped Revenue
-  const studioRevenue = monthlyBookings
-    .filter(b => units.find(u => u.id === b.apartmentId)?.type === 'studio')
-    .reduce((sum, b) => sum + parseFloat(b.totalAmount || 0), 0);
-    
-  const apartmentRevenue = monthlyBookings
-    .filter(b => units.find(u => u.id === b.apartmentId)?.type === 'apartment')
-    .reduce((sum, b) => sum + parseFloat(b.totalAmount || 0), 0);
-  
-  // Smart Categorization:
   const rentTotal = monthlyExpenses
     .filter(e => e.category === 'إيجار')
     .reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
@@ -227,42 +252,44 @@ export default function FinancePage() {
       </div>
 
       {/* ── PROFIT DISTRIBUTION TABLE (Excel Layout) ── */}
-      <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
-        <div className="bg-[#2A2723] px-8 py-4 flex items-center justify-between">
-          <h2 className="text-white font-black text-sm tracking-widest uppercase">توزيع الأرباح بين الشركاء</h2>
-          <span className="text-[#C1A68D] text-xs font-black bg-white/10 px-4 py-1.5 rounded-full">
-            صافي الربح: {studioNetProfit.toLocaleString()} ج.م
-          </span>
+      {!isPartner && (
+        <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
+          <div className="bg-[#2A2723] px-8 py-4 flex items-center justify-between">
+            <h2 className="text-white font-black text-sm tracking-widest uppercase">توزيع الأرباح بين الشركاء</h2>
+            <span className="text-[#C1A68D] text-xs font-black bg-white/10 px-4 py-1.5 rounded-full">
+              صافي الربح: {studioNetProfit.toLocaleString()} ج.م
+            </span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-center">
+              <thead>
+                <tr className="bg-[#FDFBF7]">
+                  <th className="px-8 py-4 font-black text-xs text-[#7A7061] border border-[#EAE4D9]/60 w-32">Name</th>
+                  {PARTNERS.map(p => (
+                    <th key={p.key} className="px-8 py-4 font-black text-sm text-[#2A2723] border border-[#EAE4D9]/60">
+                      {p.label}
+                      <span className="block text-[10px] font-bold text-[#C1A68D]">({p.percentage}%)</span>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="px-8 py-6 font-black text-[#7A7061] text-sm border border-[#EAE4D9]/40 bg-[#FDFBF7]/60">Value</td>
+                  {PARTNERS.map(p => (
+                    <td key={p.key} className="px-8 py-6 border border-[#EAE4D9]/40">
+                      <div className={`text-2xl font-black ${studioNetProfit >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                        {isLoading ? '...' : Math.round(studioNetProfit * p.percentage / 100).toLocaleString()}
+                      </div>
+                      <div className="text-[10px] text-[#7A7061] font-bold mt-1">ج.م</div>
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-center">
-            <thead>
-              <tr className="bg-[#FDFBF7]">
-                <th className="px-8 py-4 font-black text-xs text-[#7A7061] border border-[#EAE4D9]/60 w-32">Name</th>
-                {PARTNERS.map(p => (
-                  <th key={p.key} className="px-8 py-4 font-black text-sm text-[#2A2723] border border-[#EAE4D9]/60">
-                    {p.label}
-                    <span className="block text-[10px] font-bold text-[#C1A68D]">({p.percentage}%)</span>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="px-8 py-6 font-black text-[#7A7061] text-sm border border-[#EAE4D9]/40 bg-[#FDFBF7]/60">Value</td>
-                {PARTNERS.map(p => (
-                  <td key={p.key} className="px-8 py-6 border border-[#EAE4D9]/40">
-                    <div className={`text-2xl font-black ${studioNetProfit >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                      {isLoading ? '...' : Math.round(studioNetProfit * p.percentage / 100).toLocaleString()}
-                    </div>
-                    <div className="text-[10px] text-[#7A7061] font-bold mt-1">ج.م</div>
-                  </td>
-                ))}
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      )}
 
       {/* ── FINAL NET BAR ── */}
       <div className={`p-10 rounded-[3rem] shadow-2xl flex flex-col md:flex-row justify-between items-center gap-8 ${studioNetProfit >= 0 ? 'bg-[#2A2723]' : 'bg-red-900'}`}>
