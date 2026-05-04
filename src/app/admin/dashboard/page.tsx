@@ -395,8 +395,6 @@ export default function DashboardOverview() {
         {/* QUICK SEARCH merged into Unit Map */}
         <div className="bg-white p-8 rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm">
           {/* Header row: title + date + filters */}
-        <div className="bg-white p-8 rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm">
-          {/* Header row: title + date + filters */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-5 border-b border-[#EAE4D9]/30">
             <h4 className="font-black text-sm text-[#2A2723]">
               {selectedCategory === 'all' ? '🗺️ جميع الوحدات' : `🟢 وحدات ${inventoryStats.find(i => i.id === selectedCategory)?.label} المتاحة`}
