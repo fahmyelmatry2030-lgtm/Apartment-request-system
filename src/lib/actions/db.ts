@@ -174,7 +174,15 @@ export async function saveDbBooking(booking: any) {
 
     if (error) {
       console.error('Supabase Insert Error:', error);
-      return { success: false, error: error.message };
+      
+      // DEBUG: Try to find what columns actually exist
+      const { data: sample } = await supabase.from('bookings').select('*').limit(1);
+      const existingCols = sample && sample[0] ? Object.keys(sample[0]).join(', ') : 'unknown';
+      
+      return { 
+        success: false, 
+        error: `${error.message}. (Existing columns: ${existingCols})` 
+      };
     }
 
     // Send Telegram Alert to Admin (Awaiting to ensure delivery)
