@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { getBookings, getSystemUnits } from '@/lib/data-init';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
+import { updateDbBookingStatus } from '@/lib/actions/db';
 
 const CONFIRMED_STATUSES = ['مؤكد', 'approved', 'مؤكد/دخول', 'مغادر/تنظيف', 'مغادر/تم'];
 const PENDING_STATUSES = ['جديد', 'قيد المراجعة', 'pending', 'رد جديد'];
@@ -81,6 +82,8 @@ export default function DashboardOverview() {
         category: cat,
         isOccupied: !!activeBooking || apt.status === 'مشغول',
         guest: activeBooking?.name,
+        bookingId: activeBooking?.id,
+        clientStatus: activeBooking?.clientStatus || 'انتظار',
         checkOut: activeBooking?.checkOut,
         guestsCount: activeBooking?.guestsCount,
       };
@@ -162,6 +165,17 @@ export default function DashboardOverview() {
 
   const targetDateStr = selectedDate;
 
+  const handleStatusUpdate = async (bookingId: string, newStatus: string) => {
+    if (!bookingId) return;
+    try {
+      await updateDbBookingStatus(bookingId, { clientStatus: newStatus });
+      loadOverviewData();
+    } catch (err) {
+      console.error(err);
+      alert('خطأ في تحديث الحالة');
+    }
+  };
+
   const kpis = [
     { key: 'total',    label: 'إجمالي الطلبات', value: stats.totalBookings,   icon: '📊', gradient: 'from-[#2A2723] to-[#3D3530]',   text: 'text-white' },
     { key: 'pending',  label: 'قيد المراجعة',   value: stats.pendingBookings,  icon: '⏳', gradient: 'from-amber-500 to-orange-500', text: 'text-white' },
@@ -188,13 +202,23 @@ export default function DashboardOverview() {
 
       {/* ── HEADER ── */}
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-4xl font-black mb-1 tracking-tight text-[#2A2723]">
-            الاستعراض <span className="text-[#C1A68D]">العام</span>
-          </h1>
-          <p className="text-[#7A7061] font-bold opacity-70 text-sm">
-            {new Date().toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-          </p>
+        <div className="flex flex-col md:flex-row md:items-center gap-4">
+          <div>
+            <h1 className="text-4xl font-black mb-1 tracking-tight text-[#2A2723]">
+              الاستعراض <span className="text-[#C1A68D]">العام</span>
+            </h1>
+            <p className="text-[#7A7061] font-bold opacity-70 text-sm">
+              {new Date().toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+            </p>
+          </div>
+          <div className="bg-[#2A2723] text-white px-5 py-3 rounded-2xl border-l-4 border-[#C1A68D] shadow-lg">
+            <div className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest mb-1">السياسة العامة للمواعيد</div>
+            <div className="flex gap-4 text-xs font-black">
+              <div className="flex items-center gap-2"><span>🛫 خروج:</span> <span className="text-[#C1A68D]">12:00 ظهراً</span></div>
+              <div className="w-px h-3 bg-white/20" />
+              <div className="flex items-center gap-2"><span>🛬 دخول:</span> <span className="text-[#C1A68D]">02:00 ظهراً</span></div>
+            </div>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 bg-white border border-[#EAE4D9]/50 px-4 py-2 rounded-full shadow-sm">
@@ -501,6 +525,7 @@ export default function DashboardOverview() {
                         <th className="px-4 py-3 text-[10px] font-black">النوع</th>
                         <th className="px-4 py-3 text-[10px] font-black text-center">الحالة</th>
                         <th className="px-4 py-3 text-[10px] font-black">الضيف</th>
+                        <th className="px-4 py-3 text-[10px] font-black">حالة الإقامة</th>
                         <th className="px-4 py-3 text-[10px] font-black text-center">تاريخ الخروج</th>
                       </tr>
                     </thead>
@@ -537,6 +562,23 @@ export default function DashboardOverview() {
                                 </span>
                               </td>
                               <td className="px-4 py-2.5 text-[10px] text-[#7A7061] font-bold">{apt.guest || '—'}</td>
+                              <td className="px-4 py-2.5">
+                                {apt.isOccupied && apt.bookingId ? (
+                                  <select 
+                                    value={apt.clientStatus} 
+                                    onChange={(e) => handleStatusUpdate(apt.bookingId, e.target.value)}
+                                    className={`text-[10px] font-black rounded-lg px-2 py-1 outline-none border transition-all ${
+                                      apt.clientStatus === 'متواجد' ? 'bg-green-600 text-white border-green-700' :
+                                      apt.clientStatus === 'غادر' ? 'bg-gray-600 text-white border-gray-700' :
+                                      'bg-amber-100 text-amber-700 border-amber-200'
+                                    }`}
+                                  >
+                                    <option value="انتظار">⏳ انتظار</option>
+                                    <option value="متواجد">👤 متواجد</option>
+                                    <option value="غادر">🚪 غادر</option>
+                                  </select>
+                                ) : <span className="text-[10px] text-gray-300">—</span>}
+                              </td>
                               <td className="px-4 py-2.5 text-[10px] text-center text-[#2A2723] font-black">{formatMiniDate(apt.checkOut)}</td>
                             </tr>
                           );
