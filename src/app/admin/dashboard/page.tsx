@@ -412,18 +412,43 @@ export default function DashboardOverview() {
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">🔍</span>
               </div>
 
-              {/* Date picker */}
-              <div className="flex items-center gap-2 bg-[#F8F5F0] border border-[#EAE4D9] rounded-xl px-2">
-                <span className="text-[10px] font-black text-[#7A7061] pr-1">التاريخ:</span>
-                <input
-                  type="date"
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                  className="bg-transparent border-none py-1.5 text-xs font-black text-[#2A2723] outline-none"
-                />
+              {/* Smart Date Navigator */}
+              <div className="flex items-center gap-2 bg-white border border-[#EAE4D9] rounded-2xl px-3 py-1.5 shadow-sm">
+                <button 
+                  onClick={() => {
+                    const d = new Date(selectedDate);
+                    d.setDate(d.getDate() - 1);
+                    setSelectedDate(d.toISOString().split('T')[0]);
+                  }}
+                  className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors text-lg"
+                >◀️</button>
+                
+                <div className="relative group">
+                  <div className="flex flex-col items-center px-4 cursor-pointer">
+                    <span className="text-[10px] font-black text-[#C1A68D] uppercase leading-none">تاريخ العرض</span>
+                    <span className="text-xs font-black text-[#2A2723]">
+                      {new Date(selectedDate).toLocaleDateString('ar-EG', { day: 'numeric', month: 'short' })}
+                    </span>
+                  </div>
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full"
+                  />
+                </div>
+
+                <button 
+                  onClick={() => {
+                    const d = new Date(selectedDate);
+                    d.setDate(d.getDate() + 1);
+                    setSelectedDate(d.toISOString().split('T')[0]);
+                  }}
+                  className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors text-lg"
+                >▶️</button>
               </div>
 
-              <div className="w-px h-5 bg-[#EAE4D9] hidden md:block" />
+              <div className="w-px h-8 bg-[#EAE4D9] hidden md:block" />
               
               {/* Category filters */}
               <div className="flex gap-1">
