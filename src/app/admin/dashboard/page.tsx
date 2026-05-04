@@ -78,20 +78,38 @@ export default function DashboardOverview() {
     // Helper to map 1-24 to b1-sX or b2-sX
     const getFullId = (n: number) => n <= 12 ? `b1-s${n}` : `b2-s${n-12}`;
 
-    const singleIds  = [2, 3, 6, 7, 8, 17].map(getFullId);
-    const doubleIds  = [1, 5, 9, 10, 11, 12, 13, 18, 20, 24].map(getFullId);
-    const tripleIds  = [4, 14, 15, 22, 23].map(getFullId);
-    const twoRoomIds = [16, 19, 21].map(getFullId);
+    // Dynamic classification logic below replaces hardcoded arrays
 
     const map = apts.map((apt: any) => {
       const activeBooking = confirmed.find((b: any) =>
         b.apartmentId === apt.id && targetDateStr >= b.checkIn && targetDateStr < b.checkOut
       );
       let cat = 'apartment';
-      if (singleIds.includes(apt.id)) cat = 'single';
-      else if (doubleIds.includes(apt.id)) cat = 'double';
-      else if (tripleIds.includes(apt.id)) cat = 'triple';
-      else if (twoRoomIds.includes(apt.id)) cat = 'two-room';
+      if (String(apt.id).startsWith('apt-')) {
+         cat = 'apartment';
+      } else {
+         const title = apt.title?.ar || '';
+         const features = apt.features?.ar || [];
+         const featsString = features.join(' ');
+         if (title.includes('سنجل') || featsString.includes('كينج') || title.includes('1')) cat = 'single';
+         if (title.includes('دبل') || featsString.includes('مزدوج') || title.includes('2')) cat = 'double';
+         if (title.includes('تريبل') || featsString.includes('٣ أسرة') || featsString.includes('3') || title.includes('3')) cat = 'triple';
+         if (title.includes('غرفتين') || featsString.includes('غرفتين')) cat = 'two-room';
+         
+         // Fallback based on original hardcoded IDs to maintain backward compatibility if titles changed
+         const getFullId = (n: number) => n <= 12 ? `b1-s${n}` : `b2-s${n-12}`;
+         if (cat === 'apartment' && !String(apt.id).startsWith('apt-')) {
+            const singleIds  = [2, 3, 6, 7, 8, 17].map(getFullId);
+            const doubleIds  = [1, 5, 9, 10, 11, 12, 13, 18, 20, 24].map(getFullId);
+            const tripleIds  = [4, 14, 15, 22, 23].map(getFullId);
+            const twoRoomIds = [16, 19, 21].map(getFullId);
+            if (singleIds.includes(apt.id)) cat = 'single';
+            else if (doubleIds.includes(apt.id)) cat = 'double';
+            else if (tripleIds.includes(apt.id)) cat = 'triple';
+            else if (twoRoomIds.includes(apt.id)) cat = 'two-room';
+            else cat = 'single'; // Final fallback
+         }
+      }
 
       return {
         ...apt,
@@ -108,11 +126,11 @@ export default function DashboardOverview() {
     setFullMap(map);
 
     setInventoryStats([
-      { id: 'single',   label: 'سنجل',    count: map.filter((u: any) => singleIds.includes(u.id)  && !u.isOccupied).length, total: 6,  color: 'text-green-500'  },
-      { id: 'double',   label: 'دبل',      count: map.filter((u: any) => doubleIds.includes(u.id)  && !u.isOccupied).length, total: 10, color: 'text-blue-400'   },
-      { id: 'triple',   label: 'تريبل',    count: map.filter((u: any) => tripleIds.includes(u.id)  && !u.isOccupied).length, total: 5,  color: 'text-orange-400' },
-      { id: 'two-room', label: 'غرفتين',   count: map.filter((u: any) => twoRoomIds.includes(u.id) && !u.isOccupied).length, total: 3,  color: 'text-purple-400' },
-      { id: 'apartment', label: 'شقق',    count: map.filter((u: any) => String(u.id).startsWith('apt-') && !u.isOccupied).length, total: map.filter((u: any) => String(u.id).startsWith('apt-')).length, color: 'text-amber-500' },
+      { id: 'single',   label: 'سنجل',    count: map.filter((u: any) => u.category === 'single' && !u.isOccupied).length, total: map.filter((u: any) => u.category === 'single').length, color: 'text-green-500'  },
+      { id: 'double',   label: 'دبل',      count: map.filter((u: any) => u.category === 'double' && !u.isOccupied).length, total: map.filter((u: any) => u.category === 'double').length, color: 'text-blue-400'   },
+      { id: 'triple',   label: 'تريبل',    count: map.filter((u: any) => u.category === 'triple' && !u.isOccupied).length, total: map.filter((u: any) => u.category === 'triple').length, color: 'text-orange-400' },
+      { id: 'two-room', label: 'غرفتين',   count: map.filter((u: any) => u.category === 'two-room' && !u.isOccupied).length, total: map.filter((u: any) => u.category === 'two-room').length, color: 'text-purple-400' },
+      { id: 'apartment', label: 'شقق',    count: map.filter((u: any) => u.category === 'apartment' && !u.isOccupied).length, total: map.filter((u: any) => u.category === 'apartment').length, color: 'text-amber-500' },
     ]);
 
     setAllBookings(bookings);
