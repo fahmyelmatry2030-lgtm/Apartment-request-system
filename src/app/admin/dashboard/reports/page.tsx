@@ -73,27 +73,33 @@ function EditableCell({
 
   if (editing) {
     return (
-      <input
-        ref={inputRef}
-        type={type}
-        value={editValue}
-        onChange={e => setEditValue(e.target.value)}
-        onBlur={handleSave}
-        onKeyDown={e => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') setEditing(false); }}
-        className="w-full bg-yellow-50 border border-[#C1A68D] rounded px-1 py-0.5 text-[10px] font-bold text-[#2A2723] outline-none text-center"
-        style={{ minWidth: '50px' }}
-      />
+      <div className="relative w-full">
+        <input
+          ref={inputRef}
+          type={type}
+          value={editValue}
+          onChange={e => setEditValue(e.target.value)}
+          onBlur={handleSave}
+          onKeyDown={e => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') setEditing(false); }}
+          className="w-full bg-yellow-50 border-2 border-[#C1A68D] rounded px-2 py-1 text-[11px] font-black text-[#2A2723] outline-none text-center shadow-inner"
+          style={{ minWidth: '60px' }}
+        />
+        <div className="absolute left-1 top-1/2 -translate-y-1/2 text-[10px] opacity-30 animate-pulse">💾</div>
+      </div>
     );
   }
 
   return (
-    <span
+    <div
       onClick={() => setEditing(true)}
-      className={`cursor-pointer hover:bg-yellow-50/80 px-1 py-0.5 rounded transition-all inline-block min-w-[20px] min-h-[16px] ${saving ? 'opacity-50 animate-pulse' : ''} ${className}`}
+      className={`group cursor-text hover:bg-white/50 px-2 py-1.5 rounded-lg transition-all block w-full min-h-[32px] relative ${saving ? 'opacity-50 animate-pulse' : ''} ${className}`}
       title="اضغط للتعديل"
     >
-      {value || <span className="text-[#EAE4D9]">—</span>}
-    </span>
+      <div className="flex items-center justify-center gap-1">
+        <span>{value || <span className="text-[#EAE4D9]">—</span>}</span>
+        <span className="opacity-0 group-hover:opacity-40 text-[10px] transition-opacity">✏️</span>
+      </div>
+    </div>
   );
 }
 
@@ -982,22 +988,22 @@ export default function ReportsPage() {
                     >
                       <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-black text-[#C1A68D]">{row.no}</td>
                       <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-bold text-[#2A2723] whitespace-nowrap">{formatDate(row.date)}</td>
-                      <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-black text-[#2A2723]">
+                      <td className="px-1 py-1 border-l border-[#EAE4D9]/20">
                         {row.hasData ? (
-                          <div className="flex flex-col items-center">
+                          <div className="flex flex-col items-center w-full">
                             <EditableCell value={row.name} bookingId={row.id} field="name" onSave={handleCellSave} className="text-[#2A2723] font-black" />
-                            <span className="text-[7px] text-[#C1A68D] opacity-50 uppercase tracking-tighter">({row.clientStatus})</span>
+                            <span className="text-[7px] text-[#C1A68D] opacity-60 uppercase tracking-tighter mt-[-4px] font-black">({row.clientStatus})</span>
                           </div>
                         ) : <span className="text-[#EAE4D9]">—</span>}
                       </td>
 
                       {/* EDITABLE CELLS */}
-                      <td className="px-1 py-2.5 border-l border-[#EAE4D9]/20">
+                      <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
                         {row.hasData ? (
                           <EditableCell value={row.nationality} bookingId={row.id} field="nationality" onSave={handleCellSave} className="text-[#7A7061] font-bold" />
                         ) : <span className="text-[#EAE4D9]">—</span>}
                       </td>
-                      <td className="px-1 py-2.5 border-l border-[#EAE4D9]/20">
+                      <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
                         {row.hasData ? (
                           <EditableCell value={row.idNumber} bookingId={row.id} field="idNumber" onSave={handleCellSave} className="text-[#7A7061] font-bold font-mono text-[9px]" />
                         ) : <span className="text-[#EAE4D9]">—</span>}
@@ -1005,19 +1011,19 @@ export default function ReportsPage() {
 
                       <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-bold text-[#7A7061] font-mono text-[9px] whitespace-nowrap">{row.phone}</td>
                       
-                      <td className="px-1 py-2.5 border-l border-[#EAE4D9]/20">
+                      <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
                         {row.hasData ? <EditableCell value={formatDate(row.checkIn)} bookingId={row.id} field="checkIn" onSave={handleCellSave} className="text-[#2A2723] font-bold whitespace-nowrap" /> : <span className="text-[#EAE4D9]">—</span>}
                       </td>
-                      <td className="px-1 py-2.5 border-l border-[#EAE4D9]/20">
+                      <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
                         {row.hasData ? <EditableCell value={formatDate(row.checkOut)} bookingId={row.id} field="checkOut" onSave={handleCellSave} className="text-[#2A2723] font-bold whitespace-nowrap" /> : <span className="text-[#EAE4D9]">—</span>}
                       </td>
                       
                       <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-black text-[#2A2723]">{row.hasData ? row.days : 0}</td>
                       
-                      <td className="px-1 py-2.5 border-l border-[#EAE4D9]/20">
+                      <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
                         {row.hasData ? <EditableCell value={row.pricePerNight} bookingId={row.id} field="pricePerNight" onSave={handleCellSave} type="number" className="text-[#7A7061] font-bold" /> : <span className="text-[#EAE4D9]">0</span>}
                       </td>
-                      <td className="px-1 py-2.5 border-l border-[#EAE4D9]/20">
+                      <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
                          {row.hasData ? <EditableCell value={row.total} bookingId={row.id} field="totalAmount" onSave={handleCellSave} type="number" className="text-[#2A2723] font-black" /> : <span className="text-[#EAE4D9]">0</span>}
                       </td>
 
@@ -1040,14 +1046,14 @@ export default function ReportsPage() {
                       </td>
 
                       {/* EDITABLE: Commission */}
-                      <td className="px-1 py-2.5 border-l border-[#EAE4D9]/20">
+                      <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
                         {row.hasData ? (
                           <EditableCell value={row.commission} bookingId={row.id} field="commission" onSave={handleCellSave} type="number" className="text-orange-500 font-bold" />
                         ) : <span className="text-[#EAE4D9]">—</span>}
                       </td>
 
                       {/* EDITABLE: Broker Name */}
-                      <td className="px-1 py-2.5 border-l border-[#EAE4D9]/20">
+                      <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
                         {row.hasData ? (
                           <EditableCell value={row.brokerName} bookingId={row.id} field="brokerName" onSave={handleCellSave} className="text-[#7A7061] font-bold" />
                         ) : <span className="text-[#EAE4D9]">—</span>}
@@ -1056,7 +1062,7 @@ export default function ReportsPage() {
                       <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-black text-green-600">{row.hasData ? row.netValue : 0}</td>
 
                       {/* EDITABLE: Notes */}
-                      <td className="px-1 py-2.5">
+                      <td className="px-0 py-0">
                         {row.hasData ? (
                           <EditableCell value={row.notes} bookingId={row.id} field="notes" onSave={handleCellSave} className="text-[#7A7061] font-bold text-[9px]" />
                         ) : <span className="text-[#EAE4D9]">—</span>}
@@ -1116,12 +1122,13 @@ export default function ReportsPage() {
         <div className="no-print bg-[#FDFBF7] p-6 rounded-[1.5rem] border border-[#EAE4D9]/50 flex gap-4 items-start" dir="rtl">
           <span className="text-2xl mt-1">✏️</span>
           <div className="text-[10px] leading-relaxed text-[#7A7061] font-bold">
-            <strong className="block mb-1 text-[#C1A68D] text-xs font-black tracking-widest uppercase">تعديل مباشر من الجدول:</strong>
+            <strong className="block mb-1 text-[#C1A68D] text-xs font-black tracking-widest uppercase">كيفية التعديل على الجدول:</strong>
             <ul className="list-disc list-inside space-y-1 mr-2 opacity-80">
-              <li>اضغط على أي خلية <span className="text-yellow-600 font-black">(الجنسية / رقم الهوية / العمولة / الوسيط / الملاحظات)</span> لتعديلها مباشرة.</li>
-              <li>التعديلات بتتحفظ تلقائي في قاعدة البيانات لحظة ما تخرج من الخلية أو تضغط Enter.</li>
-              <li>الصافي (Net Value) بيتحسب تلقائي = الإجمالي − العمولة.</li>
-              <li>يعرض فقط الحجوزات <span className="text-green-600 font-black">المؤكدة</span> المسكّنة في الوحدة المختارة.</li>
+              <li>أي مكان في الخلية مكتوب فيه نص <span className="text-[#C1A68D] font-black">(الاسم / الجنسية / التاريخ / المبالغ / الملاحظات)</span> تقدر تضغط عليه مباشرة وهتتحول لخانة كتابة.</li>
+              <li>بعد ما تخلص كتابة، اضغط <span className="text-blue-600 font-black">Enter</span> أو اضغط في أي مكان بره الخلية عشان الحفظ يتم تلقائياً.</li>
+              <li>علامة الـ <span className="text-yellow-600">✏️</span> بتظهر لما تقف بالماوس على الخلية عشان تعرف إنها قابلة للتعديل.</li>
+              <li>الخلايا الفاضية <span className="text-[#EAE4D9]">(—)</span> في الحجوزات الموجودة برضه قابلة للتعديل بنفس الطريقة.</li>
+              <li>الصفوف الرمادية في آخر الجدول هي صفوف انتظار ولا يمكن التعديل عليها، استخدم نموذج "إضافة للجدول" في الأعلى لإضافة حجز جديد.</li>
             </ul>
           </div>
         </div>
@@ -1192,12 +1199,29 @@ export default function ReportsPage() {
                     />
                   </div>
                   <div className="space-y-2">
+                    <label className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest px-2">سعر الليلة</label>
+                    <input 
+                      type="number"
+                      value={editingBooking.pricePerNight || 0}
+                      onChange={e => {
+                        const pNight = Number(e.target.value);
+                        const nights = editingBooking.numberOfDays || 0;
+                        setEditingBooking({
+                          ...editingBooking, 
+                          pricePerNight: pNight,
+                          totalAmount: pNight * nights
+                        });
+                      }}
+                      className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C1A68D] font-black text-blue-600"
+                    />
+                  </div>
+                  <div className="space-y-2">
                     <label className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest px-2">إجمالي المبلغ</label>
                     <input 
                       type="number" required
                       value={editingBooking.totalAmount || 0}
                       onChange={e => setEditingBooking({...editingBooking, totalAmount: Number(e.target.value)})}
-                      className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C1A68D] font-bold"
+                      className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C1A68D] font-black"
                     />
                   </div>
                   <div className="space-y-2">
@@ -1206,7 +1230,7 @@ export default function ReportsPage() {
                       type="number"
                       value={editingBooking.commission || 0}
                       onChange={e => setEditingBooking({...editingBooking, commission: Number(e.target.value)})}
-                      className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C1A68D] font-bold"
+                      className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C1A68D] font-bold text-orange-500"
                     />
                   </div>
                   <div className="space-y-2">
