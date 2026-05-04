@@ -363,6 +363,12 @@ export default function ReportsPage() {
       const outDate = new Date(checkOutStr);
       const diff = Math.ceil((outDate.getTime() - inDate.getTime()) / (1000 * 60 * 60 * 24));
       const nights = diff > 0 ? diff : 0;
+      
+      if (nights <= 0) {
+        setSaveStatus('');
+        return alert('تنبيه: يجب أن يكون تاريخ الخروج بعد تاريخ الدخول (على الأقل ليلة واحدة)');
+      }
+      
       const totalAmount = nights * newRecord.pricePerNight;
 
       // Overlap check for new record
@@ -406,36 +412,42 @@ export default function ReportsPage() {
         notes: newRecord.notes
       };
       
-      const freshData = await saveDbBooking(newBooking);
+      const result = await saveDbBooking(newBooking);
       
-      // Update local state WITH THE FRESH DATA RETURNED FROM SERVER
-      if (freshData && Array.isArray(freshData)) {
-        setBookings(freshData);
+      if (result.success) {
+        // Update local state WITH THE FRESH DATA RETURNED FROM SERVER
+        if (result.data && Array.isArray(result.data)) {
+          setBookings(result.data);
+        } else {
+          await loadData();
+        }
+        
+        // Reset form
+        const resetStr = String(selectedMonth + 1).padStart(2, '0');
+        const sDateStr = `${selectedYear}-${resetStr}-01`;
+        setNewRecord({
+          name: '',
+          nationality: '',
+          idNumber: '',
+          phone: '',
+          checkIn: sDateStr,
+          checkOut: sDateStr,
+          pricePerNight: 0,
+          commission: 0,
+          clientStatus: 'انتظار',
+          brokerName: '',
+          notes: ''
+        });
+        setSaveStatus('✅ تمت إضافة السجل للجدول');
+        setTimeout(() => setSaveStatus(''), 3000);
       } else {
-        await loadData();
+        setSaveStatus(`❌ فشل: ${result.error}`);
+        // Keep status message longer if it's an error
+        setTimeout(() => setSaveStatus(''), 10000);
       }
-      
-      // Reset form
-      const resetStr = String(selectedMonth + 1).padStart(2, '0');
-      const sDateStr = `${selectedYear}-${resetStr}-01`;
-      setNewRecord({
-        name: '',
-        nationality: '',
-        idNumber: '',
-        phone: '',
-        checkIn: sDateStr,
-        checkOut: sDateStr,
-        pricePerNight: 0,
-        commission: 0,
-        clientStatus: 'انتظار',
-        brokerName: '',
-        notes: ''
-      });
-      setSaveStatus('✅ تمت إضافة السجل للجدول');
-      setTimeout(() => setSaveStatus(''), 3000);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setSaveStatus('❌ فشل إضافة السجل');
+      setSaveStatus(`❌ فشل غير متوقع: ${err.message || ''}`);
       setTimeout(() => setSaveStatus(''), 3000);
     }
   };

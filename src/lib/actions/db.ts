@@ -136,55 +136,60 @@ export async function getFreshDbBookings(nonce?: string) {
 
 export async function saveDbBooking(booking: any) {
   try {
-    const newBooking = {
+    const supabase = getSupabaseServerClient();
+    if (!supabase) {
+      console.warn('⚠️ Database Offline: Simulate saving booking');
+      return { success: true, data: [] };
+    }
+
+    const newBookingWithId = {
       ...booking,
-      id: `#B-${Date.now().toString().slice(-4)}${Math.floor(100 + Math.random() * 900)}`,
-      status: booking.status || 'approved', // Default to approved for manual records
+      id: `B-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      status: booking.status || 'approved',
       timestamp: booking.timestamp || new Date().toISOString(),
     };
 
-    const supabase = getSupabaseServerClient();
-    if (!supabase) {
-      console.warn('⚠️ Database Offline: Simulate saving booking', newBooking.id);
-      return newBooking; 
-    }
-
     const { error } = await supabase.from('bookings').insert({
-      id: newBooking.id,
-      name: newBooking.name,
-      phone: newBooking.phone,
-      check_in: newBooking.checkIn,
-      check_out: newBooking.checkOut,
-      apartment_id: newBooking.apartmentId ?? null,
-      studio: newBooking.studio ?? null,
-      status: newBooking.status,
-      payment_info: newBooking.paymentInfo ?? null,
-      total_amount: newBooking.totalAmount ?? null,
-      number_of_days: newBooking.numberOfDays ?? null,
-      price_per_night: newBooking.pricePerNight ?? null,
-      nationality: newBooking.nationality ?? null,
-      id_number: newBooking.idNumber ?? null,
-      commission: newBooking.commission ?? null,
-      broker_name: newBooking.brokerName ?? null,
-      client_status: newBooking.clientStatus || 'انتظار',
-      guests_count: newBooking.guestsCount ?? 1,
-      notes: newBooking.notes ?? null,
-      timestamp: newBooking.timestamp,
+      id: newBookingWithId.id,
+      name: newBookingWithId.name,
+      phone: newBookingWithId.phone,
+      check_in: newBookingWithId.checkIn,
+      check_out: newBookingWithId.checkOut,
+      apartment_id: newBookingWithId.apartmentId ?? null,
+      studio: newBookingWithId.studio ?? null,
+      status: newBookingWithId.status,
+      payment_info: newBookingWithId.paymentInfo ?? null,
+      total_amount: newBookingWithId.totalAmount ?? null,
+      number_of_days: newBookingWithId.numberOfDays ?? null,
+      price_per_night: newBookingWithId.pricePerNight ?? null,
+      nationality: newBookingWithId.nationality ?? null,
+      id_number: newBookingWithId.idNumber ?? null,
+      commission: newBookingWithId.commission ?? null,
+      broker_name: newBookingWithId.brokerName ?? null,
+      client_status: newBookingWithId.clientStatus || 'انتظار',
+      guests_count: newBookingWithId.guestsCount ?? 1,
+      notes: newBookingWithId.notes ?? null,
+      timestamp: newBookingWithId.timestamp,
     });
-    if (error) throw error;
+
+    if (error) {
+      console.error('Supabase Insert Error:', error);
+      return { success: false, error: error.message };
+    }
 
     // Send Telegram Alert to Admin (Awaiting to ensure delivery)
     try {
-      await sendTelegramNotification(newBooking);
+      await sendTelegramNotification(newBookingWithId);
     } catch (err) {
       console.error('Telegram notification error:', err);
     }
 
     revalidatePath('/admin/dashboard/reports');
-    return await getFreshDbBookings(Date.now().toString());
-  } catch (error) {
+    const freshData = await getFreshDbBookings(Date.now().toString());
+    return { success: true, data: freshData };
+  } catch (error: any) {
     console.error('Error saving booking:', error);
-    throw error;
+    return { success: false, error: error.message || 'Unknown error' };
   }
 }
 
