@@ -79,6 +79,7 @@ export default function DashboardOverview() {
         category: cat,
         isOccupied: !!activeBooking || apt.status === 'مشغول',
         guest: activeBooking?.name,
+        checkOut: activeBooking?.checkOut,
         guestsCount: activeBooking?.guestsCount,
       };
     });
@@ -435,6 +436,7 @@ export default function DashboardOverview() {
                     <th className="px-4 py-3 text-[10px] font-black">النوع</th>
                     <th className="px-4 py-3 text-[10px] font-black text-center">الحالة</th>
                     <th className="px-4 py-3 text-[10px] font-black">الضيف</th>
+                    <th className="px-4 py-3 text-[10px] font-black text-center">تاريخ الخروج</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#EAE4D9]/30">
@@ -450,6 +452,13 @@ export default function DashboardOverview() {
                       const rowBg = isB1 ? 'bg-blue-50/50 hover:bg-blue-50' : isB2 ? 'bg-emerald-50/50 hover:bg-emerald-50' : 'bg-amber-50/50 hover:bg-amber-50';
                       const badgeColor = isB1 ? 'bg-blue-600 text-white' : isB2 ? 'bg-emerald-600 text-white' : 'bg-[#C1A68D] text-white';
                       const typeLabel: Record<string,string> = { single:'سنجل', double:'دبل', triple:'تريبل', 'two-room':'غرفتين', apartment:'شقة' };
+                      
+                      const formatMiniDate = (d: string) => {
+                        if (!d || !d.includes('-')) return '—';
+                        const [y, m, day] = d.split('-');
+                        return `${day}/${m}`;
+                      };
+
                       return (
                         <tr key={apt.id} className={`${rowBg} transition-colors`}>
                           <td className="px-4 py-2.5 text-center">
@@ -463,6 +472,7 @@ export default function DashboardOverview() {
                             </span>
                           </td>
                           <td className="px-4 py-2.5 text-[10px] text-[#7A7061] font-bold">{apt.guest || '—'}</td>
+                          <td className="px-4 py-2.5 text-[10px] text-center text-[#2A2723] font-black">{formatMiniDate(apt.checkOut)}</td>
                         </tr>
                       );
                     })}
