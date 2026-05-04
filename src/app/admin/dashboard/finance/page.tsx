@@ -109,8 +109,7 @@ export default function FinancePage() {
     .reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
 
   const netProfit = revenue - commissions - rentTotal - otherExpenses - salariesTotal;
-
-
+  const totalExpenses = rentTotal + otherExpenses + salariesTotal;
 
   const handleDelete = async (id: string) => {
     if (!confirm('هل أنت متأكد من الحذف؟')) return;
@@ -145,7 +144,7 @@ export default function FinancePage() {
       </header>
 
       {/* ── KPI CARDS ── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-4">
         <div className="bg-white p-6 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm text-center">
           <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">إجمالي الإيرادات</p>
           <div className="text-3xl font-black text-green-600">{isLoading ? '...' : revenue.toLocaleString()} <small className="text-sm">ج.م</small></div>
@@ -170,6 +169,11 @@ export default function FinancePage() {
           <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">إجمالي العمولات</p>
           <div className="text-2xl font-black text-orange-500">{isLoading ? '...' : commissions.toLocaleString()} <small className="text-xs">ج.م</small></div>
           <p className="text-[10px] text-[#7A7061] mt-2">مخصومة من الإيرادات</p>
+        </div>
+        <div className="bg-white p-6 rounded-[2rem] border border-red-500/20 shadow-sm text-center">
+          <p className="text-[10px] font-black text-red-500 uppercase tracking-widest mb-3">إجمالي المصروفات</p>
+          <div className="text-2xl font-black text-red-600">{isLoading ? '...' : totalExpenses.toLocaleString()} <small className="text-xs">ج.م</small></div>
+          <p className="text-[10px] text-[#7A7061] mt-2">إيجارات + رواتب + تشغيل</p>
         </div>
       </div>
 
