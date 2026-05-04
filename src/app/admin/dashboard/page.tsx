@@ -39,6 +39,8 @@ export default function DashboardOverview() {
   const [allBookings, setAllBookings] = useState<any[]>([]);
   const [selectedKpi, setSelectedKpi] = useState<string | null>(null);
 
+  const [searchTerm, setSearchTerm] = useState('');
+
   const loadOverviewData = useCallback(async () => {
     setIsLoading(true);
     const bookings = await getBookings(Date.now().toString());
@@ -86,12 +88,12 @@ export default function DashboardOverview() {
 
     setFullMap(map);
 
-    const physicalStudios = map.filter((u: any) => u.id.startsWith('b1-s') || u.id.startsWith('b2-s'));
     setInventoryStats([
-      { id: 'single',   label: 'سنجل',    count: physicalStudios.filter((u: any) => singleIds.includes(u.id)  && !u.isOccupied).length, total: 6,  color: 'text-green-500'  },
-      { id: 'double',   label: 'دبل',      count: physicalStudios.filter((u: any) => doubleIds.includes(u.id)  && !u.isOccupied).length, total: 10, color: 'text-blue-400'   },
-      { id: 'triple',   label: 'تريبل',    count: physicalStudios.filter((u: any) => tripleIds.includes(u.id)  && !u.isOccupied).length, total: 5,  color: 'text-orange-400' },
-      { id: 'two-room', label: 'غرفتين',   count: physicalStudios.filter((u: any) => twoRoomIds.includes(u.id) && !u.isOccupied).length, total: 3,  color: 'text-purple-400' },
+      { id: 'single',   label: 'سنجل',    count: map.filter((u: any) => singleIds.includes(u.id)  && !u.isOccupied).length, total: 6,  color: 'text-green-500'  },
+      { id: 'double',   label: 'دبل',      count: map.filter((u: any) => doubleIds.includes(u.id)  && !u.isOccupied).length, total: 10, color: 'text-blue-400'   },
+      { id: 'triple',   label: 'تريبل',    count: map.filter((u: any) => tripleIds.includes(u.id)  && !u.isOccupied).length, total: 5,  color: 'text-orange-400' },
+      { id: 'two-room', label: 'غرفتين',   count: map.filter((u: any) => twoRoomIds.includes(u.id) && !u.isOccupied).length, total: 3,  color: 'text-purple-400' },
+      { id: 'apartment', label: 'شقق',    count: map.filter((u: any) => u.id.startsWith('apt-') && !u.isOccupied).length, total: map.filter((u: any) => u.id.startsWith('apt-')).length, color: 'text-amber-500' },
     ]);
 
     setAllBookings(bookings);
@@ -153,7 +155,7 @@ export default function DashboardOverview() {
   useEffect(() => {
     if (fullMap.length === 0) return;
     const filtered = selectedCategory === 'all'
-      ? fullMap.filter((u: any) => u.id.startsWith('b1-s') || u.id.startsWith('b2-s'))
+      ? fullMap // Show everything when 'all' is selected
       : fullMap.filter((u: any) => u.category === selectedCategory);
     setApartmentMap(filtered);
   }, [selectedCategory, fullMap]);
@@ -393,113 +395,148 @@ export default function DashboardOverview() {
         {/* QUICK SEARCH merged into Unit Map */}
         <div className="bg-white p-8 rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm">
           {/* Header row: title + date + filters */}
+        <div className="bg-white p-8 rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm">
+          {/* Header row: title + date + filters */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-5 border-b border-[#EAE4D9]/30">
             <h4 className="font-black text-sm text-[#2A2723]">
               {selectedCategory === 'all' ? '🗺️ جميع الوحدات' : `🟢 وحدات ${inventoryStats.find(i => i.id === selectedCategory)?.label} المتاحة`}
             </h4>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Search Box */}
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="بحث عن ضيف أو وحدة..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="bg-[#F8F5F0] border border-[#EAE4D9] rounded-xl px-9 py-1.5 text-xs font-black text-[#2A2723] focus:ring-2 focus:ring-[#C1A68D] transition-all outline-none w-48"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">🔍</span>
+              </div>
+
               {/* Date picker */}
-              <input
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                className="bg-[#F8F5F0] border border-[#EAE4D9] rounded-xl px-3 py-1.5 text-xs font-black text-[#2A2723] focus:ring-2 focus:ring-[#C1A68D] transition-all outline-none"
-              />
-              <div className="w-px h-5 bg-[#EAE4D9]" />
+              <div className="flex items-center gap-2 bg-[#F8F5F0] border border-[#EAE4D9] rounded-xl px-2">
+                <span className="text-[10px] font-black text-[#7A7061] pr-1">التاريخ:</span>
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="bg-transparent border-none py-1.5 text-xs font-black text-[#2A2723] outline-none"
+                />
+              </div>
+
+              <div className="w-px h-5 bg-[#EAE4D9] hidden md:block" />
+              
               {/* Category filters */}
-              <button
-                onClick={() => setSelectedCategory('all')}
-                className={`px-4 py-1.5 rounded-xl text-xs font-black transition-all ${selectedCategory === 'all' ? 'bg-[#2A2723] text-white shadow-md' : 'bg-gray-50 text-[#7A7061] hover:bg-gray-100'}`}
-              >الكل ({apartmentMap.length})</button>
-              {inventoryStats.map((item, i) => (
+              <div className="flex gap-1">
                 <button
-                  key={i}
-                  onClick={() => setSelectedCategory(item.id)}
-                  className={`px-4 py-1.5 rounded-xl text-xs font-black transition-all ${selectedCategory === item.id ? 'bg-[#C1A68D] text-white shadow-md' : 'bg-gray-50 text-[#7A7061] hover:bg-gray-100'}`}
-                >
-                  {item.label} ({item.count})
-                </button>
-              ))}
+                  onClick={() => setSelectedCategory('all')}
+                  className={`px-4 py-1.5 rounded-xl text-xs font-black transition-all ${selectedCategory === 'all' ? 'bg-[#2A2723] text-white shadow-md' : 'bg-gray-50 text-[#7A7061] hover:bg-gray-100'}`}
+                >الكل</button>
+                {inventoryStats.map((item, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setSelectedCategory(item.id)}
+                    className={`px-4 py-1.5 rounded-xl text-xs font-black transition-all ${selectedCategory === item.id ? 'bg-[#C1A68D] text-white shadow-md' : 'bg-gray-50 text-[#7A7061] hover:bg-gray-100'}`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
           {/* Unit Grid or Table */}
-          {apartmentMap.length === 0 ? (
-            <div className="h-40 flex items-center justify-center text-gray-300 animate-pulse font-black text-sm italic">لا يوجد وحدات مطابقة للبحث...</div>
-          ) : selectedCategory === 'all' ? (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-right">
-                <thead>
-                  <tr className="bg-[#2A2723] text-white">
-                    <th className="px-4 py-3 text-[10px] font-black text-center w-12">#</th>
-                    <th className="px-4 py-3 text-[10px] font-black">اسم الوحدة</th>
-                    <th className="px-4 py-3 text-[10px] font-black">النوع</th>
-                    <th className="px-4 py-3 text-[10px] font-black text-center">الحالة</th>
-                    <th className="px-4 py-3 text-[10px] font-black">الضيف</th>
-                    <th className="px-4 py-3 text-[10px] font-black text-center">تاريخ الخروج</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#EAE4D9]/30">
-                  {[...apartmentMap]
-                    .sort((a, b) => {
-                      const n = (u: any) => u.id.startsWith('b1-s') ? parseInt(u.id.replace('b1-s',''),10) : u.id.startsWith('b2-s') ? parseInt(u.id.replace('b2-s',''),10)+12 : 99;
-                      return n(a) - n(b);
-                    })
-                    .map((apt) => {
-                      const isB1 = apt.id.startsWith('b1-s');
-                      const isB2 = apt.id.startsWith('b2-s');
-                      const num = isB1 ? parseInt(apt.id.replace('b1-s',''),10) : isB2 ? parseInt(apt.id.replace('b2-s',''),10)+12 : 0;
-                      const rowBg = isB1 ? 'bg-blue-50/50 hover:bg-blue-50' : isB2 ? 'bg-emerald-50/50 hover:bg-emerald-50' : 'bg-amber-50/50 hover:bg-amber-50';
-                      const badgeColor = isB1 ? 'bg-blue-600 text-white' : isB2 ? 'bg-emerald-600 text-white' : 'bg-[#C1A68D] text-white';
-                      const typeLabel: Record<string,string> = { single:'سنجل', double:'دبل', triple:'تريبل', 'two-room':'غرفتين', apartment:'شقة' };
-                      
-                      const formatMiniDate = (d: string) => {
-                        if (!d || !d.includes('-')) return '—';
-                        const [y, m, day] = d.split('-');
-                        return `${day}/${m}`;
-                      };
+          {(() => {
+            const displayList = apartmentMap.filter(apt => 
+              !searchTerm || 
+              apt.guest?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+              apt.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              apt.title?.ar?.toLowerCase().includes(searchTerm.toLowerCase())
+            );
 
-                      return (
-                        <tr key={apt.id} className={`${rowBg} transition-colors`}>
-                          <td className="px-4 py-2.5 text-center">
-                            <span className={`${badgeColor} w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-black mx-auto`}>{num}</span>
-                          </td>
-                          <td className="px-4 py-2.5 font-black text-[#2A2723] text-xs">{apt.title?.ar || apt.id}</td>
-                          <td className="px-4 py-2.5 text-[10px] text-[#7A7061] font-bold">{typeLabel[apt.category] || apt.category}</td>
-                          <td className="px-4 py-2.5 text-center">
-                            <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${apt.status === 'صيانة' ? 'bg-gray-100 text-gray-500' : apt.isOccupied ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-700'}`}>
-                              {apt.isOccupied ? 'مشغول' : apt.status === 'صيانة' ? 'صيانة' : 'متاح'}
-                            </span>
-                          </td>
-                          <td className="px-4 py-2.5 text-[10px] text-[#7A7061] font-bold">{apt.guest || '—'}</td>
-                          <td className="px-4 py-2.5 text-[10px] text-center text-[#2A2723] font-black">{formatMiniDate(apt.checkOut)}</td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-              {apartmentMap.map((apt) => (
-                <div key={apt.id} className={`p-4 rounded-2xl border transition-all duration-300 ${
-                  apt.status === 'maintenance' || apt.status === 'صيانة'
-                    ? 'bg-gray-50 border-gray-100 opacity-60'
-                    : apt.isOccupied
-                    ? 'bg-red-50 border-red-100 opacity-40 grayscale'
-                    : 'bg-white border-[#EAE4D9] shadow-sm hover:border-[#C1A68D] hover:scale-105'
-                }`}>
-                  <div className="text-[9px] font-black text-[#7A7061] uppercase mb-1 opacity-60">{apt.id}</div>
-                  <div className={`text-[11px] font-black mb-1 ${apt.status === 'صيانة' ? 'text-gray-400' : apt.isOccupied ? 'text-red-500' : 'text-green-600'}`}>
-                    {apt.isOccupied ? '🔴 مشغول' : apt.status === 'صيانة' ? '🔧 صيانة' : '🟢 متاح'}
-                  </div>
-                  {!apt.isOccupied && (
-                    <div className="text-[10px] font-bold text-[#2A2723] mt-1">{apt.title?.ar}</div>
-                  )}
+            if (displayList.length === 0) {
+              return <div className="h-40 flex items-center justify-center text-gray-300 animate-pulse font-black text-sm italic">لا يوجد وحدات مطابقة للبحث...</div>;
+            }
+
+            if (selectedCategory === 'all') {
+              return (
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse text-right">
+                    <thead>
+                      <tr className="bg-[#2A2723] text-white">
+                        <th className="px-4 py-3 text-[10px] font-black text-center w-12">#</th>
+                        <th className="px-4 py-3 text-[10px] font-black">اسم الوحدة</th>
+                        <th className="px-4 py-3 text-[10px] font-black">النوع</th>
+                        <th className="px-4 py-3 text-[10px] font-black text-center">الحالة</th>
+                        <th className="px-4 py-3 text-[10px] font-black">الضيف</th>
+                        <th className="px-4 py-3 text-[10px] font-black text-center">تاريخ الخروج</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#EAE4D9]/30">
+                      {[...displayList]
+                        .sort((a, b) => {
+                          const n = (u: any) => u.id.startsWith('b1-s') ? parseInt(u.id.replace('b1-s',''),10) : u.id.startsWith('b2-s') ? parseInt(u.id.replace('b2-s',''),10)+12 : 99;
+                          return n(a) - n(b);
+                        })
+                        .map((apt) => {
+                          const isB1 = apt.id.startsWith('b1-s');
+                          const isB2 = apt.id.startsWith('b2-s');
+                          const num = isB1 ? parseInt(apt.id.replace('b1-s',''),10) : isB2 ? parseInt(apt.id.replace('b2-s',''),10)+12 : 0;
+                          const rowBg = isB1 ? 'bg-blue-50/50 hover:bg-blue-50' : isB2 ? 'bg-emerald-50/50 hover:bg-emerald-50' : 'bg-amber-50/50 hover:bg-amber-50';
+                          const badgeColor = isB1 ? 'bg-blue-600 text-white' : isB2 ? 'bg-emerald-600 text-white' : 'bg-[#C1A68D] text-white';
+                          const typeLabel: Record<string,string> = { single:'سنجل', double:'دبل', triple:'تريبل', 'two-room':'غرفتين', apartment:'شقة' };
+                          
+                          const formatMiniDate = (d: string) => {
+                            if (!d || !d.includes('-')) return '—';
+                            const [y, m, day] = d.split('-');
+                            return `${day}/${m}`;
+                          };
+
+                          return (
+                            <tr key={apt.id} className={`${rowBg} transition-colors`}>
+                              <td className="px-4 py-2.5 text-center">
+                                <span className={`${badgeColor} w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-black mx-auto`}>{num}</span>
+                              </td>
+                              <td className="px-4 py-2.5 font-black text-[#2A2723] text-xs">{apt.title?.ar || apt.id}</td>
+                              <td className="px-4 py-2.5 text-[10px] text-[#7A7061] font-bold">{typeLabel[apt.category] || apt.category}</td>
+                              <td className="px-4 py-2.5 text-center">
+                                <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${apt.status === 'صيانة' ? 'bg-gray-100 text-gray-500' : apt.isOccupied ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-700'}`}>
+                                  {apt.isOccupied ? 'مشغول' : apt.status === 'صيانة' ? 'صيانة' : 'متاح'}
+                                </span>
+                              </td>
+                              <td className="px-4 py-2.5 text-[10px] text-[#7A7061] font-bold">{apt.guest || '—'}</td>
+                              <td className="px-4 py-2.5 text-[10px] text-center text-[#2A2723] font-black">{formatMiniDate(apt.checkOut)}</td>
+                            </tr>
+                          );
+                        })}
+                    </tbody>
+                  </table>
                 </div>
-              ))}
-            </div>
-          )}
+              );
+            } else {
+              return (
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                  {displayList.map((apt) => (
+                    <div key={apt.id} className={`p-4 rounded-2xl border transition-all duration-300 ${
+                      apt.status === 'maintenance' || apt.status === 'صيانة'
+                        ? 'bg-gray-50 border-gray-100 opacity-60'
+                        : apt.isOccupied
+                        ? 'bg-red-50 border-red-100 opacity-40 grayscale'
+                        : 'bg-white border-[#EAE4D9] shadow-sm hover:border-[#C1A68D] hover:scale-105'
+                    }`}>
+                      <div className="text-[9px] font-black text-[#7A7061] uppercase mb-1 opacity-60">{apt.id}</div>
+                      <div className={`text-[11px] font-black mb-1 ${apt.status === 'صيانة' ? 'text-gray-400' : apt.isOccupied ? 'text-red-500' : 'text-green-600'}`}>
+                        {apt.isOccupied ? '🔴 مشغول' : apt.status === 'صيانة' ? '🔧 صيانة' : '🟢 متاح'}
+                      </div>
+                      <div className="text-[10px] font-bold text-[#2A2723] mt-1">{apt.title?.ar}</div>
+                      {apt.guest && <div className="text-[9px] text-[#7A7061] mt-1 truncate">👤 {apt.guest}</div>}
+                    </div>
+                  ))}
+                </div>
+              );
+            }
+          })()}
         </div>
       </div>
 
