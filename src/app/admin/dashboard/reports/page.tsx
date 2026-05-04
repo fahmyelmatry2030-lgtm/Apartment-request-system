@@ -98,8 +98,14 @@ function EditableCell({
 }
 
 const AdminDatePicker = ({ label, value, onChange, icon, color }: any) => {
-  const parts = value ? value.split('-') : [new Date().getFullYear().toString(), (new Date().getMonth() + 1).toString().padStart(2, '0'), new Date().getDate().toString().padStart(2, '0')];
-  const [year, month, day] = parts;
+  const [defaultParts, setDefaultParts] = useState<string[]>(['', '', '']);
+  useEffect(() => {
+    setDefaultParts([new Date().getFullYear().toString(), (new Date().getMonth() + 1).toString().padStart(2, '0'), new Date().getDate().toString().padStart(2, '0')]);
+  }, []);
+  const parts = value ? value.split('-') : defaultParts;
+  const year = parts[0] || '';
+  const month = parts[1] || '';
+  const day = parts[2] || '';
 
   const daysInMonth = new Date(Number(year), Number(month), 0).getDate();
   const days = Array.from({length: daysInMonth || 31}, (_, i) => (i+1).toString().padStart(2, '0'));

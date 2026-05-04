@@ -18,8 +18,13 @@ export default function FinancePage() {
   const [expenses, setExpenses] = useState<any[]>([]);
   const [salaries, setSalaries] = useState<any[]>([]);
   const [units, setUnits] = useState<any[]>([]);
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(-1);
+  const [selectedYear, setSelectedYear] = useState(-1);
+
+  useEffect(() => {
+    setSelectedMonth(new Date().getMonth());
+    setSelectedYear(new Date().getFullYear());
+  }, []);
   const [isLoading, setIsLoading] = useState(true);
   const [newExpense, setNewExpense] = useState({ category: '', amount: '', description: '', from_entity: '', to_entity: '', ordered_by: '' });
   const [saving, setSaving] = useState(false);
