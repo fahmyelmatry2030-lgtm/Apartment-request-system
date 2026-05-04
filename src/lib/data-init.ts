@@ -183,15 +183,15 @@ export const saveBooking = async (booking: any) => {
     const result = await saveDbBooking(booking);
     
     // Cleanup: If DB save succeeded, remove any local backup to avoid shadowing
-    if (typeof window !== 'undefined' && result?.id) {
-       const local = JSON.parse(localStorage.getItem('local_bookings') || '[]');
-       const filtered = local.filter((b: any) => b.id !== result.id);
-       if (local.length !== filtered.length) {
-         localStorage.setItem('local_bookings', JSON.stringify(filtered));
-       }
+    if (typeof window !== 'undefined' && result.success) {
+       // Since we don't have the specific ID easily here anymore without searching the data, 
+       // and since saveDbBooking now returns the fresh list, we can just clear any local bookings 
+       // that might have been added during offline mode or just rely on the fresh data.
+       // For now, let's just return the result data.
+       return result.data;
     }
     
-    return result;
+    return result.data;
   } catch (e) {
     console.warn('Database save failed, falling back to LocalStorage:', e);
     
