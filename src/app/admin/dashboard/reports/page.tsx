@@ -209,6 +209,7 @@ export default function ReportsPage() {
 
   // Update checkIn/Out safely if month/year changes
   useEffect(() => {
+    if (selectedMonth === -1 || selectedYear === -1) return;
     const sStr = String(selectedMonth + 1).padStart(2, '0');
     const safeStr = `${selectedYear}-${sStr}-01`;
     setNewRecord(prev => ({ ...prev, checkIn: safeStr, checkOut: safeStr }));
@@ -351,10 +352,15 @@ export default function ReportsPage() {
     e.preventDefault();
     try {
       if (!selectedUnit) return alert('الرجاء اختيار وحدة أولاً');
+      if (!newRecord.name) return alert('الرجاء إدخال اسم العميل');
+      
       setSaveStatus('جاري الحفظ...');
       
-      const inDate = new Date(newRecord.checkIn || new Date());
-      const outDate = new Date(newRecord.checkOut || new Date());
+      const checkInStr = newRecord.checkIn || new Date().toISOString().split('T')[0];
+      const checkOutStr = newRecord.checkOut || checkInStr;
+
+      const inDate = new Date(checkInStr);
+      const outDate = new Date(checkOutStr);
       const diff = Math.ceil((outDate.getTime() - inDate.getTime()) / (1000 * 60 * 60 * 24));
       const nights = diff > 0 ? diff : 0;
       const totalAmount = nights * newRecord.pricePerNight;
@@ -380,19 +386,13 @@ export default function ReportsPage() {
         }
       }
 
-      if (!selectedUnit) {
-        alert('⚠️ يرجى اختيار الوحدة أولاً من القائمة أو التبويبات');
-        setSaveStatus('');
-        return;
-      }
-
       const newBooking = {
         name: newRecord.name,
         nationality: newRecord.nationality,
         idNumber: newRecord.idNumber,
         phone: newRecord.phone,
-        checkIn: newRecord.checkIn,
-        checkOut: newRecord.checkOut,
+        checkIn: checkInStr,
+        checkOut: checkOutStr,
         apartmentId: selectedUnit,
         studio: units.find((u: any) => u.id === selectedUnit)?.title?.ar || selectedUnit,
         status: 'approved',
@@ -406,8 +406,14 @@ export default function ReportsPage() {
         notes: newRecord.notes
       };
       
-      await saveDbBooking(newBooking);
-      await loadData();
+      const freshData = await saveDbBooking(newBooking);
+      
+      // Update local state WITH THE FRESH DATA RETURNED FROM SERVER
+      if (freshData && Array.isArray(freshData)) {
+        setBookings(freshData);
+      } else {
+        await loadData();
+      }
       
       // Reset form
       const resetStr = String(selectedMonth + 1).padStart(2, '0');

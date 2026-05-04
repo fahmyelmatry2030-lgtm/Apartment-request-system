@@ -138,8 +138,8 @@ export async function saveDbBooking(booking: any) {
   try {
     const newBooking = {
       ...booking,
-      id: `#B-${Math.floor(1000 + Math.random() * 9000)}`,
-      status: booking.status || 'رد جديد',
+      id: `#B-${Date.now().toString().slice(-4)}${Math.floor(100 + Math.random() * 900)}`,
+      status: booking.status || 'approved', // Default to approved for manual records
       timestamp: booking.timestamp || new Date().toISOString(),
     };
 
@@ -181,7 +181,7 @@ export async function saveDbBooking(booking: any) {
     }
 
     revalidatePath('/admin/dashboard/reports');
-    return newBooking;
+    return await getFreshDbBookings(Date.now().toString());
   } catch (error) {
     console.error('Error saving booking:', error);
     throw error;
