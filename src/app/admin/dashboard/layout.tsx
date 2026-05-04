@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { getBookings } from '@/lib/data-init';
 import Logo from '@/components/Logo';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
 export default function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -104,7 +105,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
       loadData();
 
       // REAL-TIME NOTIFICATIONS
-      const supabase = require('@/lib/supabase/client').getSupabaseBrowserClient();
+      const supabase = getSupabaseBrowserClient();
       let channel: any;
 
       if (supabase) {

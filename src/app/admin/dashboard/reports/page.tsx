@@ -161,8 +161,8 @@ export default function ReportsPage() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [units, setUnits] = useState<any[]>([]);
   const [selectedUnit, setSelectedUnit] = useState<string>('');
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(-1);
+  const [selectedYear, setSelectedYear] = useState(-1);
   const [isLoading, setIsLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState('');
   const [editingBooking, setEditingBooking] = useState<any>(null);
@@ -181,6 +181,12 @@ export default function ReportsPage() {
       }
     }
   }, []);
+
+  // Initialize month/year on client-side only to avoid hydration mismatch
+  useEffect(() => {
+    if (selectedMonth === -1) setSelectedMonth(new Date().getMonth());
+    if (selectedYear === -1) setSelectedYear(new Date().getFullYear());
+  }, [selectedMonth, selectedYear]);
   
   const monthStr = String(selectedMonth + 1).padStart(2, '0');
   const safeDateStr = `${selectedYear}-${monthStr}-01`;

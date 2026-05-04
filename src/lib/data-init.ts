@@ -102,7 +102,7 @@ export const getPublicUnitsWithAvailability = async () => {
   const occupiedIds = bookings
     .filter((b: any) => {
       // Logic: If today is within [checkIn, checkOut-1]
-      return b.checkIn <= today && today < b.checkOut && (b.status === 'approved' || b.status.includes('مؤكد'));
+      return b.checkIn <= today && today < b.checkOut && (b.status === 'approved' || (b.status && b.status.includes('مؤكد')));
     })
     .map((b: any) => b.apartmentId);
 
