@@ -301,11 +301,19 @@ export default function BookingsManagement() {
                       </td>
                       <td className="px-8 py-6">
                         <div className="flex justify-end gap-3 opacity-40 group-hover:opacity-100 transition-opacity">
+                            {booking.status !== 'approved' && booking.status !== 'مؤكد' && (
+                              <button 
+                                  onClick={() => { setSelectedBooking(booking); setShowApproveModal(true); }}
+                                  className="text-green-600 bg-green-50 px-3 py-1.5 rounded-lg hover:bg-green-600 hover:text-white transition-colors font-black text-[10px] uppercase tracking-tighter"
+                              >
+                                  تفعيل
+                              </button>
+                            )}
                             <button 
                                 onClick={() => { setSelectedBooking(booking); setShowDeleteModal(true); }}
-                                className="text-[#7A7061] hover:text-red-600 transition-colors font-black text-[10px] uppercase tracking-tighter"
+                                className="text-red-600 bg-red-50 px-3 py-1.5 rounded-lg hover:bg-red-600 hover:text-white transition-colors font-black text-[10px] uppercase tracking-tighter"
                             >
-                                حذف السجل
+                                حذف
                             </button>
                         </div>
                       </td>
@@ -395,16 +403,25 @@ export default function BookingsManagement() {
                      )}
 
                      <div className="pt-6 border-t border-white/5 flex gap-3">
-                        <div className="flex w-full gap-3">
+                        <div className="flex w-full gap-2">
+                            {b.status !== 'approved' && b.status !== 'مؤكد' && (
+                                <button 
+                                    onClick={() => { setSelectedBooking(b); setShowApproveModal(true); }}
+                                    className="flex-1 py-4 bg-green-600 text-white rounded-2xl text-[10px] font-black hover:bg-green-700 transition-all shadow-lg shadow-green-600/20"
+                                >
+                                    تفعيل
+                                </button>
+                            )}
                             <button 
                                 onClick={() => openWhatsAppChat(b)}
-                                className="flex-1 py-4 bg-green-600/10 text-green-400 border border-green-600/20 rounded-2xl text-[10px] font-black hover:bg-green-600 hover:text-white transition-all"
+                                className="flex-1 py-4 bg-white/5 text-white border border-white/10 rounded-2xl text-[10px] font-black hover:bg-white/10 transition-all"
                             >
-                                واتساب الضيف
+                                واتساب
                             </button>
                             <button 
                                 onClick={() => { setSelectedBooking(b); setShowDeleteModal(true); }}
-                                className="px-6 py-4 bg-white/5 text-gray-500 rounded-2xl text-[10px] font-black hover:bg-red-600 hover:text-white transition-all"
+                                className="px-6 py-4 bg-red-500/10 text-red-400 border border-red-500/20 rounded-2xl text-[10px] font-black hover:bg-red-600 hover:text-white transition-all"
+                                title="حذف"
                             >
                                 🗑️
                             </button>

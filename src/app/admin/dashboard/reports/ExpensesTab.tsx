@@ -409,7 +409,7 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                   <th className="px-4 py-4 border-x border-white/10 w-32">To</th>
                   <th className="px-4 py-4 border-x border-white/10 w-32">Order By</th>
                   <th className="px-4 py-4 border-x border-white/10 w-32">Notes</th>
-                  <th className="px-4 py-4 border-x border-white/10 w-24">Action</th>
+                  <th className="px-4 py-4 border-x border-white/10 w-32">الإجراءات</th>
                 </tr>
               </thead>
               <tbody className="bg-white">
@@ -444,12 +444,14 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                         <button 
                           onClick={() => handleEdit(exp)} 
                           className="w-8 h-8 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-all shadow-sm"
+                          title="تعديل"
                         >
                           ✏️
                         </button>
                         <button 
                           onClick={() => handleDelete(exp.id)} 
                           className="w-8 h-8 rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm"
+                          title="حذف"
                         >
                           🗑️
                         </button>

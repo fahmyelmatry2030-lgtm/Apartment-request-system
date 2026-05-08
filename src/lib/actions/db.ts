@@ -310,7 +310,17 @@ export async function getDbUnits() {
     return [];
   }
 
-  return (data || []).map((u: any) => ({
+  return (data || [])
+    .filter((u: any) => {
+      // Exclude studios 25 to 30
+      if (u.type === 'studio') {
+         const titleMatch = u.title?.ar?.match(/(25|26|27|28|29|30)/);
+         const idMatch = String(u.id).match(/s(25|26|27|28|29|30)$/);
+         if (titleMatch || idMatch) return false;
+      }
+      return true;
+    })
+    .map((u: any) => ({
     id: u.id,
     branch: u.branch,
     type: u.type,
