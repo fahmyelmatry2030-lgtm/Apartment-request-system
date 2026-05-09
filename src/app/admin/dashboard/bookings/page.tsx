@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { getSystemUnits, updateBookingStatus, getBookings, deleteBooking } from '@/lib/data-init';
 import { formatWhatsAppNumber } from '@/lib/utils';
+import { CheckCircle, Trash2 } from 'lucide-react';
 
 export default function BookingsManagement() {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -304,16 +305,18 @@ export default function BookingsManagement() {
                             {!['approved', 'مؤكد', 'مؤكد/دخول', 'مغادر/تنظيف', 'مغادر/تم'].includes(booking.status) && (
                               <button 
                                   onClick={() => { setSelectedBooking(booking); setShowApproveModal(true); }}
-                                  className="text-green-600 bg-green-50 px-3 py-1.5 rounded-lg hover:bg-green-600 hover:text-white transition-colors font-black text-[10px] uppercase tracking-tighter"
+                                  className="w-8 h-8 flex items-center justify-center text-green-600 bg-green-50 rounded-lg hover:bg-green-600 hover:text-white transition-colors"
+                                  title="تفعيل الحجز"
                               >
-                                  تفعيل
+                                  <CheckCircle size={14} strokeWidth={2.5} />
                               </button>
                             )}
                             <button 
                                 onClick={() => { setSelectedBooking(booking); setShowDeleteModal(true); }}
-                                className="text-red-600 bg-red-50 px-3 py-1.5 rounded-lg hover:bg-red-600 hover:text-white transition-colors font-black text-[10px] uppercase tracking-tighter"
+                                className="w-8 h-8 flex items-center justify-center text-red-600 bg-red-50 rounded-lg hover:bg-red-600 hover:text-white transition-colors"
+                                title="حذف الحجز"
                             >
-                                حذف
+                                <Trash2 size={14} strokeWidth={2.5} />
                             </button>
                         </div>
                       </td>
@@ -409,21 +412,21 @@ export default function BookingsManagement() {
                                     onClick={() => { setSelectedBooking(b); setShowApproveModal(true); }}
                                     className="flex-1 py-4 bg-green-600 text-white rounded-2xl text-[10px] font-black hover:bg-green-700 transition-all shadow-lg shadow-green-600/20"
                                 >
-                                    تفعيل
+                                    <CheckCircle size={18} strokeWidth={2.5} />
                                 </button>
                             )}
                             <button 
                                 onClick={() => openWhatsAppChat(b)}
                                 className="flex-1 py-4 bg-white/5 text-white border border-white/10 rounded-2xl text-[10px] font-black hover:bg-white/10 transition-all"
                             >
-                                واتساب
+                                <Smartphone size={18} strokeWidth={2.5} />
                             </button>
                             <button 
                                 onClick={() => { setSelectedBooking(b); setShowDeleteModal(true); }}
                                 className="px-6 py-4 bg-red-500/10 text-red-400 border border-red-500/20 rounded-2xl text-[10px] font-black hover:bg-red-600 hover:text-white transition-all"
                                 title="حذف"
                             >
-                                🗑️
+                                <Trash2 size={18} strokeWidth={2.5} />
                             </button>
                         </div>
                      </div>

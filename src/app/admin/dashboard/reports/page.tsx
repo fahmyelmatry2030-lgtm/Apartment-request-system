@@ -8,6 +8,7 @@ import {
   saveDbBooking, 
   deleteDbBooking 
 } from '@/lib/actions/db';
+import { Pencil, Trash2 } from 'lucide-react';
 import ExpensesTab from './ExpensesTab';
 import FinancialSummaryTab from './FinancialSummaryTab';
 
@@ -1095,18 +1096,18 @@ export default function ReportsPage() {
                                   setIsEditModalOpen(true);
                                 }
                               }}
-                              className="px-3 py-1.5 text-blue-600 bg-blue-50 font-black text-[9px] hover:bg-blue-600 hover:text-white rounded-lg transition-all"
+                              className="w-8 h-8 flex items-center justify-center text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white rounded-lg transition-all"
                               title="تعديل كافة البيانات"
                             >
-                              تعديل
+                              <Pencil size={14} strokeWidth={2.5} />
                             </button>
 
                             <button 
                               onClick={() => handleDelete(row.id)}
-                              className="px-3 py-1.5 text-red-600 bg-red-50 font-black text-[9px] hover:bg-red-600 hover:text-white rounded-lg transition-all"
+                              className="w-8 h-8 flex items-center justify-center text-red-600 bg-red-50 hover:bg-red-600 hover:text-white rounded-lg transition-all"
                               title="حذف الحجز"
                             >
-                              حذف
+                              <Trash2 size={14} strokeWidth={2.5} />
                             </button>
                           </div>
                         )}

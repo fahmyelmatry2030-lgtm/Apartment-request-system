@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { saveDbExpense, deleteDbExpense, getDbExpenses, updateDbExpense } from '@/lib/actions/db';
+import { Pencil, Trash2 } from 'lucide-react';
 
 // ── Custom CountUp Component (No external lib needed) ──
 function AnimatedNumber({ value }: { value: number }) {
@@ -446,14 +447,14 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                           className="w-8 h-8 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-all shadow-sm"
                           title="تعديل"
                         >
-                          ✏️
+                          <Pencil size={14} strokeWidth={2.5} />
                         </button>
                         <button 
                           onClick={() => handleDelete(exp.id)} 
                           className="w-8 h-8 rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm"
                           title="حذف"
                         >
-                          🗑️
+                          <Trash2 size={14} strokeWidth={2.5} />
                         </button>
                       </div>
                     </td>
