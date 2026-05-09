@@ -661,6 +661,21 @@ export default function ReportsPage() {
         }
         @media screen {
           .print-header { display: none; }
+          .custom-scrollbar-horizontal::-webkit-scrollbar {
+            height: 10px;
+          }
+          .custom-scrollbar-horizontal::-webkit-scrollbar-track {
+            background: #FDFBF7;
+            border-radius: 10px;
+          }
+          .custom-scrollbar-horizontal::-webkit-scrollbar-thumb {
+            background: #C1A68D;
+            border-radius: 10px;
+            border: 2px solid #FDFBF7;
+          }
+          .custom-scrollbar-horizontal::-webkit-scrollbar-thumb:hover {
+            background: #2A2723;
+          }
         }
       `}</style>
 
@@ -943,11 +958,11 @@ export default function ReportsPage() {
             <p>{MONTHS_AR[selectedMonth]} {selectedYear}</p>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-center border-collapse" dir="rtl">
-              <thead>
+          <div className="overflow-x-auto custom-scrollbar-horizontal pb-4">
+            <table className="w-full min-w-[1500px] text-center border-collapse" dir="rtl">
+              <thead className="sticky top-0 z-30">
                 <tr className="bg-[#2A2723] text-white text-[9px] uppercase tracking-widest font-black">
-                  <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">No</th>
+                  <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap sticky right-0 bg-[#2A2723] z-20 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">No</th>
                   <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">التاريخ</th>
                   <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">الاسم</th>
                   <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">الجنسية</th>
@@ -963,7 +978,7 @@ export default function ReportsPage() {
                   <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">الوسيط</th>
                   <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">الصافي</th>
                   <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">ملاحظات</th>
-                  <th className="px-3 py-4 no-print whitespace-nowrap">الإجراءات</th>
+                  <th className="px-3 py-4 no-print whitespace-nowrap sticky left-0 bg-[#2A2723] z-20 shadow-[-2px_0_5px_rgba(0,0,0,0.3)]">الإجراءات</th>
                 </tr>
               </thead>
               <tbody className="text-[10px]">
@@ -976,7 +991,7 @@ export default function ReportsPage() {
                 ) : (
                   allRows.map((row, i) => (
                     <tr
-                      key={i}
+                      key={row.no}
                       className={`border-t border-[#EAE4D9]/30 transition-colors ${
                         row.hasData
                           ? row.clientStatus.trim() === 'متواجد' ? 'bg-green-200 hover:bg-green-300'
@@ -984,9 +999,9 @@ export default function ReportsPage() {
                             : row.clientStatus.trim() === 'انتظار' ? 'bg-orange-200 hover:bg-orange-300' 
                             : 'bg-white hover:bg-yellow-50/30'
                           : 'bg-[#FDFBF7]/50'
-                      }`}
+                      } group`}
                     >
-                      <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-black text-[#C1A68D]">{row.no}</td>
+                      <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-black text-[#7A7061] sticky right-0 bg-inherit z-10 shadow-[2px_0_5px_rgba(0,0,0,0.02)]">{row.no}</td>
                       <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-bold text-[#2A2723] whitespace-nowrap">{formatDate(row.date)}</td>
                       <td className="px-1 py-1 border-l border-[#EAE4D9]/20">
                         {row.hasData ? (
@@ -1069,7 +1084,7 @@ export default function ReportsPage() {
                       </td>
 
                       {/* --- ACTIONS --- */}
-                      <td className="px-1 py-1 no-print border-r border-[#EAE4D9]/20">
+                      <td className="px-1 py-1 no-print border-r border-[#EAE4D9]/20 sticky left-0 bg-inherit z-10 shadow-[-2px_0_5px_rgba(0,0,0,0.02)]">
                         {row.hasData && (
                           <div className="flex items-center justify-center gap-1">
                             <button 

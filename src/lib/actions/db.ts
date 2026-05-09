@@ -149,7 +149,7 @@ export async function saveDbBooking(booking: any) {
     const newBookingWithId = {
       ...booking,
       id: `B-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-      status: booking.status || 'approved',
+      status: booking.status || 'جديد',
       timestamp: booking.timestamp || new Date().toISOString(),
     };
 

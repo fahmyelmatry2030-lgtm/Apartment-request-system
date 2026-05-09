@@ -167,7 +167,7 @@ export default function BookingsManagement() {
     if (b.checkIn <= today) return false;
 
     if (activeTab === 'all') return true;
-    if (activeTab === 'pending') return b.status === 'رد جديد' || b.status === 'pending';
+    if (activeTab === 'pending') return b.status === 'رد جديد' || b.status === 'pending' || b.status === 'جديد' || b.status === 'قيد المراجعة';
     if (activeTab === 'approved') return b.status === 'approved' || b.status === 'مؤكد';
     return true;
   });
@@ -300,8 +300,8 @@ export default function BookingsManagement() {
                         </span>
                       </td>
                       <td className="px-8 py-6">
-                        <div className="flex justify-end gap-3 opacity-40 group-hover:opacity-100 transition-opacity">
-                            {booking.status !== 'approved' && booking.status !== 'مؤكد' && (
+                        <div className="flex justify-end gap-3 transition-opacity">
+                            {!['approved', 'مؤكد', 'مؤكد/دخول', 'مغادر/تنظيف', 'مغادر/تم'].includes(booking.status) && (
                               <button 
                                   onClick={() => { setSelectedBooking(booking); setShowApproveModal(true); }}
                                   className="text-green-600 bg-green-50 px-3 py-1.5 rounded-lg hover:bg-green-600 hover:text-white transition-colors font-black text-[10px] uppercase tracking-tighter"
