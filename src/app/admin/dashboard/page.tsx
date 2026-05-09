@@ -40,15 +40,6 @@ export default function DashboardOverview() {
   const [allBookings, setAllBookings] = useState<any[]>([]);
   const [selectedKpi, setSelectedKpi] = useState<string | null>(null);
 
-  const getKpiBookings = (type: string) => {
-    const list = allBookings;
-    if (type === 'pending') return list.filter((b: any) => PENDING_STATUSES.includes(b.status));
-    if (type === 'total') return list;
-    if (type === 'inToday') return list.filter((b: any) => CONFIRMED_STATUSES.includes(b.status) && b.checkIn === new Date().toISOString().split('T')[0]);
-    if (type === 'outToday') return list.filter((b: any) => CONFIRMED_STATUSES.includes(b.status) && b.checkOut === new Date().toISOString().split('T')[0]);
-    return [];
-  };
-
   const [searchTerm, setSearchTerm] = useState('');
   const [adminRole, setAdminRole] = useState<string>('Admin');
 
