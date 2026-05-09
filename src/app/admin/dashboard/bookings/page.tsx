@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { getSystemUnits, updateBookingStatus, getBookings, deleteBooking } from '@/lib/data-init';
 import { formatWhatsAppNumber } from '@/lib/utils';
-import { CheckCircle, Trash2 } from 'lucide-react';
+import { CheckCircle, Trash2, Smartphone } from 'lucide-react';
 
 export default function BookingsManagement() {
   const [bookings, setBookings] = useState<any[]>([]);
