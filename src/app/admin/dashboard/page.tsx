@@ -63,6 +63,9 @@ export default function DashboardOverview() {
       apts = apts.filter((u: any) => u.branch === 3);
     }
 
+    // Filter out master unit types from display (s-single, s-double, etc)
+    apts = apts.filter((u: any) => !['s-single', 's-double', 's-triple', 's-tworoom'].includes(u.id));
+
     const targetDateStr = selectedDate;
     const nextDay = new Date(selectedDate);
     nextDay.setDate(nextDay.getDate() + 1);
