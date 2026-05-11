@@ -47,7 +47,14 @@
       "smartAccessBadge": "دخول ذكي",
       "hotelServiceBadge": "خدمة فندقية",
       "footerBrandTagline": "MAZAR HOTEL STUDIOS • PREMIUM STAY EXPERIENCE",
-      "differentExperience": "فندقية في مدينة نصر"
+      "differentExperience": "فندقية في مدينة نصر",
+      "whatsapp": {
+        "support": "دعم واتساب",
+        "online": "متصل الآن",
+        "welcome": "مرحباً! كيف يمكننا مساعدتك اليوم؟ يمكنك مراسلتنا مباشرة عبر واتساب.",
+        "startChat": "بدء المحادثة",
+        "defaultMsg": "مرحباً مزار، أود الاستفسار عن حجز استوديو."
+      }
     },
     "design4": {
       "cta": "بدء الحجز الان",
@@ -240,7 +247,14 @@
       "smartAccessBadge": "Smart Access",
       "hotelServiceBadge": "Hotel Service",
       "footerBrandTagline": "MAZAR HOTEL STUDIOS • PREMIUM STAY EXPERIENCE",
-      "differentExperience": "Hotel in Nasr City"
+      "differentExperience": "Hotel in Nasr City",
+      "whatsapp": {
+        "support": "WhatsApp Support",
+        "online": "Online Now",
+        "welcome": "Hello! How can we help you today? You can message us directly on WhatsApp.",
+        "startChat": "Start Chat",
+        "defaultMsg": "Hi Mazar, I would like to inquire about booking a studio."
+      }
     },
     "design4": {
       "cta": "INITIALIZE BOOKING",

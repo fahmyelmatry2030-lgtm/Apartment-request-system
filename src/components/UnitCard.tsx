@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useLanguage } from '@/lib/LanguageContext';
 import { getStudios } from '@/lib/data-init';
+import { motion } from 'framer-motion';
 
 interface UnitCardProps {
   unit: any;
@@ -25,7 +26,11 @@ const UnitCard: React.FC<UnitCardProps> = ({ unit }) => {
   }, [unit.id]);
 
   return (
-    <div className={`bg-white rounded-3xl border border-[#EAE4D9] overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group`}>
+    <motion.div 
+      whileHover={{ y: -8 }}
+      transition={{ duration: 0.3 }}
+      className={`bg-white rounded-[2rem] border border-[#EAE4D9] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col group h-full`}
+    >
       <div className="relative h-64 overflow-hidden">
         {unit?.images?.[0] ? (
           <Image 
@@ -73,12 +78,15 @@ const UnitCard: React.FC<UnitCardProps> = ({ unit }) => {
 
         <Link 
           href={`/mazar/units/${unit?.id}`}
-          className="mt-auto w-full bg-[#E63946] text-white text-sm font-bold py-3.5 rounded-xl text-center hover:bg-[#c1121f] transition-colors shadow-lg shadow-red-100"
+          className="mt-auto w-full bg-[#2A2723] text-white text-sm font-black py-4 rounded-2xl text-center hover:bg-black transition-all shadow-xl shadow-black/5 flex items-center justify-center gap-2 group/btn"
         >
           {t?.unitsPage?.viewDetails || 'Details'}
+          <span className={`transition-transform duration-300 ${isRTL ? 'group-hover:-translate-x-1' : 'group-hover:translate-x-1'}`}>
+            {isRTL ? '←' : '→'}
+          </span>
         </Link>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

@@ -257,30 +257,31 @@ export default function ReportsPage() {
       const updates: any = { [field]: finalValue };
       
       // Auto-calculate dependencies
-      if (['checkIn', 'checkOut', 'pricePerNight'].includes(field)) {
+      if (['checkIn', 'checkOut', 'pricePerNight', 'totalAmount'].includes(field)) {
         const cIn = field === 'checkIn' ? finalValue : currentBooking.checkIn;
         const cOut = field === 'checkOut' ? finalValue : currentBooking.checkOut;
         
-        let pNight = field === 'pricePerNight' ? (parseInt(value, 10) || 0) : null;
+        let pNight = field === 'pricePerNight' ? (parseFloat(value) || 0) : currentBooking.pricePerNight;
+        let totalAmt = field === 'totalAmount' ? (parseFloat(value) || 0) : currentBooking.totalAmount;
         
-        if (pNight === null) {
-          if (currentBooking.numberOfDays > 0) {
-            pNight = currentBooking.totalAmount / currentBooking.numberOfDays;
-          } else {
-            pNight = 0;
-          }
-        }
-
         if (cIn && cOut) {
           const dIn = new Date(cIn);
           const dOut = new Date(cOut);
           const diff = Math.ceil((dOut.getTime() - dIn.getTime()) / (1000 * 60 * 60 * 24));
           const nights = diff > 0 ? diff : 0;
-          updates.totalAmount = nights * pNight;
-          updates.pricePerNight = pNight;
+          
+          updates.numberOfDays = nights;
+
+          if (field === 'checkIn' || field === 'checkOut' || field === 'pricePerNight') {
+            // Price per night or dates changed -> recalculate total
+            updates.totalAmount = nights * pNight;
+          } else if (field === 'totalAmount' && nights > 0) {
+            // Total changed -> recalculate price per night
+            updates.pricePerNight = totalAmt / nights;
+          }
           
           // Overlap check on edit
-          if (nights > 0) {
+          if (nights > 0 && (field === 'checkIn' || field === 'checkOut')) {
             const hasOverlap = bookings.some(b => {
               if (b.id === bookingId || b.status === 'deleted' || b.apartmentId !== currentBooking.apartmentId) return false;
               if (b.status !== 'approved' && b.status !== 'مؤكد') return false;
@@ -1200,7 +1201,18 @@ export default function ReportsPage() {
                     <AdminDatePicker 
                       label="تاريخ الدخول" 
                       value={editingBooking.checkIn} 
-                      onChange={(v: string) => setEditingBooking({...editingBooking, checkIn: v})} 
+                      onChange={(v: string) => {
+                        const dIn = new Date(v);
+                        const dOut = new Date(editingBooking.checkOut);
+                        const diff = Math.ceil((dOut.getTime() - dIn.getTime()) / (1000 * 60 * 60 * 24));
+                        const nights = diff > 0 ? diff : 0;
+                        setEditingBooking({
+                          ...editingBooking, 
+                          checkIn: v,
+                          numberOfDays: nights,
+                          totalAmount: nights * (editingBooking.pricePerNight || 0)
+                        });
+                      }} 
                       icon="🛬" 
                       color="gold" 
                     />
@@ -1209,7 +1221,18 @@ export default function ReportsPage() {
                     <AdminDatePicker 
                       label="تاريخ الخروج" 
                       value={editingBooking.checkOut} 
-                      onChange={(v: string) => setEditingBooking({...editingBooking, checkOut: v})} 
+                      onChange={(v: string) => {
+                        const dIn = new Date(editingBooking.checkIn);
+                        const dOut = new Date(v);
+                        const diff = Math.ceil((dOut.getTime() - dIn.getTime()) / (1000 * 60 * 60 * 24));
+                        const nights = diff > 0 ? diff : 0;
+                        setEditingBooking({
+                          ...editingBooking, 
+                          checkOut: v,
+                          numberOfDays: nights,
+                          totalAmount: nights * (editingBooking.pricePerNight || 0)
+                        });
+                      }} 
                       icon="🛫" 
                       color="red" 
                     />
@@ -1236,7 +1259,15 @@ export default function ReportsPage() {
                     <input 
                       type="number" required
                       value={editingBooking.totalAmount || 0}
-                      onChange={e => setEditingBooking({...editingBooking, totalAmount: Number(e.target.value)})}
+                      onChange={e => {
+                        const total = Number(e.target.value);
+                        const nights = editingBooking.numberOfDays || 0;
+                        setEditingBooking({
+                          ...editingBooking, 
+                          totalAmount: total,
+                          pricePerNight: nights > 0 ? total / nights : total
+                        });
+                      }}
                       className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C1A68D] font-black"
                     />
                   </div>

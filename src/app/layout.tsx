@@ -4,6 +4,8 @@ import "./globals.css";
 import { LanguageProvider } from "@/lib/LanguageContext";
 import { translations as fallbackTranslations } from "@/lib/translations";
 import { getDbTranslations } from "@/lib/actions/db";
+import ScrollProgress from "@/components/ScrollProgress";
+import WhatsAppWidget from "@/components/WhatsAppWidget";
 
 export const dynamic = 'force-dynamic';
 
@@ -122,7 +124,9 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <LanguageProvider initialTranslations={initialTranslations}>
+          <ScrollProgress />
           {children}
+          <WhatsAppWidget />
         </LanguageProvider>
         <script
           dangerouslySetInnerHTML={{

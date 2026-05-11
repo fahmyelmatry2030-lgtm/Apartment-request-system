@@ -9,6 +9,8 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useLanguage } from '@/lib/LanguageContext';
 import { getPublicSystemUnits } from '@/lib/data-init';
 import UnitCard from '@/components/UnitCard';
+import ScrollReveal from '@/components/ScrollReveal';
+import { motion } from 'framer-motion';
 
 export default function HomeClient() {
   const { t, media, isRTL } = useLanguage();
@@ -105,31 +107,37 @@ export default function HomeClient() {
 
         {/* Quick Stats */}
         <div className="mt-4 bg-white/50 backdrop-blur-md border border-[#EAE4D9] rounded-3xl px-6 md:px-12 py-5 flex flex-row gap-6 md:gap-12 items-center justify-center">
-          <div className="text-center">
-            <span className="block text-xl md:text-3xl font-black text-[#2A2723]">24</span>
-            <span className="text-[8px] md:text-[10px] font-bold text-[#7A7061] uppercase tracking-wider">{t.unitsPage.branch1} & {t.unitsPage.branch2}</span>
-          </div>
+          <ScrollReveal delay={0.2} direction="down">
+            <div className="text-center">
+              <span className="block text-xl md:text-3xl font-black text-[#2A2723]">24</span>
+              <span className="text-[8px] md:text-[10px] font-bold text-[#7A7061] uppercase tracking-wider">{t.unitsPage.branch1} & {t.unitsPage.branch2}</span>
+            </div>
+          </ScrollReveal>
           <div className="w-px h-8 bg-[#EAE4D9]" />
-          <div className="text-center">
-            <span className="block text-xl md:text-3xl font-black text-[#2A2723]">3</span>
-            <span className="text-[8px] md:text-[10px] font-bold text-[#7A7061] uppercase tracking-wider">{t.unitsPage.apartments}</span>
-          </div>
+          <ScrollReveal delay={0.3} direction="down">
+            <div className="text-center">
+              <span className="block text-xl md:text-3xl font-black text-[#2A2723]">3</span>
+              <span className="text-[8px] md:text-[10px] font-bold text-[#7A7061] uppercase tracking-wider">{t.unitsPage.apartments}</span>
+            </div>
+          </ScrollReveal>
         </div>
 
         {/* Units Display Section - DIRECTLY UNDER STATS */}
-        <div className="w-full max-w-7xl mt-16 px-4">
-           {loading ? (
-             <div className="py-20 flex justify-center">
-                <div className="w-12 h-12 border-4 border-[#C1A68D] border-t-transparent rounded-full animate-spin"></div>
-             </div>
-           ) : (
-             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-               {units.map((unit) => (
-                 <UnitCard key={unit.id} unit={unit} />
-               ))}
-             </div>
-           )}
-        </div>
+        <ScrollReveal delay={0.4}>
+          <div className="w-full max-w-7xl mt-16 px-4">
+             {loading ? (
+               <div className="py-20 flex justify-center">
+                  <div className="w-12 h-12 border-4 border-[#C1A68D] border-t-transparent rounded-full animate-spin"></div>
+               </div>
+             ) : (
+               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                 {units.map((unit) => (
+                   <UnitCard key={unit.id} unit={unit} />
+                 ))}
+               </div>
+             )}
+          </div>
+        </ScrollReveal>
 
         {/* Feature Highlights (Horizontal on mobile) */}
         <div className="flex flex-wrap justify-center gap-4 md:gap-8 mt-16 text-[9px] md:text-[11px] font-black text-[#9A8F82] uppercase tracking-widest bg-white/30 px-6 py-3 rounded-full">
@@ -145,34 +153,36 @@ export default function HomeClient() {
         </div>
 
         {/* Visual Showcase */}
-        <div className="relative w-full max-w-6xl mt-20 flex flex-col md:block min-h-[500px] md:h-[600px] gap-6">
+        <ScrollReveal delay={0.6} direction="up" distance={100}>
+          <div className="relative w-full max-w-6xl mt-20 flex flex-col md:block min-h-[500px] md:h-[600px] gap-6">
 
-          {/* Main Showcase Image (Right on Desktop, Top on Mobile) */}
-          <div className={`relative md:absolute ${isRTL ? 'md:left-0' : 'md:right-0'} md:top-0 w-full md:w-[70%] h-[300px] md:h-[500px] rounded-[2.5rem] overflow-hidden shadow-xl z-10`}>
-            <NextImage
-              src={media.homeHeroRight}
-              alt="Luxury Living"
-              fill
-              className="object-cover"
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-80" />
-          </div>
+            {/* Main Showcase Image (Right on Desktop, Top on Mobile) */}
+            <div className={`relative md:absolute ${isRTL ? 'md:left-0' : 'md:right-0'} md:top-0 w-full md:w-[70%] h-[300px] md:h-[500px] rounded-[2.5rem] overflow-hidden shadow-xl z-10`}>
+              <NextImage
+                src={media.homeHeroRight}
+                alt="Luxury Living"
+                fill
+                className="object-cover"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-80" />
+            </div>
 
-          {/* Secondary Detail Image (Left on Desktop, Bottom on Mobile) */}
-          <div className={`relative md:absolute ${isRTL ? 'md:right-0 md:bottom-0' : 'md:left-0 md:bottom-0'} w-full md:w-[50%] h-[280px] md:h-[400px] rounded-[2.5rem] overflow-hidden shadow-2xl border-[6px] md:border-[12px] border-white z-20 md:-mt-32`}>
-            <NextImage
-              src={media.homeHeroLeft}
-              alt="Cozy Studio"
-              fill
-              className="object-cover"
-            />
-            <div className={`absolute bottom-4 md:bottom-8 ${isRTL ? 'right-4 md:right-8 left-4 md:left-8 text-right' : 'left-4 md:left-8 right-4 md:right-8 text-left'} bg-white/95 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-xl border border-gray-100`}>
-              <h3 className="font-bold text-[#2A2723] text-lg md:text-xl mb-1">{t.common.features.quiet}</h3>
-              <p className="text-xs md:text-sm text-[#7A7061] leading-relaxed">{t.common.features.quietDesc}</p>
+            {/* Secondary Detail Image (Left on Desktop, Bottom on Mobile) */}
+            <div className={`relative md:absolute ${isRTL ? 'md:right-0 md:bottom-0' : 'md:left-0 md:bottom-0'} w-full md:w-[50%] h-[280px] md:h-[400px] rounded-[2.5rem] overflow-hidden shadow-2xl border-[6px] md:border-[12px] border-white z-20 md:-mt-32`}>
+              <NextImage
+                src={media.homeHeroLeft}
+                alt="Cozy Studio"
+                fill
+                className="object-cover"
+              />
+              <div className={`absolute bottom-4 md:bottom-8 ${isRTL ? 'right-4 md:right-8 left-4 md:left-8 text-right' : 'left-4 md:left-8 right-4 md:right-8 text-left'} bg-white/95 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-xl border border-gray-100`}>
+                <h3 className="font-bold text-[#2A2723] text-lg md:text-xl mb-1">{t.common.features.quiet}</h3>
+                <p className="text-xs md:text-sm text-[#7A7061] leading-relaxed">{t.common.features.quietDesc}</p>
+              </div>
             </div>
           </div>
-        </div>
+        </ScrollReveal>
       </section>
 
       {/* Mobile Floating Action Button */}

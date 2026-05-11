@@ -1,5 +1,28 @@
 @import "tailwindcss";
 
+@layer base {
+  /* Premium Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #FDFBF7;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #C1A68D;
+    border-radius: 10px;
+    border: 2px solid #FDFBF7;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #A68D74;
+  }
+
+  /* Smooth Scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 @theme {
   --color-mazar-cream: #FDFBF7;
   --color-mazar-coffee: #2A2723;
@@ -55,21 +78,6 @@
 
 .delay-100 { animation-delay: 100ms; }
 .delay-200 { animation-delay: 200ms; }
-
-/* Luxury Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: var(--color-mazar-cream);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--color-mazar-gold);
-  border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-mazar-gray);
-}
 
 .selection\:bg-mazar-gold::selection {
   background-color: var(--color-mazar-gold);
