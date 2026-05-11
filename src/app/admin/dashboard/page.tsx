@@ -84,9 +84,14 @@ export default function DashboardOverview() {
     // Dynamic classification logic below replaces hardcoded arrays
 
     const map = apts.map((apt: any) => {
-      const activeBooking = confirmed.find((b: any) =>
-        b.apartmentId === apt.id && targetDateStr >= b.checkIn && targetDateStr < b.checkOut
-      );
+      const targetDateStr = selectedDate;
+      
+      // Precise identification of booking types for the target date
+      const outToday = confirmed.find((b: any) => b.apartmentId === apt.id && b.checkOut === targetDateStr);
+      const inToday = confirmed.find((b: any) => b.apartmentId === apt.id && b.checkIn === targetDateStr);
+      const inHouse = confirmed.find((b: any) => b.apartmentId === apt.id && targetDateStr > b.checkIn && targetDateStr < b.checkOut);
+
+      const activeBooking = inToday || inHouse; // The guest who will be there tonight
       
       let cat = 'apartment';
       if (String(apt.id).startsWith('apt-')) {
@@ -100,7 +105,6 @@ export default function DashboardOverview() {
          if (title.includes('تريبل') || featsString.includes('٣ أسرة') || featsString.includes('3') || title.includes('3')) cat = 'triple';
          if (title.includes('غرفتين') || featsString.includes('غرفتين')) cat = 'two-room';
          
-         // Fallback based on original hardcoded IDs to maintain backward compatibility if titles changed
          const getFullId = (n: number) => n <= 12 ? `b1-s${n}` : `b2-s${n-12}`;
          if (cat === 'apartment' && !String(apt.id).startsWith('apt-')) {
             const singleIds  = [2, 3, 6, 7, 8, 17].map(getFullId);
@@ -111,11 +115,11 @@ export default function DashboardOverview() {
             else if (doubleIds.includes(apt.id)) cat = 'double';
             else if (tripleIds.includes(apt.id)) cat = 'triple';
             else if (twoRoomIds.includes(apt.id)) cat = 'two-room';
-            else cat = 'single'; // Final fallback
+            else cat = 'single';
          }
       }
 
-      // Find last past booking if currently unoccupied
+      // Find last past booking if currently unoccupied (for turnover/empty state)
       let lastBooking = null;
       if (!activeBooking) {
         lastBooking = confirmed
@@ -133,6 +137,12 @@ export default function DashboardOverview() {
         checkOut: activeBooking?.checkOut,
         guestsCount: activeBooking?.guestsCount,
         lastCheckOut: lastBooking?.checkOut,
+        // Turnover logic
+        isTurnover: !!outToday && !!inToday,
+        leavingGuest: outToday?.name,
+        arrivingGuest: inToday?.name,
+        isCheckingOut: !!outToday && !inToday,
+        isCheckingIn: !!inToday && !outToday,
       };
     });
 
@@ -542,13 +552,18 @@ export default function DashboardOverview() {
 
           {/* Unit Grid or Table */}
           {(() => {
+            const formatMiniDate = (d: string) => {
+              if (!d || !d.includes('-')) return '—';
+              const [y, m, day] = d.split('-');
+              return `${day}/${m}`;
+            };
+
             const displayList = apartmentMap.filter(apt => {
               if (!searchTerm) return true;
               const s = searchTerm.toLowerCase();
               const guestMatch = String(apt.guest || '').toLowerCase().includes(s);
               const idMatch = String(apt.id || '').toLowerCase().includes(s);
               const titleMatch = String(apt.title?.ar || '').toLowerCase().includes(s);
-              // Support searching by date in format YYYY-MM-DD or DD/MM
               const dateMatch = apt.checkOut?.includes(s) || (apt.checkOut && (() => {
                 const [y, m, d] = apt.checkOut.split('-');
                 return `${d}/${m}`.includes(s);
@@ -590,12 +605,6 @@ export default function DashboardOverview() {
                           const badgeColor = isB1 ? 'bg-blue-600 text-white' : isB2 ? 'bg-emerald-600 text-white' : 'bg-[#C1A68D] text-white';
                           const typeLabel: Record<string,string> = { single:'سنجل', double:'دبل', triple:'تريبل', 'two-room':'غرفتين', apartment:'شقة' };
                           
-                          const formatMiniDate = (d: string) => {
-                            if (!d || !d.includes('-')) return '—';
-                            const [y, m, day] = d.split('-');
-                            return `${day}/${m}`;
-                          };
-
                           return (
                             <tr key={apt.id} className={`${rowBg} transition-colors`}>
                               <td className="px-4 py-2.5 text-center">
@@ -604,11 +613,32 @@ export default function DashboardOverview() {
                               <td className="px-4 py-2.5 font-black text-[#2A2723] text-xs">{apt.title?.ar || apt.id}</td>
                               <td className="px-4 py-2.5 text-[10px] text-[#7A7061] font-bold">{typeLabel[apt.category] || apt.category}</td>
                               <td className="px-4 py-2.5 text-center">
-                                <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${apt.status === 'صيانة' ? 'bg-gray-100 text-gray-500' : apt.isOccupied ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-700'}`}>
-                                  {apt.isOccupied ? 'مشغول' : apt.status === 'صيانة' ? 'صيانة' : 'متاح'}
+                                <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                                  apt.isTurnover ? 'bg-orange-500 text-white animate-pulse' :
+                                  apt.isCheckingOut ? 'bg-rose-100 text-rose-600' :
+                                  apt.isCheckingIn ? 'bg-blue-100 text-blue-600' :
+                                  apt.status === 'صيانة' ? 'bg-gray-100 text-gray-500' : 
+                                  apt.isOccupied ? 'bg-red-100 text-red-600' : 
+                                  'bg-green-100 text-green-700'
+                                }`}>
+                                  {apt.isTurnover ? '🔄 تبديل' : 
+                                   apt.isCheckingOut ? '🛫 خروج اليوم' :
+                                   apt.isCheckingIn ? '🛬 وصول اليوم' :
+                                   apt.isOccupied ? 'مشغول' : 
+                                   apt.status === 'صيانة' ? 'صيانة' : 
+                                   'متاح'}
                                 </span>
                               </td>
-                              <td className="px-4 py-2.5 text-[10px] text-[#7A7061] font-bold">{apt.guest || '—'}</td>
+                              <td className="px-4 py-2.5 text-[10px] text-[#7A7061] font-bold">
+                                {apt.isTurnover ? (
+                                  <div className="flex flex-col gap-0.5">
+                                    <span className="text-rose-500">🛫 {apt.leavingGuest}</span>
+                                    <span className="text-blue-600">🛬 {apt.arrivingGuest}</span>
+                                  </div>
+                                ) : (
+                                  apt.guest || (apt.isCheckingOut ? apt.leavingGuest : '—')
+                                )}
+                              </td>
                               <td className="px-4 py-2.5">
                                 {apt.isOccupied && apt.bookingId ? (
                                   <select 
@@ -656,12 +686,29 @@ export default function DashboardOverview() {
                         : 'bg-white border-[#EAE4D9] shadow-sm hover:border-[#C1A68D] hover:scale-105'
                     }`}>
                       <div className="text-[9px] font-black text-[#7A7061] uppercase mb-1 opacity-60">{apt.id}</div>
-                      <div className={`text-[11px] font-black mb-1 ${apt.status === 'صيانة' ? 'text-gray-400' : apt.isOccupied ? 'text-red-500' : 'text-green-600'}`}>
-                        {apt.isOccupied ? '🔴 مشغول' : apt.status === 'صيانة' ? '🔧 صيانة' : '🟢 متاح'}
+                      <div className={`text-[11px] font-black mb-1 ${
+                        apt.isTurnover ? 'text-orange-500' :
+                        apt.isCheckingOut ? 'text-rose-500' :
+                        apt.isCheckingIn ? 'text-blue-600' :
+                        apt.status === 'صيانة' ? 'text-gray-400' : 
+                        apt.isOccupied ? 'text-red-500' : 
+                        'text-green-600'
+                      }`}>
+                        {apt.isTurnover ? '🔄 تبديل اليوم' : 
+                         apt.isCheckingOut ? '🛫 خروج اليوم' :
+                         apt.isCheckingIn ? '🛬 وصول اليوم' :
+                         apt.isOccupied ? '🔴 مشغول' : 
+                         apt.status === 'صيانة' ? '🔧 صيانة' : 
+                         '🟢 متاح'}
                       </div>
-                      <div className="text-[10px] font-bold text-[#2A2723] mt-1">{apt.title?.ar}</div>
-                      {apt.guest ? (
-                        <div className="text-[9px] text-[#7A7061] mt-1 truncate">👤 {apt.guest}</div>
+                      <div className="text-xs font-black text-[#2A2723] mt-1">{apt.title?.ar}</div>
+                      {apt.isTurnover ? (
+                         <div className="mt-2 space-y-1">
+                            <div className="text-[8px] text-rose-500 font-bold truncate">🛫 {apt.leavingGuest}</div>
+                            <div className="text-[8px] text-blue-600 font-bold truncate">🛬 {apt.arrivingGuest}</div>
+                         </div>
+                      ) : (apt.guest || apt.leavingGuest) ? (
+                        <div className="text-[9px] text-[#7A7061] mt-1 truncate">👤 {apt.guest || apt.leavingGuest}</div>
                       ) : apt.lastCheckOut ? (
                         <div className="text-[8px] text-gray-400 mt-1 font-bold italic">🕒 آخر خروج: {formatMiniDate(apt.lastCheckOut)}</div>
                       ) : null}
