@@ -87,6 +87,7 @@ export default function DashboardOverview() {
       const activeBooking = confirmed.find((b: any) =>
         b.apartmentId === apt.id && targetDateStr >= b.checkIn && targetDateStr < b.checkOut
       );
+      
       let cat = 'apartment';
       if (String(apt.id).startsWith('apt-')) {
          cat = 'apartment';
@@ -114,6 +115,14 @@ export default function DashboardOverview() {
          }
       }
 
+      // Find last past booking if currently unoccupied
+      let lastBooking = null;
+      if (!activeBooking) {
+        lastBooking = confirmed
+          .filter((b: any) => b.apartmentId === apt.id && b.checkOut <= targetDateStr)
+          .sort((a: any, b: any) => new Date(b.checkOut).getTime() - new Date(a.checkOut).getTime())[0];
+      }
+
       return {
         ...apt,
         category: cat,
@@ -123,6 +132,7 @@ export default function DashboardOverview() {
         clientStatus: activeBooking?.clientStatus || 'انتظار',
         checkOut: activeBooking?.checkOut,
         guestsCount: activeBooking?.guestsCount,
+        lastCheckOut: lastBooking?.checkOut,
       };
     });
 
@@ -619,7 +629,14 @@ export default function DashboardOverview() {
                                   </select>
                                 ) : <span className="text-[10px] text-gray-300">—</span>}
                               </td>
-                              <td className="px-4 py-2.5 text-[10px] text-center text-[#2A2723] font-black">{formatMiniDate(apt.checkOut)}</td>
+                              <td className="px-4 py-2.5 text-[10px] text-center text-[#2A2723] font-black">
+                                {apt.isOccupied 
+                                  ? formatMiniDate(apt.checkOut) 
+                                  : (apt.lastCheckOut 
+                                      ? <span className="text-gray-400 font-bold opacity-60">آخر: {formatMiniDate(apt.lastCheckOut)}</span> 
+                                      : '—')
+                                }
+                              </td>
                             </tr>
                           );
                         })}
@@ -643,7 +660,11 @@ export default function DashboardOverview() {
                         {apt.isOccupied ? '🔴 مشغول' : apt.status === 'صيانة' ? '🔧 صيانة' : '🟢 متاح'}
                       </div>
                       <div className="text-[10px] font-bold text-[#2A2723] mt-1">{apt.title?.ar}</div>
-                      {apt.guest && <div className="text-[9px] text-[#7A7061] mt-1 truncate">👤 {apt.guest}</div>}
+                      {apt.guest ? (
+                        <div className="text-[9px] text-[#7A7061] mt-1 truncate">👤 {apt.guest}</div>
+                      ) : apt.lastCheckOut ? (
+                        <div className="text-[8px] text-gray-400 mt-1 font-bold italic">🕒 آخر خروج: {formatMiniDate(apt.lastCheckOut)}</div>
+                      ) : null}
                     </div>
                   ))}
                 </div>

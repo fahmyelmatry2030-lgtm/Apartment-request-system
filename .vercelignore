@@ -11,3 +11,7 @@ build_log_v2.txt
 public/images/video
 public/images/Mazar 2 Pictures
 public/uploads
+*.zip
+.git
+.vercel
+MazarBooking-v2.zip
