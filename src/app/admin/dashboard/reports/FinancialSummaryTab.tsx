@@ -37,7 +37,7 @@ export default function FinancialSummaryTab({ bookings }: { bookings: any[] }) {
           <p className="text-[10px] font-black text-green-600 uppercase tracking-widest mb-4">صافي إيرادات الحجوزات (بعد العمولات)</p>
           <div className="text-4xl font-black text-[#2A2723]">{totalRevenue.toLocaleString()} <small className="text-sm">ج.م</small></div>
         </div>
-        
+
         <div className="bg-white p-8 rounded-[2.5rem] border border-red-100 shadow-xl shadow-red-600/5 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/5 rounded-full blur-3xl -mr-12 -mt-12 group-hover:bg-red-500/10 transition-all" />
           <p className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-4">إجمالي المصروفات التشغيلية</p>
@@ -55,7 +55,7 @@ export default function FinancialSummaryTab({ bookings }: { bookings: any[] }) {
       <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
         <div className="p-8 border-b border-[#EAE4D9]/50 bg-[#FDFBF7]/50">
           <h3 className="text-xl font-black text-[#2A2723] flex items-center gap-3">
-             <span>📊</span> ملخص مالي "Excel" للتحصيل والمصاريف
+            <span>📊</span> ملخص مالي "Excel" للتحصيل والمصاريف
           </h3>
         </div>
         <div className="overflow-x-auto">
