@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   getFreshDbBookings,
   getDbUnits,
@@ -164,17 +165,45 @@ const AdminDatePicker = ({ label, value, onChange, icon, color }: any) => {
   );
 };
 
-export default function ReportsPage() {
+function ReportsContent() {
+  const searchParams = useSearchParams();
+  
   const [bookings, setBookings] = useState<any[]>([]);
   const [units, setUnits] = useState<any[]>([]);
-  const [selectedUnit, setSelectedUnit] = useState<string>('');
-  const [selectedMonth, setSelectedMonth] = useState(-1);
-  const [selectedYear, setSelectedYear] = useState(-1);
+  
+  // Initialize from URL params if available, otherwise default
+  const [selectedUnit, setSelectedUnit] = useState<string>(searchParams.get('unit') || '');
+  const [selectedMonth, setSelectedMonth] = useState(() => {
+    const m = searchParams.get('month');
+    return m ? parseInt(m, 10) : -1;
+  });
+  const [selectedYear, setSelectedYear] = useState(() => {
+    const y = searchParams.get('year');
+    return y ? parseInt(y, 10) : -1;
+  });
+  
   const [isLoading, setIsLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState('');
   const [editingBooking, setEditingBooking] = useState<any>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'operational' | 'expenses' | 'financial'>('expenses');
+  const [activeTab, setActiveTab] = useState<'operational' | 'expenses' | 'financial'>(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'operational' || tab === 'expenses' || tab === 'financial') return tab;
+    return searchParams.get('unit') ? 'operational' : 'expenses';
+  });
+
+  // URL PARAM SYNC (for dynamic updates without full reload)
+  useEffect(() => {
+    const unitParam = searchParams.get('unit');
+    const monthParam = searchParams.get('month');
+    const yearParam = searchParams.get('year');
+    const tabParam = searchParams.get('tab');
+
+    if (unitParam) setSelectedUnit(unitParam);
+    if (monthParam) setSelectedMonth(parseInt(monthParam, 10));
+    if (yearParam) setSelectedYear(parseInt(yearParam, 10));
+    if (tabParam) setActiveTab(tabParam as any);
+  }, [searchParams]);
 
   // AUTO-RESET LOGIC: Clears stale localStorage once per version update
   useEffect(() => {
@@ -228,7 +257,9 @@ export default function ReportsPage() {
       const [b, u] = await Promise.all([getFreshDbBookings(), getDbUnits()]);
       setBookings(b || []);
       setUnits(u || []);
-      if (!selectedUnit && u && u.length > 0) {
+      
+      // Only set default unit if none is selected AND none in URL
+      if (!selectedUnit && !searchParams.get('unit') && u && u.length > 0) {
         setSelectedUnit(u[0].id);
       }
     } catch (error) {
@@ -1333,5 +1364,13 @@ export default function ReportsPage() {
         )}
       </div>
     </>
+  );
+}
+
+export default function ReportsPage() {
+  return (
+    <Suspense fallback={<div className="p-10 text-center font-black animate-pulse text-[#C1A68D]">جاري تحميل التقارير...</div>}>
+      <ReportsContent />
+    </Suspense>
   );
 }

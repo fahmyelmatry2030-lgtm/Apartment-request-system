@@ -404,7 +404,10 @@ export async function verifyAdminAuth(username: string, pass: string) {
       .eq('username', cleanUsername)
       .eq('password', cleanPass)
       .limit(1);
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase error during admin auth:', error);
+      throw error;
+    }
 
     const validAdmin = data?.[0];
     if (validAdmin) return { success: true, admin: validAdmin };

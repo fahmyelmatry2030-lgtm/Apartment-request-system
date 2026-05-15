@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { getBookings, getSystemUnits } from '@/lib/data-init';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { updateDbBookingStatus } from '@/lib/actions/db';
@@ -42,6 +43,7 @@ export default function DashboardOverview() {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [adminRole, setAdminRole] = useState<string>('Admin');
+  const router = useRouter();
 
   useEffect(() => {
     const info = sessionStorage.getItem('adminInfo');
@@ -252,6 +254,15 @@ export default function DashboardOverview() {
     if (key === 'checkout') return confirmed.filter((b: any) => b.checkOut === targetDateStr);
     if (key === 'occupancy') return confirmed.filter((b: any) => targetDateStr >= b.checkIn && targetDateStr < b.checkOut);
     return [];
+  };
+
+  const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+
+  const handleUnitClick = (apt: any) => {
+    const d = new Date(selectedDate);
+    const m = d.getMonth();
+    const y = d.getFullYear();
+    router.push(`/admin/dashboard/reports?unit=${apt.id}&month=${m}&year=${y}&tab=operational`);
   };
 
   return (
@@ -608,9 +619,22 @@ export default function DashboardOverview() {
                           return (
                             <tr key={apt.id} className={`${rowBg} transition-colors`}>
                               <td className="px-4 py-2.5 text-center">
-                                <span className={`${badgeColor} w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-black mx-auto`}>{num}</span>
+                                <button 
+                                  onClick={() => handleUnitClick(apt)}
+                                  className={`${badgeColor} w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-black mx-auto hover:scale-110 transition-transform`}
+                                  title="عرض التقرير المالي"
+                                >
+                                  {num}
+                                </button>
                               </td>
-                              <td className="px-4 py-2.5 font-black text-[#2A2723] text-xs">{apt.title?.ar || apt.id}</td>
+                              <td className="px-4 py-2.5 font-black text-[#2A2723] text-xs">
+                                <button 
+                                  onClick={() => handleUnitClick(apt)}
+                                  className="hover:text-[#C1A68D] transition-colors"
+                                >
+                                  {apt.title?.ar || apt.id}
+                                </button>
+                              </td>
                               <td className="px-4 py-2.5 text-[10px] text-[#7A7061] font-bold">{typeLabel[apt.category] || apt.category}</td>
                               <td className="px-4 py-2.5 text-center">
                                 <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
@@ -678,11 +702,14 @@ export default function DashboardOverview() {
               return (
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
                   {displayList.map((apt) => (
-                    <div key={apt.id} className={`p-4 rounded-2xl border transition-all duration-300 ${
+                    <div 
+                      key={apt.id} 
+                      onClick={() => handleUnitClick(apt)}
+                      className={`p-4 rounded-2xl border transition-all duration-300 cursor-pointer ${
                       apt.status === 'maintenance' || apt.status === 'صيانة'
                         ? 'bg-gray-50 border-gray-100 opacity-60'
                         : apt.isOccupied
-                        ? 'bg-red-50 border-red-100 opacity-40 grayscale'
+                        ? 'bg-red-50 border-red-100 opacity-40 grayscale hover:grayscale-0 hover:opacity-100'
                         : 'bg-white border-[#EAE4D9] shadow-sm hover:border-[#C1A68D] hover:scale-105'
                     }`}>
                       <div className="text-[9px] font-black text-[#7A7061] uppercase mb-1 opacity-60">{apt.id}</div>
