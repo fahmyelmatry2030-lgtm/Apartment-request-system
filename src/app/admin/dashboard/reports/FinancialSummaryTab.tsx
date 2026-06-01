@@ -3,18 +3,24 @@
 import { useState, useEffect, useMemo } from 'react';
 import { getDbExpenses } from '@/lib/actions/db';
 
+const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+
 interface FinancialSummaryTabProps {
   bookings: any[];
   units: any[];
   selectedMonth: number;
   selectedYear: number;
+  setSelectedMonth: (month: number) => void;
+  setSelectedYear: (year: number) => void;
 }
 
 export default function FinancialSummaryTab({
   bookings,
   units,
   selectedMonth,
-  selectedYear
+  selectedYear,
+  setSelectedMonth,
+  setSelectedYear
 }: FinancialSummaryTabProps) {
   const [expenses, setExpenses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,8 +85,36 @@ export default function FinancialSummaryTab({
 
   const netProfit = totalRevenue - totalExpenses;
 
+  const currentYear = new Date().getFullYear();
+  const yearOptions = [currentYear - 1, currentYear, currentYear + 1];
+
   return (
     <div className="space-y-8 animate-fade-in" dir="rtl">
+      {/* Header & Selectors */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+        <div className="animate-in slide-in-from-right duration-700">
+          <h2 className="text-4xl md:text-6xl font-black text-mazar-coffee uppercase tracking-tighter leading-none">
+            التقرير المالي
+          </h2>
+          <div className="flex items-center gap-3 mt-3">
+             <span className="w-2 h-2 rounded-full bg-mazar-gold animate-pulse"></span>
+             <p className="text-mazar-gray font-bold uppercase tracking-widest text-[10px]">
+               التقرير المالي لشهر {selectedMonth !== -1 ? MONTHS_AR[selectedMonth] : MONTHS_AR[new Date().getMonth()]} {selectedYear !== -1 ? selectedYear : new Date().getFullYear()}
+             </p>
+          </div>
+        </div>
+        <div className="flex gap-3 bg-white p-2 rounded-[1.5rem] border border-[#EAE4D9]/50 shadow-sm">
+          <select value={selectedMonth} onChange={e => setSelectedMonth(Number(e.target.value))}
+            className="bg-[#FDFBF7] border-none rounded-xl px-4 py-2 text-xs font-black outline-none cursor-pointer">
+            {MONTHS_AR.map((m, i) => <option key={i} value={i}>{m}</option>)}
+          </select>
+          <select value={selectedYear} onChange={e => setSelectedYear(Number(e.target.value))}
+            className="bg-[#FDFBF7] border-none rounded-xl px-4 py-2 text-xs font-black outline-none cursor-pointer">
+            {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
+          </select>
+        </div>
+      </div>
+
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white p-8 rounded-[2.5rem] border border-green-100 shadow-xl shadow-green-600/5 relative overflow-hidden group">

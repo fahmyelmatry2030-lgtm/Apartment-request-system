@@ -736,7 +736,16 @@ function ReportsContent() {
         </div>
 
         {activeTab === 'expenses' && <ExpensesTab />}
-        {activeTab === 'financial' && <FinancialSummaryTab bookings={bookings} units={units} selectedMonth={selectedMonth} selectedYear={selectedYear} />}
+        {activeTab === 'financial' && (
+          <FinancialSummaryTab
+            bookings={bookings}
+            units={units}
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+            setSelectedMonth={setSelectedMonth}
+            setSelectedYear={setSelectedYear}
+          />
+        )}
 
         {activeTab === 'operational' && (
           <>
