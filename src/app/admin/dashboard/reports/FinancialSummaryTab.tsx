@@ -1,9 +1,21 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { getDbExpenses } from '@/lib/actions/db';
 
-export default function FinancialSummaryTab({ bookings }: { bookings: any[] }) {
+interface FinancialSummaryTabProps {
+  bookings: any[];
+  units: any[];
+  selectedMonth: number;
+  selectedYear: number;
+}
+
+export default function FinancialSummaryTab({
+  bookings,
+  units,
+  selectedMonth,
+  selectedYear
+}: FinancialSummaryTabProps) {
   const [expenses, setExpenses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -21,11 +33,50 @@ export default function FinancialSummaryTab({ bookings }: { bookings: any[] }) {
     loadExpenses();
   }, []);
 
-  const totalRevenue = bookings
-    .filter(b => b.status === 'approved' || b.status === 'مؤكد')
-    .reduce((acc, b) => acc + (parseFloat(b.totalAmount || 0) - parseFloat(b.commission || 0)), 0);
+  // Filter bookings: only approved, matching month/year, and of type studio (branch !== 3)
+  const filteredBookings = useMemo(() => {
+    if (selectedMonth === -1 || selectedYear === -1) return [];
+    return bookings.filter((b: any) => {
+      if (b.status === 'deleted') return false;
+      if (b.status !== 'approved' && b.status !== 'مؤكد') return false;
 
-  const totalExpenses = expenses.reduce((acc, e) => acc + (parseFloat(e.amount || 0)), 0);
+      // Match month/year based on check-in date string
+      const parts = b.checkIn?.split('-');
+      if (!parts || parts.length < 2) return false;
+      const year = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1; // 0-indexed
+      if (month !== selectedMonth || year !== selectedYear) return false;
+
+      // Filter by Studio only (type === 'studio' && branch !== 3)
+      const u = units.find(unit => unit.id === b.apartmentId);
+      return u?.type === 'studio' && u?.branch !== 3;
+    });
+  }, [bookings, units, selectedMonth, selectedYear]);
+
+  // Filter expenses by selected month/year
+  const filteredExpenses = useMemo(() => {
+    if (selectedMonth === -1 || selectedYear === -1) return [];
+    return expenses.filter((e: any) => {
+      if (!e.date) return false;
+      const parts = e.date.split('-');
+      if (parts.length < 2) return false;
+      const year = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      return month === selectedMonth && year === selectedYear;
+    });
+  }, [expenses, selectedMonth, selectedYear]);
+
+  const totalRevenue = useMemo(() => {
+    return filteredBookings.reduce(
+      (acc, b) => acc + (parseFloat(b.totalAmount || 0) - parseFloat(b.commission || 0)),
+      0
+    );
+  }, [filteredBookings]);
+
+  const totalExpenses = useMemo(() => {
+    return filteredExpenses.reduce((acc, e) => acc + parseFloat(e.amount || 0), 0);
+  }, [filteredExpenses]);
+
   const netProfit = totalRevenue - totalExpenses;
 
   return (

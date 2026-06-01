@@ -4,6 +4,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { saveDbExpense, deleteDbExpense, getDbExpenses, updateDbExpense } from '@/lib/actions/db';
 import { Pencil, Trash2 } from 'lucide-react';
 
+const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+
 // ── Custom CountUp Component (No external lib needed) ──
 function AnimatedNumber({ value }: { value: number }) {
   const [displayValue, setDisplayValue] = useState(0);
@@ -42,6 +44,14 @@ export default function ExpensesTab() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState(-1);
+  const [selectedYear, setSelectedYear] = useState(-1);
+
+  useEffect(() => {
+    setSelectedMonth(new Date().getMonth());
+    setSelectedYear(new Date().getFullYear());
+  }, []);
+
   const [newExpense, setNewExpense] = useState({
     category: '',
     amount: '',
@@ -94,11 +104,22 @@ export default function ExpensesTab() {
     loadExpenses();
   }, []);
 
-  // ── Derived Data ──
+  // ── Derived Data: Filter by month first, then by category ──
+  const monthlyExpenses = useMemo(() => {
+    return expenses.filter((e: any) => {
+      if (!e.date) return false;
+      const parts = e.date.split('-');
+      if (parts.length < 2) return false;
+      const year = parseInt(parts[0]);
+      const month = parseInt(parts[1]) - 1;
+      return month === selectedMonth && year === selectedYear;
+    });
+  }, [expenses, selectedMonth, selectedYear]);
+
   const filteredExpenses = useMemo(() => {
-    if (!selectedCategory) return expenses;
-    return expenses.filter(e => e.category === selectedCategory);
-  }, [expenses, selectedCategory]);
+    if (!selectedCategory) return monthlyExpenses;
+    return monthlyExpenses.filter(e => e.category === selectedCategory);
+  }, [monthlyExpenses, selectedCategory]);
 
   const totalAmount = useMemo(() => {
     return filteredExpenses.reduce((acc, curr) => acc + (curr.amount || 0), 0);
@@ -116,9 +137,9 @@ export default function ExpensesTab() {
   const categoryStats = useMemo(() => {
     return categories.map(cat => ({
       ...cat,
-      count: expenses.filter(e => e.category === cat.name).length
+      count: monthlyExpenses.filter(e => e.category === cat.name).length
     }));
-  }, [expenses]);
+  }, [monthlyExpenses]);
 
   const handleAddExpense = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -220,8 +241,18 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
           </h2>
           <div className="flex items-center gap-3 mt-3">
              <span className="w-2 h-2 rounded-full bg-mazar-gold animate-pulse"></span>
-             <p className="text-mazar-gray font-bold uppercase tracking-widest text-[10px]">إدارة السجلات المالية الذكية</p>
+             <p className="text-mazar-gray font-bold uppercase tracking-widest text-[10px]">مصروفات شهر {MONTHS_AR[selectedMonth]} {selectedYear}</p>
           </div>
+        </div>
+        <div className="flex gap-3 bg-white p-2 rounded-[1.5rem] border border-[#EAE4D9]/50 shadow-sm">
+          <select value={selectedMonth} onChange={e => setSelectedMonth(Number(e.target.value))}
+            className="bg-[#FDFBF7] border-none rounded-xl px-4 py-2 text-xs font-black outline-none">
+            {MONTHS_AR.map((m, i) => <option key={i} value={i}>{m}</option>)}
+          </select>
+          <select value={selectedYear} onChange={e => setSelectedYear(Number(e.target.value))}
+            className="bg-[#FDFBF7] border-none rounded-xl px-4 py-2 text-xs font-black outline-none">
+            {[2025, 2026, 2027].map(y => <option key={y} value={y}>{y}</option>)}
+          </select>
         </div>
       </div>
 
