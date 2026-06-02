@@ -43,7 +43,6 @@ export default function ExpensesTab() {
   const [expenses, setExpenses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState(-1);
   const [selectedYear, setSelectedYear] = useState(-1);
 
@@ -53,14 +52,14 @@ export default function ExpensesTab() {
   }, []);
 
   const [newExpense, setNewExpense] = useState({
-    category: '',
     amount: '',
     description: '',
     date: '',
     branch: '1',
     from_entity: '',
     to_entity: '',
-    ordered_by: ''
+    ordered_by: '',
+    invoice_number: '',
   });
 
   useEffect(() => {
@@ -104,8 +103,8 @@ export default function ExpensesTab() {
     loadExpenses();
   }, []);
 
-  // ── Derived Data: Filter by month first, then by category ──
-  const monthlyExpenses = useMemo(() => {
+  // ── Derived Data: Filter by month ──
+  const filteredExpenses = useMemo(() => {
     return expenses.filter((e: any) => {
       if (!e.date) return false;
       const parts = e.date.split('-');
@@ -116,53 +115,33 @@ export default function ExpensesTab() {
     });
   }, [expenses, selectedMonth, selectedYear]);
 
-  const filteredExpenses = useMemo(() => {
-    if (!selectedCategory) return monthlyExpenses;
-    return monthlyExpenses.filter(e => e.category === selectedCategory);
-  }, [monthlyExpenses, selectedCategory]);
-
   const totalAmount = useMemo(() => {
     return filteredExpenses.reduce((acc, curr) => acc + (curr.amount || 0), 0);
   }, [filteredExpenses]);
-
-  const categories = [
-    { name: 'صيانة', icon: '🛠️', color: '#8B4513' },
-    { name: 'غسيل', icon: '🧺', color: '#4682B4' },
-    { name: 'إيجار', icon: '🏠', color: '#2F4F4F' },
-    { name: 'كهرباء', icon: '⚡', color: '#FFD700' },
-    { name: 'رواتب', icon: '💰', color: '#228B22' },
-    { name: 'أخرى', icon: '📦', color: '#708090' },
-  ];
-
-  const categoryStats = useMemo(() => {
-    return categories.map(cat => ({
-      ...cat,
-      count: monthlyExpenses.filter(e => e.category === cat.name).length
-    }));
-  }, [monthlyExpenses]);
 
   const handleAddExpense = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await saveDbExpense({
-        category: newExpense.category,
+        category: 'عام',
         amount: parseFloat(newExpense.amount),
         description: newExpense.description,
         date: newExpense.date,
         branch: parseInt(newExpense.branch),
         from_entity: newExpense.from_entity,
         to_entity: newExpense.to_entity,
-        ordered_by: newExpense.ordered_by
+        ordered_by: newExpense.ordered_by,
+        invoice_number: newExpense.invoice_number,
       });
       setNewExpense({
-        category: '',
         amount: '',
         description: '',
         date: new Date().toISOString().split('T')[0],
         branch: '1',
         from_entity: '',
         to_entity: '',
-        ordered_by: ''
+        ordered_by: '',
+        invoice_number: '',
       });
       loadExpenses();
     } catch (error: any) {
@@ -179,13 +158,13 @@ export default function ExpensesTab() {
     e.preventDefault();
     try {
       await updateDbExpense(editingExpense.id, {
-        category: editingExpense.category,
         amount: parseFloat(editingExpense.amount),
         description: editingExpense.description,
         date: editingExpense.date,
         from_entity: editingExpense.from_entity,
         to_entity: editingExpense.to_entity,
-        ordered_by: editingExpense.ordered_by
+        ordered_by: editingExpense.ordered_by,
+        invoice_number: editingExpense.invoice_number,
       });
       setIsEditModalOpen(false);
       setEditingExpense(null);
@@ -222,6 +201,7 @@ export default function ExpensesTab() {
   from_entity text,
   to_entity text,
   ordered_by text,
+  invoice_number text,
   created_at timestamptz default now()
 );
 alter table public.expenses enable row level security;
@@ -268,22 +248,8 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
 
         <form onSubmit={handleAddExpense} className="space-y-10">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-10">
-            <div className="space-y-3 group">
-              <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">الفئة الأساسية (Category)</label>
-              <input 
-                required
-                placeholder="مثلاً: صيانة، إيجار، غسيل..."
-                list="category-suggestions"
-                value={newExpense.category}
-                onChange={e => setNewExpense({...newExpense, category: e.target.value})}
-                className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all placeholder:text-gray-300"
-              />
-              <datalist id="category-suggestions">
-                {categories.map(cat => (
-                  <option key={cat.name} value={cat.name} />
-                ))}
-              </datalist>
-            </div>
+
+            {/* المبلغ */}
             <div className="space-y-3 group">
               <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">المبلغ (ج.م)</label>
               <input 
@@ -295,6 +261,8 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                 className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all placeholder:text-gray-300" 
               />
             </div>
+
+            {/* التاريخ */}
             <div className="space-y-3 group">
               <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">التاريخ (يوم/شهر/سنة)</label>
               <input 
@@ -304,13 +272,25 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                 value={formatDate(newExpense.date)}
                 onChange={e => {
                   const val = e.target.value;
-                  // Simple auto-formatting for DD/MM/YYYY
                   let clean = val.replace(/[^0-9/]/g, '');
                   setNewExpense({...newExpense, date: parseDate(clean)});
                 }}
                 className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all" 
               />
             </div>
+
+            {/* رقم الفاتورة */}
+            <div className="space-y-3 group">
+              <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">رقم الفاتورة</label>
+              <input 
+                placeholder="مثلاً: INV-001"
+                value={newExpense.invoice_number}
+                onChange={e => setNewExpense({...newExpense, invoice_number: e.target.value})}
+                className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all placeholder:text-gray-300" 
+              />
+            </div>
+
+            {/* الآمر بالصرف */}
             <div className="space-y-3 group">
               <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">الآمر بالصرف</label>
               <input 
@@ -320,6 +300,8 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                 className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all placeholder:text-gray-300" 
               />
             </div>
+
+            {/* من */}
             <div className="space-y-3 group">
               <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">من (الجهة)</label>
               <input 
@@ -329,6 +311,8 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                 className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all placeholder:text-gray-300" 
               />
             </div>
+
+            {/* إلى */}
             <div className="space-y-3 group">
               <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">إلى (الجهة)</label>
               <input 
@@ -338,9 +322,12 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                 className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all placeholder:text-gray-300" 
               />
             </div>
+
+            {/* السبب */}
             <div className="space-y-3 lg:col-span-2 group">
               <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">السبب / البيان (Reason)</label>
               <input 
+                required
                 placeholder="مثلاً: إعلانات فيسبوك، شراء أدوات نظافة..."
                 value={newExpense.description}
                 onChange={e => setNewExpense({...newExpense, description: e.target.value})}
@@ -355,35 +342,13 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
         </form>
       </div>
 
-      {/* Categories Horizontal Scroll / Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {categoryStats.map((cat, i) => (
-          <button 
-            key={i} 
-            onClick={() => setSelectedCategory(selectedCategory === cat.name ? null : cat.name)}
-            className={`glass-card group flex flex-col items-center justify-center gap-3 py-6 transition-all duration-500 relative overflow-hidden ${selectedCategory === cat.name ? 'border-mazar-gold bg-mazar-coffee text-white scale-105 shadow-2xl' : 'hover:border-mazar-gold/50'}`}
-          >
-            {selectedCategory === cat.name && (
-              <div className="absolute top-0 right-0 p-1">
-                <div className="w-2 h-2 rounded-full bg-mazar-gold shadow-[0_0_10px_#D4AF37]"></div>
-              </div>
-            )}
-            <span className={`text-4xl transition-transform duration-500 ${selectedCategory === cat.name ? 'scale-110' : 'group-hover:scale-125'}`}>{cat.icon}</span>
-            <span className="font-black text-xs uppercase tracking-widest">{cat.name}</span>
-            <div className={`text-[10px] font-black px-3 py-1 rounded-full transition-colors ${selectedCategory === cat.name ? 'bg-mazar-gold text-mazar-coffee' : 'bg-gray-100 text-gray-400 group-hover:bg-mazar-gold/20'}`}>
-              {cat.count} عملية
-            </div>
-          </button>
-        ))}
-      </div>
-
       {/* Summary Banner (Animated) */}
       <div className="bg-mazar-coffee p-12 rounded-[3rem] text-white flex flex-col lg:flex-row justify-between items-center gap-10 relative overflow-hidden shadow-[0_30px_60px_-15px_rgba(44,38,28,0.4)] border border-white/5">
         <div className="absolute top-0 right-0 w-96 h-96 bg-mazar-gold/10 blur-[120px] rounded-full -mr-48 -mt-48"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 blur-[100px] rounded-full -ml-32 -mb-32"></div>
         
         <div className="relative z-10 text-center lg:text-right">
-          <p className="text-mazar-gold font-black uppercase tracking-[0.3em] text-[10px] mb-4 opacity-80">إجمالي التكاليف {selectedCategory ? `(فئة ${selectedCategory})` : '(كافة الفئات)'}</p>
+          <p className="text-mazar-gold font-black uppercase tracking-[0.3em] text-[10px] mb-4 opacity-80">إجمالي التكاليف (كافة المصروفات)</p>
           <h3 className="text-6xl md:text-8xl font-black tracking-tighter">
             <AnimatedNumber value={totalAmount} />
             <span className="text-xl md:text-3xl text-mazar-gold mr-4">ج.م</span>
@@ -412,18 +377,10 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
           <div>
             <h3 className="text-2xl font-black text-mazar-coffee uppercase leading-none">سجلات القيود المالية</h3>
             <p className="text-[9px] font-black text-mazar-gray uppercase tracking-widest mt-2">
-              عرض {filteredExpenses.length} عملية {selectedCategory ? `في فئة ${selectedCategory}` : ''}
+              عرض {filteredExpenses.length} عملية
             </p>
           </div>
           <div className="flex gap-4">
-             {selectedCategory && (
-               <button 
-                 onClick={() => setSelectedCategory(null)}
-                 className="text-[10px] font-black text-red-500 hover:underline uppercase tracking-widest"
-               >
-                 إلغاء الفلتر ✕
-               </button>
-             )}
              <button className="text-[10px] font-black text-mazar-gold hover:text-mazar-coffee transition-colors uppercase tracking-[0.2em] border-b-2 border-mazar-gold">تصدير EXCEL ↓</button>
           </div>
         </div>
@@ -432,16 +389,16 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
           <div className="overflow-x-auto">
             <table className="w-full text-center border-collapse">
               <thead>
-                <tr className="bg-[#2A2723] text-white text-[10px] font-black uppercase tracking-widest">
-                  <th className="px-4 py-4 border-x border-white/10 w-12">No</th>
-                  <th className="px-4 py-4 border-x border-white/10 w-32">Date</th>
-                  <th className="px-4 py-4 border-x border-white/10 w-28">Price</th>
-                  <th className="px-4 py-4 border-x border-white/10">Reason</th>
-                  <th className="px-4 py-4 border-x border-white/10 w-32">From</th>
-                  <th className="px-4 py-4 border-x border-white/10 w-32">To</th>
-                  <th className="px-4 py-4 border-x border-white/10 w-32">Order By</th>
-                  <th className="px-4 py-4 border-x border-white/10 w-32">Notes</th>
-                  <th className="px-4 py-4 border-x border-white/10 w-32">الإجراءات</th>
+                <tr className="bg-[#2A2723] text-white text-xs font-black uppercase tracking-widest">
+                  <th className="px-4 py-5 border-x border-white/10 w-12">No</th>
+                  <th className="px-4 py-5 border-x border-white/10 w-36">Date</th>
+                  <th className="px-4 py-5 border-x border-white/10 w-32">Price</th>
+                  <th className="px-4 py-5 border-x border-white/10">Reason</th>
+                  <th className="px-4 py-5 border-x border-white/10 w-36">Invoice No</th>
+                  <th className="px-4 py-5 border-x border-white/10 w-32">From</th>
+                  <th className="px-4 py-5 border-x border-white/10 w-32">To</th>
+                  <th className="px-4 py-5 border-x border-white/10 w-32">Order By</th>
+                  <th className="px-4 py-5 border-x border-white/10 w-32">الإجراءات</th>
                 </tr>
               </thead>
               <tbody className="bg-white">
@@ -453,39 +410,35 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                   </tr>
                 ) : filteredExpenses.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="p-32 text-center text-gray-300 font-black uppercase tracking-widest text-xs">لا توجد سجلات</td>
+                    <td colSpan={9} className="p-32 text-center text-gray-300 font-black uppercase tracking-widest text-sm">لا توجد سجلات</td>
                   </tr>
                 ) : filteredExpenses.map((exp, i) => (
                   <tr key={exp.id} className="hover:bg-[#FDFBF7] transition-colors group">
-                    <td className="px-4 py-4 border border-[#EAE4D9]/40 text-[11px] font-black text-mazar-gray">{i + 1}</td>
-                    <td className="px-4 py-4 border border-[#EAE4D9]/40 text-[11px] font-black whitespace-nowrap">{formatDate(exp.date)}</td>
-                    <td className="px-4 py-4 border border-[#EAE4D9]/40 text-sm font-black text-red-600">{exp.amount?.toLocaleString()}</td>
-                    <td className="px-4 py-4 border border-[#EAE4D9]/40 text-right">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] opacity-40">{categories.find(c => c.name === exp.category)?.icon || '📦'}</span>
-                        <span className="text-[11px] font-bold text-mazar-coffee">{exp.category}</span>
-                        {exp.description && <span className="text-[11px] text-mazar-gray font-medium">— {exp.description}</span>}
-                      </div>
+                    <td className="px-4 py-5 border border-[#EAE4D9]/40 text-sm font-black text-mazar-gray">{i + 1}</td>
+                    <td className="px-4 py-5 border border-[#EAE4D9]/40 text-sm font-black whitespace-nowrap">{formatDate(exp.date)}</td>
+                    <td className="px-4 py-5 border border-[#EAE4D9]/40 text-base font-black text-red-600">{exp.amount?.toLocaleString()}</td>
+                    <td className="px-4 py-5 border border-[#EAE4D9]/40 text-right">
+                      <span className="text-sm font-bold text-mazar-coffee">{exp.description || '—'}</span>
                     </td>
-                    <td className="px-4 py-4 border border-[#EAE4D9]/40 text-[11px] font-bold text-mazar-coffee">{exp.from_entity || '—'}</td>
-                    <td className="px-4 py-4 border border-[#EAE4D9]/40 text-[11px] font-bold text-mazar-coffee">{exp.to_entity || '—'}</td>
-                    <td className="px-4 py-4 border border-[#EAE4D9]/40 text-[11px] font-bold text-mazar-coffee">{exp.ordered_by || '—'}</td>
-                    <td className="px-4 py-4 border border-[#EAE4D9]/40 text-[11px] font-bold text-mazar-gray opacity-30">—</td>
-                    <td className="px-4 py-4 border border-[#EAE4D9]/40">
+                    <td className="px-4 py-5 border border-[#EAE4D9]/40 text-sm font-bold text-mazar-gold">{exp.invoice_number || '—'}</td>
+                    <td className="px-4 py-5 border border-[#EAE4D9]/40 text-sm font-bold text-mazar-coffee">{exp.from_entity || '—'}</td>
+                    <td className="px-4 py-5 border border-[#EAE4D9]/40 text-sm font-bold text-mazar-coffee">{exp.to_entity || '—'}</td>
+                    <td className="px-4 py-5 border border-[#EAE4D9]/40 text-sm font-bold text-mazar-coffee">{exp.ordered_by || '—'}</td>
+                    <td className="px-4 py-5 border border-[#EAE4D9]/40">
                       <div className="flex gap-2 justify-center opacity-0 group-hover:opacity-100 transition-all">
                         <button 
                           onClick={() => handleEdit(exp)} 
-                          className="w-8 h-8 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-all shadow-sm"
+                          className="w-9 h-9 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-all shadow-sm"
                           title="تعديل"
                         >
-                          <Pencil size={14} strokeWidth={2.5} />
+                          <Pencil size={15} strokeWidth={2.5} />
                         </button>
                         <button 
                           onClick={() => handleDelete(exp.id)} 
-                          className="w-8 h-8 rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm"
+                          className="w-9 h-9 rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm"
                           title="حذف"
                         >
-                          <Trash2 size={14} strokeWidth={2.5} />
+                          <Trash2 size={15} strokeWidth={2.5} />
                         </button>
                       </div>
                     </td>
@@ -511,16 +464,8 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
             
             <form onSubmit={handleSaveEdit} className="p-10 space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div className="space-y-2">
-                  <label className="text-[9px] font-black text-mazar-coffee uppercase tracking-widest opacity-60">الفئة</label>
-                  <input 
-                    required
-                    list="category-suggestions"
-                    value={editingExpense.category}
-                    onChange={e => setEditingExpense({...editingExpense, category: e.target.value})}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all"
-                  />
-                </div>
+
+                {/* المبلغ */}
                 <div className="space-y-2">
                   <label className="text-[9px] font-black text-mazar-coffee uppercase tracking-widest opacity-60">المبلغ</label>
                   <input 
@@ -531,6 +476,8 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                     className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all"
                   />
                 </div>
+
+                {/* التاريخ */}
                 <div className="space-y-2">
                   <label className="text-[9px] font-black text-mazar-coffee uppercase tracking-widest opacity-60">التاريخ</label>
                   <input 
@@ -545,6 +492,18 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                     className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all"
                   />
                 </div>
+
+                {/* رقم الفاتورة */}
+                <div className="space-y-2">
+                  <label className="text-[9px] font-black text-mazar-coffee uppercase tracking-widest opacity-60">رقم الفاتورة</label>
+                  <input 
+                    value={editingExpense.invoice_number || ''}
+                    onChange={e => setEditingExpense({...editingExpense, invoice_number: e.target.value})}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all"
+                  />
+                </div>
+
+                {/* الآمر بالصرف */}
                 <div className="space-y-2">
                   <label className="text-[9px] font-black text-mazar-coffee uppercase tracking-widest opacity-60">الآمر بالصرف</label>
                   <input 
@@ -553,6 +512,8 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                     className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all"
                   />
                 </div>
+
+                {/* من */}
                 <div className="space-y-2">
                   <label className="text-[9px] font-black text-mazar-coffee uppercase tracking-widest opacity-60">من</label>
                   <input 
@@ -561,6 +522,8 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                     className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all"
                   />
                 </div>
+
+                {/* إلى */}
                 <div className="space-y-2">
                   <label className="text-[9px] font-black text-mazar-coffee uppercase tracking-widest opacity-60">إلى</label>
                   <input 
@@ -569,9 +532,12 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                     className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all"
                   />
                 </div>
+
+                {/* السبب */}
                 <div className="lg:col-span-3 space-y-2">
                   <label className="text-[9px] font-black text-mazar-coffee uppercase tracking-widest opacity-60">السبب / البيان</label>
                   <input 
+                    required
                     value={editingExpense.description}
                     onChange={e => setEditingExpense({...editingExpense, description: e.target.value})}
                     className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all"
