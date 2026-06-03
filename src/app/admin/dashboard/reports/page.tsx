@@ -265,12 +265,17 @@ function ReportsContent() {
     setIsLoading(true);
     try {
       const [b, u] = await Promise.all([getFreshDbBookings(), getDbUnits()]);
+      const safeUnits = (u || []).filter((unit: any) => unit && unit.id);
       setBookings(b || []);
-      setUnits(u || []);
+      setUnits(safeUnits);
       
       // Only set default unit if none is selected AND none in URL
-      if (!selectedUnit && !searchParams.get('unit') && u && u.length > 0) {
-        setSelectedUnit(u[0].id);
+      // Pick first studio (b1-s* or b2-s*) as default, otherwise first unit
+      if (!selectedUnit && !searchParams.get('unit') && safeUnits.length > 0) {
+        const firstStudio = safeUnits.find((unit: any) =>
+          String(unit.id).startsWith('b1-s') || String(unit.id).startsWith('b2-s')
+        );
+        setSelectedUnit((firstStudio || safeUnits[0]).id);
       }
     } catch (error) {
       console.error('Error loading reports data:', error);
@@ -962,33 +967,45 @@ function ReportsContent() {
                 <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#C1A68D] inline-block" /><span className="text-[9px] font-black text-[#C1A68D]">الشقق الفندقية</span></span>
               </div>
               <div>
-                <div className="text-[9px] font-black text-[#C1A68D] uppercase tracking-[0.25em] px-3 mb-2">الاستديوهات الفندقية</div>
-                <div className="flex flex-wrap gap-1.5">
+                <div className="text-[9px] font-black text-[#C1A68D] uppercase tracking-[0.25em] px-3 mb-2">الاستديوهات الفندقية — المبنى الأول (1-12)</div>
+                <div className="flex flex-wrap gap-1.5 mb-3">
                   {units
-                    .filter(u => u && u.id && u.type === 'studio' && !String(u.id).startsWith('s-'))
+                    .filter(u => u && u.id && u.type === 'studio' && String(u.id).startsWith('b1-s'))
                     .sort((a, b) => {
-                      if (!a || !a.id || !b || !b.id) return 0;
-                      const getNum = (u: any) => {
-                        const idStr = String(u.id || '');
-                        if (idStr.startsWith('b1-s')) return parseInt(idStr.replace('b1-s', ''), 10);
-                        if (idStr.startsWith('b2-s')) return parseInt(idStr.replace('b2-s', ''), 10) + 12;
-                        return 99;
-                      };
+                      const getNum = (u: any) => parseInt(String(u.id || '').replace('b1-s', ''), 10) || 99;
                       return getNum(a) - getNum(b);
                     })
                     .map(u => {
-                      const isB1 = String(u.id).startsWith('b1-s');
-                      const isB2 = String(u.id).startsWith('b2-s');
                       const isActive = selectedUnit === u.id;
-                      let cls = '';
-                      if (isActive) {
-                        cls = 'bg-blue-600 text-white shadow-lg shadow-blue-500/20';
-                      } else {
-                        cls = 'bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200';
-                      }
                       return (
                         <button key={u.id} onClick={() => setSelectedUnit(u.id)}
-                          className={`px-3 py-2 rounded-xl text-[10px] font-black transition-all ${cls}`}>
+                          className={`px-3 py-2 rounded-xl text-[10px] font-black transition-all ${
+                            isActive
+                              ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                              : 'bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200'
+                          }`}>
+                          {u.title?.ar || u.id}
+                        </button>
+                      );
+                    })}
+                </div>
+                <div className="text-[9px] font-black text-[#C1A68D] uppercase tracking-[0.25em] px-3 mb-2">الاستديوهات الفندقية — المبنى الثاني (13-24)</div>
+                <div className="flex flex-wrap gap-1.5">
+                  {units
+                    .filter(u => u && u.id && u.type === 'studio' && String(u.id).startsWith('b2-s'))
+                    .sort((a, b) => {
+                      const getNum = (u: any) => parseInt(String(u.id || '').replace('b2-s', ''), 10) || 99;
+                      return getNum(a) - getNum(b);
+                    })
+                    .map(u => {
+                      const isActive = selectedUnit === u.id;
+                      return (
+                        <button key={u.id} onClick={() => setSelectedUnit(u.id)}
+                          className={`px-3 py-2 rounded-xl text-[10px] font-black transition-all ${
+                            isActive
+                              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+                              : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200'
+                          }`}>
                           {u.title?.ar || u.id}
                         </button>
                       );
