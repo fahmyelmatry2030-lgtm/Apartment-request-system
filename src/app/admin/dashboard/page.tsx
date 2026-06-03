@@ -142,7 +142,13 @@ export default function DashboardOverview() {
         // Turnover logic
         isTurnover: !!outToday && !!inToday,
         leavingGuest: outToday?.name,
+        leavingBookingId: outToday?.id,
+        leavingClientStatus: outToday?.clientStatus || 'انتظار',
+        leavingCheckOut: outToday?.checkOut,
         arrivingGuest: inToday?.name,
+        arrivingBookingId: inToday?.id,
+        arrivingClientStatus: inToday?.clientStatus || 'انتظار',
+        arrivingCheckOut: inToday?.checkOut,
         isCheckingOut: !!outToday && !inToday,
         isCheckingIn: !!inToday && !outToday,
       };
@@ -664,7 +670,48 @@ export default function DashboardOverview() {
                                 )}
                               </td>
                               <td className="px-4 py-2.5">
-                                {apt.isOccupied && apt.bookingId ? (
+                                {apt.isTurnover ? (
+                                  <div className="flex flex-col gap-1.5 items-center">
+                                    <div className="flex items-center gap-1">
+                                      <span className="text-rose-500 font-bold text-[9px]" title="النزيل المغادر">🛫</span>
+                                      <select 
+                                        disabled={isPartner}
+                                        value={apt.leavingClientStatus} 
+                                        onChange={(e) => handleStatusUpdate(apt.leavingBookingId, e.target.value)}
+                                        className={`text-[9px] font-black rounded-lg px-2 py-0.5 outline-none border transition-all ${
+                                          isPartner ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'
+                                        } ${
+                                          apt.leavingClientStatus === 'متواجد' ? 'bg-green-600 text-white border-green-700' :
+                                          apt.leavingClientStatus === 'غادر' ? 'bg-gray-600 text-white border-gray-700' :
+                                          'bg-amber-100 text-amber-700 border-amber-200'
+                                        }`}
+                                      >
+                                        <option value="انتظار">⏳ انتظار</option>
+                                        <option value="متواجد">👤 متواجد</option>
+                                        <option value="غادر">🚪 غادر</option>
+                                      </select>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      <span className="text-blue-600 font-bold text-[9px]" title="النزيل القادم">🛬</span>
+                                      <select 
+                                        disabled={isPartner}
+                                        value={apt.arrivingClientStatus} 
+                                        onChange={(e) => handleStatusUpdate(apt.arrivingBookingId, e.target.value)}
+                                        className={`text-[9px] font-black rounded-lg px-2 py-0.5 outline-none border transition-all ${
+                                          isPartner ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'
+                                        } ${
+                                          apt.arrivingClientStatus === 'متواجد' ? 'bg-green-600 text-white border-green-700' :
+                                          apt.arrivingClientStatus === 'غادر' ? 'bg-gray-600 text-white border-gray-700' :
+                                          'bg-amber-100 text-amber-700 border-amber-200'
+                                        }`}
+                                      >
+                                        <option value="انتظار">⏳ انتظار</option>
+                                        <option value="متواجد">👤 متواجد</option>
+                                        <option value="غادر">🚪 غادر</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                ) : apt.isOccupied && apt.bookingId ? (
                                   <select 
                                     disabled={isPartner}
                                     value={apt.clientStatus} 
@@ -684,12 +731,18 @@ export default function DashboardOverview() {
                                 ) : <span className="text-[10px] text-gray-300">—</span>}
                               </td>
                               <td className="px-4 py-2.5 text-[10px] text-center text-[#2A2723] font-black">
-                                {apt.isOccupied 
-                                  ? formatMiniDate(apt.checkOut) 
-                                  : (apt.lastCheckOut 
-                                      ? <span className="text-gray-400 font-bold opacity-60">آخر: {formatMiniDate(apt.lastCheckOut)}</span> 
-                                      : '—')
-                                }
+                                {apt.isTurnover ? (
+                                  <div className="flex flex-col gap-0.5 text-[9px] font-black justify-center items-center">
+                                    <span className="text-rose-500">🛫 {formatMiniDate(apt.leavingCheckOut)}</span>
+                                    <span className="text-blue-600">🛬 {formatMiniDate(apt.arrivingCheckOut)}</span>
+                                  </div>
+                                ) : apt.isOccupied ? (
+                                  formatMiniDate(apt.checkOut)
+                                ) : (
+                                  apt.lastCheckOut 
+                                    ? <span className="text-gray-400 font-bold opacity-60">آخر: {formatMiniDate(apt.lastCheckOut)}</span> 
+                                    : '—'
+                                )}
                               </td>
                             </tr>
                           );
@@ -731,8 +784,8 @@ export default function DashboardOverview() {
                       <div className="text-xs font-black text-[#2A2723] mt-1">{apt.title?.ar}</div>
                       {apt.isTurnover ? (
                          <div className="mt-2 space-y-1">
-                            <div className="text-[8px] text-rose-500 font-bold truncate">🛫 {apt.leavingGuest}</div>
-                            <div className="text-[8px] text-blue-600 font-bold truncate">🛬 {apt.arrivingGuest}</div>
+                            <div className="text-[8px] text-rose-500 font-bold truncate">🛫 {apt.leavingGuest} ({apt.leavingClientStatus === 'متواجد' ? 'متواجد' : apt.leavingClientStatus === 'غادر' ? 'غادر' : 'انتظار'})</div>
+                            <div className="text-[8px] text-blue-600 font-bold truncate">🛬 {apt.arrivingGuest} ({apt.arrivingClientStatus === 'متواجد' ? 'متواجد' : apt.arrivingClientStatus === 'غادر' ? 'غادر' : 'انتظار'})</div>
                          </div>
                       ) : (apt.guest || apt.leavingGuest) ? (
                         <div className="text-[9px] text-[#7A7061] mt-1 truncate">👤 {apt.guest || apt.leavingGuest}</div>
