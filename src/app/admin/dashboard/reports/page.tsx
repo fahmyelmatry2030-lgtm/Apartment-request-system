@@ -580,7 +580,7 @@ function ReportsContent() {
     const netValue = total - commission;
 
     // Manual Status takes precedence if it's not the default 'انتظار' or if it was manually changed
-    let rawStatus = (booking.clientStatus || 'انتظار').trim();
+    let rawStatus = String(booking.clientStatus || 'انتظار').trim();
     let clientStatus = rawStatus;
 
     // Only apply automatic transitions if the status is currently 'انتظار' أو 'متواجد'
@@ -592,8 +592,8 @@ function ReportsContent() {
       const todayStr = `${y}-${m}-${d}`;
       const currentHour = now.getHours(); // 0 to 23
 
-      const checkInStr = booking.checkIn.trim();
-      const checkOutStr = booking.checkOut.trim();
+      const checkInStr = String(booking.checkIn || '').trim();
+      const checkOutStr = String(booking.checkOut || '').trim();
 
       // If we haven't manually changed it to something else, or if it's still 'انتظار'
       if (rawStatus === 'انتظار' || !rawStatus) {
@@ -633,7 +633,7 @@ function ReportsContent() {
       clientStatus,
       bookingManager: booking.bookingManager || '',
       paymentMethod: booking.paymentMethod || '',
-      notes: (booking.notes || '').replace(/خصم بقيمة \d+/, '').trim(),
+      notes: typeof booking.notes === 'string' ? booking.notes.replace(/خصم بقيمة \d+/, '').trim() : '',
       isCarriedOver: booking.isCarriedOver,
       hasData: true,
     };
