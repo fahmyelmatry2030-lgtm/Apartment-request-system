@@ -918,12 +918,12 @@ function ReportsContent() {
                     >
                       <option value="" disabled>اختر الوحدة</option>
                       <optgroup label="الاستديوهات الفندقية">
-                        {units.filter(u => u.type === 'studio').sort((a, b) => String(a.id).localeCompare(String(b.id), undefined, { numeric: true })).map(u => (
+                        {units.filter(u => u && u.id && u.type === 'studio').sort((a, b) => String(a.id || '').localeCompare(String(b.id || ''), undefined, { numeric: true })).map(u => (
                           <option key={u.id} value={u.id}>{u.title?.ar || u.id}</option>
                         ))}
                       </optgroup>
                       <optgroup label="الشقق الفندقية">
-                        {units.filter(u => u.type === 'apartment').sort((a, b) => String(a.id).localeCompare(String(b.id), undefined, { numeric: true })).map(u => (
+                        {units.filter(u => u && u.id && u.type === 'apartment').sort((a, b) => String(a.id || '').localeCompare(String(b.id || ''), undefined, { numeric: true })).map(u => (
                           <option key={u.id} value={u.id}>{u.title?.ar || u.id}</option>
                         ))}
                       </optgroup>
@@ -965,11 +965,13 @@ function ReportsContent() {
                 <div className="text-[9px] font-black text-[#C1A68D] uppercase tracking-[0.25em] px-3 mb-2">الاستديوهات الفندقية</div>
                 <div className="flex flex-wrap gap-1.5">
                   {units
-                    .filter(u => u.type === 'studio' && !String(u.id).startsWith('s-'))
+                    .filter(u => u && u.id && u.type === 'studio' && !String(u.id).startsWith('s-'))
                     .sort((a, b) => {
+                      if (!a || !a.id || !b || !b.id) return 0;
                       const getNum = (u: any) => {
-                        if (String(u.id).startsWith('b1-s')) return parseInt(String(u.id).replace('b1-s', ''), 10);
-                        if (String(u.id).startsWith('b2-s')) return parseInt(String(u.id).replace('b2-s', ''), 10) + 12;
+                        const idStr = String(u.id || '');
+                        if (idStr.startsWith('b1-s')) return parseInt(idStr.replace('b1-s', ''), 10);
+                        if (idStr.startsWith('b2-s')) return parseInt(idStr.replace('b2-s', ''), 10) + 12;
                         return 99;
                       };
                       return getNum(a) - getNum(b);
@@ -996,7 +998,7 @@ function ReportsContent() {
               <div>
                 <div className="text-[9px] font-black text-[#C1A68D] uppercase tracking-[0.25em] px-3 mb-2">الشقق الفندقية</div>
                 <div className="flex flex-wrap gap-1.5">
-                  {units.filter(u => u.type === 'apartment').map(u => (
+                  {units.filter(u => u && u.id && u.type === 'apartment').map(u => (
                     <button key={u.id} onClick={() => setSelectedUnit(u.id)}
                       className={`px-3 py-2 rounded-xl text-[10px] font-black transition-all ${selectedUnit === u.id
                           ? 'bg-[#C1A68D] text-white shadow-lg shadow-[#C1A68D]/20'
