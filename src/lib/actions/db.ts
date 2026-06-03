@@ -737,8 +737,22 @@ export async function saveDbExpense(expense: any) {
 
   const { error } = await supabase.from('expenses').insert([expense]);
   if (error) {
-    console.error('Error saving expense:', error);
-    throw error;
+    if (error.message?.includes('invoice_number') || error.code === '42703') {
+      console.warn('⚠️ Column "invoice_number" not found in DB table. Retrying with fallback...');
+      const fallbackExpense = { ...expense };
+      delete fallbackExpense.invoice_number;
+      if (expense.invoice_number) {
+        fallbackExpense.description = `[فاتورة: ${expense.invoice_number}] ${expense.description || ''}`.trim();
+      }
+      const { error: retryError } = await supabase.from('expenses').insert([fallbackExpense]);
+      if (retryError) {
+        console.error('Error saving expense on fallback retry:', retryError);
+        throw retryError;
+      }
+    } else {
+      console.error('Error saving expense:', error);
+      throw error;
+    }
   }
   
   revalidatePath('/admin/dashboard/reports');
@@ -770,8 +784,25 @@ export async function updateDbExpense(id: string, updates: any) {
     .eq('id', id);
 
   if (error) {
-    console.error('Error updating expense:', error);
-    throw error;
+    if (error.message?.includes('invoice_number') || error.code === '42703') {
+      console.warn('⚠️ Column "invoice_number" not found in DB table on update. Retrying with fallback...');
+      const fallbackUpdates = { ...updates };
+      delete fallbackUpdates.invoice_number;
+      if (updates.invoice_number) {
+        fallbackUpdates.description = `[فاتورة: ${updates.invoice_number}] ${updates.description || ''}`.trim();
+      }
+      const { error: retryError } = await supabase
+        .from('expenses')
+        .update(fallbackUpdates)
+        .eq('id', id);
+      if (retryError) {
+        console.error('Error updating expense on fallback retry:', retryError);
+        throw retryError;
+      }
+    } else {
+      console.error('Error updating expense:', error);
+      throw error;
+    }
   }
   
   revalidatePath('/admin/dashboard/reports');
