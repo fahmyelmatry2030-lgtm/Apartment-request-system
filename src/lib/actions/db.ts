@@ -132,6 +132,8 @@ export async function getFreshDbBookings(nonce?: string) {
         brokerName: b.broker_name,
         guestsCount: Number(b.guests_count || 1),
         clientStatus: b.client_status || 'انتظار',
+        bookingManager: b.booking_manager || '',
+        paymentMethod: b.payment_method || '',
         notes: b.notes,
         timestamp: b.timestamp,
       };
@@ -171,6 +173,8 @@ export async function saveDbBooking(booking: any) {
       broker_name: newBookingWithId.brokerName ?? null,
       client_status: newBookingWithId.clientStatus || 'انتظار',
       guests_count: newBookingWithId.guestsCount ?? 1,
+      booking_manager: newBookingWithId.bookingManager ?? null,
+      payment_method: newBookingWithId.paymentMethod ?? null,
       notes: newBookingWithId.notes ?? null,
       timestamp: newBookingWithId.timestamp,
     });
@@ -220,6 +224,8 @@ export async function updateDbBookingStatus(id: string, updates: any) {
   if (updates.brokerName !== undefined) patch.broker_name = updates.brokerName;
   if (updates.clientStatus !== undefined) patch.client_status = updates.clientStatus;
   if (updates.guestsCount !== undefined) patch.guests_count = updates.guestsCount;
+  if (updates.bookingManager !== undefined) patch.booking_manager = updates.bookingManager;
+  if (updates.paymentMethod !== undefined) patch.payment_method = updates.paymentMethod;
   if (updates.notes !== undefined) patch.notes = updates.notes;
   
   // ALWAYS update the timestamp on edit to ensure "Fresh First" sync logic works

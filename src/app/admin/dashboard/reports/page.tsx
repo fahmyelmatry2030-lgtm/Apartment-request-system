@@ -238,6 +238,8 @@ function ReportsContent() {
     commission: 0,
     clientStatus: 'انتظار',
     brokerName: '',
+    bookingManager: '',
+    paymentMethod: '',
     notes: ''
   });
 
@@ -448,6 +450,8 @@ function ReportsContent() {
         commission: newRecord.commission,
         brokerName: newRecord.brokerName,
         clientStatus: newRecord.clientStatus || 'انتظار',
+        bookingManager: (newRecord as any).bookingManager || '',
+        paymentMethod: (newRecord as any).paymentMethod || '',
         notes: newRecord.notes
       };
 
@@ -475,8 +479,10 @@ function ReportsContent() {
           commission: 0,
           clientStatus: 'انتظار',
           brokerName: '',
+          bookingManager: '',
+          paymentMethod: '',
           notes: ''
-        });
+        } as any);
         setSaveStatus('✅ تمت إضافة السجل للجدول');
         setTimeout(() => setSaveStatus(''), 3000);
       } else {
@@ -604,6 +610,8 @@ function ReportsContent() {
       brokerName: booking.brokerName || '',
       netValue,
       clientStatus,
+      bookingManager: booking.bookingManager || '',
+      paymentMethod: booking.paymentMethod || '',
       notes: booking.notes?.replace(/خصم بقيمة \d+/, '').trim() || '',
       hasData: true,
     };
@@ -628,7 +636,8 @@ function ReportsContent() {
     no: renumberedRows.length + i + 1,
     id: '', date: '', name: '', nationality: '', idNumber: '', phone: '',
     checkIn: '', checkOut: '', days: 0, pricePerNight: 0, total: 0,
-    commission: 0, brokerName: '', netValue: 0, clientStatus: '', notes: '', hasData: false,
+    commission: 0, brokerName: '', netValue: 0, clientStatus: '',
+    bookingManager: '', paymentMethod: '', notes: '', hasData: false,
   }));
 
   const allRows = [...renumberedRows, ...emptyRows];
@@ -904,6 +913,20 @@ function ReportsContent() {
                       <option value="غادر">غادر</option>
                     </select>
                   </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">مسئول الحجز</label>
+                    <input type="text" value={(newRecord as any).bookingManager || ''} onChange={e => setNewRecord({ ...newRecord, bookingManager: e.target.value } as any)} placeholder="اسم المسئول" className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-[#C1A68D]" />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">طريقة الدفع</label>
+                    <select value={(newRecord as any).paymentMethod || ''} onChange={e => setNewRecord({ ...newRecord, paymentMethod: e.target.value } as any)} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-black text-[#2A2723] outline-none focus:border-[#C1A68D]">
+                      <option value="">اختر</option>
+                      <option value="كاش">كاش</option>
+                      <option value="تحويل بنكي">تحويل بنكي</option>
+                      <option value="فيزا">فيزا</option>
+                      <option value="آجل">آجل</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div className="flex justify-end mt-2">
@@ -1018,6 +1041,8 @@ function ReportsContent() {
                       <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">العمولة</th>
                       <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">الوسيط</th>
                       <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">الصافي</th>
+                      <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">مسئول الحجز</th>
+                      <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">طريقة الدفع</th>
                       <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">ملاحظات</th>
                       <th className="px-3 py-4 no-print whitespace-nowrap sticky left-0 bg-[#2A2723] z-20 shadow-[-2px_0_5px_rgba(0,0,0,0.3)]">الإجراءات</th>
                     </tr>
@@ -1115,6 +1140,30 @@ function ReportsContent() {
 
                           <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-black text-green-600">{row.hasData ? row.netValue : 0}</td>
 
+                          {/* EDITABLE: Booking Manager */}
+                          <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
+                            {row.hasData ? (
+                              <EditableCell value={row.bookingManager} bookingId={row.id} field="bookingManager" onSave={handleCellSave} className="text-[#2A2723] font-bold" />
+                            ) : <span className="text-[#EAE4D9]">—</span>}
+                          </td>
+
+                          {/* EDITABLE: Payment Method */}
+                          <td className="px-1 py-2.5 border-l border-[#EAE4D9]/20">
+                            {row.hasData ? (
+                              <select
+                                value={row.paymentMethod || ''}
+                                onChange={(e) => handleCellSave(row.id, 'paymentMethod', e.target.value)}
+                                className="bg-transparent outline-none font-black text-[10px] p-1.5 rounded-lg text-center cursor-pointer appearance-none text-blue-600 bg-blue-50"
+                              >
+                                <option value="">—</option>
+                                <option value="كاش">كاش</option>
+                                <option value="تحويل بنكي">تحويل بنكي</option>
+                                <option value="فيزا">فيزا</option>
+                                <option value="آجل">آجل</option>
+                              </select>
+                            ) : <span className="text-[#EAE4D9]">—</span>}
+                          </td>
+
                           {/* EDITABLE: Notes */}
                           <td className="px-0 py-0">
                             {row.hasData ? (
@@ -1164,6 +1213,8 @@ function ReportsContent() {
                       <td className="px-3 py-4 border-l border-[#3a3730] text-orange-300">{totals.commission.toLocaleString()}</td>
                       <td className="px-3 py-4 border-l border-[#3a3730]"></td>
                       <td className="px-3 py-4 border-l border-[#3a3730] text-green-400">{totals.netValue.toLocaleString()}</td>
+                      <td className="px-3 py-4 border-l border-[#3a3730]"></td>
+                      <td className="px-3 py-4 border-l border-[#3a3730]"></td>
                       <td className="px-3 py-4 border-l border-[#3a3730]"></td>
                       <td className="px-3 py-4 no-print"></td>
                     </tr>
@@ -1325,6 +1376,30 @@ function ReportsContent() {
                           onChange={e => setEditingBooking({ ...editingBooking, brokerName: e.target.value })}
                           className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C1A68D] font-bold"
                         />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest px-2">مسئول الحجز</label>
+                        <input
+                          type="text"
+                          value={editingBooking.bookingManager || ''}
+                          onChange={e => setEditingBooking({ ...editingBooking, bookingManager: e.target.value })}
+                          placeholder="اسم المسئول"
+                          className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C1A68D] font-bold"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest px-2">طريقة الدفع</label>
+                        <select
+                          value={editingBooking.paymentMethod || ''}
+                          onChange={e => setEditingBooking({ ...editingBooking, paymentMethod: e.target.value })}
+                          className="w-full bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C1A68D] font-bold"
+                        >
+                          <option value="">اختر طريقة الدفع</option>
+                          <option value="كاش">كاش</option>
+                          <option value="تحويل بنكي">تحويل بنكي</option>
+                          <option value="فيزا">فيزا</option>
+                          <option value="آجل">آجل</option>
+                        </select>
                       </div>
                       <div className="space-y-2">
                         <label className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest px-2">حالة العميل (يدوياً)</label>
