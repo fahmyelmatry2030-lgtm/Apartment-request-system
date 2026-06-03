@@ -75,7 +75,7 @@ const UnitCard: React.FC<UnitCardProps> = ({ unit }) => {
         )}
         
         <div className="flex flex-wrap gap-2 mb-8 mt-auto">          
-          {unit?.features?.[language]?.slice(0, 3).map((feat: string, i: number) => (
+          {unit?.features?.[language]?.slice(0, 3)?.map((feat: string, i: number) => (
             <span key={i} className="text-[10px] font-bold text-[#5C554B] bg-[#F7F5F0] px-2.5 py-1 rounded-lg border border-[#EAE4D9]">
               {feat}
             </span>

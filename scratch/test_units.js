@@ -11,23 +11,45 @@ async function main() {
     const { data: units, error: uError } = await supabase.from('units').select('*');
     if (bError || uError) throw new Error('DB error');
 
-    console.log(`Loaded ${bookings.length} bookings and ${units.length} units.`);
+    const mappedBookings = bookings.map((b) => {
+      return {
+        id: b.id,
+        name: b.name,
+        phone: b.phone,
+        checkIn: b.check_in,
+        checkOut: b.check_out,
+        apartmentId: b.apartment_id,
+        studio: b.studio,
+        status: b.status,
+        paymentInfo: b.payment_info,
+        totalAmount: Number(b.total_amount || 0),
+        numberOfDays: Number(b.number_of_days || 0),
+        pricePerNight: Number(b.number_of_days || 0) > 0 ? (Number(b.total_amount || 0) / Number(b.number_of_days || 0)) : 0,
+        nationality: b.nationality,
+        idNumber: b.id_number,
+        commission: Number(b.commission || 0),
+        brokerName: b.broker_name,
+        guestsCount: Number(b.guests_count || 1),
+        clientStatus: b.client_status || 'انتظار',
+        bookingManager: b.booking_manager || '',
+        paymentMethod: b.payment_method || '',
+        notes: b.notes,
+        timestamp: b.timestamp,
+      };
+    });
 
-    // Simulate front-end data processing for each selected unit
+    console.log("Units loaded: ", units.length);
+
     for (const unit of units) {
       const selectedUnit = unit.id;
-      // Let's simulate selectedMonth and selectedYear for all months
       for (let selectedMonth = 0; selectedMonth < 12; selectedMonth++) {
         const selectedYear = 2026;
-        
-        const filteredBookings = bookings.map((b) => {
-          const checkIn = b.check_in;
-          const checkOut = b.check_out;
-          const apartmentId = b.apartment_id;
-          const status = b.status;
+
+        const filteredBookings = mappedBookings.map((b) => {
+          if (selectedMonth === -1 || selectedYear === -1) return { ...b, matches: false };
           
-          const partsIn = checkIn?.split('-');
-          const partsOut = checkOut?.split('-');
+          const partsIn = b.checkIn?.split('-');
+          const partsOut = b.checkOut?.split('-');
           if (!partsIn || partsIn.length < 2 || !partsOut || partsOut.length < 2) return { ...b, matches: false };
           
           const checkInYear = parseInt(partsIn[0], 10);
@@ -42,7 +64,7 @@ async function main() {
           const isCarriedOver = selVal > inVal;
           const matches = selVal >= inVal && selVal <= outVal;
           
-          return { ...b, checkIn, checkOut, apartmentId, isCarriedOver, matches };
+          return { ...b, isCarriedOver, matches };
         }).filter((b) => {
           if (!b.matches) return false;
           if (b.status === 'deleted') return false;
@@ -52,9 +74,9 @@ async function main() {
           return true;
         });
 
-        // Run dataRows map
+        // Run dataRows mapping
         const unitPrice = unit.price ? parseInt(unit.price.toString().replace(/[^0-9]/g, '')) || 0 : 0;
-        
+
         filteredBookings.map((booking, i) => {
           const days = booking.numberOfDays || 0;
           let pricePerNight = unitPrice;
@@ -66,25 +88,46 @@ async function main() {
           const commission = booking.commission || 0;
           const netValue = total - commission;
 
-          let rawStatus = String(booking.client_status || 'انتظار').trim();
+          let rawStatus = String(booking.clientStatus || 'انتظار').trim();
           let clientStatus = rawStatus;
 
           if (booking.checkIn && booking.checkOut) {
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            const todayStr = `${y}-${m}-${d}`;
+            const currentHour = now.getHours();
+
             const checkInStr = String(booking.checkIn || '').trim();
             const checkOutStr = String(booking.checkOut || '').trim();
+
+            if (rawStatus === 'انتظار' || !rawStatus) {
+              if (todayStr > checkOutStr || (todayStr === checkOutStr && currentHour >= 12)) {
+                clientStatus = 'غادر';
+              } else if (todayStr > checkInStr || (todayStr === checkInStr && currentHour >= 14)) {
+                clientStatus = 'متواجد';
+              }
+            } else if (rawStatus === 'متواجد') {
+              if (todayStr > checkOutStr || (todayStr === checkOutStr && currentHour >= 12)) {
+                clientStatus = 'غادر';
+              }
+            }
           }
+
+          const notesVal = typeof booking.notes === 'string' ? booking.notes.replace(/خصم بقيمة \d+/, '').trim() : '';
 
           return {
             no: i + 1,
             id: booking.id,
-            notes: typeof booking.notes === 'string' ? booking.notes.replace(/خصم بقيمة \d+/, '').trim() : '',
+            notes: notesVal
           };
         });
       }
     }
-    console.log("SUCCESS: Simulated dataRows processing for all units and months without any crash!");
+    console.log("No error during dataRows execution on all units!");
   } catch (err) {
-    console.error("CRASH IN SIMULATION:", err);
+    console.error("CRASH FOUND:", err);
   }
 }
 main();

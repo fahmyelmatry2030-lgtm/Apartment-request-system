@@ -155,7 +155,8 @@ export async function saveDbBooking(booking: any) {
       timestamp: booking.timestamp || new Date().toISOString(),
     };
 
-    const { error } = await supabase.from('bookings').insert({
+    // Build insert object — exclude columns that may not exist in DB yet
+    const insertData: any = {
       id: newBookingWithId.id,
       name: newBookingWithId.name,
       phone: newBookingWithId.phone,
@@ -173,11 +174,39 @@ export async function saveDbBooking(booking: any) {
       broker_name: newBookingWithId.brokerName ?? null,
       client_status: newBookingWithId.clientStatus || 'انتظار',
       guests_count: newBookingWithId.guestsCount ?? 1,
-      booking_manager: newBookingWithId.bookingManager ?? null,
-      payment_method: newBookingWithId.paymentMethod ?? null,
       notes: newBookingWithId.notes ?? null,
       timestamp: newBookingWithId.timestamp,
-    });
+    };
+
+    // Append optional columns only if they have values (they may not exist in the DB schema yet)
+    if (newBookingWithId.bookingManager) insertData.booking_manager = newBookingWithId.bookingManager;
+    if (newBookingWithId.paymentMethod) insertData.payment_method = newBookingWithId.paymentMethod;
+
+    let { error } = await supabase.from('bookings').insert(insertData);
+
+    // Retry without optional columns if they don't exist in the schema
+    const isSchemaError = error && (
+      error.code === 'PGRST204' ||
+      error.code === '42703' ||
+      error.message?.toLowerCase().includes('schema cache') ||
+      error.message?.toLowerCase().includes('booking_manager') ||
+      error.message?.toLowerCase().includes('payment_method')
+    );
+
+    if (isSchemaError) {
+      console.warn('Retrying insert without booking_manager/payment_method columns...');
+      delete insertData.booking_manager;
+      delete insertData.payment_method;
+      // Preserve booking_manager/payment_method info in notes if they were provided
+      const extras: string[] = [];
+      if (newBookingWithId.bookingManager) extras.push(`مسئول الحجز: ${newBookingWithId.bookingManager}`);
+      if (newBookingWithId.paymentMethod) extras.push(`طريقة الدفع: ${newBookingWithId.paymentMethod}`);
+      if (extras.length > 0) {
+        insertData.notes = [insertData.notes, ...extras].filter(Boolean).join(' | ');
+      }
+      const retry = await supabase.from('bookings').insert(insertData);
+      error = retry.error;
+    }
 
     if (error) {
       console.error('Supabase Insert Error:', error);
@@ -224,6 +253,7 @@ export async function updateDbBookingStatus(id: string, updates: any) {
   if (updates.brokerName !== undefined) patch.broker_name = updates.brokerName;
   if (updates.clientStatus !== undefined) patch.client_status = updates.clientStatus;
   if (updates.guestsCount !== undefined) patch.guests_count = updates.guestsCount;
+  // booking_manager & payment_method: try to include, will be stripped on retry if columns don't exist
   if (updates.bookingManager !== undefined) patch.booking_manager = updates.bookingManager;
   if (updates.paymentMethod !== undefined) patch.payment_method = updates.paymentMethod;
   if (updates.notes !== undefined) patch.notes = updates.notes;
@@ -231,10 +261,31 @@ export async function updateDbBookingStatus(id: string, updates: any) {
   // ALWAYS update the timestamp on edit to ensure "Fresh First" sync logic works
   patch.timestamp = new Date().toISOString();
 
-  const { data, error } = await supabase.from('bookings')
+  let { data, error } = await supabase.from('bookings')
     .update(patch)
     .eq('id', id)
     .select();
+
+  // Retry without optional columns if they don't exist in the schema
+  const isSchemaError = error && (
+    error.code === 'PGRST204' ||
+    error.code === '42703' ||
+    error.message?.toLowerCase().includes('schema cache') ||
+    error.message?.toLowerCase().includes('booking_manager') ||
+    error.message?.toLowerCase().includes('payment_method')
+  );
+
+  if (isSchemaError) {
+    console.warn('Retrying update without booking_manager/payment_method columns...');
+    delete patch.booking_manager;
+    delete patch.payment_method;
+    const retry = await supabase.from('bookings')
+      .update(patch)
+      .eq('id', id)
+      .select();
+    data = retry.data;
+    error = retry.error;
+  }
 
   if (error) {
     console.error('Error updating booking:', error);

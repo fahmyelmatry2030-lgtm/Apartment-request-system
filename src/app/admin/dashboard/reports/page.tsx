@@ -56,10 +56,7 @@ function EditableCell({
   const [saving, setSaving] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  if (readOnly) {
-    return <div className={`px-2 py-3 ${className}`}>{value || '—'}</div>;
-  }
-
+  // ✅ ALL hooks must be called before any early return (React Rules of Hooks)
   useEffect(() => {
     setEditValue(String(value));
   }, [value]);
@@ -70,6 +67,10 @@ function EditableCell({
       inputRef.current.select();
     }
   }, [editing]);
+
+  if (readOnly) {
+    return <div className={`px-2 py-3 ${className}`}>{value || '—'}</div>;
+  }
 
   const handleSave = async () => {
     setEditing(false);

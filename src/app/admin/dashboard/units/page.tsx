@@ -542,7 +542,7 @@ export default function UnitsManagement() {
                          <div className="space-y-3">
                              <label className="text-[10px] font-black text-[#C1A68D] block mb-4 border-b border-[#EAE4D9] pb-2">القائمة الحالية (AR)</label>
                              <div className="space-y-2">
-                                {editingUnit.features?.ar.map((f: string, i: number) => (
+                                {(editingUnit.features?.ar || []).map((f: string, i: number) => (
                                     <div key={i} className="flex justify-between items-center bg-[#FDFBF7] px-5 py-3 rounded-xl border border-[#EAE4D9]/50 group">
                                         <span className="text-xs font-bold text-[#2A2723]">{f}</span>
                                         <button onClick={() => removeFeature(i)} className="text-red-500 hover:scale-125 transition-transform p-1 opacity-40 group-hover:opacity-100">✕</button>
@@ -553,7 +553,7 @@ export default function UnitsManagement() {
                          <div className="space-y-3" dir="ltr">
                              <label className="text-[10px] font-black text-[#C1A68D] block mb-4 text-left border-b border-[#EAE4D9] pb-2">CURRENT LIST (EN)</label>
                              <div className="space-y-2">
-                                {editingUnit.features?.en.map((f: string, i: number) => (
+                                {(editingUnit.features?.en || []).map((f: string, i: number) => (
                                     <div key={i} className="flex justify-between items-center bg-[#FDFBF7] px-5 py-3 rounded-xl border border-[#EAE4D9]/50 group">
                                         <span className="text-xs font-bold text-[#2A2723]">{f}</span>
                                         <button onClick={() => removeFeature(i)} className="text-red-500 hover:scale-125 transition-transform p-1 opacity-40 group-hover:opacity-100">✕</button>

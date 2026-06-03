@@ -45,11 +45,21 @@ export default function ExpensesTab() {
   const [error, setError] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState(-1);
   const [selectedYear, setSelectedYear] = useState(-1);
+  const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   useEffect(() => {
     setSelectedMonth(new Date().getMonth());
     setSelectedYear(new Date().getFullYear());
   }, []);
+
+  const getDefaultDate = () => {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  };
 
   const [newExpense, setNewExpense] = useState({
     amount: '',
@@ -65,7 +75,7 @@ export default function ExpensesTab() {
   useEffect(() => {
     setNewExpense(prev => ({
       ...prev,
-      date: new Date().toISOString().split('T')[0]
+      date: getDefaultDate()
     }));
   }, []);
 
@@ -74,15 +84,28 @@ export default function ExpensesTab() {
 
   const formatDate = (dateStr: string) => {
     if (!dateStr || !dateStr.includes('-')) return dateStr;
-    const [y, m, d] = dateStr.split('-');
+    const parts = dateStr.split('-');
+    if (parts.length !== 3) return dateStr;
+    const [y, m, d] = parts;
     return `${d}/${m}/${y}`;
   };
 
   const parseDate = (displayStr: string) => {
     if (!displayStr || !displayStr.includes('/')) return displayStr;
-    const [d, m, y] = displayStr.split('/');
-    if (y && m && d) return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+    const parts = displayStr.split('/');
+    if (parts.length !== 3) return displayStr;
+    const [d, m, y] = parts;
+    if (y && y.length === 4 && m && d) return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
     return displayStr;
+  };
+
+  // Validate date is in YYYY-MM-DD format
+  const isValidDate = (dateStr: string) => {
+    if (!dateStr) return false;
+    const regex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!regex.test(dateStr)) return false;
+    const d = new Date(dateStr);
+    return !isNaN(d.getTime());
   };
 
   const loadExpenses = async () => {
@@ -121,31 +144,65 @@ export default function ExpensesTab() {
 
   const handleAddExpense = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate amount
+    const amount = parseFloat(newExpense.amount);
+    if (!amount || isNaN(amount) || amount <= 0) {
+      alert('الرجاء إدخال مبلغ صحيح');
+      return;
+    }
+
+    // Validate description
+    if (!newExpense.description.trim()) {
+      alert('الرجاء إدخال السبب / البيان');
+      return;
+    }
+
+    // Validate and fix date
+    let dateToSave = newExpense.date;
+    if (!isValidDate(dateToSave)) {
+      // Try to parse it in case it's in DD/MM/YYYY format
+      const parsed = parseDate(dateToSave);
+      if (isValidDate(parsed)) {
+        dateToSave = parsed;
+      } else {
+        // Fallback to today's date
+        dateToSave = getDefaultDate();
+      }
+    }
+
+    setSaving(true);
+    setSaveSuccess(false);
     try {
       await saveDbExpense({
         category: 'عام',
-        amount: parseFloat(newExpense.amount),
-        description: newExpense.description,
-        date: newExpense.date,
-        branch: parseInt(newExpense.branch),
-        from_entity: newExpense.from_entity,
-        to_entity: newExpense.to_entity,
-        ordered_by: newExpense.ordered_by,
-        invoice_number: newExpense.invoice_number,
+        amount: amount,
+        description: newExpense.description.trim(),
+        date: dateToSave,
+        branch: parseInt(newExpense.branch) || 1,
+        from_entity: newExpense.from_entity.trim(),
+        to_entity: newExpense.to_entity.trim(),
+        ordered_by: newExpense.ordered_by.trim(),
+        invoice_number: newExpense.invoice_number.trim(),
       });
       setNewExpense({
         amount: '',
         description: '',
-        date: new Date().toISOString().split('T')[0],
+        date: getDefaultDate(),
         branch: '1',
         from_entity: '',
         to_entity: '',
         ordered_by: '',
         invoice_number: '',
       });
-      loadExpenses();
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+      await loadExpenses();
     } catch (error: any) {
-      alert('خطأ في الإضافة: ' + error.message);
+      console.error('Error saving expense:', error);
+      alert('خطأ في الإضافة: ' + (error.message || 'خطأ غير معروف'));
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -264,17 +321,12 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
 
             {/* التاريخ */}
             <div className="space-y-3 group">
-              <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">التاريخ (يوم/شهر/سنة)</label>
+              <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">التاريخ</label>
               <input 
-                type="text"
+                type="date"
                 required
-                placeholder="DD/MM/YYYY"
-                value={formatDate(newExpense.date)}
-                onChange={e => {
-                  const val = e.target.value;
-                  let clean = val.replace(/[^0-9/]/g, '');
-                  setNewExpense({...newExpense, date: parseDate(clean)});
-                }}
+                value={newExpense.date}
+                onChange={e => setNewExpense({...newExpense, date: e.target.value})}
                 className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all" 
               />
             </div>
@@ -336,8 +388,27 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
             </div>
           </div>
           
-          <button type="submit" className="w-full bg-mazar-coffee text-white font-black py-6 rounded-2xl hover:bg-mazar-gold hover:text-mazar-coffee transition-all shadow-2xl active:scale-95 uppercase tracking-[0.3em] text-xs">
-            تأكيد وإدراج المصروف في النظام
+          <button 
+            type="submit" 
+            disabled={saving}
+            className={`w-full font-black py-6 rounded-2xl transition-all shadow-2xl active:scale-95 uppercase tracking-[0.3em] text-xs ${
+              saving 
+                ? 'bg-gray-400 text-white cursor-wait' 
+                : saveSuccess 
+                  ? 'bg-green-600 text-white' 
+                  : 'bg-mazar-coffee text-white hover:bg-mazar-gold hover:text-mazar-coffee'
+            }`}
+          >
+            {saving ? (
+              <span className="flex items-center justify-center gap-3">
+                <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                جاري الحفظ...
+              </span>
+            ) : saveSuccess ? (
+              '✅ تم حفظ المصروف بنجاح!'
+            ) : (
+              'تأكيد وإدراج المصروف في النظام'
+            )}
           </button>
         </form>
       </div>
