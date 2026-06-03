@@ -6,7 +6,7 @@ import Logo from '@/components/Logo';
 import Footer from '@/components/Footer';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useLanguage } from '@/lib/LanguageContext';
-import { getStudios } from '@/lib/data-init';
+
 import UnitCard from '@/components/UnitCard';
 
 export default function StudiosPage() {
@@ -17,8 +17,14 @@ export default function StudiosPage() {
 
   useEffect(() => {
     const loadUnits = async () => {
-      const allStudios = await getStudios();
-      setStudios(allStudios);
+      try {
+        const res = await fetch('/api/units');
+        if (!res.ok) return;
+        const allUnits = await res.json();
+        setStudios(allUnits.filter((u: any) => u.type === 'studio'));
+      } catch {
+        // silently fail
+      }
     };
     loadUnits();
   }, []);

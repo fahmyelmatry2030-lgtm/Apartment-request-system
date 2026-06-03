@@ -6,7 +6,7 @@ import Footer from '@/components/Footer';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import Calendar from '@/components/Calendar';
 import { useLanguage } from '@/lib/LanguageContext';
-import { saveBooking, initializeData, getPublicSystemUnits, getBookings } from '@/lib/data-init';
+
 
 export default function BookingPage() {
   const { t, isRTL, language } = useLanguage();
@@ -51,26 +51,31 @@ export default function BookingPage() {
 
   useEffect(() => {
     const init = async () => {
-      await initializeData();
       const params = new URLSearchParams(window.location.search);
       const unitParam = params.get('unit');
       if (unitParam) {
         setSelectedUnitId(unitParam);
-        // If we have a unit, fetch its booked dates immediately
-        const allBookings = await getBookings();
-        const unitBooked = allBookings
-          .filter((b: any) => b.apartmentId === unitParam && !['cancelled', 'deleted', 'rejected', 'مرفوض'].includes(b.status))
-          .flatMap((b: any) => {
-            const dates: string[] = [];
-            let current = new Date(b.checkIn);
-            const end = new Date(b.checkOut);
-            while (current < end) {
-              dates.push(current.toISOString().split('T')[0]);
-              current.setDate(current.getDate() + 1);
-            }
-            return dates;
-          });
-        setBookedDates(unitBooked);
+        try {
+          const res = await fetch('/api/bookings');
+          if (res.ok) {
+            const allBookings = await res.json();
+            const unitBooked = allBookings
+              .filter((b: any) => b.apartmentId === unitParam && !['cancelled', 'deleted', 'rejected', 'مرفوض'].includes(b.status))
+              .flatMap((b: any) => {
+                const dates: string[] = [];
+                let current = new Date(b.checkIn);
+                const end = new Date(b.checkOut);
+                while (current < end) {
+                  dates.push(current.toISOString().split('T')[0]);
+                  current.setDate(current.getDate() + 1);
+                }
+                return dates;
+              });
+            setBookedDates(unitBooked);
+          }
+        } catch {
+          // ignore — no booked dates blocked
+        }
       }
     };
     init();
@@ -93,20 +98,26 @@ export default function BookingPage() {
   useEffect(() => {
      if (selectedUnitId) {
         const fetchBooked = async () => {
-           const allBookings = await getBookings();
-           const unitBooked = allBookings
-             .filter((b: any) => b.apartmentId === selectedUnitId && !['cancelled', 'deleted', 'rejected', 'مرفوض'].includes(b.status))
-             .flatMap((b: any) => {
-               const dates: string[] = [];
-               let current = new Date(b.checkIn);
-               const end = new Date(b.checkOut);
-               while (current < end) {
-                 dates.push(current.toISOString().split('T')[0]);
-                 current.setDate(current.getDate() + 1);
-               }
-               return dates;
-             });
-           setBookedDates(unitBooked);
+           try {
+             const res = await fetch('/api/bookings');
+             if (!res.ok) return;
+             const allBookings = await res.json();
+             const unitBooked = allBookings
+               .filter((b: any) => b.apartmentId === selectedUnitId && !['cancelled', 'deleted', 'rejected', 'مرفوض'].includes(b.status))
+               .flatMap((b: any) => {
+                 const dates: string[] = [];
+                 let current = new Date(b.checkIn);
+                 const end = new Date(b.checkOut);
+                 while (current < end) {
+                   dates.push(current.toISOString().split('T')[0]);
+                   current.setDate(current.getDate() + 1);
+                 }
+                 return dates;
+               });
+             setBookedDates(unitBooked);
+           } catch {
+             setBookedDates([]);
+           }
         };
         fetchBooked();
      } else {
@@ -127,7 +138,9 @@ export default function BookingPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const allUnits = await getPublicSystemUnits();
+      const res = await fetch('/api/units');
+      if (!res.ok) throw new Error('Failed to fetch units');
+      const allUnits = await res.json();
 
       const activeUnitsByStatus = allUnits.filter((u: any) => u.status === 'متاح' || !u.status);
       const available = activeUnitsByStatus;
@@ -169,7 +182,12 @@ export default function BookingPage() {
     };
 
     try {
-      await saveBooking(bookingData);
+      const saveRes = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bookingData),
+      });
+      if (!saveRes.ok) throw new Error('Failed to save booking');
       setIsSubmitting(false);
       setIsSuccess(true);
       

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/lib/LanguageContext';
 import { units } from '@/lib/data';
-import { getStudios } from '@/lib/data-init';
+
 import { Home, Menu, Search, Grid, ShoppingCart } from 'lucide-react';
 
 export default function UnitsListingPage() {
@@ -12,10 +12,16 @@ export default function UnitsListingPage() {
 
   useEffect(() => {
     const loadCounts = async () => {
-      const allStudios = await getStudios();
-      const availableStudios = units.filter(u => u.type === 'studio' && allStudios.find((s: any) => s.id === u.id)?.status === 'متاح').length;
-      const availableApts = units.filter(u => u.type === 'apartment' && allStudios.find((s: any) => s.id === u.id)?.status === 'متاح').length;
-      setCounts({ studios: availableStudios, apts: availableApts });
+      try {
+        const res = await fetch('/api/units');
+        if (!res.ok) return;
+        const allStudios = await res.json();
+        const availableStudios = units.filter(u => u.type === 'studio' && allStudios.find((s: any) => s.id === u.id)?.status === 'متاح').length;
+        const availableApts = units.filter(u => u.type === 'apartment' && allStudios.find((s: any) => s.id === u.id)?.status === 'متاح').length;
+        setCounts({ studios: availableStudios, apts: availableApts });
+      } catch {
+        // silently fail, keep default counts
+      }
     };
     loadCounts();
   }, []);

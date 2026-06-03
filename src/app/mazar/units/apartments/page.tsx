@@ -6,7 +6,7 @@ import Logo from '@/components/Logo';
 import Footer from '@/components/Footer';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useLanguage } from '@/lib/LanguageContext';
-import { getPublicSystemUnits } from '@/lib/data-init';
+
 import UnitCard from '@/components/UnitCard';
 
 export default function ApartmentsListingPage() {
@@ -17,8 +17,14 @@ export default function ApartmentsListingPage() {
 
   useEffect(() => {
     const loadUnits = async () => {
-      const allUnits = await getPublicSystemUnits();
-      setLuxuryApartments(allUnits.filter((u: any) => u.type === 'apartment'));
+      try {
+        const res = await fetch('/api/units');
+        if (!res.ok) return;
+        const allUnits = await res.json();
+        setLuxuryApartments(allUnits.filter((u: any) => u.type === 'apartment'));
+      } catch {
+        // silently fail
+      }
     };
     loadUnits();
   }, []);

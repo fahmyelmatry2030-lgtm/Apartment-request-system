@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useLanguage } from '@/lib/LanguageContext';
-import { getStudios } from '@/lib/data-init';
+
 import { motion } from 'framer-motion';
 
 interface UnitCardProps {
@@ -16,10 +16,16 @@ const UnitCard: React.FC<UnitCardProps> = ({ unit }) => {
 
   useEffect(() => {
     const loadStatus = async () => {
-      const studios = await getStudios();
-      const studio = studios.find((s: any) => s.id === unit.id);
-      if (studio) {
-        setStatus(studio.status || 'متاح');
+      try {
+        const res = await fetch('/api/units');
+        if (!res.ok) return;
+        const studios = await res.json();
+        const studio = studios.find((s: any) => s.id === unit.id);
+        if (studio) {
+          setStatus(studio.status || 'متاح');
+        }
+      } catch {
+        // silently fail — fallback status stays as default
       }
     };
     loadStatus();

@@ -7,7 +7,7 @@ import Logo from '@/components/Logo';
 import Footer from '@/components/Footer';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useLanguage } from '@/lib/LanguageContext';
-import { getPublicSystemUnits } from '@/lib/data-init';
+
 import UnitCard from '@/components/UnitCard';
 import ScrollReveal from '@/components/ScrollReveal';
 import { motion } from 'framer-motion';
@@ -20,7 +20,9 @@ export default function HomeClient() {
   useEffect(() => {
     const loadUnits = async () => {
       try {
-        const allUnits = await getPublicSystemUnits();
+        const res = await fetch('/api/units');
+        if (!res.ok) throw new Error('Failed to fetch units');
+        const allUnits = await res.json();
         setUnits(allUnits);
       } catch (e) {
         console.error('Failed to load units on home page:', e);
