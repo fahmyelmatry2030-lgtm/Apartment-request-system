@@ -633,7 +633,7 @@ function ReportsContent() {
       clientStatus,
       bookingManager: booking.bookingManager || '',
       paymentMethod: booking.paymentMethod || '',
-      notes: booking.notes?.replace(/خصم بقيمة \d+/, '').trim() || '',
+      notes: (booking.notes || '').replace(/خصم بقيمة \d+/, '').trim(),
       isCarriedOver: booking.isCarriedOver,
       hasData: true,
     };
