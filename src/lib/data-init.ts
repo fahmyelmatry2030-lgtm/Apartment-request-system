@@ -32,13 +32,23 @@ export const getSystemUnits = async () => {
   try {
     const dbUnits = await getDbUnits();
     if (dbUnits && dbUnits.length > 0) {
-      // Merge static UI data with dynamic DB data to prevent missing media properties
       units = dbUnits.map((dbUnit: any) => {
-        const baseUnit = staticUnits.find(u => u.id === dbUnit.id) || {};
-        return {
-          ...baseUnit,
-          ...dbUnit
-        };
+        const baseUnit = staticUnits.find(u => u.id === dbUnit.id) || ({} as any);
+        const merged: any = { ...baseUnit };
+        
+        Object.keys(dbUnit).forEach(key => {
+          const val = dbUnit[key];
+          if (val !== null && val !== undefined && val !== '') {
+            // For arrays or objects, check if they are empty
+            if (Array.isArray(val) && val.length === 0) return;
+            if (typeof val === 'object' && !Array.isArray(val)) {
+              if (Object.keys(val).length === 0) return;
+            }
+            merged[key] = val;
+          }
+        });
+        
+        return merged;
       });
     }
   } catch (e) {
