@@ -14,17 +14,19 @@ import ExpensesTab from './ExpensesTab';
 import FinancialSummaryTab from './FinancialSummaryTab';
 
 // Units will be fetched dynamically from the database
-const LAYOUT_VERSION = 'v1.9.0'; // Auto-increment this to force-clear client caches
+const LAYOUT_VERSION = 'v2.0.0'; // Auto-increment this to force-clear client caches
 
 const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 
-const formatDate = (dateStr: string) => {
+const formatDate = (dateStr: any) => {
+  if (typeof dateStr !== 'string') return '';
   if (!dateStr || !dateStr.includes('-')) return dateStr;
   const [y, m, d] = dateStr.split('-');
   return `${d}/${m}/${y}`;
 };
 
-const parseDate = (displayStr: string) => {
+const parseDate = (displayStr: any) => {
+  if (typeof displayStr !== 'string') return '';
   if (!displayStr || !displayStr.includes('/')) return displayStr;
   const [d, m, y] = displayStr.split('/');
   if (y && m && d) return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
