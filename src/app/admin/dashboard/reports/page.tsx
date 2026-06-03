@@ -39,6 +39,7 @@ function EditableCell({
   onSave,
   type = 'text',
   className = '',
+  readOnly = false,
 }: {
   value: string | number;
   bookingId: string;
@@ -46,11 +47,16 @@ function EditableCell({
   onSave: (id: string, field: string, value: any) => void;
   type?: 'text' | 'number';
   className?: string;
+  readOnly?: boolean;
 }) {
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(String(value));
   const [saving, setSaving] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  if (readOnly) {
+    return <div className={`px-2 py-3 ${className}`}>{value || '—'}</div>;
+  }
 
   useEffect(() => {
     setEditValue(String(value));
@@ -497,21 +503,34 @@ function ReportsContent() {
     }
   };
 
-  // Filter bookings for selected unit + month/year
-  const filteredBookings = bookings.filter((b: any) => {
+  // Filter bookings for selected unit + month/year (supports cross-month)
+  const filteredBookings = bookings.map((b: any) => {
+    if (selectedMonth === -1 || selectedYear === -1) return { ...b, matches: false };
+    
+    const partsIn = b.checkIn?.split('-');
+    const partsOut = b.checkOut?.split('-');
+    if (!partsIn || partsIn.length < 2 || !partsOut || partsOut.length < 2) return { ...b, matches: false };
+    
+    const checkInYear = parseInt(partsIn[0], 10);
+    const checkInMonth = parseInt(partsIn[1], 10) - 1; // 0-indexed
+    const checkOutYear = parseInt(partsOut[0], 10);
+    const checkOutMonth = parseInt(partsOut[1], 10) - 1; // 0-indexed
+    
+    const inVal = checkInYear * 12 + checkInMonth;
+    const outVal = checkOutYear * 12 + checkOutMonth;
+    const selVal = selectedYear * 12 + selectedMonth;
+    
+    const isCarriedOver = selVal > inVal;
+    const matches = selVal >= inVal && selVal <= outVal;
+    
+    return { ...b, isCarriedOver, matches };
+  }).filter((b: any) => {
+    if (!b.matches) return false;
     if (b.status === 'deleted') return false;
     const isApproved = b.status === 'approved' || b.status === 'مؤكد';
     if (!isApproved) return false;
-
-    // Match unit
     if (b.apartmentId !== selectedUnit) return false;
-
-    // Match month/year based on check-in date string (Timezone Safe)
-    const parts = b.checkIn?.split('-');
-    if (!parts || parts.length < 2) return false;
-    const year = parseInt(parts[0], 10);
-    const month = parseInt(parts[1], 10) - 1; // 0-indexed
-    return month === selectedMonth && year === selectedYear;
+    return true;
   });
 
   // Get unit price
@@ -529,6 +548,8 @@ function ReportsContent() {
 
   const totals = filteredBookings.reduce(
     (acc: any, b: any) => {
+      if (b.isCarriedOver) return acc;
+
       const days = safeNum(b.numberOfDays);
       const total = safeNum(b.totalAmount);
       const commission = safeNum(b.commission);
@@ -613,6 +634,7 @@ function ReportsContent() {
       bookingManager: booking.bookingManager || '',
       paymentMethod: booking.paymentMethod || '',
       notes: booking.notes?.replace(/خصم بقيمة \d+/, '').trim() || '',
+      isCarriedOver: booking.isCarriedOver,
       hasData: true,
     };
   });
@@ -637,7 +659,7 @@ function ReportsContent() {
     id: '', date: '', name: '', nationality: '', idNumber: '', phone: '',
     checkIn: '', checkOut: '', days: 0, pricePerNight: 0, total: 0,
     commission: 0, brokerName: '', netValue: 0, clientStatus: '',
-    bookingManager: '', paymentMethod: '', notes: '', hasData: false,
+    bookingManager: '', paymentMethod: '', notes: '', isCarriedOver: false, hasData: false,
   }));
 
   const allRows = [...renumberedRows, ...emptyRows];
@@ -1054,149 +1076,162 @@ function ReportsContent() {
                           جاري تحميل البيانات...
                         </td>
                       </tr>
+                    ) : allRows.length === 0 ? (
+                      <tr>
+                        <td colSpan={15} className="px-6 py-20 text-center text-[#7A7061] italic font-bold opacity-40 uppercase tracking-widest">لا توجد سجلات لهذا الشهر</td>
+                      </tr>
                     ) : (
-                      allRows.map((row, i) => (
-                        <tr
-                          key={row.no}
-                          className={`border-t border-[#EAE4D9]/30 transition-colors ${row.hasData
-                              ? row.clientStatus.trim() === 'متواجد' ? 'bg-green-200 hover:bg-green-300'
-                                : row.clientStatus.trim() === 'غادر' ? 'bg-gray-300 hover:bg-gray-400'
-                                  : row.clientStatus.trim() === 'انتظار' ? 'bg-orange-200 hover:bg-orange-300'
-                                    : 'bg-white hover:bg-yellow-50/30'
-                              : 'bg-[#FDFBF7]/50'
-                            } group`}
-                        >
-                          <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-black text-[#7A7061] sticky right-0 bg-inherit z-10 shadow-[2px_0_5px_rgba(0,0,0,0.02)]">{row.no}</td>
+                      allRows.map((row, index) => (
+                        <tr key={index} className={`border-t border-[#EAE4D9]/40 transition-colors group ${!row.hasData ? 'bg-[#FDFBF7] opacity-60' : row.isCarriedOver ? 'bg-[#fcf9f2]' : 'hover:bg-[#FDFBF7]'}`}>
+                          <td className="px-2 py-2.5 text-[#C1A68D] font-black tracking-widest sticky right-0 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.02)] transition-colors group-hover:bg-[#FDFBF7]" style={{ backgroundColor: !row.hasData ? '#FDFBF7' : row.isCarriedOver ? '#fcf9f2' : 'inherit' }}>
+                            {row.no.toString().padStart(2, '0')}
+                          </td>
                           <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-bold text-[#2A2723] whitespace-nowrap">{formatDate(row.date)}</td>
-                          <td className="px-1 py-1 border-l border-[#EAE4D9]/20">
+                          
+                          {/* EDITABLE: Name */}
+                          <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
                             {row.hasData ? (
-                              <div className="flex flex-col items-center w-full">
-                                <EditableCell value={row.name} bookingId={row.id} field="name" onSave={handleCellSave} className="text-[#2A2723] font-black" />
-                                <span className="text-[7px] text-[#C1A68D] opacity-60 uppercase tracking-tighter mt-[-4px] font-black">({row.clientStatus})</span>
-                              </div>
+                              <EditableCell value={row.name} bookingId={row.id} field="name" onSave={handleCellSave} className="text-[#2A2723] font-bold" readOnly={row.isCarriedOver} />
                             ) : <span className="text-[#EAE4D9]">—</span>}
                           </td>
 
-                          {/* EDITABLE CELLS */}
+                          {/* EDITABLE: Nationality */}
                           <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
                             {row.hasData ? (
-                              <EditableCell value={row.nationality} bookingId={row.id} field="nationality" onSave={handleCellSave} className="text-[#7A7061] font-bold" />
+                              <EditableCell value={row.nationality} bookingId={row.id} field="nationality" onSave={handleCellSave} className="text-[#7A7061] font-bold" readOnly={row.isCarriedOver} />
                             ) : <span className="text-[#EAE4D9]">—</span>}
                           </td>
+                          
+                          {/* EDITABLE: ID Number */}
                           <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
                             {row.hasData ? (
-                              <EditableCell value={row.idNumber} bookingId={row.id} field="idNumber" onSave={handleCellSave} className="text-[#7A7061] font-bold font-mono text-[9px]" />
+                              <EditableCell value={row.idNumber} bookingId={row.id} field="idNumber" onSave={handleCellSave} className="text-[#7A7061] font-bold" readOnly={row.isCarriedOver} />
                             ) : <span className="text-[#EAE4D9]">—</span>}
                           </td>
 
-                          <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-bold text-[#7A7061] font-mono text-[9px] whitespace-nowrap">{row.phone}</td>
-
+                          {/* EDITABLE: Phone */}
                           <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
-                            {row.hasData ? <EditableCell value={formatDate(row.checkIn)} bookingId={row.id} field="checkIn" onSave={handleCellSave} className="text-[#2A2723] font-bold whitespace-nowrap" /> : <span className="text-[#EAE4D9]">—</span>}
-                          </td>
-                          <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
-                            {row.hasData ? <EditableCell value={formatDate(row.checkOut)} bookingId={row.id} field="checkOut" onSave={handleCellSave} className="text-[#2A2723] font-bold whitespace-nowrap" /> : <span className="text-[#EAE4D9]">—</span>}
+                            {row.hasData ? (
+                              <EditableCell value={row.phone} bookingId={row.id} field="phone" onSave={handleCellSave} className="text-[#2A2723] font-bold" readOnly={row.isCarriedOver} />
+                            ) : <span className="text-[#EAE4D9]">—</span>}
                           </td>
 
-                          <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-black text-[#2A2723]">{row.hasData ? row.days : 0}</td>
-
+                          {/* EDITABLE: Check In */}
                           <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
-                            {row.hasData ? <EditableCell value={row.pricePerNight} bookingId={row.id} field="pricePerNight" onSave={handleCellSave} type="number" className="text-[#7A7061] font-bold" /> : <span className="text-[#EAE4D9]">0</span>}
+                            {row.hasData ? <EditableCell value={formatDate(row.checkIn)} bookingId={row.id} field="checkIn" onSave={handleCellSave} className="text-blue-600 font-bold bg-blue-50/50" readOnly={row.isCarriedOver} /> : <span className="text-[#EAE4D9]">—</span>}
                           </td>
+                          
+                          {/* EDITABLE: Check Out */}
                           <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
-                            {row.hasData ? <EditableCell value={row.total} bookingId={row.id} field="totalAmount" onSave={handleCellSave} type="number" className="text-[#2A2723] font-black" /> : <span className="text-[#EAE4D9]">0</span>}
+                            {row.hasData ? <EditableCell value={formatDate(row.checkOut)} bookingId={row.id} field="checkOut" onSave={handleCellSave} className="text-red-600 font-bold bg-red-50/50" readOnly={row.isCarriedOver} /> : <span className="text-[#EAE4D9]">—</span>}
                           </td>
 
+                          <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 text-[#C1A68D] font-black">{row.hasData ? row.days : 0}</td>
+
+                          {/* EDITABLE: Price per Night */}
+                          <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
+                            {row.hasData ? <EditableCell value={row.pricePerNight} bookingId={row.id} field="pricePerNight" onSave={handleCellSave} type="number" className="text-[#7A7061] font-bold" readOnly={row.isCarriedOver} /> : <span className="text-[#EAE4D9]">—</span>}
+                          </td>
+                          
+                          {/* EDITABLE: Total Amount */}
+                          <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
+                            {row.hasData ? <EditableCell value={row.total} bookingId={row.id} field="totalAmount" onSave={handleCellSave} type="number" className="text-[#C1A68D] font-black" readOnly={row.isCarriedOver} /> : <span className="text-[#EAE4D9]">—</span>}
+                          </td>
+
+                          {/* EDITABLE: Client Status */}
                           <td className="px-1 py-2.5 border-l border-[#EAE4D9]/20">
                             {row.hasData ? (
-                              <select
-                                value={row.clientStatus || 'انتظار'}
-                                onChange={(e) => handleCellSave(row.id, 'clientStatus', e.target.value)}
-                                className={`bg-transparent outline-none font-black text-[10px] p-1.5 rounded-lg text-center cursor-pointer appearance-none ${row.clientStatus === 'متواجد' ? 'text-green-600 bg-green-50' :
-                                    row.clientStatus === 'غادر' ? 'text-gray-500 bg-gray-100' :
-                                      'text-orange-600 bg-orange-50'
-                                  }`}
-                              >
-                                <option value="انتظار">انتظار</option>
-                                <option value="متواجد">متواجد</option>
-                                <option value="غادر">غادر</option>
-                              </select>
+                              row.isCarriedOver ? (
+                                <span className={`font-black text-[10px] p-1.5 rounded-lg text-center opacity-70 ${row.clientStatus === 'انتظار' ? 'text-gray-500 bg-gray-100' : row.clientStatus === 'متواجد' ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'}`}>{row.clientStatus}</span>
+                              ) : (
+                                <select
+                                  value={row.clientStatus}
+                                  onChange={(e) => handleCellSave(row.id, 'clientStatus', e.target.value)}
+                                  className={`bg-transparent outline-none font-black text-[10px] p-1.5 rounded-lg text-center cursor-pointer appearance-none ${row.clientStatus === 'انتظار' ? 'text-gray-500 bg-gray-100' : row.clientStatus === 'متواجد' ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'}`}
+                                >
+                                  <option value="انتظار">انتظار</option>
+                                  <option value="متواجد">متواجد</option>
+                                  <option value="غادر">غادر</option>
+                                </select>
+                              )
                             ) : <span className="text-[#EAE4D9]">—</span>}
                           </td>
 
                           {/* EDITABLE: Commission */}
                           <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
-                            {row.hasData ? (
-                              <EditableCell value={row.commission} bookingId={row.id} field="commission" onSave={handleCellSave} type="number" className="text-orange-500 font-bold" />
-                            ) : <span className="text-[#EAE4D9]">—</span>}
+                            {row.hasData ? <EditableCell value={row.commission} bookingId={row.id} field="commission" onSave={handleCellSave} type="number" className="text-orange-500 font-bold" readOnly={row.isCarriedOver} /> : <span className="text-[#EAE4D9]">—</span>}
                           </td>
 
                           {/* EDITABLE: Broker Name */}
                           <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
-                            {row.hasData ? (
-                              <EditableCell value={row.brokerName} bookingId={row.id} field="brokerName" onSave={handleCellSave} className="text-[#7A7061] font-bold" />
-                            ) : <span className="text-[#EAE4D9]">—</span>}
+                            {row.hasData ? <EditableCell value={row.brokerName} bookingId={row.id} field="brokerName" onSave={handleCellSave} className="text-[#7A7061] font-bold" readOnly={row.isCarriedOver} /> : <span className="text-[#EAE4D9]">—</span>}
                           </td>
 
                           <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-black text-green-600">{row.hasData ? row.netValue : 0}</td>
 
                           {/* EDITABLE: Booking Manager */}
                           <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
-                            {row.hasData ? (
-                              <EditableCell value={row.bookingManager} bookingId={row.id} field="bookingManager" onSave={handleCellSave} className="text-[#2A2723] font-bold" />
-                            ) : <span className="text-[#EAE4D9]">—</span>}
+                            {row.hasData ? <EditableCell value={row.bookingManager} bookingId={row.id} field="bookingManager" onSave={handleCellSave} className="text-[#2A2723] font-bold" readOnly={row.isCarriedOver} /> : <span className="text-[#EAE4D9]">—</span>}
                           </td>
 
                           {/* EDITABLE: Payment Method */}
                           <td className="px-1 py-2.5 border-l border-[#EAE4D9]/20">
                             {row.hasData ? (
-                              <select
-                                value={row.paymentMethod || ''}
-                                onChange={(e) => handleCellSave(row.id, 'paymentMethod', e.target.value)}
-                                className="bg-transparent outline-none font-black text-[10px] p-1.5 rounded-lg text-center cursor-pointer appearance-none text-blue-600 bg-blue-50"
-                              >
-                                <option value="">—</option>
-                                <option value="كاش">كاش</option>
-                                <option value="تحويل بنكي">تحويل بنكي</option>
-                                <option value="فيزا">فيزا</option>
-                                <option value="آجل">آجل</option>
-                              </select>
+                              row.isCarriedOver ? (
+                                <span className="font-black text-[10px] p-1.5 rounded-lg text-center text-blue-600 bg-blue-50/50">{row.paymentMethod || '—'}</span>
+                              ) : (
+                                <select
+                                  value={row.paymentMethod || ''}
+                                  onChange={(e) => handleCellSave(row.id, 'paymentMethod', e.target.value)}
+                                  className="bg-transparent outline-none font-black text-[10px] p-1.5 rounded-lg text-center cursor-pointer appearance-none text-blue-600 bg-blue-50"
+                                >
+                                  <option value="">—</option>
+                                  <option value="كاش">كاش</option>
+                                  <option value="تحويل بنكي">تحويل بنكي</option>
+                                  <option value="فيزا">فيزا</option>
+                                  <option value="آجل">آجل</option>
+                                </select>
+                              )
                             ) : <span className="text-[#EAE4D9]">—</span>}
                           </td>
 
                           {/* EDITABLE: Notes */}
                           <td className="px-0 py-0">
-                            {row.hasData ? (
-                              <EditableCell value={row.notes} bookingId={row.id} field="notes" onSave={handleCellSave} className="text-[#7A7061] font-bold text-[9px]" />
-                            ) : <span className="text-[#EAE4D9]">—</span>}
+                            {row.hasData ? <EditableCell value={row.notes} bookingId={row.id} field="notes" onSave={handleCellSave} className="text-[#7A7061] font-bold text-[9px]" readOnly={row.isCarriedOver} /> : <span className="text-[#EAE4D9]">—</span>}
                           </td>
 
                           {/* --- ACTIONS --- */}
-                          <td className="px-1 py-1 no-print border-r border-[#EAE4D9]/20 sticky left-0 bg-inherit z-10 shadow-[-2px_0_5px_rgba(0,0,0,0.02)]">
+                          <td className="px-1 py-1 no-print border-r border-[#EAE4D9]/20 sticky left-0 z-10 shadow-[-2px_0_5px_rgba(0,0,0,0.02)] transition-colors group-hover:bg-[#FDFBF7]" style={{ backgroundColor: row.isCarriedOver ? '#fcf9f2' : 'inherit' }}>
                             {row.hasData && (
-                              <div className="flex items-center justify-center gap-1">
-                                <button
-                                  onClick={() => {
-                                    const fullBooking = bookings.find(b => b.id === row.id);
-                                    if (fullBooking) {
-                                      setEditingBooking({ ...fullBooking });
-                                      setIsEditModalOpen(true);
-                                    }
-                                  }}
-                                  className="w-8 h-8 flex items-center justify-center text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white rounded-lg transition-all"
-                                  title="تعديل كافة البيانات"
-                                >
-                                  <Pencil size={14} strokeWidth={2.5} />
-                                </button>
+                              row.isCarriedOver ? (
+                                <div className="flex items-center justify-center">
+                                  <span className="text-[9px] font-black text-[#C1A68D] bg-white border border-[#EAE4D9] px-2 py-1 rounded-lg tracking-widest shadow-sm">مرحّل</span>
+                                </div>
+                              ) : (
+                                <div className="flex items-center justify-center gap-1">
+                                  <button
+                                    onClick={() => {
+                                      const fullBooking = bookings.find(b => b.id === row.id);
+                                      if (fullBooking) {
+                                        setEditingBooking({ ...fullBooking });
+                                        setIsEditModalOpen(true);
+                                      }
+                                    }}
+                                    className="w-8 h-8 flex items-center justify-center text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white rounded-lg transition-all"
+                                    title="تعديل كافة البيانات"
+                                  >
+                                    <Pencil size={14} strokeWidth={2.5} />
+                                  </button>
 
-                                <button
-                                  onClick={() => handleDelete(row.id)}
-                                  className="w-8 h-8 flex items-center justify-center text-red-600 bg-red-50 hover:bg-red-600 hover:text-white rounded-lg transition-all"
-                                  title="حذف الحجز"
-                                >
-                                  <Trash2 size={14} strokeWidth={2.5} />
-                                </button>
-                              </div>
+                                  <button
+                                    onClick={() => handleDelete(row.id)}
+                                    className="w-8 h-8 flex items-center justify-center text-red-600 bg-red-50 hover:bg-red-600 hover:text-white rounded-lg transition-all"
+                                    title="حذف الحجز"
+                                  >
+                                    <Trash2 size={14} strokeWidth={2.5} />
+                                  </button>
+                                </div>
+                              )
                             )}
                           </td>
                         </tr>
