@@ -21,6 +21,20 @@ const defaultContextValue: LanguageContextType = {
 
 const LanguageContext = createContext<LanguageContextType>(defaultContextValue);
 
+function deepMerge(target: any, source: any): any {
+  if (!source) return target;
+  if (!target) return source;
+  const output = { ...target };
+  for (const key of Object.keys(source)) {
+    if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+      output[key] = deepMerge(target[key] || {}, source[key]);
+    } else {
+      output[key] = source[key];
+    }
+  }
+  return output;
+}
+
 export function LanguageProvider({ 
   children, 
   initialTranslations 
@@ -29,11 +43,13 @@ export function LanguageProvider({
   initialTranslations?: typeof fallbackTranslations;
 }) {
   const [language, setLanguageState] = useState<Language>('ar');
-  const [dynamicTranslations, setDynamicTranslations] = useState(initialTranslations || fallbackTranslations);
+  const [dynamicTranslations, setDynamicTranslations] = useState(() => {
+    return deepMerge(fallbackTranslations, initialTranslations);
+  });
 
   useEffect(() => {
     if (initialTranslations) {
-      setDynamicTranslations(initialTranslations);
+      setDynamicTranslations(deepMerge(fallbackTranslations, initialTranslations));
     }
   }, [initialTranslations]);
 
@@ -75,8 +91,8 @@ export function LanguageProvider({
     }
   }, [language]);
 
-  const t = dynamicTranslations[language];
-  const media = dynamicTranslations.media;
+  const t = dynamicTranslations[language] || fallbackTranslations[language];
+  const media = dynamicTranslations.media || fallbackTranslations.media;
   const isRTL = language === 'ar';
 
   return (
