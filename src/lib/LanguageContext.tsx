@@ -37,6 +37,15 @@ export function LanguageProvider({
     }
   }, [initialTranslations]);
 
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('mazar-lang', lang);
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    }
+  };
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const savedLang = localStorage.getItem('mazar-lang') as Language;
@@ -65,17 +74,6 @@ export function LanguageProvider({
        }
     }
   }, [language]);
-
-
-
-  const setLanguage = (lang: Language) => {
-    setLanguageState(lang);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('mazar-lang', lang);
-      document.documentElement.lang = lang;
-      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-    }
-  };
 
   const t = dynamicTranslations[language];
   const media = dynamicTranslations.media;

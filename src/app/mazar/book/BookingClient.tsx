@@ -814,11 +814,18 @@ export default function BookingPage() {
             <div className="md:w-[45%] lg:w-1/2 p-6 md:p-10 bg-[#FDFBF7] flex flex-col gap-6 overflow-y-auto hidden-scrollbar" style={{ scrollbarWidth: 'none' }}>
               {/* Main Image/Video View */}
               <div className="relative h-[300px] md:h-[450px] rounded-[32px] overflow-hidden shadow-sm bg-black flex items-center justify-center shrink-0">
-                {quickViewActiveImage.endsWith('.mp4') ? (
-                  <video src={quickViewActiveImage} controls autoPlay muted className="w-full h-full object-contain" />
-                ) : (
-                  <img src={quickViewActiveImage} alt="Active Media" className="w-full h-full object-cover transition-transform duration-700" />
-                )}
+                {(() => {
+                  const isVideo = (url: string) => {
+                    if (!url) return false;
+                    const l = url.toLowerCase();
+                    return l.includes('.mp4') || l.includes('.mov') || l.includes('.webm');
+                  };
+                  return isVideo(quickViewActiveImage) ? (
+                    <video src={quickViewActiveImage} controls autoPlay muted playsInline className="w-full h-full object-contain" />
+                  ) : (
+                    <img src={quickViewActiveImage} alt="Active Media" className="w-full h-full object-cover transition-transform duration-700" />
+                  );
+                })()}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
                 <div className={`absolute bottom-6 ${isRTL ? 'right-6' : 'left-6'} text-white`}>
                   <div className="text-sm font-bold bg-[#E63946] px-3 py-1 rounded-full inline-block mb-2 shadow-sm">

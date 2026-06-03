@@ -86,10 +86,16 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
           <div className="space-y-6">
             {/* Main Image View */}
             <div className="relative h-[400px] md:h-[500px] rounded-[32px] overflow-hidden shadow-sm mb-6 group bg-black flex items-center justify-center">
-               {activeImage.endsWith('.mp4') ? (
-                 <video src={activeImage} controls autoPlay muted className="w-full h-full object-contain" />
-               ) : (
-                 <Image 
+              {(() => {
+                const isVideo = (url: string) => {
+                  if (!url) return false;
+                  const l = url.toLowerCase();
+                  return l.includes('.mp4') || l.includes('.mov') || l.includes('.webm');
+                };
+                return isVideo(activeImage) ? (
+                  <video src={activeImage} controls autoPlay muted playsInline className="w-full h-full object-contain" />
+                ) : (
+                  <Image 
                     src={activeImage} 
                     alt={unit?.title?.[language] || ''} 
                     fill
@@ -97,7 +103,8 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
                     className="object-cover group-hover:scale-105 transition-transform duration-700" 
                     priority
                  />
-               )}
+                );
+              })()}
                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
                <div className={`absolute bottom-6 ${isRTL ? 'right-6' : 'left-6'} text-white`}>
                   <div className="text-sm font-bold bg-[#E63946] px-3 py-1 rounded-full inline-block mb-2 shadow-sm">{unit?.type === 'studio' ? (isRTL ? 'استوديو' : 'Studio') : (isRTL ? 'شقة فندقية' : 'Hotel Apartment')}</div>
