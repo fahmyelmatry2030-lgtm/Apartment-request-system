@@ -735,6 +735,17 @@ export async function saveDbExpense(expense: any) {
   const supabase = getSupabaseServerClient();
   if (!supabase) throw new Error('Supabase configuration missing on server');
 
+  // Auto-generate invoice number if empty
+  if (!expense.invoice_number || expense.invoice_number.trim() === '') {
+    try {
+      const { count } = await supabase.from('expenses').select('*', { count: 'exact', head: true });
+      const nextNum = (count || 0) + 1;
+      expense.invoice_number = `INV-${new Date().getFullYear()}-${String(nextNum).padStart(4, '0')}`;
+    } catch (e) {
+      expense.invoice_number = `INV-${new Date().getFullYear()}-${Date.now().toString().slice(-4)}`;
+    }
+  }
+
   const { error } = await supabase.from('expenses').insert([expense]);
   if (error) {
     if (error.message?.includes('invoice_number') || error.code === '42703') {

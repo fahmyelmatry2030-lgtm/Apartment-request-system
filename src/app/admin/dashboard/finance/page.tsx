@@ -2,16 +2,99 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { getBookings, getSystemUnits } from '@/lib/data-init';
-import { saveDbExpense, deleteDbExpense, getDbExpenses, getDbSalaries } from '@/lib/actions/db';
+import { getDbExpenses, getDbSalaries } from '@/lib/actions/db';
 
 const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 
-const PARTNERS = [
+// شركاء مزار (1) + مزار (2) — استوديوهات 1 إلى 24
+const PARTNERS_MAZAR12 = [
   { key: 'MH', label: 'M.H', percentage: 35 },
-  { key: 'MM', label: 'M.M', percentage: 23.5 },
+  { key: 'HO', label: 'H.O', percentage: 18 },
   { key: 'ME', label: 'M.E', percentage: 23.5 },
-  { key: 'MO', label: 'M.O', percentage: 18 },
+  { key: 'HM', label: 'H.M', percentage: 23.5 },
 ];
+
+// شركاء مزار (3) — الوحدات 25 إلى 30
+const PARTNERS_MAZAR3 = [
+  { key: 'Koura', label: 'Koura', percentage: 50 },
+  { key: 'MM',   label: 'M.M',   percentage: 25 },
+  { key: 'ME',   label: 'M.E',   percentage: 25 },
+];
+
+// ── بطاقة مقياس ──
+function KpiCard({
+  label,
+  value,
+  sub,
+  color = 'text-[#2A2723]',
+  bg = 'bg-white',
+  border = 'border-[#EAE4D9]/50',
+  highlighted = false,
+}: {
+  label: string;
+  value: string | number;
+  sub?: string;
+  color?: string;
+  bg?: string;
+  border?: string;
+  highlighted?: boolean;
+}) {
+  return (
+    <div
+      className={`${bg} p-5 rounded-2xl border ${border} shadow-sm text-center flex flex-col items-center justify-center gap-1 ${highlighted ? 'ring-2 ring-[#FACC15]' : ''}`}
+    >
+      <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest">{label}</p>
+      <div className={`text-2xl font-black ${color}`}>
+        {value} <small className="text-xs font-bold text-[#7A7061]">ج.م</small>
+      </div>
+      {sub && <p className="text-[9px] text-[#7A7061] font-bold">{sub}</p>}
+    </div>
+  );
+}
+
+// ── جدول توزيع الأرباح ──
+function ProfitDistribution({
+  partners,
+  netProfit,
+  isLoading,
+}: {
+  partners: { key: string; label: string; percentage: number }[];
+  netProfit: number;
+  isLoading: boolean;
+}) {
+  return (
+    <div className="overflow-x-auto mt-4">
+      <table className="w-full border-collapse text-center">
+        <thead>
+          <tr className="bg-[#FDFBF7]">
+            <th className="px-4 py-3 text-[10px] font-black text-[#7A7061] border border-[#EAE4D9]/60">توزيع الأرباح</th>
+            {partners.map((p) => (
+              <th key={p.key} className="px-6 py-3 font-black text-sm text-[#2A2723] border border-[#EAE4D9]/60">
+                {p.label}
+                <span className="block text-[10px] font-bold text-[#C1A68D]">%{p.percentage}</span>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td className="px-4 py-5 font-black text-[#7A7061] text-xs border border-[#EAE4D9]/40 bg-[#FDFBF7]/60">
+              القيمة
+            </td>
+            {partners.map((p) => (
+              <td key={p.key} className="px-6 py-5 border border-[#EAE4D9]/40">
+                <div className={`text-xl font-black ${netProfit >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                  {isLoading ? '...' : Math.round((netProfit * p.percentage) / 100).toLocaleString()}
+                </div>
+                <div className="text-[10px] text-[#7A7061] font-bold mt-1">ج.م</div>
+              </td>
+            ))}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 export default function FinancePage() {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -20,25 +103,12 @@ export default function FinancePage() {
   const [units, setUnits] = useState<any[]>([]);
   const [selectedMonth, setSelectedMonth] = useState(-1);
   const [selectedYear, setSelectedYear] = useState(-1);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     setSelectedMonth(new Date().getMonth());
     setSelectedYear(new Date().getFullYear());
   }, []);
-  const [isLoading, setIsLoading] = useState(true);
-  const [newExpense, setNewExpense] = useState({ category: '', amount: '', description: '', from_entity: '', to_entity: '', ordered_by: '' });
-  const [saving, setSaving] = useState(false);
-  const [adminRole, setAdminRole] = useState<string>('Admin');
-
-  useEffect(() => {
-    const info = sessionStorage.getItem('adminInfo');
-    if (info) {
-      const admin = JSON.parse(info);
-      setAdminRole(admin.role);
-    }
-  }, []);
-
-  const isPartner = adminRole === 'Partner';
 
   const loadData = async () => {
     setIsLoading(true);
@@ -47,7 +117,7 @@ export default function FinancePage() {
         getBookings(),
         getDbExpenses(),
         getDbSalaries(),
-        getSystemUnits()
+        getSystemUnits(),
       ]);
       setBookings(b);
       setExpenses(expData || []);
@@ -62,252 +132,303 @@ export default function FinancePage() {
 
   useEffect(() => { loadData(); }, []);
 
+  // ── الحجوزات المؤكدة للشهر المختار ──
   const monthlyBookings = useMemo(() => {
     return bookings.filter((b: any) => {
       if (b.status === 'deleted') return false;
       if (b.status !== 'approved' && b.status !== 'مؤكد') return false;
-      
-      const unit = units.find(u => u.id === b.apartmentId);
-      if (isPartner && unit?.branch !== 3) return false;
-      
       const parts = b.checkIn?.split('-');
       if (!parts || parts.length < 2) return false;
       return parseInt(parts[1], 10) - 1 === selectedMonth && parseInt(parts[0], 10) === selectedYear;
     });
-  }, [bookings, selectedMonth, selectedYear, units, isPartner]);
+  }, [bookings, selectedMonth, selectedYear]);
 
-  const studioRevenue = monthlyBookings
-    .filter(b => {
-      const u = units.find(unit => unit.id === b.apartmentId);
-      return u?.type === 'studio' && u?.branch !== 3;
-    })
-    .reduce((sum, b) => sum + parseFloat(b.totalAmount || 0), 0);
-    
-  const apartmentRevenue = monthlyBookings
-    .filter(b => {
-      const u = units.find(unit => unit.id === b.apartmentId);
-      return u?.type === 'apartment' && u?.branch !== 3;
-    })
-    .reduce((sum, b) => sum + parseFloat(b.totalAmount || 0), 0);
-
-  const partnerRevenue = monthlyBookings
-    .filter(b => units.find(u => u.id === b.apartmentId)?.branch === 3)
-    .reduce((sum, b) => sum + parseFloat(b.totalAmount || 0), 0);
-  
-  const revenue = isPartner ? partnerRevenue : (studioRevenue + apartmentRevenue);
-  const commissions = monthlyBookings.reduce((sum, b) => sum + parseFloat(b.commission || 0), 0);
-  const totalNights = monthlyBookings.reduce((sum, b) => sum + (Number(b.numberOfDays) || 0), 0);
-  const avgNightlyRate = totalNights > 0 ? revenue / totalNights : 0;
-  
+  // ── المصروفات الشهرية ──
   const monthlyExpenses = useMemo(() => {
     return expenses.filter((e: any) => {
       if (!e.date) return false;
-      if (isPartner) return false;
-      
       const parts = e.date.split('-');
       if (parts.length < 2) return false;
       const year = parseInt(parts[0]);
       const month = parseInt(parts[1]) - 1;
       return month === selectedMonth && year === selectedYear;
     });
-  }, [expenses, selectedMonth, selectedYear, isPartner]);
+  }, [expenses, selectedMonth, selectedYear]);
 
   const monthlySalaries = useMemo(() => {
-    return salaries.filter((s: any) => {
-      if (isPartner) return false;
-      return Number(s.month) - 1 === selectedMonth && Number(s.year) === selectedYear;
-    });
-  }, [salaries, selectedMonth, selectedYear, isPartner]);
+    return salaries.filter((s: any) =>
+      Number(s.month) - 1 === selectedMonth && Number(s.year) === selectedYear
+    );
+  }, [salaries, selectedMonth, selectedYear]);
 
-  const rentTotal = monthlyExpenses
-    .filter(e => e.category === 'إيجار')
-    .reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
-    
+  // إجمالي الرواتب
   const salariesFromExpenses = monthlyExpenses
     .filter(e => e.category === 'رواتب' || e.category === 'مرتبات' || e.category === 'مرتب')
     .reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
-    
   const salariesTotal = monthlySalaries.reduce((sum, s) => sum + (parseFloat(s.amount) || 0), 0) + salariesFromExpenses;
-  
+
+  // المصروفات التشغيلية (غير الرواتب)
   const otherExpenses = monthlyExpenses
-    .filter(e => 
-      e.category !== 'إيجار' && 
-      e.category !== 'رواتب' && 
-      e.category !== 'مرتبات' && 
+    .filter(e =>
+      e.category !== 'رواتب' &&
+      e.category !== 'مرتبات' &&
       e.category !== 'مرتب'
     )
     .reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
 
-  const totalExpenses = rentTotal + otherExpenses + salariesTotal;
-  
-  // Isolated profit for SUM table (Studio only)
-  const studioNetProfit = studioRevenue - commissions - otherExpenses - salariesTotal;
+  // ════════════════════════════════════════════════
+  //  SECTION 1: مزار(1) + مزار(2) — استوديوهات 1-24
+  // ════════════════════════════════════════════════
+  const mazar12Bookings = monthlyBookings.filter(b => {
+    const u = units.find(u => u.id === b.apartmentId);
+    return u?.type === 'studio' && (u?.branch === 1 || u?.branch === 2);
+  });
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('هل أنت متأكد من الحذف؟')) return;
-    try {
-      await deleteDbExpense(id);
-      await loadData();
-    } catch (err) {
-      console.error(err);
-      alert('خطأ في الحذف');
-    }
-  };
+  const mazar12Revenue = mazar12Bookings.reduce((sum, b) => sum + parseFloat(b.totalAmount || 0), 0);
+  const mazar12Commissions = mazar12Bookings.reduce((sum, b) => sum + parseFloat(b.commission || 0), 0);
+  const mazar12TotalNights = mazar12Bookings.reduce((sum, b) => sum + (Number(b.numberOfDays) || 0), 0);
+  const mazar12AvgNight = mazar12TotalNights > 0 ? mazar12Revenue / mazar12TotalNights : 0;
+  // صافي الربح = الإيراد - العمولات - المصروفات التشغيلية - الرواتب
+  const mazar12NetProfit = mazar12Revenue - mazar12Commissions - otherExpenses - salariesTotal;
+
+  // ════════════════════════════════════════════════
+  //  SECTION 2: مزار(3) — الوحدات من 25 إلى 30
+  // ════════════════════════════════════════════════
+  const mazar3Bookings = monthlyBookings.filter(b => {
+    const u = units.find(u => u.id === b.apartmentId);
+    return u?.branch === 3;
+  });
+
+  const mazar3Revenue = mazar3Bookings.reduce((sum, b) => sum + parseFloat(b.totalAmount || 0), 0);
+  const mazar3Commissions = mazar3Bookings.reduce((sum, b) => sum + parseFloat(b.commission || 0), 0);
+  const mazar3TotalNights = mazar3Bookings.reduce((sum, b) => sum + (Number(b.numberOfDays) || 0), 0);
+  const mazar3AvgNight = mazar3TotalNights > 0 ? mazar3Revenue / mazar3TotalNights : 0;
+  const mazar3NetProfit = mazar3Revenue - mazar3Commissions;
+
+  // ════════════════════════════════════════════════
+  //  SECTION 3: الشقق الفندقية — apt-1 / apt-2 / apt-3
+  // ════════════════════════════════════════════════
+  const aptBooking = (aptId: string) =>
+    monthlyBookings.filter(b => b.apartmentId === aptId);
+
+  const aptRevenue = (aptId: string) =>
+    aptBooking(aptId).reduce((sum, b) => sum + parseFloat(b.totalAmount || 0), 0);
+
+  const aptCommission = (aptId: string) =>
+    aptBooking(aptId).reduce((sum, b) => sum + parseFloat(b.commission || 0), 0);
+
+  const aptNetProfit = (aptId: string) => aptRevenue(aptId) - aptCommission(aptId);
+
+  const apt1Net = aptNetProfit('apt-1');
+  const apt2Net = aptNetProfit('apt-2');
+  const apt3Net = aptNetProfit('apt-3');
 
   return (
-    <div className="space-y-8 animate-fade-in" dir="rtl">
+    <div className="space-y-10 animate-fade-in" dir="rtl">
 
-      {/* ── HEADER ── */}
+      {/* ══════════ HEADER ══════════ */}
       <header className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
         <div>
-          <h1 className="text-4xl font-black text-[#2A2723]">الإدارة <span className="text-[#C1A68D]">المالية الشاملة</span></h1>
-          <p className="text-[#7A7061] font-bold opacity-70 text-sm mt-1">ملخص الإيرادات، المصروفات، وتوزيع الأرباح</p>
+          <h1 className="text-4xl font-black text-[#2A2723]">
+            الإدارة <span className="text-[#C1A68D]">المالية الشاملة</span>
+          </h1>
+          <p className="text-[#7A7061] font-bold opacity-70 text-sm mt-1">
+            كشف حساب شهر{' '}
+            <span className="text-[#2A2723] font-black">
+              {selectedMonth >= 0 ? MONTHS_AR[selectedMonth] : '...'} {selectedYear > 0 ? selectedYear : ''}
+            </span>
+          </p>
         </div>
         <div className="flex gap-3 bg-white p-2 rounded-[1.5rem] border border-[#EAE4D9]/50 shadow-sm">
-          <select value={selectedMonth} onChange={e => setSelectedMonth(Number(e.target.value))}
-            className="bg-[#FDFBF7] border-none rounded-xl px-4 py-2 text-xs font-black outline-none">
+          <select
+            value={selectedMonth}
+            onChange={e => setSelectedMonth(Number(e.target.value))}
+            className="bg-[#FDFBF7] border-none rounded-xl px-4 py-2 text-xs font-black outline-none"
+          >
             {MONTHS_AR.map((m, i) => <option key={i} value={i}>{m}</option>)}
           </select>
-          <select value={selectedYear} onChange={e => setSelectedYear(Number(e.target.value))}
-            className="bg-[#FDFBF7] border-none rounded-xl px-4 py-2 text-xs font-black outline-none">
+          <select
+            value={selectedYear}
+            onChange={e => setSelectedYear(Number(e.target.value))}
+            className="bg-[#FDFBF7] border-none rounded-xl px-4 py-2 text-xs font-black outline-none"
+          >
             {[2025, 2026, 2027].map(y => <option key={y} value={y}>{y}</option>)}
           </select>
         </div>
       </header>
 
-      {/* ── KPI CARDS ── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-4">
-        <div className="bg-white p-6 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm text-center">
-          <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">إجمالي الإيرادات</p>
-          <div className="text-3xl font-black text-green-600">{isLoading ? '...' : revenue.toLocaleString()} <small className="text-sm">ج.م</small></div>
-          <p className="text-[10px] text-[#7A7061] mt-2">{monthlyBookings.length} حجز مؤكد</p>
-        </div>
-        <div className="bg-white p-6 rounded-[2rem] border-2 border-blue-500/30 shadow-sm text-center">
-          <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">إيراد الاستديوهات</p>
-          <div className="text-2xl font-black text-blue-600">{isLoading ? '...' : studioRevenue.toLocaleString()} <small className="text-xs">ج.م</small></div>
-          <p className="text-[9px] text-blue-400 mt-2 font-bold">جميع الاستديوهات</p>
-        </div>
-        <div className="bg-white p-6 rounded-[2rem] border-2 border-amber-500/30 shadow-sm text-center">
-          <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">إيراد الشقق</p>
-          <div className="text-2xl font-black text-amber-600">{isLoading ? '...' : apartmentRevenue.toLocaleString()} <small className="text-xs">ج.م</small></div>
-          <p className="text-[9px] text-amber-500 mt-2 font-bold">جميع الشقق</p>
-        </div>
-        <div className="bg-white p-6 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm text-center">
-          <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">معدل سعر الليلة</p>
-          <div className="text-2xl font-black text-[#2A2723]">{isLoading ? '...' : Math.round(avgNightlyRate).toLocaleString()} <small className="text-xs">ج.م</small></div>
-          <p className="text-[10px] text-[#7A7061] mt-2">{totalNights} ليلة إجمالاً</p>
-        </div>
-        <div className="bg-white p-6 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm text-center">
-          <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">إجمالي العمولات</p>
-          <div className="text-2xl font-black text-orange-500">{isLoading ? '...' : commissions.toLocaleString()} <small className="text-xs">ج.م</small></div>
-          <p className="text-[10px] text-[#7A7061] mt-2">مخصومة من الإيرادات</p>
-        </div>
-        <div className="bg-white p-6 rounded-[2rem] border border-red-500/20 shadow-sm text-center">
-          <p className="text-[10px] font-black text-red-500 uppercase tracking-widest mb-3">إجمالي المصروفات</p>
-          <div className="text-2xl font-black text-red-600">{isLoading ? '...' : totalExpenses.toLocaleString()} <small className="text-xs">ج.م</small></div>
-          <p className="text-[10px] text-[#7A7061] mt-2">إيجارات + رواتب + تشغيل</p>
-        </div>
-      </div>
-
-
-      {/* ── SUM TABLE (Excel Layout) ── */}
+      {/* ══════════════════════════════════════════════════════════════
+          SECTION 1 ★ مزار(1) + مزار(2) — من استوديو 1 إلى 24
+      ══════════════════════════════════════════════════════════════ */}
       <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
+        {/* عنوان القسم */}
         <div className="bg-[#2A2723] px-8 py-4 flex items-center gap-3">
-          <span className="text-white font-black text-sm tracking-widest uppercase">SUM</span>
-          <span className="text-[#C1A68D] text-xs font-bold">— ملخص الدورة المالية لشهر {MONTHS_AR[selectedMonth]} {selectedYear}</span>
+          <span className="text-white font-black text-sm tracking-widest">★ مزار (1) + مزار (2)</span>
+          <span className="text-[#C1A68D] text-xs font-bold">— من استوديو 1 إلى استوديو 24</span>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-center">
-            <thead>
-              <tr>
-                <th className="px-6 py-4 font-black text-xs bg-[#22C55E] text-white border border-green-300">Revenue (Studios Only)</th>
-                <th className="px-6 py-4 font-black text-xs bg-[#F97316] text-white border border-orange-300">Expenses</th>
-                <th className="px-6 py-4 font-black text-xs bg-[#F97316] text-white border border-orange-300">Salaries</th>
-                <th className="px-6 py-4 font-black text-sm bg-[#FACC15] text-[#2A2723] border border-yellow-300">Final</th>
-              </tr>
-              <tr>
-                <th className="px-4 py-1 text-[10px] font-bold text-[#7A7061] bg-green-50 border border-green-100">إيرادات الاستديوهات فقط</th>
-                <th className="px-4 py-1 text-[10px] font-bold text-[#7A7061] bg-orange-50 border border-orange-100">المصروفات + العمولات</th>
-                <th className="px-4 py-1 text-[10px] font-bold text-[#7A7061] bg-orange-50 border border-orange-100">الرواتب</th>
-                <th className="px-4 py-1 text-[10px] font-bold text-[#2A2723] bg-yellow-50 border border-yellow-100">صافي الربح (استديوهات)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="px-6 py-8 border border-[#EAE4D9]/40 bg-green-50/20">
-                  <div className="text-2xl font-black text-green-700">{isLoading ? '...' : studioRevenue.toLocaleString()}</div>
-                  <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
-                </td>
-                <td className="px-6 py-8 border border-[#EAE4D9]/40">
-                  <div className="text-2xl font-black text-red-600">{isLoading ? '...' : (otherExpenses + commissions).toLocaleString()}</div>
-                  <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
-                </td>
-                <td className="px-6 py-8 border border-[#EAE4D9]/40">
-                  <div className="text-2xl font-black text-orange-600">{isLoading ? '...' : salariesTotal.toLocaleString()}</div>
-                  <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
-                </td>
-                <td className={`px-6 py-8 border border-yellow-200 bg-[#FACC15]/10 ${studioNetProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  <div className="text-3xl font-black">{isLoading ? '...' : studioNetProfit.toLocaleString()}</div>
-                  <div className="text-[10px] text-[#7A7061] font-bold">ج.م</div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+
+        <div className="p-6 space-y-6">
+          {/* بطاقات المقاييس */}
+          <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-4">
+            <KpiCard
+              label="إجمالي الإيراد"
+              value={isLoading ? '...' : mazar12Revenue.toLocaleString()}
+              sub={`${mazar12Bookings.length} حجز مؤكد`}
+              color="text-green-600"
+              border="border-green-200"
+            />
+            <KpiCard
+              label="إجمالي المصروفات"
+              value={isLoading ? '...' : (otherExpenses + salariesTotal).toLocaleString()}
+              sub="مصروفات + رواتب"
+              color="text-red-500"
+              border="border-red-200"
+            />
+            <KpiCard
+              label="إجمالي العمولات"
+              value={isLoading ? '...' : mazar12Commissions.toLocaleString()}
+              color="text-orange-500"
+              border="border-orange-200"
+            />
+            <KpiCard
+              label="صافي الربح"
+              value={isLoading ? '...' : mazar12NetProfit.toLocaleString()}
+              color={mazar12NetProfit >= 0 ? 'text-green-700' : 'text-red-600'}
+              bg={mazar12NetProfit >= 0 ? 'bg-green-50' : 'bg-red-50'}
+              border={mazar12NetProfit >= 0 ? 'border-green-300' : 'border-red-300'}
+              highlighted={true}
+            />
+            <KpiCard
+              label="معدل سعر الليلة"
+              value={isLoading ? '...' : Math.round(mazar12AvgNight).toLocaleString()}
+              sub={`${mazar12TotalNights} ليلة`}
+              color="text-[#2A2723]"
+            />
+          </div>
+
+          {/* توزيع الأرباح */}
+          <div>
+            <p className="text-xs font-black text-[#7A7061] mb-2 uppercase tracking-widest">توزيع الأرباح</p>
+            <ProfitDistribution
+              partners={PARTNERS_MAZAR12}
+              netProfit={mazar12NetProfit}
+              isLoading={isLoading}
+            />
+          </div>
         </div>
       </div>
 
-      {/* ── PROFIT DISTRIBUTION TABLE (Excel Layout) ── */}
-      {!isPartner && (
-        <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
-          <div className="bg-[#2A2723] px-8 py-4 flex items-center justify-between">
-            <h2 className="text-white font-black text-sm tracking-widest uppercase">توزيع الأرباح بين الشركاء</h2>
-            <span className="text-[#C1A68D] text-xs font-black bg-white/10 px-4 py-1.5 rounded-full">
-              صافي الربح: {studioNetProfit.toLocaleString()} ج.م
-            </span>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-center">
-              <thead>
-                <tr className="bg-[#FDFBF7]">
-                  <th className="px-8 py-4 font-black text-xs text-[#7A7061] border border-[#EAE4D9]/60 w-32">Name</th>
-                  {PARTNERS.map(p => (
-                    <th key={p.key} className="px-8 py-4 font-black text-sm text-[#2A2723] border border-[#EAE4D9]/60">
-                      {p.label}
-                      <span className="block text-[10px] font-bold text-[#C1A68D]">({p.percentage}%)</span>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="px-8 py-6 font-black text-[#7A7061] text-sm border border-[#EAE4D9]/40 bg-[#FDFBF7]/60">Value</td>
-                  {PARTNERS.map(p => (
-                    <td key={p.key} className="px-8 py-6 border border-[#EAE4D9]/40">
-                      <div className={`text-2xl font-black ${studioNetProfit >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                        {isLoading ? '...' : Math.round(studioNetProfit * p.percentage / 100).toLocaleString()}
-                      </div>
-                      <div className="text-[10px] text-[#7A7061] font-bold mt-1">ج.م</div>
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </table>
-          </div>
+      {/* ══════════════════════════════════════════════════════════════
+          SECTION 2 ★ مزار(3) — الوحدات من شقة 25 إلى شقة 30
+      ══════════════════════════════════════════════════════════════ */}
+      <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
+        {/* عنوان القسم */}
+        <div className="bg-[#2A2723] px-8 py-4 flex items-center gap-3">
+          <span className="text-white font-black text-sm tracking-widest">مزار (3)</span>
+          <span className="text-[#C1A68D] text-xs font-bold">— الوحدات من شقة 25 إلى شقة 30</span>
         </div>
-      )}
 
-      {/* ── FINAL NET BAR ── */}
-      <div className={`p-10 rounded-[3rem] shadow-2xl flex flex-col md:flex-row justify-between items-center gap-8 ${studioNetProfit >= 0 ? 'bg-[#2A2723]' : 'bg-red-900'}`}>
-        <div className="text-center md:text-right">
-          <p className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest mb-2">
-            صافي الربح النهائي — {MONTHS_AR[selectedMonth]} {selectedYear}
-          </p>
-          <p className="text-xs text-gray-400 font-bold">
-            الإيرادات ({studioRevenue.toLocaleString()}) − العمولات − الإيجارات − المصروفات − الرواتب
-          </p>
+        <div className="p-6 space-y-6">
+          {/* بطاقات المقاييس */}
+          <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-4">
+            <KpiCard
+              label="إجمالي الإيراد"
+              value={isLoading ? '...' : mazar3Revenue.toLocaleString()}
+              sub={`${mazar3Bookings.length} حجز مؤكد`}
+              color="text-green-600"
+              border="border-green-200"
+            />
+            <KpiCard
+              label="المصروفات"
+              value="0"
+              color="text-red-500"
+              border="border-red-200"
+            />
+            <KpiCard
+              label="العمولات"
+              value={isLoading ? '...' : mazar3Commissions.toLocaleString()}
+              color="text-orange-500"
+              border="border-orange-200"
+            />
+            <KpiCard
+              label="صافي الربح"
+              value={isLoading ? '...' : mazar3NetProfit.toLocaleString()}
+              color={mazar3NetProfit >= 0 ? 'text-green-700' : 'text-red-600'}
+              bg={mazar3NetProfit >= 0 ? 'bg-green-50' : 'bg-red-50'}
+              border={mazar3NetProfit >= 0 ? 'border-green-300' : 'border-red-300'}
+              highlighted={true}
+            />
+            <KpiCard
+              label="معدل سعر الليلة"
+              value={isLoading ? '...' : Math.round(mazar3AvgNight).toLocaleString()}
+              sub={`${mazar3TotalNights} ليلة`}
+              color="text-[#2A2723]"
+            />
+          </div>
+
+          {/* توزيع الأرباح */}
+          <div>
+            <p className="text-xs font-black text-[#7A7061] mb-2 uppercase tracking-widest">توزيع الأرباح</p>
+            <ProfitDistribution
+              partners={PARTNERS_MAZAR3}
+              netProfit={mazar3NetProfit}
+              isLoading={isLoading}
+            />
+          </div>
         </div>
-        <div className={`text-5xl font-black ${studioNetProfit >= 0 ? 'text-white' : 'text-red-200'}`}>
-          {isLoading ? '...' : studioNetProfit.toLocaleString()} <small className="text-sm">ج.م</small>
+      </div>
+
+      {/* ══════════════════════════════════════════════════════════════
+          SECTION 3 ★ الشقق الفندقية — شقة(1) + شقة(2) + شقة(3)
+      ══════════════════════════════════════════════════════════════ */}
+      <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
+        {/* عنوان القسم */}
+        <div className="bg-[#2A2723] px-8 py-4 flex items-center gap-3">
+          <span className="text-white font-black text-sm tracking-widest">الشقق الفندقية</span>
+          <span className="text-[#C1A68D] text-xs font-bold">— شقة فندقية (1) + (2) + (3)</span>
+        </div>
+
+        <div className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* شقة (1) */}
+            <div className={`p-6 rounded-2xl border text-center ${apt1Net >= 0 ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+              <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">صافي ربح شقة (1)</p>
+              <div className={`text-3xl font-black ${apt1Net >= 0 ? 'text-green-700' : 'text-red-600'}`}>
+                {isLoading ? '...' : apt1Net.toLocaleString()}
+                <small className="text-sm font-bold text-[#7A7061] ml-1">ج.م</small>
+              </div>
+              <div className="mt-3 text-[9px] text-[#7A7061] font-bold space-y-0.5">
+                <div>إيراد: {isLoading ? '...' : aptRevenue('apt-1').toLocaleString()} ج.م</div>
+                <div>عمولات: {isLoading ? '...' : aptCommission('apt-1').toLocaleString()} ج.م</div>
+              </div>
+            </div>
+
+            {/* شقة (2) */}
+            <div className={`p-6 rounded-2xl border text-center ${apt2Net >= 0 ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+              <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">صافي ربح شقة (2)</p>
+              <div className={`text-3xl font-black ${apt2Net >= 0 ? 'text-green-700' : 'text-red-600'}`}>
+                {isLoading ? '...' : apt2Net.toLocaleString()}
+                <small className="text-sm font-bold text-[#7A7061] ml-1">ج.م</small>
+              </div>
+              <div className="mt-3 text-[9px] text-[#7A7061] font-bold space-y-0.5">
+                <div>إيراد: {isLoading ? '...' : aptRevenue('apt-2').toLocaleString()} ج.م</div>
+                <div>عمولات: {isLoading ? '...' : aptCommission('apt-2').toLocaleString()} ج.م</div>
+              </div>
+            </div>
+
+            {/* شقة (3) */}
+            <div className={`p-6 rounded-2xl border text-center ${apt3Net >= 0 ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+              <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">صافي ربح شقة (3)</p>
+              <div className={`text-3xl font-black ${apt3Net >= 0 ? 'text-green-700' : 'text-red-600'}`}>
+                {isLoading ? '...' : apt3Net.toLocaleString()}
+                <small className="text-sm font-bold text-[#7A7061] ml-1">ج.م</small>
+              </div>
+              <div className="mt-3 text-[9px] text-[#7A7061] font-bold space-y-0.5">
+                <div>إيراد: {isLoading ? '...' : aptRevenue('apt-3').toLocaleString()} ج.م</div>
+                <div>عمولات: {isLoading ? '...' : aptCommission('apt-3').toLocaleString()} ج.م</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
