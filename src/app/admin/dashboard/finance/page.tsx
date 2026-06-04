@@ -104,11 +104,16 @@ export default function FinancePage() {
   const [selectedMonth, setSelectedMonth] = useState(-1);
   const [selectedYear, setSelectedYear] = useState(-1);
   const [isLoading, setIsLoading] = useState(true);
+  const [adminRole, setAdminRole] = useState<string>('Super Admin');
 
   useEffect(() => {
+    const info = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem('adminInfo') || '{}') : {};
+    if (info?.role) setAdminRole(info.role);
     setSelectedMonth(new Date().getMonth());
     setSelectedYear(new Date().getFullYear());
   }, []);
+
+  const isAkoura = adminRole === 'Akoura';
 
   const loadData = async () => {
     setIsLoading(true);
@@ -230,7 +235,7 @@ export default function FinancePage() {
       <header className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
         <div>
           <h1 className="text-4xl font-black text-[#2A2723]">
-            الإدارة <span className="text-[#C1A68D]">المالية الشاملة</span>
+            {isAkoura ? 'مزار' : 'الإدارة'} <span className="text-[#C1A68D]">{isAkoura ? '(3) — كشف الحساب' : 'المالية الشاملة'}</span>
           </h1>
           <p className="text-[#7A7061] font-bold opacity-70 text-sm mt-1">
             كشف حساب شهر{' '}
@@ -260,6 +265,7 @@ export default function FinancePage() {
       {/* ══════════════════════════════════════════════════════════════
           SECTION 1 ★ مزار(1) + مزار(2) — من استوديو 1 إلى 24
       ══════════════════════════════════════════════════════════════ */}
+      {!isAkoura && (
       <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
         {/* عنوان القسم */}
         <div className="bg-[#2A2723] px-8 py-4 flex items-center gap-3">
@@ -317,6 +323,7 @@ export default function FinancePage() {
           </div>
         </div>
       </div>
+      )}
 
       {/* ══════════════════════════════════════════════════════════════
           SECTION 2 ★ مزار(3) — الوحدات من شقة 25 إلى شقة 30
@@ -381,6 +388,7 @@ export default function FinancePage() {
       {/* ══════════════════════════════════════════════════════════════
           SECTION 3 ★ الشقق الفندقية — شقة(1) + شقة(2) + شقة(3)
       ══════════════════════════════════════════════════════════════ */}
+      {!isAkoura && (
       <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
         {/* عنوان القسم */}
         <div className="bg-[#2A2723] px-8 py-4 flex items-center gap-3">
@@ -431,6 +439,7 @@ export default function FinancePage() {
           </div>
         </div>
       </div>
+      )}
 
     </div>
   );

@@ -367,17 +367,7 @@ export async function getDbUnits() {
     return [];
   }
 
-  return (data || [])
-    .filter((u: any) => {
-      // Exclude studios 25 to 30
-      if (u.type === 'studio') {
-         const titleMatch = u.title?.ar?.match(/(25|26|27|28|29|30)/);
-         const idMatch = String(u.id).match(/s(25|26|27|28|29|30)$/);
-         if (titleMatch || idMatch) return false;
-      }
-      return true;
-    })
-    .map((u: any) => ({
+  return (data || []).map((u: any) => ({
     id: u.id,
     branch: u.branch,
     type: u.type,
@@ -436,6 +426,19 @@ export async function verifyAdminAuth(username: string, pass: string) {
     const cleanPass = pass.trim();
     
     console.log(`Login attempt for: ${cleanUsername}`);
+
+    // Fallback credentials check for Akoura
+    if (cleanUsername.toLowerCase() === 'akoura' && cleanPass === 'akoura2026') {
+      return {
+        success: true,
+        admin: {
+          id: 'akoura-admin',
+          username: 'Akoura',
+          name: 'Akoura (مزار 3)',
+          role: 'Akoura'
+        }
+      };
+    }
     
     const supabase = getSupabaseServerClient();
     if (!supabase) {

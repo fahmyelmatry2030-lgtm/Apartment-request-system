@@ -84,12 +84,22 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
     if (!auth && pathname !== '/admin/login') {
       router.push('/admin/login');
     } else if (auth) {
-      // Role Guard Logic
       const isBookingsAdmin = info?.role === 'مدير الحجوزات';
       const isUnitsAdmin = info?.role === 'مدير الوحدات';
+      const isAkoura = info?.role === 'Akoura';
 
       const restrictedForBookings = ['/admin/dashboard/units', '/admin/dashboard/reports', '/admin/dashboard/admins'];
       const restrictedForUnits = ['/admin/dashboard/bookings', '/admin/dashboard/reports', '/admin/dashboard/admins'];
+      const restrictedForAkoura = [
+        '/admin/dashboard',
+        '/admin/dashboard/bookings',
+        '/admin/dashboard/units',
+        '/admin/dashboard/customers',
+        '/admin/dashboard/hr/salaries',
+        '/admin/dashboard/hr/vacations',
+        '/admin/dashboard/content',
+        '/admin/dashboard/admins'
+      ];
 
       if (isBookingsAdmin && restrictedForBookings.includes(pathname)) {
         router.push('/admin/dashboard/bookings');
@@ -98,6 +108,11 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
 
       if (isUnitsAdmin && restrictedForUnits.includes(pathname)) {
         router.push('/admin/dashboard/units');
+        return;
+      }
+
+      if (isAkoura && (restrictedForAkoura.includes(pathname) || pathname === '/admin/dashboard')) {
+        router.push('/admin/dashboard/finance');
         return;
       }
 
@@ -179,8 +194,8 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
     { name: 'مرتبات الموظفين', href: '/admin/dashboard/hr/salaries', icon: '💸', roles: ['Super Admin'] },
     { name: 'إجازات الموظفين', href: '/admin/dashboard/hr/vacations', icon: '🌴', roles: ['Super Admin'] },
     { name: 'إدارة المحتوى', href: '/admin/dashboard/content', icon: '📝', roles: ['Super Admin'] },
-    { name: 'التقارير المالي', href: '/admin/dashboard/reports', icon: '💰', roles: ['Super Admin'] },
-    { name: 'كشف الحساب الشهري', href: '/admin/dashboard/finance', icon: '🏛️', roles: ['Super Admin'] },
+    { name: 'التقارير المالي', href: '/admin/dashboard/reports', icon: '💰', roles: ['Super Admin', 'Akoura'] },
+    { name: 'كشف الحساب الشهري', href: '/admin/dashboard/finance', icon: '🏛️', roles: ['Super Admin', 'Akoura'] },
     { name: 'فريق الإدارة', href: '/admin/dashboard/admins', icon: '👥', roles: ['Super Admin'] },
   ].filter(item => item.roles.includes(adminRole as string));
 

@@ -965,5 +965,119 @@ export const units = [
     "original_price": "350",
     "price": "200",
     "updated_at": "2026-04-19T22:11:47.153348+00:00"
+  },
+  {
+    "id": "p-s25",
+    "branch": 3,
+    "type": "studio",
+    "title": {
+      "ar": "شقة غرفتين (25)",
+      "en": "Two-room Apartment (25)"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": null,
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": null,
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-05-04T05:53:28.052+00:00"
+  },
+  {
+    "id": "p-s26",
+    "branch": 3,
+    "type": "studio",
+    "title": {
+      "ar": "شقة غرفتين (26)",
+      "en": "Two-room Apartment (26)"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": null,
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": null,
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-05-04T05:53:28.052+00:00"
+  },
+  {
+    "id": "p-s27",
+    "branch": 3,
+    "type": "studio",
+    "title": {
+      "ar": "شقة غرفتين (27)",
+      "en": "Two-room Apartment (27)"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": null,
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": null,
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-05-04T05:53:28.052+00:00"
+  },
+  {
+    "id": "p-s28",
+    "branch": 3,
+    "type": "studio",
+    "title": {
+      "ar": "شقة غرفتين (28)",
+      "en": "Two-room Apartment (28)"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": null,
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": null,
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-05-04T05:53:28.052+00:00"
+  },
+  {
+    "id": "p-s29",
+    "branch": 3,
+    "type": "studio",
+    "title": {
+      "ar": "شقة غرفتين (29)",
+      "en": "Two-room Apartment (29)"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": null,
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": null,
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-05-04T05:53:28.052+00:00"
+  },
+  {
+    "id": "p-s30",
+    "branch": 3,
+    "type": "studio",
+    "title": {
+      "ar": "شقة غرفتين (30)",
+      "en": "Two-room Apartment (30)"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "next_booking": null,
+    "description": null,
+    "images": null,
+    "video": null,
+    "features": null,
+    "original_price": null,
+    "price": "200",
+    "updated_at": "2026-05-04T05:53:28.052+00:00"
   }
 ];
