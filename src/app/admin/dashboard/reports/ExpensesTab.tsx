@@ -45,6 +45,7 @@ export default function ExpensesTab() {
   const [error, setError] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState(-1);
   const [selectedYear, setSelectedYear] = useState(-1);
+  const [selectedBranch, setSelectedBranch] = useState('all');
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -157,7 +158,7 @@ export default function ExpensesTab() {
     loadExpenses();
   }, []);
 
-  // ── Derived Data: Filter by month ──
+  // ── Derived Data: Filter by month + branch ──
   const filteredExpenses = useMemo(() => {
     return expenses.filter((e: any) => {
       if (!e.date) return false;
@@ -165,9 +166,21 @@ export default function ExpensesTab() {
       if (parts.length < 2) return false;
       const year = parseInt(parts[0]);
       const month = parseInt(parts[1]) - 1;
-      return month === selectedMonth && year === selectedYear;
+      if (month !== selectedMonth || year !== selectedYear) return false;
+
+      // Branch filter
+      if (selectedBranch !== 'all') {
+        const b = parseInt(e.branch) || 0;
+        if (selectedBranch === '12') {
+          if (b !== 1 && b !== 2 && b !== 12 && e.branch) return false;
+        } else {
+          if (b !== parseInt(selectedBranch)) return false;
+        }
+      }
+
+      return true;
     });
-  }, [expenses, selectedMonth, selectedYear]);
+  }, [expenses, selectedMonth, selectedYear, selectedBranch]);
 
   const totalAmount = useMemo(() => {
     return filteredExpenses.reduce((acc, curr) => acc + (curr.amount || 0), 0);
@@ -313,7 +326,16 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
              <p className="text-mazar-gray font-bold uppercase tracking-widest text-[10px]">مصروفات شهر {MONTHS_AR[selectedMonth]} {selectedYear}</p>
           </div>
         </div>
-        <div className="flex gap-3 bg-white p-2 rounded-[1.5rem] border border-[#EAE4D9]/50 shadow-sm">
+        <div className="flex gap-3 bg-white p-2 rounded-[1.5rem] border border-[#EAE4D9]/50 shadow-sm flex-wrap">
+          <select value={selectedBranch} onChange={e => setSelectedBranch(e.target.value)}
+            className="bg-[#FDFBF7] border-none rounded-xl px-4 py-2 text-xs font-black outline-none">
+            <option value="all">كل الفروع</option>
+            {!isAkoura && <option value="12">مزار 1 و 2</option>}
+            <option value="3">مزار 3</option>
+            {!isAkoura && <option value="4">شقة 1</option>}
+            {!isAkoura && <option value="5">شقة 2</option>}
+            {!isAkoura && <option value="6">شقة 3</option>}
+          </select>
           <select value={selectedMonth} onChange={e => setSelectedMonth(Number(e.target.value))}
             className="bg-[#FDFBF7] border-none rounded-xl px-4 py-2 text-xs font-black outline-none">
             {MONTHS_AR.map((m, i) => <option key={i} value={i}>{m}</option>)}
