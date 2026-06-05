@@ -352,5 +352,77 @@
     "status": "متاح",
     "housekeeping": "نظيف",
     "nextBooking": "لا يوجد"
+  },
+  {
+    "id": "p-s25",
+    "branch": 3,
+    "type": "studio",
+    "title": {
+      "ar": "شقة غرفتين (25)",
+      "en": "Two-room Apartment (25)"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "nextBooking": "لا يوجد"
+  },
+  {
+    "id": "p-s26",
+    "branch": 3,
+    "type": "studio",
+    "title": {
+      "ar": "شقة غرفتين (26)",
+      "en": "Two-room Apartment (26)"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "nextBooking": "لا يوجد"
+  },
+  {
+    "id": "p-s27",
+    "branch": 3,
+    "type": "studio",
+    "title": {
+      "ar": "شقة غرفتين (27)",
+      "en": "Two-room Apartment (27)"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "nextBooking": "لا يوجد"
+  },
+  {
+    "id": "p-s28",
+    "branch": 3,
+    "type": "studio",
+    "title": {
+      "ar": "شقة غرفتين (28)",
+      "en": "Two-room Apartment (28)"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "nextBooking": "لا يوجد"
+  },
+  {
+    "id": "p-s29",
+    "branch": 3,
+    "type": "studio",
+    "title": {
+      "ar": "شقة غرفتين (29)",
+      "en": "Two-room Apartment (29)"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "nextBooking": "لا يوجد"
+  },
+  {
+    "id": "p-s30",
+    "branch": 3,
+    "type": "studio",
+    "title": {
+      "ar": "شقة غرفتين (30)",
+      "en": "Two-room Apartment (30)"
+    },
+    "status": "متاح",
+    "housekeeping": "نظيف",
+    "nextBooking": "لا يوجد"
   }
 ]

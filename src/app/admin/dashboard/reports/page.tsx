@@ -262,21 +262,45 @@ function ReportsContent() {
     setNewRecord(prev => ({ ...prev, checkIn: safeStr, checkOut: safeStr }));
   }, [selectedMonth, selectedYear]);
 
+  const [adminRole, setAdminRole] = useState<string>('Super Admin');
+
+  useEffect(() => {
+    const info = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem('adminInfo') || '{}') : {};
+    if (info?.role) setAdminRole(info.role);
+  }, []);
+
+  const isAkoura = adminRole === 'Akoura';
+
   const loadData = useCallback(async () => {
     setIsLoading(true);
     try {
       const [b, u] = await Promise.all([getFreshDbBookings(), getDbUnits()]);
-      const safeUnits = (u || []).filter((unit: any) => unit && unit.id);
+      let safeUnits = (u || []).filter((unit: any) => unit && unit.id);
+      
+      // Filter for Akoura (only show Mazar 3 units)
+      if (typeof window !== 'undefined') {
+        const info = JSON.parse(sessionStorage.getItem('adminInfo') || '{}');
+        if (info?.role === 'Akoura') {
+          safeUnits = safeUnits.filter((unit: any) => unit.branch === 3);
+        }
+      }
+      
       setBookings(b || []);
       setUnits(safeUnits);
       
       // Only set default unit if none is selected AND none in URL
-      // Pick first studio (b1-s* or b2-s*) as default, otherwise first unit
       if (!selectedUnit && !searchParams.get('unit') && safeUnits.length > 0) {
-        const firstStudio = safeUnits.find((unit: any) =>
-          String(unit.id).startsWith('b1-s') || String(unit.id).startsWith('b2-s')
-        );
-        setSelectedUnit((firstStudio || safeUnits[0]).id);
+        // If Akoura, default to p-s25 (first branch 3 unit)
+        const isUserAkoura = typeof window !== 'undefined' && JSON.parse(sessionStorage.getItem('adminInfo') || '{}')?.role === 'Akoura';
+        if (isUserAkoura) {
+          const firstM3 = safeUnits.find((unit: any) => String(unit.id).startsWith('p-s'));
+          setSelectedUnit((firstM3 || safeUnits[0]).id);
+        } else {
+          const firstStudio = safeUnits.find((unit: any) =>
+            String(unit.id).startsWith('b1-s') || String(unit.id).startsWith('b2-s')
+          );
+          setSelectedUnit((firstStudio || safeUnits[0]).id);
+        }
       }
     } catch (error) {
       console.error('Error loading reports data:', error);
@@ -928,11 +952,13 @@ function ReportsContent() {
                           <option key={u.id} value={u.id}>{u.title?.ar || u.id}</option>
                         ))}
                       </optgroup>
+                      {!isAkoura && (
                       <optgroup label="الشقق الفندقية">
                         {units.filter(u => u && u.id && u.type === 'apartment').sort((a, b) => String(a.id || '').localeCompare(String(b.id || ''), undefined, { numeric: true })).map(u => (
                           <option key={u.id} value={u.id}>{u.title?.ar || u.id}</option>
                         ))}
                       </optgroup>
+                      )}
                     </select>
                   </div>
                   <div className="space-y-1">
@@ -968,6 +994,8 @@ function ReportsContent() {
                 <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#C1A68D] inline-block" /><span className="text-[9px] font-black text-[#C1A68D]">الشقق الفندقية</span></span>
               </div>
               <div>
+              {!isAkoura && (
+              <div>
                 <div className="text-[9px] font-black text-[#C1A68D] uppercase tracking-[0.25em] px-3 mb-2">الاستديوهات الفندقية — المبنى الأول (1-12)</div>
                 <div className="flex flex-wrap gap-1.5 mb-3">
                   {units
@@ -991,7 +1019,7 @@ function ReportsContent() {
                     })}
                 </div>
                 <div className="text-[9px] font-black text-[#C1A68D] uppercase tracking-[0.25em] px-3 mb-2">الاستديوهات الفندقية — المبنى الثاني (13-24)</div>
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-1.5 mb-3">
                   {units
                     .filter(u => u && u.id && u.type === 'studio' && String(u.id).startsWith('b2-s'))
                     .sort((a, b) => {
@@ -1013,6 +1041,34 @@ function ReportsContent() {
                     })}
                 </div>
               </div>
+              )}
+              
+              <div>
+                <div className="text-[9px] font-black text-[#C1A68D] uppercase tracking-[0.25em] px-3 mb-2">الاستديوهات الفندقية — مزار 3 (25-30)</div>
+                <div className="flex flex-wrap gap-1.5">
+                  {units
+                    .filter(u => u && u.id && u.type === 'studio' && String(u.id).startsWith('p-s'))
+                    .sort((a, b) => {
+                      const getNum = (u: any) => parseInt(String(u.id || '').replace('p-s', ''), 10) || 99;
+                      return getNum(a) - getNum(b);
+                    })
+                    .map(u => {
+                      const isActive = selectedUnit === u.id;
+                      return (
+                        <button key={u.id} onClick={() => setSelectedUnit(u.id)}
+                          className={`px-3 py-2 rounded-xl text-[10px] font-black transition-all ${
+                            isActive
+                              ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20'
+                              : 'bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200'
+                          }`}>
+                          {u.title?.ar || u.id}
+                        </button>
+                      );
+                    })}
+                </div>
+              </div>
+
+              {!isAkoura && (
               <div>
                 <div className="text-[9px] font-black text-[#C1A68D] uppercase tracking-[0.25em] px-3 mb-2">الشقق الفندقية</div>
                 <div className="flex flex-wrap gap-1.5">
@@ -1027,6 +1083,8 @@ function ReportsContent() {
                   ))}
                 </div>
               </div>
+              )}
+            </div>
             </div>
 
             {/* Summary Cards */}

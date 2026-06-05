@@ -29,13 +29,35 @@ export default function BookingsManagement() {
   const [commission, setCommission] = useState<number>(0);
   const [brokerName, setBrokerName] = useState('');
   const [bookingNotes, setBookingNotes] = useState('');
+  const [adminRole, setAdminRole] = useState<string>('Admin');
+
+  useEffect(() => {
+    const info = sessionStorage.getItem('adminInfo');
+    if (info) {
+      const admin = JSON.parse(info);
+      setAdminRole(admin.role);
+    }
+  }, []);
 
   const refreshBookings = useCallback(async () => {
     setIsLoading(true);
-    const data = await getBookings();
+    let data = await getBookings();
+    
+    const currentRole = typeof window !== 'undefined'
+      ? (JSON.parse(sessionStorage.getItem('adminInfo') || '{}')?.role || adminRole)
+      : adminRole;
+    
+    if (currentRole === 'Akoura' || currentRole === 'Partner') {
+      // Filter bookings to Mazar 3 units (apartmentId starts with p-s or contains branch 3 IDs)
+      data = data.filter((b: any) => 
+        String(b.apartmentId).startsWith('p-s') || 
+        !b.apartmentId
+      );
+    }
+    
     setBookings(data);
     setIsLoading(false);
-  }, []);
+  }, [adminRole]);
 
   useEffect(() => {
     refreshBookings();
@@ -45,8 +67,17 @@ export default function BookingsManagement() {
   useEffect(() => {
     const findFreeUnits = async () => {
         if (selectedBooking) {
-            const units = await getSystemUnits();
+            let units = await getSystemUnits();
             const allBookings = await getBookings();
+            
+            const currentRole = typeof window !== 'undefined'
+              ? (JSON.parse(sessionStorage.getItem('adminInfo') || '{}')?.role || adminRole)
+              : adminRole;
+            
+            if (currentRole === 'Akoura' || currentRole === 'Partner') {
+              units = units.filter((a: any) => a.branch === 3);
+            }
+
             const approved = allBookings.filter((b: any) => b.status === 'approved' && b.id !== selectedBooking.id);
             
             const checkInDate = new Date(selectedBooking.checkIn);
@@ -64,7 +95,7 @@ export default function BookingsManagement() {
         }
     };
     findFreeUnits();
-  }, [selectedBooking]);
+  }, [selectedBooking, adminRole]);
 
   // Handle Dynamic Calculations
   useEffect(() => {

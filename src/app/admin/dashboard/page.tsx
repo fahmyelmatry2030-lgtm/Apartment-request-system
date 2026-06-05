@@ -54,15 +54,26 @@ export default function DashboardOverview() {
   }, []);
 
   const isPartner = adminRole === 'Partner';
+  const isAkoura = adminRole === 'Akoura';
 
   const loadOverviewData = useCallback(async () => {
     setIsLoading(true);
-    const bookings = await getBookings(Date.now().toString());
+    let bookings = await getBookings(Date.now().toString());
     let apts = await getSystemUnits();
 
-    // Filter for Partner: Only show Branch 3 (Units 25-30)
-    if (isPartner) {
+    // Read role directly from sessionStorage to avoid stale closure
+    const currentRole = typeof window !== 'undefined'
+      ? (JSON.parse(sessionStorage.getItem('adminInfo') || '{}')?.role || adminRole)
+      : adminRole;
+    const isCurrentAkoura = currentRole === 'Akoura';
+    const isCurrentPartner = currentRole === 'Partner';
+
+    // Filter for Partner or Akoura: Only show Branch 3 (Units 25-30)
+    if (isCurrentPartner || isCurrentAkoura) {
       apts = apts.filter((u: any) => u.branch === 3);
+      // Also filter bookings to only Mazar 3 units (p-s*)
+      const branch3Ids = apts.map((u: any) => u.id);
+      bookings = bookings.filter((b: any) => branch3Ids.includes(b.apartmentId) || String(b.apartmentId).startsWith('p-s'));
     }
 
     // Filter out master unit types from display (s-single, s-double, etc)
@@ -201,7 +212,7 @@ export default function DashboardOverview() {
 
     setLastUpdated(new Date());
     setIsLoading(false);
-  }, [selectedDate, selectedCategory]);
+  }, [selectedDate, selectedCategory, adminRole]);
 
   useEffect(() => {
     loadOverviewData();
@@ -682,11 +693,11 @@ export default function DashboardOverview() {
                                     <div className="flex items-center gap-1">
                                       <span className="text-rose-500 font-bold text-[9px]" title="النزيل المغادر">🛫</span>
                                       <select 
-                                        disabled={isPartner}
+                                        disabled={isPartner || isAkoura}
                                         value={apt.leavingClientStatus} 
                                         onChange={(e) => handleStatusUpdate(apt.leavingBookingId, e.target.value)}
                                         className={`text-[9px] font-black rounded-lg px-2 py-0.5 outline-none border transition-all ${
-                                          isPartner ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'
+                                          (isPartner || isAkoura) ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'
                                         } ${
                                           apt.leavingClientStatus === 'متواجد' ? 'bg-green-600 text-white border-green-700' :
                                           apt.leavingClientStatus === 'غادر' ? 'bg-gray-600 text-white border-gray-700' :
@@ -701,11 +712,11 @@ export default function DashboardOverview() {
                                     <div className="flex items-center gap-1">
                                       <span className="text-blue-600 font-bold text-[9px]" title="النزيل القادم">🛬</span>
                                       <select 
-                                        disabled={isPartner}
+                                        disabled={isPartner || isAkoura}
                                         value={apt.arrivingClientStatus} 
                                         onChange={(e) => handleStatusUpdate(apt.arrivingBookingId, e.target.value)}
                                         className={`text-[9px] font-black rounded-lg px-2 py-0.5 outline-none border transition-all ${
-                                          isPartner ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'
+                                          (isPartner || isAkoura) ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'
                                         } ${
                                           apt.arrivingClientStatus === 'متواجد' ? 'bg-green-600 text-white border-green-700' :
                                           apt.arrivingClientStatus === 'غادر' ? 'bg-gray-600 text-white border-gray-700' :
@@ -720,7 +731,7 @@ export default function DashboardOverview() {
                                   </div>
                                 ) : apt.isOccupied && apt.bookingId ? (
                                   <select 
-                                    disabled={isPartner}
+                                    disabled={isPartner || isAkoura}
                                     value={apt.clientStatus} 
                                     onChange={(e) => handleStatusUpdate(apt.bookingId, e.target.value)}
                                     className={`text-[10px] font-black rounded-lg px-2 py-1 outline-none border transition-all ${

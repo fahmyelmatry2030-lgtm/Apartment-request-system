@@ -91,10 +91,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
       const restrictedForBookings = ['/admin/dashboard/units', '/admin/dashboard/reports', '/admin/dashboard/admins'];
       const restrictedForUnits = ['/admin/dashboard/bookings', '/admin/dashboard/reports', '/admin/dashboard/admins'];
       const restrictedForAkoura = [
-        '/admin/dashboard',
-        '/admin/dashboard/bookings',
         '/admin/dashboard/units',
-        '/admin/dashboard/customers',
         '/admin/dashboard/hr/salaries',
         '/admin/dashboard/hr/vacations',
         '/admin/dashboard/content',
@@ -111,8 +108,8 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
         return;
       }
 
-      if (isAkoura && (restrictedForAkoura.includes(pathname) || pathname === '/admin/dashboard')) {
-        router.push('/admin/dashboard/finance');
+      if (isAkoura && restrictedForAkoura.includes(pathname)) {
+        router.push('/admin/dashboard');
         return;
       }
 
@@ -187,10 +184,10 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
   if (pathname === '/admin/login') return <>{children}</>;
 
   const menuItems = [
-    { name: 'الاستعراض العام', href: '/admin/dashboard', icon: '📊', roles: ['Super Admin', 'مدير الحجوزات', 'مدير الوحدات'] },
-    { name: 'طلبات الحجز', href: '/admin/dashboard/bookings', icon: '📩', roles: ['Super Admin', 'مدير الحجوزات'] },
+    { name: 'الاستعراض العام', href: '/admin/dashboard', icon: '📊', roles: ['Super Admin', 'مدير الحجوزات', 'مدير الوحدات', 'Akoura'] },
+    { name: 'طلبات الحجز', href: '/admin/dashboard/bookings', icon: '📩', roles: ['Super Admin', 'مدير الحجوزات', 'Akoura'] },
     { name: 'إدارة الوحدات', href: '/admin/dashboard/units', icon: '🏢', roles: ['Super Admin', 'مدير الوحدات'] },
-    { name: 'قاعدة العملاء', href: '/admin/dashboard/customers', icon: '📞', roles: ['Super Admin'] },
+    { name: 'قاعدة العملاء', href: '/admin/dashboard/customers', icon: '📞', roles: ['Super Admin', 'Akoura'] },
     { name: 'مرتبات الموظفين', href: '/admin/dashboard/hr/salaries', icon: '💸', roles: ['Super Admin'] },
     { name: 'إجازات الموظفين', href: '/admin/dashboard/hr/vacations', icon: '🌴', roles: ['Super Admin'] },
     { name: 'إدارة المحتوى', href: '/admin/dashboard/content', icon: '📝', roles: ['Super Admin'] },

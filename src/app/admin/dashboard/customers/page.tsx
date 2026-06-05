@@ -9,18 +9,36 @@ export default function CustomersDatabase() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [adminRole, setAdminRole] = useState<string>('Admin');
+
+  useEffect(() => {
+    const info = sessionStorage.getItem('adminInfo');
+    if (info) {
+      const admin = JSON.parse(info);
+      setAdminRole(admin.role);
+    }
+  }, []);
 
   const loadData = async () => {
     setIsLoading(true);
     // Add cache buster
-    const data = await getFreshDbBookings(Date.now().toString());
+    let data = await getFreshDbBookings(Date.now().toString());
+    
+    const currentRole = typeof window !== 'undefined'
+      ? (JSON.parse(sessionStorage.getItem('adminInfo') || '{}')?.role || adminRole)
+      : adminRole;
+      
+    if (currentRole === 'Akoura' || currentRole === 'Partner') {
+      data = data.filter((b: any) => String(b.apartmentId).startsWith('p-s') || !b.apartmentId);
+    }
+
     setBookings(data);
     setIsLoading(false);
   };
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [adminRole]);
 
   const handleDelete = async (phone: string, name: string) => {
     if (!confirm(`هل أنت متأكد من حذف العميل "${name}"؟ سيتم حذف كافة سجلات حجوزاته نهائياً من النظام.`)) {

@@ -108,11 +108,27 @@ export default function ExpensesTab() {
     return !isNaN(d.getTime());
   };
 
+  const [adminRole, setAdminRole] = useState<string>('Super Admin');
+
+  useEffect(() => {
+    const info = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem('adminInfo') || '{}') : {};
+    if (info?.role) setAdminRole(info.role);
+  }, []);
+
+  const isAkoura = adminRole === 'Akoura';
+
   const loadExpenses = async () => {
     setLoading(true);
     try {
       const data = await getDbExpenses();
-      setExpenses(data || []);
+      let cleanData = data || [];
+      if (typeof window !== 'undefined') {
+        const info = JSON.parse(sessionStorage.getItem('adminInfo') || '{}');
+        if (info?.role === 'Akoura') {
+          cleanData = cleanData.filter((e: any) => e.branch === 3);
+        }
+      }
+      setExpenses(cleanData);
       setError(null);
     } catch (err: any) {
       console.error('Error loading expenses:', err);

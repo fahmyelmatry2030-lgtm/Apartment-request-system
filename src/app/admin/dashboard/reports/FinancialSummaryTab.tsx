@@ -24,6 +24,14 @@ export default function FinancialSummaryTab({
 }: FinancialSummaryTabProps) {
   const [expenses, setExpenses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [adminRole, setAdminRole] = useState<string>('Super Admin');
+
+  useEffect(() => {
+    const info = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem('adminInfo') || '{}') : {};
+    if (info?.role) setAdminRole(info.role);
+  }, []);
+
+  const isAkoura = adminRole === 'Akoura';
 
   useEffect(() => {
     const loadExpenses = async () => {
@@ -39,7 +47,9 @@ export default function FinancialSummaryTab({
     loadExpenses();
   }, []);
 
-  // Filter bookings: only approved, matching month/year, and of type studio (branch !== 3)
+  // Filter bookings: only approved, matching month/year
+  // For Akoura: only branch 3 (p-s* units)
+  // For others: branch 1 & 2 studios + apartments (excluding branch 3)
   const filteredBookings = useMemo(() => {
     if (selectedMonth === -1 || selectedYear === -1) return [];
     return bookings.filter((b: any) => {
@@ -53,13 +63,19 @@ export default function FinancialSummaryTab({
       const month = parseInt(parts[1], 10) - 1; // 0-indexed
       if (month !== selectedMonth || year !== selectedYear) return false;
 
-      // Filter by Studio only (type === 'studio' && branch !== 3)
-      const u = units.find(unit => unit.id === b.apartmentId);
-      return u?.type === 'studio' && u?.branch !== 3;
-    });
-  }, [bookings, units, selectedMonth, selectedYear]);
+      const u = units.find((unit: any) => unit.id === b.apartmentId);
 
-  // Filter expenses by selected month/year
+      if (isAkoura) {
+        // Akoura: only Mazar 3 (branch === 3, p-s* ids)
+        return u?.branch === 3 || String(b.apartmentId).startsWith('p-s');
+      } else {
+        // Super Admin: only branch 1 & 2 studios + apartments (exclude branch 3)
+        return (u?.type === 'studio' && u?.branch !== 3) || u?.type === 'apartment';
+      }
+    });
+  }, [bookings, units, selectedMonth, selectedYear, isAkoura]);
+
+  // Filter expenses by selected month/year (and branch for Akoura)
   const filteredExpenses = useMemo(() => {
     if (selectedMonth === -1 || selectedYear === -1) return [];
     return expenses.filter((e: any) => {
@@ -68,9 +84,15 @@ export default function FinancialSummaryTab({
       if (parts.length < 2) return false;
       const year = parseInt(parts[0], 10);
       const month = parseInt(parts[1], 10) - 1;
-      return month === selectedMonth && year === selectedYear;
+      if (month !== selectedMonth || year !== selectedYear) return false;
+      // For Akoura: only show expenses tagged to branch 3
+      if (isAkoura) {
+        return e.branch === 3 || e.branch === '3' || String(e.unitId || '').startsWith('p-s');
+      }
+      // For others: exclude branch 3 expenses
+      return e.branch !== 3 && e.branch !== '3' && !String(e.unitId || '').startsWith('p-s');
     });
-  }, [expenses, selectedMonth, selectedYear]);
+  }, [expenses, selectedMonth, selectedYear, isAkoura]);
 
   const totalRevenue = useMemo(() => {
     return filteredBookings.reduce(
