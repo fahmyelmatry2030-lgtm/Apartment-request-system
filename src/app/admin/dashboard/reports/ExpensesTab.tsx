@@ -112,10 +112,26 @@ export default function ExpensesTab() {
 
   useEffect(() => {
     const info = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem('adminInfo') || '{}') : {};
-    if (info?.role) setAdminRole(info.role);
+    if (info?.role) {
+      setAdminRole(info.role);
+      if (info.role === 'Akoura') {
+        setNewExpense(prev => ({ ...prev, branch: '3' }));
+      }
+    }
   }, []);
 
   const isAkoura = adminRole === 'Akoura';
+
+  const getBranchLabel = (branch: any) => {
+    const b = parseInt(branch);
+    if (b === 1) return 'مزار 1';
+    if (b === 2) return 'مزار 2';
+    if (b === 3) return 'مزار 3';
+    if (b === 4) return 'شقة 1';
+    if (b === 5) return 'شقة 2';
+    if (b === 6) return 'شقة 3';
+    return 'مزار 1';
+  };
 
   const loadExpenses = async () => {
     setLoading(true);
@@ -238,6 +254,7 @@ export default function ExpensesTab() {
         to_entity: editingExpense.to_entity,
         ordered_by: editingExpense.ordered_by,
         invoice_number: editingExpense.invoice_number,
+        branch: parseInt(editingExpense.branch) || 1,
       });
       setIsEditModalOpen(false);
       setEditingExpense(null);
@@ -391,6 +408,24 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
               />
             </div>
 
+            {/* الفرع / القسم */}
+            <div className="space-y-3 group">
+              <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">الفرع / القسم</label>
+              <select
+                disabled={isAkoura}
+                value={newExpense.branch}
+                onChange={e => setNewExpense({...newExpense, branch: e.target.value})}
+                className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all cursor-pointer"
+              >
+                <option value="1">مزار 1</option>
+                <option value="2">مزار 2</option>
+                <option value="3">مزار 3</option>
+                <option value="4">شقة 1</option>
+                <option value="5">شقة 2</option>
+                <option value="6">شقة 3</option>
+              </select>
+            </div>
+
             {/* السبب */}
             <div className="space-y-3 lg:col-span-2 group">
               <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">السبب / البيان (Reason)</label>
@@ -485,19 +520,20 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                   <th className="px-4 py-5 border-x border-white/10 w-32">From</th>
                   <th className="px-4 py-5 border-x border-white/10 w-32">To</th>
                   <th className="px-4 py-5 border-x border-white/10 w-32">Order By</th>
+                  <th className="px-4 py-5 border-x border-white/10 w-36">الفرع / القسم</th>
                   <th className="px-4 py-5 border-x border-white/10 w-32">الإجراءات</th>
                 </tr>
               </thead>
               <tbody className="bg-white">
                 {loading ? (
                   <tr>
-                    <td colSpan={9} className="p-20 text-center">
+                    <td colSpan={10} className="p-20 text-center">
                       <div className="inline-block w-8 h-8 border-4 border-mazar-gold border-t-transparent rounded-full animate-spin"></div>
                     </td>
                   </tr>
                 ) : filteredExpenses.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="p-32 text-center text-gray-300 font-black uppercase tracking-widest text-sm">لا توجد سجلات</td>
+                    <td colSpan={10} className="p-32 text-center text-gray-300 font-black uppercase tracking-widest text-sm">لا توجد سجلات</td>
                   </tr>
                 ) : filteredExpenses.map((exp, i) => (
                   <tr key={exp.id} className="hover:bg-[#FDFBF7] transition-colors group">
@@ -511,6 +547,7 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                     <td className="px-4 py-5 border border-[#EAE4D9]/40 text-sm font-bold text-mazar-coffee">{exp.from_entity || '—'}</td>
                     <td className="px-4 py-5 border border-[#EAE4D9]/40 text-sm font-bold text-mazar-coffee">{exp.to_entity || '—'}</td>
                     <td className="px-4 py-5 border border-[#EAE4D9]/40 text-sm font-bold text-mazar-coffee">{exp.ordered_by || '—'}</td>
+                    <td className="px-4 py-5 border border-[#EAE4D9]/40 text-xs font-black text-mazar-gold">{getBranchLabel(exp.branch)}</td>
                     <td className="px-4 py-5 border border-[#EAE4D9]/40">
                       <div className="flex gap-2 justify-center opacity-0 group-hover:opacity-100 transition-all">
                         <button 
@@ -618,6 +655,24 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                     onChange={e => setEditingExpense({...editingExpense, to_entity: e.target.value})}
                     className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all"
                   />
+                </div>
+
+                {/* الفرع / القسم */}
+                <div className="space-y-2">
+                  <label className="text-[9px] font-black text-mazar-coffee uppercase tracking-widest opacity-60">الفرع / القسم</label>
+                  <select
+                    disabled={isAkoura}
+                    value={editingExpense.branch || '1'}
+                    onChange={e => setEditingExpense({...editingExpense, branch: e.target.value})}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all cursor-pointer"
+                  >
+                    <option value="1">مزار 1</option>
+                    <option value="2">مزار 2</option>
+                    <option value="3">مزار 3</option>
+                    <option value="4">شقة 1</option>
+                    <option value="5">شقة 2</option>
+                    <option value="6">شقة 3</option>
+                  </select>
                 </div>
 
                 {/* السبب */}

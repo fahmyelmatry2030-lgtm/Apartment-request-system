@@ -172,13 +172,37 @@ export default function FinancePage() {
     .reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
   const salariesTotal = monthlySalaries.reduce((sum, s) => sum + (parseFloat(s.amount) || 0), 0) + salariesFromExpenses;
 
-  // المصروفات التشغيلية (غير الرواتب)
-  const otherExpenses = monthlyExpenses
+  // المصروفات التشغيلية لـ مزار 1 ومزار 2 (غير الرواتب)
+  const mazar12Expenses = monthlyExpenses
     .filter(e =>
+      (e.branch === 1 || e.branch === 2 || e.branch === '1' || e.branch === '2' || !e.branch) &&
       e.category !== 'رواتب' &&
       e.category !== 'مرتبات' &&
       e.category !== 'مرتب'
     )
+    .reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+
+  // المصروفات التشغيلية لـ مزار 3
+  const mazar3Expenses = monthlyExpenses
+    .filter(e =>
+      (e.branch === 3 || e.branch === '3') &&
+      e.category !== 'رواتب' &&
+      e.category !== 'مرتبات' &&
+      e.category !== 'مرتب'
+    )
+    .reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+
+  // مصروفات الشقق الفندقية
+  const apt1Expenses = monthlyExpenses
+    .filter(e => e.branch === 4 || e.branch === '4')
+    .reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+
+  const apt2Expenses = monthlyExpenses
+    .filter(e => e.branch === 5 || e.branch === '5')
+    .reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+
+  const apt3Expenses = monthlyExpenses
+    .filter(e => e.branch === 6 || e.branch === '6')
     .reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
 
   // ════════════════════════════════════════════════
@@ -194,7 +218,7 @@ export default function FinancePage() {
   const mazar12TotalNights = mazar12Bookings.reduce((sum, b) => sum + (Number(b.numberOfDays) || 0), 0);
   const mazar12AvgNight = mazar12TotalNights > 0 ? mazar12Revenue / mazar12TotalNights : 0;
   // صافي الربح = الإيراد - العمولات - المصروفات التشغيلية - الرواتب
-  const mazar12NetProfit = mazar12Revenue - mazar12Commissions - otherExpenses - salariesTotal;
+  const mazar12NetProfit = mazar12Revenue - mazar12Commissions - mazar12Expenses - salariesTotal;
 
   // ════════════════════════════════════════════════
   //  SECTION 2: مزار(3) — الوحدات من 25 إلى 30
@@ -208,7 +232,7 @@ export default function FinancePage() {
   const mazar3Commissions = mazar3Bookings.reduce((sum, b) => sum + parseFloat(b.commission || 0), 0);
   const mazar3TotalNights = mazar3Bookings.reduce((sum, b) => sum + (Number(b.numberOfDays) || 0), 0);
   const mazar3AvgNight = mazar3TotalNights > 0 ? mazar3Revenue / mazar3TotalNights : 0;
-  const mazar3NetProfit = mazar3Revenue - mazar3Commissions;
+  const mazar3NetProfit = mazar3Revenue - mazar3Commissions - mazar3Expenses;
 
   // ════════════════════════════════════════════════
   //  SECTION 3: الشقق الفندقية — apt-1 / apt-2 / apt-3
@@ -222,11 +246,9 @@ export default function FinancePage() {
   const aptCommission = (aptId: string) =>
     aptBooking(aptId).reduce((sum, b) => sum + parseFloat(b.commission || 0), 0);
 
-  const aptNetProfit = (aptId: string) => aptRevenue(aptId) - aptCommission(aptId);
-
-  const apt1Net = aptNetProfit('apt-1');
-  const apt2Net = aptNetProfit('apt-2');
-  const apt3Net = aptNetProfit('apt-3');
+  const apt1Net = aptRevenue('apt-1') - aptCommission('apt-1') - apt1Expenses;
+  const apt2Net = aptRevenue('apt-2') - aptCommission('apt-2') - apt2Expenses;
+  const apt3Net = aptRevenue('apt-3') - aptCommission('apt-3') - apt3Expenses;
 
   return (
     <div className="space-y-10 animate-fade-in" dir="rtl">
@@ -285,7 +307,7 @@ export default function FinancePage() {
             />
             <KpiCard
               label="إجمالي المصروفات"
-              value={isLoading ? '...' : (otherExpenses + salariesTotal).toLocaleString()}
+              value={isLoading ? '...' : (mazar12Expenses + salariesTotal).toLocaleString()}
               sub="مصروفات + رواتب"
               color="text-red-500"
               border="border-red-200"
@@ -347,7 +369,7 @@ export default function FinancePage() {
             />
             <KpiCard
               label="المصروفات"
-              value="0"
+              value={isLoading ? '...' : mazar3Expenses.toLocaleString()}
               color="text-red-500"
               border="border-red-200"
             />
@@ -408,6 +430,7 @@ export default function FinancePage() {
               <div className="mt-3 text-[9px] text-[#7A7061] font-bold space-y-0.5">
                 <div>إيراد: {isLoading ? '...' : aptRevenue('apt-1').toLocaleString()} ج.م</div>
                 <div>عمولات: {isLoading ? '...' : aptCommission('apt-1').toLocaleString()} ج.م</div>
+                <div>مصروفات: {isLoading ? '...' : apt1Expenses.toLocaleString()} ج.م</div>
               </div>
             </div>
 
@@ -421,6 +444,7 @@ export default function FinancePage() {
               <div className="mt-3 text-[9px] text-[#7A7061] font-bold space-y-0.5">
                 <div>إيراد: {isLoading ? '...' : aptRevenue('apt-2').toLocaleString()} ج.م</div>
                 <div>عمولات: {isLoading ? '...' : aptCommission('apt-2').toLocaleString()} ج.م</div>
+                <div>مصروفات: {isLoading ? '...' : apt2Expenses.toLocaleString()} ج.م</div>
               </div>
             </div>
 
@@ -434,6 +458,7 @@ export default function FinancePage() {
               <div className="mt-3 text-[9px] text-[#7A7061] font-bold space-y-0.5">
                 <div>إيراد: {isLoading ? '...' : aptRevenue('apt-3').toLocaleString()} ج.م</div>
                 <div>عمولات: {isLoading ? '...' : aptCommission('apt-3').toLocaleString()} ج.م</div>
+                <div>مصروفات: {isLoading ? '...' : apt3Expenses.toLocaleString()} ج.م</div>
               </div>
             </div>
           </div>
