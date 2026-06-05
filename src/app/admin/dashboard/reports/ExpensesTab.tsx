@@ -123,6 +123,14 @@ export default function ExpensesTab() {
 
   const isAkoura = adminRole === 'Akoura';
 
+  // Sync branch filter with form branch field
+  useEffect(() => {
+    if (isAkoura) return; // Akoura always uses branch 3
+    if (selectedBranch !== 'all') {
+      setNewExpense(prev => ({ ...prev, branch: selectedBranch }));
+    }
+  }, [selectedBranch, isAkoura]);
+
   const getBranchLabel = (branch: any) => {
     const b = parseInt(branch);
     if (b === 1 || b === 2 || b === 12) return 'مزار 1 و 2';
