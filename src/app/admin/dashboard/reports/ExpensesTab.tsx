@@ -65,7 +65,7 @@ export default function ExpensesTab() {
     amount: '',
     description: '',
     date: '',
-    branch: '1',
+    branch: '12',
     from_entity: '',
     to_entity: '',
     ordered_by: '',
@@ -124,13 +124,12 @@ export default function ExpensesTab() {
 
   const getBranchLabel = (branch: any) => {
     const b = parseInt(branch);
-    if (b === 1) return 'مزار 1';
-    if (b === 2) return 'مزار 2';
+    if (b === 1 || b === 2 || b === 12) return 'مزار 1 و 2';
     if (b === 3) return 'مزار 3';
     if (b === 4) return 'شقة 1';
     if (b === 5) return 'شقة 2';
     if (b === 6) return 'شقة 3';
-    return 'مزار 1';
+    return 'مزار 1 و 2';
   };
 
   const loadExpenses = async () => {
@@ -211,7 +210,7 @@ export default function ExpensesTab() {
         amount: amount,
         description: newExpense.description.trim(),
         date: dateToSave,
-        branch: parseInt(newExpense.branch) || 1,
+        branch: parseInt(newExpense.branch) || 12,
         from_entity: newExpense.from_entity.trim(),
         to_entity: newExpense.to_entity.trim(),
         ordered_by: newExpense.ordered_by.trim(),
@@ -221,7 +220,7 @@ export default function ExpensesTab() {
         amount: '',
         description: '',
         date: getDefaultDate(),
-        branch: '1',
+        branch: '12',
         from_entity: '',
         to_entity: '',
         ordered_by: '',
@@ -254,7 +253,7 @@ export default function ExpensesTab() {
         to_entity: editingExpense.to_entity,
         ordered_by: editingExpense.ordered_by,
         invoice_number: editingExpense.invoice_number,
-        branch: parseInt(editingExpense.branch) || 1,
+        branch: parseInt(editingExpense.branch) || 12,
       });
       setIsEditModalOpen(false);
       setEditingExpense(null);
@@ -417,8 +416,7 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                 onChange={e => setNewExpense({...newExpense, branch: e.target.value})}
                 className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all cursor-pointer"
               >
-                <option value="1">مزار 1</option>
-                <option value="2">مزار 2</option>
+                <option value="12">مزار 1 و 2</option>
                 <option value="3">مزار 3</option>
                 <option value="4">شقة 1</option>
                 <option value="5">شقة 2</option>
@@ -662,12 +660,11 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
                   <label className="text-[9px] font-black text-mazar-coffee uppercase tracking-widest opacity-60">الفرع / القسم</label>
                   <select
                     disabled={isAkoura}
-                    value={editingExpense.branch || '1'}
+                    value={editingExpense.branch === 1 || editingExpense.branch === 2 || editingExpense.branch === '1' || editingExpense.branch === '2' ? '12' : (editingExpense.branch || '12')}
                     onChange={e => setEditingExpense({...editingExpense, branch: e.target.value})}
                     className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all cursor-pointer"
                   >
-                    <option value="1">مزار 1</option>
-                    <option value="2">مزار 2</option>
+                    <option value="12">مزار 1 و 2</option>
                     <option value="3">مزار 3</option>
                     <option value="4">شقة 1</option>
                     <option value="5">شقة 2</option>

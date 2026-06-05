@@ -175,7 +175,7 @@ export default function FinancePage() {
   // المصروفات التشغيلية لـ مزار 1 ومزار 2 (غير الرواتب)
   const mazar12Expenses = monthlyExpenses
     .filter(e =>
-      (e.branch === 1 || e.branch === 2 || e.branch === '1' || e.branch === '2' || !e.branch) &&
+      (e.branch === 1 || e.branch === 2 || e.branch === '1' || e.branch === '2' || e.branch === 12 || e.branch === '12' || !e.branch) &&
       e.category !== 'رواتب' &&
       e.category !== 'مرتبات' &&
       e.category !== 'مرتب'
