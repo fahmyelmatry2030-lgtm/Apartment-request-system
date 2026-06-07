@@ -146,6 +146,20 @@ export default function DashboardOverview() {
       let isCheckingOut = !!outToday && !inToday;
       let isCheckingIn = !!inToday && !outToday;
 
+      const currentHour = new Date().getHours();
+      
+      // If it's past 2:00 PM, the checkout guest has already left.
+      // The system should drop the 'turnover' and 'checkout' states and focus on the check-in.
+      if (currentHour >= 14) {
+        if (isTurnover) {
+          isTurnover = false;
+          isCheckingIn = true;
+        }
+        if (isCheckingOut) {
+          isCheckingOut = false;
+        }
+      }
+
       if (isTurnover) {
         const outName = outToday?.name?.trim()?.toLowerCase() || '';
         const inName = inToday?.name?.trim()?.toLowerCase() || '';
