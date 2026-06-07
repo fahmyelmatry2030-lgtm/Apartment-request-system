@@ -147,12 +147,35 @@ export default function DashboardOverview() {
       let isCheckingIn = !!inToday && !outToday;
 
       if (isTurnover) {
-        const outName = outToday?.name?.trim()?.toLowerCase() || '1';
-        const inName = inToday?.name?.trim()?.toLowerCase() || '2';
-        const outPhone = outToday?.phone?.trim() || '3';
-        const inPhone = inToday?.phone?.trim() || '4';
+        const outName = outToday?.name?.trim()?.toLowerCase() || '';
+        const inName = inToday?.name?.trim()?.toLowerCase() || '';
+        const outPhone = outToday?.phone?.trim() || '';
+        const inPhone = inToday?.phone?.trim() || '';
 
-        if (outName === inName || outPhone === inPhone) {
+        const normalizeName = (n: string) => n.replace(/^(أ|ا|إ|أ\.|د|م|مهندس|دكتور|استاذ)\s*/g, '').trim();
+        const n1 = normalizeName(outName);
+        const n2 = normalizeName(inName);
+        
+        let isSameGuest = false;
+        if (outPhone && inPhone && outPhone === inPhone) {
+          isSameGuest = true;
+        } else if (n1 && n2) {
+          if (n1 === n2 || n1.includes(n2) || n2.includes(n1)) {
+            isSameGuest = true;
+          } else {
+            const words1 = n1.split(/\s+/);
+            const words2 = n2.split(/\s+/);
+            if (words1.length >= 2 && words2.length >= 2) {
+              const firstTwo1 = words1.slice(0, 2).join(' ');
+              const firstTwo2 = words2.slice(0, 2).join(' ');
+              if (firstTwo1 === firstTwo2) {
+                isSameGuest = true;
+              }
+            }
+          }
+        }
+
+        if (isSameGuest) {
           isTurnover = false;
           isCheckingOut = false;
           isCheckingIn = false;
@@ -707,8 +730,8 @@ export default function DashboardOverview() {
                               </td>
                               <td className="px-4 py-2.5 text-center">
                                 {apt.upcomingBookingsCount > 0 ? (
-                                  <span className="text-[10px] font-black text-white bg-blue-500 shadow-sm px-2 py-1 rounded-lg">
-                                    {apt.upcomingBookingsCount}+ بعده
+                                  <span className="text-[10px] font-black text-white bg-blue-500 shadow-sm px-3 py-1 rounded-lg">
+                                    {apt.upcomingBookingsCount}
                                   </span>
                                 ) : (
                                   <span className="text-[10px] font-bold text-gray-400">—</span>
