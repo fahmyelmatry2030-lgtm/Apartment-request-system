@@ -271,6 +271,9 @@ function ReportsContent() {
 
   const isAkoura = adminRole === 'Akoura';
 
+  const selectedUnitRef = useRef(selectedUnit);
+  selectedUnitRef.current = selectedUnit;
+
   const loadData = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -289,7 +292,7 @@ function ReportsContent() {
       setUnits(safeUnits);
       
       // Only set default unit if none is selected AND none in URL
-      if (!selectedUnit && !searchParams.get('unit') && safeUnits.length > 0) {
+      if (!selectedUnitRef.current && !searchParams.get('unit') && safeUnits.length > 0) {
         // If Akoura, default to p-s25 (first branch 3 unit)
         const isUserAkoura = typeof window !== 'undefined' && JSON.parse(sessionStorage.getItem('adminInfo') || '{}')?.role === 'Akoura';
         if (isUserAkoura) {
@@ -307,7 +310,7 @@ function ReportsContent() {
     } finally {
       setIsLoading(false);
     }
-  }, [selectedUnit]);
+  }, [searchParams]);
 
   useEffect(() => {
     loadData();
