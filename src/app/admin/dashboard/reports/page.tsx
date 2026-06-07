@@ -1139,8 +1139,8 @@ function ReportsContent() {
                       <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">مسئول الحجز</th>
                       <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">طريقة الدفع</th>
                       <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">ملاحظات</th>
-                      <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">الحالة</th>
-                      <th className="px-3 py-4 no-print whitespace-nowrap sticky left-0 bg-[#2A2723] z-20 shadow-[-2px_0_5px_rgba(0,0,0,0.3)]">الإجراءات</th>
+                      <th className="px-3 py-4 no-print whitespace-nowrap border-l border-[#3a3730]">الإجراءات</th>
+                      <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap sticky left-0 bg-[#2A2723] z-20 shadow-[-2px_0_5px_rgba(0,0,0,0.3)]">الحالة</th>
                     </tr>
                   </thead>
                   <tbody className="text-[10px]">
@@ -1241,27 +1241,8 @@ function ReportsContent() {
                             {row.hasData ? <EditableCell value={row.notes} bookingId={row.id} field="notes" onSave={handleCellSave} className="text-[#7A7061] font-bold text-[9px]" readOnly={row.isCarriedOver} /> : <span className="text-[#EAE4D9]">—</span>}
                           </td>
 
-                          {/* EDITABLE: Client Status */}
-                          <td className="px-1 py-2.5 border-l border-[#EAE4D9]/20">
-                            {row.hasData ? (
-                              row.isCarriedOver ? (
-                                <span className={`font-black text-[10px] p-1.5 rounded-lg text-center opacity-70 ${row.clientStatus === 'انتظار' ? 'text-gray-500 bg-gray-100' : row.clientStatus === 'متواجد' ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'}`}>{row.clientStatus}</span>
-                              ) : (
-                                <select
-                                  value={row.clientStatus}
-                                  onChange={(e) => handleCellSave(row.id, 'clientStatus', e.target.value)}
-                                  className={`bg-transparent outline-none font-black text-[10px] p-1.5 rounded-lg text-center cursor-pointer appearance-none ${row.clientStatus === 'انتظار' ? 'text-gray-500 bg-gray-100' : row.clientStatus === 'متواجد' ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'}`}
-                                >
-                                  <option value="انتظار">انتظار</option>
-                                  <option value="متواجد">متواجد</option>
-                                  <option value="غادر">غادر</option>
-                                </select>
-                              )
-                            ) : <span className="text-[#EAE4D9]">—</span>}
-                          </td>
-
                           {/* --- ACTIONS --- */}
-                          <td className="px-1 py-1 no-print border-r border-[#EAE4D9]/20 sticky left-0 z-10 shadow-[-2px_0_5px_rgba(0,0,0,0.02)] transition-colors group-hover:bg-[#FDFBF7]" style={{ backgroundColor: row.isCarriedOver ? '#fcf9f2' : 'inherit' }}>
+                          <td className="px-1 py-1 no-print border-l border-[#EAE4D9]/20 transition-colors group-hover:bg-[#FDFBF7]" style={{ backgroundColor: row.isCarriedOver ? '#fcf9f2' : 'inherit' }}>
                             {row.hasData && (
                               row.isCarriedOver ? (
                                 <div className="flex items-center justify-center">
@@ -1294,6 +1275,25 @@ function ReportsContent() {
                               )
                             )}
                           </td>
+
+                          {/* EDITABLE: Client Status */}
+                          <td className="px-1 py-2.5 border-l border-[#EAE4D9]/20 sticky left-0 z-10 shadow-[-2px_0_5px_rgba(0,0,0,0.02)] transition-colors group-hover:bg-[#FDFBF7]" style={{ backgroundColor: !row.hasData ? '#FDFBF7' : row.isCarriedOver ? '#fcf9f2' : 'inherit' }}>
+                            {row.hasData ? (
+                              row.isCarriedOver ? (
+                                <span className={`font-black text-[10px] p-1.5 rounded-lg text-center opacity-70 ${row.clientStatus === 'انتظار' ? 'text-gray-500 bg-gray-100' : row.clientStatus === 'متواجد' ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'}`}>{row.clientStatus}</span>
+                              ) : (
+                                <select
+                                  value={row.clientStatus}
+                                  onChange={(e) => handleCellSave(row.id, 'clientStatus', e.target.value)}
+                                  className={`bg-transparent outline-none font-black text-[10px] p-1.5 rounded-lg text-center cursor-pointer appearance-none ${row.clientStatus === 'انتظار' ? 'text-gray-500 bg-gray-100' : row.clientStatus === 'متواجد' ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'}`}
+                                >
+                                  <option value="انتظار">انتظار</option>
+                                  <option value="متواجد">متواجد</option>
+                                  <option value="غادر">غادر</option>
+                                </select>
+                              )
+                            ) : <span className="text-[#EAE4D9]">—</span>}
+                          </td>
                         </tr>
                       ))
                     )}
@@ -1310,8 +1310,8 @@ function ReportsContent() {
                       <td className="px-3 py-4 border-l border-[#3a3730]"></td>
                       <td className="px-3 py-4 border-l border-[#3a3730]"></td>
                       <td className="px-3 py-4 border-l border-[#3a3730]"></td>
+                      <td className="px-3 py-4 no-print border-l border-[#3a3730]"></td>
                       <td className="px-3 py-4 border-l border-[#3a3730]"></td>
-                      <td className="px-3 py-4 no-print"></td>
                     </tr>
                   </tbody>
                 </table>

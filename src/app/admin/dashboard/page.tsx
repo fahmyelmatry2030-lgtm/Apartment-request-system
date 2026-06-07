@@ -632,12 +632,12 @@ export default function DashboardOverview() {
                       <tr className="bg-[#2A2723] text-white">
                         <th className="px-4 py-3 text-[10px] font-black text-center w-12">#</th>
                         <th className="px-4 py-3 text-[10px] font-black">اسم الوحدة</th>
-                        <th className="px-4 py-3 text-[10px] font-black text-center">حجوزات قادمة</th>
                         <th className="px-4 py-3 text-[10px] font-black">النوع</th>
-                        <th className="px-4 py-3 text-[10px] font-black text-center">الحالة</th>
                         <th className="px-4 py-3 text-[10px] font-black">الضيف</th>
-                        <th className="px-4 py-3 text-[10px] font-black">حالة الإقامة</th>
                         <th className="px-4 py-3 text-[10px] font-black text-center">تاريخ الخروج</th>
+                        <th className="px-4 py-3 text-[10px] font-black text-center">حجوزات قادمة</th>
+                        <th className="px-4 py-3 text-[10px] font-black text-center">الحالة</th>
+                        <th className="px-4 py-3 text-[10px] font-black">حالة الإقامة</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#EAE4D9]/30">
@@ -680,6 +680,31 @@ export default function DashboardOverview() {
                                   {apt.title?.ar || apt.id}
                                 </button>
                               </td>
+                              <td className="px-4 py-2.5 text-[10px] text-[#7A7061] font-bold">{typeLabel[apt.category] || apt.category}</td>
+                              <td className="px-4 py-2.5 text-[10px] text-[#7A7061] font-bold">
+                                {apt.isTurnover ? (
+                                  <div className="flex flex-col gap-1.5 items-start justify-center h-full pt-1">
+                                    <span className="text-rose-500 truncate max-w-[120px]">🛫 {apt.leavingGuest}</span>
+                                    <span className="text-blue-600 truncate max-w-[120px]">🛬 {apt.arrivingGuest}</span>
+                                  </div>
+                                ) : (
+                                  apt.guest || (apt.isCheckingOut ? apt.leavingGuest : '—')
+                                )}
+                              </td>
+                              <td className="px-4 py-2.5 text-[10px] text-center text-[#2A2723] font-black">
+                                {apt.isTurnover ? (
+                                  <div className="flex flex-col gap-1.5 items-center justify-center pt-1">
+                                    <span className="text-rose-500">🛫 {formatMiniDate(apt.leavingCheckOut)}</span>
+                                    <span className="text-blue-600">🛬 {formatMiniDate(apt.arrivingCheckOut)}</span>
+                                  </div>
+                                ) : apt.isOccupied ? (
+                                  formatMiniDate(apt.checkOut)
+                                ) : (
+                                  apt.lastCheckOut 
+                                    ? <span className="text-gray-400 font-bold opacity-60">آخر: {formatMiniDate(apt.lastCheckOut)}</span> 
+                                    : '—'
+                                )}
+                              </td>
                               <td className="px-4 py-2.5 text-center">
                                 {apt.upcomingBookingsCount > 0 ? (
                                   <span className="text-[10px] font-black text-white bg-blue-500 shadow-sm px-2 py-1 rounded-lg">
@@ -689,7 +714,6 @@ export default function DashboardOverview() {
                                   <span className="text-[10px] font-bold text-gray-400">—</span>
                                 )}
                               </td>
-                              <td className="px-4 py-2.5 text-[10px] text-[#7A7061] font-bold">{typeLabel[apt.category] || apt.category}</td>
                               <td className="px-4 py-2.5 text-center">
                                 <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
                                   apt.isTurnover ? 'bg-orange-500 text-white animate-pulse' :
@@ -706,16 +730,6 @@ export default function DashboardOverview() {
                                    apt.status === 'صيانة' ? 'صيانة' : 
                                    'متاح'}
                                 </span>
-                              </td>
-                              <td className="px-4 py-2.5 text-[10px] text-[#7A7061] font-bold">
-                                {apt.isTurnover ? (
-                                  <div className="flex flex-col gap-1.5 items-start justify-center h-full pt-1">
-                                    <span className="text-rose-500 truncate max-w-[120px]">🛫 {apt.leavingGuest}</span>
-                                    <span className="text-blue-600 truncate max-w-[120px]">🛬 {apt.arrivingGuest}</span>
-                                  </div>
-                                ) : (
-                                  apt.guest || (apt.isCheckingOut ? apt.leavingGuest : '—')
-                                )}
                               </td>
                               <td className="px-4 py-2.5">
                                 {apt.isTurnover ? (
@@ -777,20 +791,6 @@ export default function DashboardOverview() {
                                     <option value="غادر">🚪 غادر</option>
                                   </select>
                                 ) : <span className="text-[10px] text-gray-300">—</span>}
-                              </td>
-                              <td className="px-4 py-2.5 text-[10px] text-center text-[#2A2723] font-black">
-                                {apt.isTurnover ? (
-                                  <div className="flex flex-col gap-1.5 items-center justify-center pt-1">
-                                    <span className="text-rose-500">🛫 {formatMiniDate(apt.leavingCheckOut)}</span>
-                                    <span className="text-blue-600">🛬 {formatMiniDate(apt.arrivingCheckOut)}</span>
-                                  </div>
-                                ) : apt.isOccupied ? (
-                                  formatMiniDate(apt.checkOut)
-                                ) : (
-                                  apt.lastCheckOut 
-                                    ? <span className="text-gray-400 font-bold opacity-60">آخر: {formatMiniDate(apt.lastCheckOut)}</span> 
-                                    : '—'
-                                )}
                               </td>
                             </tr>
                           );
