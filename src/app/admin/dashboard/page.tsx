@@ -140,6 +140,8 @@ export default function DashboardOverview() {
           .sort((a: any, b: any) => new Date(b.checkOut).getTime() - new Date(a.checkOut).getTime())[0];
       }
 
+      const unitBookings = bookings.filter((b: any) => b.apartmentId === apt.id);
+
       return {
         ...apt,
         category: cat,
@@ -150,6 +152,7 @@ export default function DashboardOverview() {
         checkOut: activeBooking?.checkOut,
         guestsCount: activeBooking?.guestsCount,
         lastCheckOut: lastBooking?.checkOut,
+        totalBookings: unitBookings.length,
         // Turnover logic
         isTurnover: !!outToday && !!inToday,
         leavingGuest: outToday?.name,
@@ -612,6 +615,7 @@ export default function DashboardOverview() {
                       <tr className="bg-[#2A2723] text-white">
                         <th className="px-4 py-3 text-[10px] font-black text-center w-12">#</th>
                         <th className="px-4 py-3 text-[10px] font-black">اسم الوحدة</th>
+                        <th className="px-4 py-3 text-[10px] font-black text-center">عدد الحجوزات</th>
                         <th className="px-4 py-3 text-[10px] font-black">النوع</th>
                         <th className="px-4 py-3 text-[10px] font-black text-center">الحالة</th>
                         <th className="px-4 py-3 text-[10px] font-black">الضيف</th>
@@ -659,6 +663,11 @@ export default function DashboardOverview() {
                                   {apt.title?.ar || apt.id}
                                 </button>
                               </td>
+                              <td className="px-4 py-2.5 text-center">
+                                <span className="text-[10px] font-bold text-[#7A7061] bg-[#EAE4D9]/50 px-2 py-1 rounded-lg border border-[#EAE4D9]">
+                                  {apt.totalBookings}
+                                </span>
+                              </td>
                               <td className="px-4 py-2.5 text-[10px] text-[#7A7061] font-bold">{typeLabel[apt.category] || apt.category}</td>
                               <td className="px-4 py-2.5 text-center">
                                 <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
@@ -679,9 +688,9 @@ export default function DashboardOverview() {
                               </td>
                               <td className="px-4 py-2.5 text-[10px] text-[#7A7061] font-bold">
                                 {apt.isTurnover ? (
-                                  <div className="flex flex-col gap-0.5">
-                                    <span className="text-rose-500">🛫 {apt.leavingGuest}</span>
-                                    <span className="text-blue-600">🛬 {apt.arrivingGuest}</span>
+                                  <div className="flex flex-col gap-1.5 items-start justify-center h-full pt-1">
+                                    <span className="text-rose-500 truncate max-w-[120px]">🛫 {apt.leavingGuest}</span>
+                                    <span className="text-blue-600 truncate max-w-[120px]">🛬 {apt.arrivingGuest}</span>
                                   </div>
                                 ) : (
                                   apt.guest || (apt.isCheckingOut ? apt.leavingGuest : '—')
@@ -689,7 +698,7 @@ export default function DashboardOverview() {
                               </td>
                               <td className="px-4 py-2.5">
                                 {apt.isTurnover ? (
-                                  <div className="flex flex-col gap-1.5 items-center">
+                                  <div className="flex flex-col gap-1.5 items-start">
                                     <div className="flex items-center gap-1">
                                       <span className="text-rose-500 font-bold text-[9px]" title="النزيل المغادر">🛫</span>
                                       <select 
@@ -750,7 +759,7 @@ export default function DashboardOverview() {
                               </td>
                               <td className="px-4 py-2.5 text-[10px] text-center text-[#2A2723] font-black">
                                 {apt.isTurnover ? (
-                                  <div className="flex flex-col gap-0.5 text-[9px] font-black justify-center items-center">
+                                  <div className="flex flex-col gap-1.5 items-center justify-center pt-1">
                                     <span className="text-rose-500">🛫 {formatMiniDate(apt.leavingCheckOut)}</span>
                                     <span className="text-blue-600">🛬 {formatMiniDate(apt.arrivingCheckOut)}</span>
                                   </div>
