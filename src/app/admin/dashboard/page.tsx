@@ -140,7 +140,7 @@ export default function DashboardOverview() {
           .sort((a: any, b: any) => new Date(b.checkOut).getTime() - new Date(a.checkOut).getTime())[0];
       }
 
-      const unitBookings = bookings.filter((b: any) => b.apartmentId === apt.id);
+      const upcomingBookings = confirmed.filter((b: any) => b.apartmentId === apt.id && b.checkIn > targetDateStr);
 
       return {
         ...apt,
@@ -152,7 +152,7 @@ export default function DashboardOverview() {
         checkOut: activeBooking?.checkOut,
         guestsCount: activeBooking?.guestsCount,
         lastCheckOut: lastBooking?.checkOut,
-        totalBookings: unitBookings.length,
+        upcomingBookingsCount: upcomingBookings.length,
         // Turnover logic
         isTurnover: !!outToday && !!inToday,
         leavingGuest: outToday?.name,
@@ -615,7 +615,7 @@ export default function DashboardOverview() {
                       <tr className="bg-[#2A2723] text-white">
                         <th className="px-4 py-3 text-[10px] font-black text-center w-12">#</th>
                         <th className="px-4 py-3 text-[10px] font-black">اسم الوحدة</th>
-                        <th className="px-4 py-3 text-[10px] font-black text-center">عدد الحجوزات</th>
+                        <th className="px-4 py-3 text-[10px] font-black text-center">حجوزات قادمة</th>
                         <th className="px-4 py-3 text-[10px] font-black">النوع</th>
                         <th className="px-4 py-3 text-[10px] font-black text-center">الحالة</th>
                         <th className="px-4 py-3 text-[10px] font-black">الضيف</th>
@@ -664,9 +664,13 @@ export default function DashboardOverview() {
                                 </button>
                               </td>
                               <td className="px-4 py-2.5 text-center">
-                                <span className="text-[10px] font-bold text-[#7A7061] bg-[#EAE4D9]/50 px-2 py-1 rounded-lg border border-[#EAE4D9]">
-                                  {apt.totalBookings}
-                                </span>
+                                {apt.upcomingBookingsCount > 0 ? (
+                                  <span className="text-[10px] font-black text-white bg-blue-500 shadow-sm px-2 py-1 rounded-lg">
+                                    {apt.upcomingBookingsCount}+ بعده
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] font-bold text-gray-400">—</span>
+                                )}
                               </td>
                               <td className="px-4 py-2.5 text-[10px] text-[#7A7061] font-bold">{typeLabel[apt.category] || apt.category}</td>
                               <td className="px-4 py-2.5 text-center">
