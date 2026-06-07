@@ -142,6 +142,23 @@ export default function DashboardOverview() {
 
       const upcomingBookings = confirmed.filter((b: any) => b.apartmentId === apt.id && b.checkIn > targetDateStr);
 
+      let isTurnover = !!outToday && !!inToday;
+      let isCheckingOut = !!outToday && !inToday;
+      let isCheckingIn = !!inToday && !outToday;
+
+      if (isTurnover) {
+        const outName = outToday?.name?.trim()?.toLowerCase() || '1';
+        const inName = inToday?.name?.trim()?.toLowerCase() || '2';
+        const outPhone = outToday?.phone?.trim() || '3';
+        const inPhone = inToday?.phone?.trim() || '4';
+
+        if (outName === inName || outPhone === inPhone) {
+          isTurnover = false;
+          isCheckingOut = false;
+          isCheckingIn = false;
+        }
+      }
+
       return {
         ...apt,
         category: cat,
@@ -154,7 +171,7 @@ export default function DashboardOverview() {
         lastCheckOut: lastBooking?.checkOut,
         upcomingBookingsCount: upcomingBookings.length,
         // Turnover logic
-        isTurnover: !!outToday && !!inToday,
+        isTurnover,
         leavingGuest: outToday?.name,
         leavingBookingId: outToday?.id,
         leavingClientStatus: outToday?.clientStatus || 'انتظار',
@@ -163,8 +180,8 @@ export default function DashboardOverview() {
         arrivingBookingId: inToday?.id,
         arrivingClientStatus: inToday?.clientStatus || 'انتظار',
         arrivingCheckOut: inToday?.checkOut,
-        isCheckingOut: !!outToday && !inToday,
-        isCheckingIn: !!inToday && !outToday,
+        isCheckingOut,
+        isCheckingIn,
       };
     });
 
