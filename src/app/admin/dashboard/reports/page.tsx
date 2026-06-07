@@ -1112,7 +1112,7 @@ function ReportsContent() {
             </div>
 
             {/* THE TABLE */}
-            <div ref={printRef} className="print-area bg-white rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
+            <div ref={printRef} className="print-area bg-[#F8F5F0] rounded-[2rem] border-2 border-[#2A2723]/15 shadow-lg overflow-hidden">
               <div className="print-header">
                 <h2>مزار — تقرير حجوزات {selectedUnitInfo?.title?.ar || selectedUnit}</h2>
                 <p>{MONTHS_AR[selectedMonth]} {selectedYear}</p>
@@ -1121,7 +1121,7 @@ function ReportsContent() {
               <div className="overflow-x-auto custom-scrollbar-horizontal pb-4">
                 <table className="w-full min-w-[1500px] text-center border-collapse" dir="rtl">
                   <thead className="sticky top-0 z-30">
-                    <tr className="bg-[#2A2723] text-white text-[9px] uppercase tracking-widest font-black">
+                    <tr className="bg-gradient-to-l from-[#1a1714] via-[#2A2723] to-[#1a1714] text-[#E8DFD0] text-[9px] uppercase tracking-widest font-black">
                       <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap sticky right-0 bg-[#2A2723] z-20 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">No</th>
                       <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">التاريخ</th>
                       <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">الاسم</th>
@@ -1143,7 +1143,7 @@ function ReportsContent() {
                       <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap sticky left-0 bg-[#2A2723] z-20 shadow-[-2px_0_5px_rgba(0,0,0,0.3)]">الحالة</th>
                     </tr>
                   </thead>
-                  <tbody className="text-[10px]">
+                  <tbody className="text-[10px] font-semibold">
                     {isLoading ? (
                       <tr>
                         <td colSpan={15} className="px-6 py-20 text-center text-[#7A7061] italic font-bold opacity-40 uppercase tracking-widest">
@@ -1156,65 +1156,65 @@ function ReportsContent() {
                       </tr>
                     ) : (
                       allRows.map((row, index) => (
-                        <tr key={index} className={`border-t border-[#EAE4D9]/40 transition-colors group ${!row.hasData ? 'bg-[#FDFBF7] opacity-60' : row.isCarriedOver ? 'bg-[#fcf9f2]' : 'hover:bg-[#FDFBF7]'}`}>
-                          <td className="px-2 py-2.5 text-[#C1A68D] font-black tracking-widest sticky right-0 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.02)] transition-colors group-hover:bg-[#FDFBF7]" style={{ backgroundColor: !row.hasData ? '#FDFBF7' : row.isCarriedOver ? '#fcf9f2' : 'inherit' }}>
+                        <tr key={index} className={`border-t border-[#D5CBB8]/60 transition-colors group ${!row.hasData ? 'bg-[#F0EBE2] opacity-50' : row.isCarriedOver ? 'bg-[#F5F0E6]' : index % 2 === 0 ? 'bg-[#FDFBF7] hover:bg-[#F0EBE2]' : 'bg-[#F7F3EC] hover:bg-[#EBE5D9]'}`}>
+                          <td className="px-2 py-3 text-[#8B7355] font-black tracking-widest sticky right-0 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.06)] transition-colors" style={{ backgroundColor: !row.hasData ? '#F0EBE2' : row.isCarriedOver ? '#F5F0E6' : index % 2 === 0 ? '#FDFBF7' : '#F7F3EC' }}>
                             {row.no.toString().padStart(2, '0')}
                           </td>
-                          <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-bold text-[#2A2723] whitespace-nowrap">{formatDate(row.date)}</td>
+                          <td className="px-3 py-3 border-l border-[#D5CBB8]/40 font-black text-[#1a1714] whitespace-nowrap">{formatDate(row.date)}</td>
                           
                           {/* EDITABLE: Name */}
                           <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
                             {row.hasData ? (
-                              <EditableCell value={row.name} bookingId={row.id} field="name" onSave={handleCellSave} className="text-[#2A2723] font-bold" readOnly={row.isCarriedOver} />
-                            ) : <span className="text-[#EAE4D9]">—</span>}
+                              <EditableCell value={row.name} bookingId={row.id} field="name" onSave={handleCellSave} className="text-[#1a1714] font-black" readOnly={row.isCarriedOver} />
+                            ) : <span className="text-[#D5CBB8]">—</span>}
                           </td>
 
                           {/* EDITABLE: Nationality */}
                           <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
                             {row.hasData ? (
-                              <EditableCell value={row.nationality} bookingId={row.id} field="nationality" onSave={handleCellSave} className="text-[#7A7061] font-bold" readOnly={row.isCarriedOver} />
-                            ) : <span className="text-[#EAE4D9]">—</span>}
+                              <EditableCell value={row.nationality} bookingId={row.id} field="nationality" onSave={handleCellSave} className="text-[#4A4035] font-bold" readOnly={row.isCarriedOver} />
+                            ) : <span className="text-[#D5CBB8]">—</span>}
                           </td>
                           
                           {/* EDITABLE: ID Number */}
                           <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
                             {row.hasData ? (
-                              <EditableCell value={row.idNumber} bookingId={row.id} field="idNumber" onSave={handleCellSave} className="text-[#7A7061] font-bold" readOnly={row.isCarriedOver} />
-                            ) : <span className="text-[#EAE4D9]">—</span>}
+                              <EditableCell value={row.idNumber} bookingId={row.id} field="idNumber" onSave={handleCellSave} className="text-[#4A4035] font-bold" readOnly={row.isCarriedOver} />
+                            ) : <span className="text-[#D5CBB8]">—</span>}
                           </td>
 
                           {/* EDITABLE: Phone */}
                           <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
                             {row.hasData ? (
-                              <EditableCell value={row.phone} bookingId={row.id} field="phone" onSave={handleCellSave} className="text-[#2A2723] font-bold" readOnly={row.isCarriedOver} />
-                            ) : <span className="text-[#EAE4D9]">—</span>}
+                              <EditableCell value={row.phone} bookingId={row.id} field="phone" onSave={handleCellSave} className="text-[#1a1714] font-black" readOnly={row.isCarriedOver} />
+                            ) : <span className="text-[#D5CBB8]">—</span>}
                           </td>
 
                           {/* EDITABLE: Check In */}
                           <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
-                            {row.hasData ? <EditableCell value={formatDate(row.checkIn)} bookingId={row.id} field="checkIn" onSave={handleCellSave} className="text-blue-600 font-bold bg-blue-50/50" readOnly={row.isCarriedOver} /> : <span className="text-[#EAE4D9]">—</span>}
+                            {row.hasData ? <EditableCell value={formatDate(row.checkIn)} bookingId={row.id} field="checkIn" onSave={handleCellSave} className="text-blue-700 font-black bg-blue-100/70" readOnly={row.isCarriedOver} /> : <span className="text-[#D5CBB8]">—</span>}
                           </td>
                           
                           {/* EDITABLE: Check Out */}
                           <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
-                            {row.hasData ? <EditableCell value={formatDate(row.checkOut)} bookingId={row.id} field="checkOut" onSave={handleCellSave} className="text-red-600 font-bold bg-red-50/50" readOnly={row.isCarriedOver} /> : <span className="text-[#EAE4D9]">—</span>}
+                            {row.hasData ? <EditableCell value={formatDate(row.checkOut)} bookingId={row.id} field="checkOut" onSave={handleCellSave} className="text-red-700 font-black bg-red-100/70" readOnly={row.isCarriedOver} /> : <span className="text-[#D5CBB8]">—</span>}
                           </td>
 
-                          <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 text-[#C1A68D] font-black">{row.hasData ? row.days : 0}</td>
+                          <td className="px-3 py-3 border-l border-[#D5CBB8]/40 text-[#8B6914] font-black text-[11px]">{row.hasData ? row.days : 0}</td>
 
                           {/* EDITABLE: Price per Night */}
                           <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
-                            {row.hasData ? <EditableCell value={row.pricePerNight} bookingId={row.id} field="pricePerNight" onSave={handleCellSave} type="number" className="text-[#7A7061] font-bold" readOnly={row.isCarriedOver} /> : <span className="text-[#EAE4D9]">—</span>}
+                            {row.hasData ? <EditableCell value={row.pricePerNight} bookingId={row.id} field="pricePerNight" onSave={handleCellSave} type="number" className="text-[#3A3020] font-black" readOnly={row.isCarriedOver} /> : <span className="text-[#D5CBB8]">—</span>}
                           </td>
                           
                           {/* EDITABLE: Total Amount */}
                           <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
-                            {row.hasData ? <EditableCell value={row.total} bookingId={row.id} field="totalAmount" onSave={handleCellSave} type="number" className="text-[#C1A68D] font-black" readOnly={row.isCarriedOver} /> : <span className="text-[#EAE4D9]">—</span>}
+                            {row.hasData ? <EditableCell value={row.total} bookingId={row.id} field="totalAmount" onSave={handleCellSave} type="number" className="text-[#0d6e3f] font-black text-[11px] bg-green-50/60" readOnly={row.isCarriedOver} /> : <span className="text-[#D5CBB8]">—</span>}
                           </td>
 
                           {/* EDITABLE: Commission */}
                           <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
-                            {row.hasData ? <EditableCell value={row.commission} bookingId={row.id} field="commission" onSave={handleCellSave} type="number" className="text-orange-500 font-bold" readOnly={row.isCarriedOver} /> : <span className="text-[#EAE4D9]">—</span>}
+                            {row.hasData ? <EditableCell value={row.commission} bookingId={row.id} field="commission" onSave={handleCellSave} type="number" className="text-orange-700 font-black bg-orange-50/60" readOnly={row.isCarriedOver} /> : <span className="text-[#D5CBB8]">—</span>}
                           </td>
 
                           {/* EDITABLE: Broker Name */}
@@ -1222,7 +1222,7 @@ function ReportsContent() {
                             {row.hasData ? <EditableCell value={row.brokerName} bookingId={row.id} field="brokerName" onSave={handleCellSave} className="text-[#7A7061] font-bold" readOnly={row.isCarriedOver} /> : <span className="text-[#EAE4D9]">—</span>}
                           </td>
 
-                          <td className="px-3 py-2.5 border-l border-[#EAE4D9]/20 font-black text-green-600">{row.hasData ? row.netValue : 0}</td>
+                          <td className="px-3 py-3 border-l border-[#D5CBB8]/40 font-black text-[11px] text-emerald-700 bg-emerald-50/40">{row.hasData ? row.netValue : 0}</td>
 
                           {/* EDITABLE: Booking Manager */}
                           <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
@@ -1277,15 +1277,15 @@ function ReportsContent() {
                           </td>
 
                           {/* EDITABLE: Client Status */}
-                          <td className="px-1 py-2.5 border-l border-[#EAE4D9]/20 sticky left-0 z-10 shadow-[-2px_0_5px_rgba(0,0,0,0.02)] transition-colors group-hover:bg-[#FDFBF7]" style={{ backgroundColor: !row.hasData ? '#FDFBF7' : row.isCarriedOver ? '#fcf9f2' : 'inherit' }}>
+                          <td className="px-1 py-3 border-l border-[#D5CBB8]/40 sticky left-0 z-10 shadow-[-2px_0_5px_rgba(0,0,0,0.06)] transition-colors" style={{ backgroundColor: !row.hasData ? '#F0EBE2' : row.isCarriedOver ? '#F5F0E6' : index % 2 === 0 ? '#FDFBF7' : '#F7F3EC' }}>
                             {row.hasData ? (
                               row.isCarriedOver ? (
-                                <span className={`font-black text-[10px] p-1.5 rounded-lg text-center opacity-70 ${row.clientStatus === 'انتظار' ? 'text-gray-500 bg-gray-100' : row.clientStatus === 'متواجد' ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'}`}>{row.clientStatus}</span>
+                                <span className={`font-black text-[10px] px-2.5 py-1.5 rounded-lg text-center block ${row.clientStatus === 'انتظار' ? 'text-gray-600 bg-gray-200/80 border border-gray-300/50' : row.clientStatus === 'متواجد' ? 'text-emerald-800 bg-emerald-200/80 border border-emerald-300/50' : 'text-red-800 bg-red-200/80 border border-red-300/50'}`}>{row.clientStatus}</span>
                               ) : (
                                 <select
                                   value={row.clientStatus}
                                   onChange={(e) => handleCellSave(row.id, 'clientStatus', e.target.value)}
-                                  className={`bg-transparent outline-none font-black text-[10px] p-1.5 rounded-lg text-center cursor-pointer appearance-none ${row.clientStatus === 'انتظار' ? 'text-gray-500 bg-gray-100' : row.clientStatus === 'متواجد' ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'}`}
+                                  className={`bg-transparent outline-none font-black text-[10px] px-2.5 py-1.5 rounded-lg text-center cursor-pointer appearance-none block w-full ${row.clientStatus === 'انتظار' ? 'text-gray-700 bg-gray-200/80 border border-gray-300/50' : row.clientStatus === 'متواجد' ? 'text-emerald-800 bg-emerald-200/80 border border-emerald-300/50' : 'text-red-800 bg-red-200/80 border border-red-300/50'}`}
                                 >
                                   <option value="انتظار">انتظار</option>
                                   <option value="متواجد">متواجد</option>
@@ -1299,7 +1299,7 @@ function ReportsContent() {
                     )}
 
                     {/* Totals Row */}
-                    <tr className="bg-[#2A2723] text-white font-black text-[11px] border-t-2 border-[#C1A68D]">
+                    <tr className="bg-gradient-to-l from-[#1a1714] via-[#2A2723] to-[#1a1714] text-[#E8DFD0] font-black text-[11px] border-t-4 border-[#C1A68D]">
                       <td colSpan={8} className="px-4 py-4 text-center tracking-widest uppercase text-[9px]">الإجمالي</td>
                       <td className="px-3 py-4 border-l border-[#3a3730]">{totals.days}</td>
                       <td className="px-3 py-4 border-l border-[#3a3730]"></td>
