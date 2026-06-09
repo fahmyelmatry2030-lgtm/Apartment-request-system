@@ -53,6 +53,7 @@ export default function HomeClient() {
             <Link href="/mazar/about" className="hover:text-[#C1A68D] transition-colors">{t.common.about}</Link>
             <Link href="/mazar/how-to-book" className="hover:text-[#C1A68D] transition-colors">{t.common.howToBook}</Link>
             <Link href="/mazar/rules" className="hover:text-[#C1A68D] transition-colors">{t.common.rules}</Link>
+            <Link href="/social" className="hover:text-[#C1A68D] transition-colors">روابطنا</Link>
           </div>
           <div className="w-px h-6 bg-[#EAE4D9] hidden md:block" />
           <div className="scale-110 md:scale-125 origin-center">

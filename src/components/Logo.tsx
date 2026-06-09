@@ -14,9 +14,8 @@ interface LogoProps {
 export default function Logo({ className = "", imageClassName = "max-h-[80px]", size = 40, mdSize }: LogoProps) {
   const { language } = useLanguage();
   const logoSrc = language === 'ar' 
-    ? '/images/WhatsApp_Image_2026-03-18_-removebg-preview.png' 
-    : '/images/WhatsApp_Image_2026-03-18_at_2.02.10_PM-removebg-preview.png';
-
+    ? '/images/logo-ar.jpg' 
+    : '/images/logo-en.jpg';
 
   return (
     <div className={`flex items-center justify-center ${className}`}>
@@ -27,7 +26,7 @@ export default function Logo({ className = "", imageClassName = "max-h-[80px]", 
             src={logoSrc}
             alt="Mazar Studio Logo"
             width={size * 3}
-            height={size * 2}
+            height={size * 3}
             className={`object-contain w-full h-auto ${imageClassName}`}
             priority
           />
@@ -40,7 +39,7 @@ export default function Logo({ className = "", imageClassName = "max-h-[80px]", 
               src={logoSrc}
               alt="Mazar Studio Logo"
               width={mdSize * 3}
-              height={mdSize * 2}
+              height={mdSize * 3}
               className={`object-contain w-full h-auto ${imageClassName}`}
               priority
             />
