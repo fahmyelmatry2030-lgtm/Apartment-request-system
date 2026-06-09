@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Logo from '@/components/Logo';
 import { useLanguage } from '@/lib/LanguageContext';
-import { Facebook, Globe, Instagram, Phone as WhatsApp, Share2 } from 'lucide-react';
+import { Facebook, Globe, Instagram, Share2 } from 'lucide-react';
 
 const socialLinks = [
   {
@@ -30,18 +30,11 @@ const socialLinks = [
   },
 
   {
-    icon: <Facebook className="w-6 h-6" />,
+    icon: <img src="/icons/facebook.svg" alt="Facebook" className="w-9 h-9" />,
     label: 'فيسبوك',
     description: '@mazar.studios',
     url: 'https://www.facebook.com/share/17KqUZDzV1/',
     color: 'from-[#1877F2] to-[#0f69d6]',
-  },
-  {
-    icon: <WhatsApp className="w-6 h-6" />,
-    label: 'واتساب',
-    description: '+201108109969',
-    url: 'https://wa.me/201108109969',
-    color: 'from-[#25D366] to-[#1DA851]',
   },
 ];
 
@@ -94,8 +87,8 @@ export default function SocialLinksPage() {
               title={link.label}
             >
               <div className="absolute inset-0 rounded-full bg-white/10 opacity-60" />
-              <div className="relative inline-flex h-16 w-16 items-center justify-center rounded-full bg-black/10 backdrop-blur-xl border border-white/10 shadow-inner">
-                {React.cloneElement(link.icon, { className: 'w-9 h-9' })}
+              <div className="relative inline-flex h-16 w-16 items-center justify-center rounded-full bg-white/15 backdrop-blur-xl border border-white/15 shadow-inner">
+                {React.cloneElement(link.icon, { className: 'w-10 h-10' })}
               </div>
               <span className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/90">
                 {link.label}
