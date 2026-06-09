@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Logo from '@/components/Logo';
 import { useLanguage } from '@/lib/LanguageContext';
-import { Facebook, Globe, Instagram, Share2 } from 'lucide-react';
+import { Instagram } from 'lucide-react';
 
 const socialLinks = [
   {
@@ -28,7 +28,13 @@ const socialLinks = [
     url: 'https://www.tiktok.com/@mazar.studios?_r=1&_t=ZS-973GRvogEcv',
     color: 'from-[#000000] via-[#25F4EE] to-[#FE2C55]',
   },
-
+  {
+    icon: <img src="/icons/whatsapp.svg" alt="WhatsApp" className="w-9 h-9" />,
+    label: 'واتساب',
+    description: '+201108109969',
+    url: 'https://wa.me/201108109969',
+    color: 'from-[#25D366] to-[#1DA851]',
+  },
   {
     icon: <img src="/icons/facebook.svg" alt="Facebook" className="w-9 h-9" />,
     label: 'فيسبوك',
