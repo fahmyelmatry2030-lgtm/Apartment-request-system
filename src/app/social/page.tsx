@@ -3,11 +3,12 @@
 import React from 'react';
 import Link from 'next/link';
 import Logo from '@/components/Logo';
+import { useLanguage } from '@/lib/LanguageContext';
 import { Facebook, Globe, Instagram, Phone as WhatsApp, Share2 } from 'lucide-react';
 
 const socialLinks = [
   {
-    icon: <Globe className="w-6 h-6" />,
+    icon: <img src="/icons/google.svg" alt="Google" className="w-8 h-8" />, 
     label: 'جوجل',
     description: 'share.google',
     url: 'https://share.google/0S8xjtO2gOGZxheKs',
@@ -21,14 +22,13 @@ const socialLinks = [
     color: 'from-[#fdf5a7] via-[#f56040] to-[#7b2ff7]',
   },
   {
-    icon: (
-      <span className="text-lg font-black">Ti</span>
-    ),
+    icon: <img src="/icons/tiktok.svg" alt="TikTok" className="w-8 h-8" />,
     label: 'تيك توك',
     description: '@mazar.studios',
     url: 'https://www.tiktok.com/@mazar.studios?_r=1&_t=ZS-973GRvogEcv',
-    color: 'from-[#000000] to-[#141414]',
+    color: 'from-[#000000] via-[#25F4EE] to-[#FE2C55]',
   },
+
   {
     icon: <Facebook className="w-6 h-6" />,
     label: 'فيسبوك',
@@ -46,24 +46,32 @@ const socialLinks = [
 ];
 
 export default function SocialLinksPage() {
+  const { language } = useLanguage();
+  const logoBg = language === 'ar' ? '/images/logo-ar.jpg' : '/images/logo-en.jpg';
+
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-[#2A2723] font-sans relative overflow-hidden" dir="rtl">
+    <div className="h-screen bg-[#FDFBF7] text-[#2A2723] font-sans relative overflow-hidden" dir="rtl">
       
-      {/* Logo Watermark Background */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 opacity-20">
-        <div className="transform scale-125">
-          <Logo size={220} mdSize={260} imageClassName="h-auto" />
-        </div>
-      </div>
+      {/* Logo Page Background */}
+      <div
+        className="absolute inset-0 pointer-events-none z-0"
+        style={{
+          backgroundImage: `url(${logoBg})`,
+          backgroundSize: 'contain',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          opacity: 0.06,
+        }}
+      />
       
       {/* Navigation */}
-      <nav className="w-full px-6 py-4 flex justify-between items-center max-w-screen-2xl mx-auto z-50 sticky top-0 bg-white/70 backdrop-blur-xl border-b border-[#EAE4D9]">
+      <nav className="w-full px-6 py-4 flex justify-between items-center max-w-screen-2xl mx-auto z-50 sticky top-0 bg-transparent border-none shadow-none">
         <Link href="/">
-           <Logo size={42} mdSize={48} />
+           <Logo size={42} mdSize={48} imageClassName="h-auto" transparent />
         </Link>
       </nav>
 
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col items-center justify-center px-6 py-20 text-center">
+      <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col items-center justify-start px-6 pt-12 pb-6 text-center">
         
         {/* Header */}
         <div className="w-full mb-16 max-w-3xl">
@@ -82,10 +90,16 @@ export default function SocialLinksPage() {
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className={`inline-flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br ${link.color} text-white shadow-2xl shadow-black/30 transition duration-300 hover:scale-110 hover:shadow-2xl`}
+              className={`group relative flex h-28 w-28 flex-col items-center justify-center rounded-full border border-white/15 bg-gradient-to-br ${link.color} text-white shadow-[0_24px_64px_rgba(0,0,0,0.14)] transition duration-200 ease-out hover:shadow-[0_28px_72px_rgba(0,0,0,0.18)]`}
               title={link.label}
             >
-              {link.icon}
+              <div className="absolute inset-0 rounded-full bg-white/10 opacity-60" />
+              <div className="relative inline-flex h-16 w-16 items-center justify-center rounded-full bg-black/10 backdrop-blur-xl border border-white/10 shadow-inner">
+                {React.cloneElement(link.icon, { className: 'w-9 h-9' })}
+              </div>
+              <span className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/90">
+                {link.label}
+              </span>
             </a>
           ))}
         </div>

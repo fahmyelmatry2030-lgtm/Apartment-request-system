@@ -9,13 +9,18 @@ interface LogoProps {
   imageClassName?: string;
   size?: number;
   mdSize?: number;
+  transparent?: boolean;
 }
 
-export default function Logo({ className = "", imageClassName = "max-h-[80px]", size = 40, mdSize }: LogoProps) {
+export default function Logo({ className = "", imageClassName = "max-h-[80px]", size = 40, mdSize, transparent = false }: LogoProps) {
   const { language } = useLanguage();
-  const logoSrc = language === 'ar' 
-    ? '/images/logo-ar.jpg' 
-    : '/images/logo-en.jpg';
+  const logoSrc = transparent
+    ? language === 'ar'
+      ? '/images/WhatsApp_Image_2026-03-18_-removebg-preview.png'
+      : '/images/WhatsApp_Image_2026-03-18_at_2.02.10_PM-removebg-preview.png'
+    : language === 'ar'
+      ? '/images/logo-ar.jpg'
+      : '/images/logo-en.jpg';
 
   return (
     <div className={`flex items-center justify-center ${className}`}>

@@ -44,7 +44,7 @@ export default function HomeClient() {
       <nav className="w-full px-4 md:px-8 py-5 md:py-8 flex justify-between items-center max-w-screen-2xl mx-auto z-50 sticky top-0 bg-white/85 backdrop-blur-xl border-b border-[#EAE4D9] shadow-sm">
         {/* Logo */}
         <Link href="/" className="shrink-0 flex items-center">
-          <Logo size={isRTL ? 60 : 65} mdSize={90} imageClassName="max-h-[100px]" />
+          <Logo size={isRTL ? 60 : 65} mdSize={90} imageClassName="max-h-[100px]" transparent />
         </Link>
 
         {/* Center: Desktop Nav & Lang Switcher */}
