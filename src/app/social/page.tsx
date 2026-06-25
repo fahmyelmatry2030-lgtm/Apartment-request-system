@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Logo from '@/components/Logo';
 import { useLanguage } from '@/lib/LanguageContext';
 
-const MetallicButton = ({ type, href, label, iconRender }: any) => {
+const MetallicButton = ({ type, url, label, iconRender }: any) => {
   let innerBgClass = '';
   let logoStyle = {};
   let textClass = '';
@@ -34,7 +34,7 @@ const MetallicButton = ({ type, href, label, iconRender }: any) => {
   }
 
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" title={label} className="group flex flex-col items-center gap-3">
+    <a href={url} target="_blank" rel="noopener noreferrer" title={label} className="group flex flex-col items-center gap-3">
       {/* Outer Border */}
       <div className="w-[85px] h-[85px] sm:w-[110px] sm:h-[110px] rounded-[24px] sm:rounded-[32px] bg-gradient-to-br from-[#EBD6AC] via-[#B8925B] to-[#715024] p-[3px] shadow-[0_15px_30px_rgba(0,0,0,0.25)] transition-transform duration-300 group-hover:scale-105 group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
         {/* Inner Button */}
