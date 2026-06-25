@@ -44,7 +44,6 @@ const MetallicButton = ({ type, href, label, iconRender }: any) => {
            </div>
         </div>
       </div>
-      <span className="text-[10px] sm:text-xs font-black text-[#514332] uppercase tracking-widest opacity-90">{label}</span>
     </a>
   );
 }
@@ -138,41 +137,10 @@ export default function SocialLinksPage() {
       <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center justify-start px-6 pt-6 pb-12 text-center flex-grow">
         
         {/* Title */}
-        <div className="w-full mb-10 max-w-2xl">
+        <div className="w-full mb-10 sm:mb-16 max-w-2xl mt-4 sm:mt-10">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-[-0.02em] text-[#2C241B] drop-shadow-sm">
             (تابع مزار على السوشيال ميديا)
           </h1>
-        </div>
-
-        {/* QR Code Placeholder (Like in the image) */}
-        <div className="mb-14 relative group cursor-pointer transition-transform duration-300 hover:scale-105">
-           <div className="w-[200px] h-[200px] sm:w-[260px] sm:h-[260px] bg-gradient-to-br from-[#EBD6AC] via-[#C5A069] to-[#805F30] p-1.5 shadow-[0_20px_40px_rgba(0,0,0,0.15)] relative">
-              {/* Corner Accents */}
-              <div className="absolute -top-3 -left-3 w-6 h-6 border-t-2 border-l-2 border-[#9F7A47]"></div>
-              <div className="absolute -top-3 -right-3 w-6 h-6 border-t-2 border-r-2 border-[#9F7A47]"></div>
-              <div className="absolute -bottom-3 -left-3 w-6 h-6 border-b-2 border-l-2 border-[#9F7A47]"></div>
-              <div className="absolute -bottom-3 -right-3 w-6 h-6 border-b-2 border-r-2 border-[#9F7A47]"></div>
-              
-              <div className="w-full h-full bg-[#F5EBD0] flex items-center justify-center p-4 relative shadow-[inset_0_0_20px_rgba(150,110,60,0.2)]">
-                 {/* Inner corners */}
-                 <div className="absolute top-2 left-2 w-8 h-8 border-t-4 border-l-4 border-[#5A4833]"></div>
-                 <div className="absolute top-2 right-2 w-8 h-8 border-t-4 border-r-4 border-[#5A4833]"></div>
-                 <div className="absolute bottom-2 left-2 w-8 h-8 border-b-4 border-l-4 border-[#5A4833]"></div>
-                 <div className="absolute bottom-2 right-2 w-8 h-8 border-b-4 border-r-4 border-[#5A4833]"></div>
-                 
-                 {/* Fake QR Pattern for aesthetic */}
-                 <div className="w-full h-full opacity-80 flex flex-wrap gap-1 p-4 justify-center items-center">
-                    {Array.from({length: 64}).map((_, i) => (
-                       <div key={i} className={`w-3 sm:w-4 h-3 sm:h-4 bg-[#2C241B] ${(i%3===0 || i%7===0) ? 'opacity-0' : 'opacity-100'}`}></div>
-                    ))}
-                 </div>
-                 
-                 {/* Center G */}
-                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-[#F5EBD0] rounded-full flex items-center justify-center border-4 border-[#5A4833]">
-                    <span className="text-3xl font-black text-[#2C241B]">G</span>
-                 </div>
-              </div>
-           </div>
         </div>
 
         {/* The Icons */}
@@ -181,20 +149,6 @@ export default function SocialLinksPage() {
             <MetallicButton key={link.id} {...link} iconRender={link.icon} />
           ))}
         </div>
-        
-        {/* WI-FI Section matching the image */}
-        <div className="mt-16 w-full max-w-lg bg-gradient-to-r from-[#D7C49E] via-[#E2D2B3] to-[#D7C49E] rounded-xl p-1 shadow-lg border border-[#F2EADA]">
-           <div className="bg-[#EAE0CA] w-full h-full rounded-lg px-8 py-6 text-center shadow-[inset_0_2px_10px_rgba(0,0,0,0.05)] border border-[#C5B490]">
-              <h3 className="text-sm sm:text-base font-black text-[#3E3021] mb-3 tracking-wide">
-                 بيانات الواي فاي / WI-FI CREDENTIALS
-              </h3>
-              <p className="text-xs sm:text-sm font-bold text-[#554533] leading-relaxed">
-                 Network: <span className="font-black text-[#2C241B]">MAZAR 14</span><br/>
-                 Password: <span className="font-black text-[#2C241B]">Mazar14#</span>
-              </p>
-           </div>
-        </div>
-
       </div>
     </div>
   );
