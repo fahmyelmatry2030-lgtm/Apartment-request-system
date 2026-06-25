@@ -901,7 +901,36 @@ function ReportsContent() {
                 <div className="grid grid-cols-2 md:grid-cols-5 xl:grid-cols-9 gap-3">
                   <div className="space-y-1 col-span-2 xl:col-span-2">
                     <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">الاسم</label>
-                    <input type="text" required value={newRecord.name} onChange={e => setNewRecord({ ...newRecord, name: e.target.value })} className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-[#C1A68D]" />
+                    <datalist id="past-customers">
+                      {Array.from(new Set(bookings.filter(b => b.name).map(b => b.name.trim()))).map((name, idx) => (
+                        <option key={idx} value={name} />
+                      ))}
+                    </datalist>
+                    <input 
+                      type="text" 
+                      required 
+                      list="past-customers"
+                      value={newRecord.name} 
+                      onChange={e => {
+                        const enteredName = e.target.value;
+                        setNewRecord(prev => {
+                          let updates: any = { name: enteredName };
+                          if (enteredName.trim().length > 2) {
+                            const pastBooking = bookings.find(b => b.name && b.name.trim() === enteredName.trim());
+                            if (pastBooking) {
+                              updates = {
+                                ...updates,
+                                nationality: prev.nationality || pastBooking.nationality || '',
+                                idNumber: prev.idNumber || pastBooking.idNumber || '',
+                                phone: prev.phone || pastBooking.phone || '',
+                              };
+                            }
+                          }
+                          return { ...prev, ...updates };
+                        });
+                      }} 
+                      className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-[#C1A68D]" 
+                    />
                   </div>
                   <div className="space-y-1">
                     <label className="text-[9px] font-black text-[#C1A68D] uppercase px-2">الجنسية</label>
