@@ -142,6 +142,17 @@ export default function DashboardOverview() {
 
       const upcomingBookings = confirmed.filter((b: any) => b.apartmentId === apt.id && b.checkIn > targetDateStr);
 
+      const futureBookings = confirmed.filter((b: any) => b.apartmentId === apt.id && b.checkIn >= (activeBooking ? activeBooking.checkOut : targetDateStr) && b.id !== activeBooking?.id);
+      const nextBooking = futureBookings.sort((a: any, b: any) => new Date(a.checkIn).getTime() - new Date(b.checkIn).getTime())[0];
+
+      let daysUntilNextBooking = null;
+      if (nextBooking) {
+        const nextCheckInDate = nextBooking.checkIn;
+        const refDate = activeBooking ? activeBooking.checkOut : targetDateStr;
+        const diffTime = new Date(nextCheckInDate).getTime() - new Date(refDate).getTime();
+        daysUntilNextBooking = Math.round(diffTime / (1000 * 3600 * 24));
+      }
+
       let isTurnover = !!outToday && !!inToday;
       let isCheckingOut = !!outToday && !inToday;
       let isCheckingIn = !!inToday && !outToday;
@@ -207,6 +218,7 @@ export default function DashboardOverview() {
         guestsCount: activeBooking?.guestsCount,
         lastCheckOut: lastBooking?.checkOut,
         upcomingBookingsCount: upcomingBookings.length,
+        daysUntilNextBooking,
         // Turnover logic
         isTurnover,
         leavingGuest: outToday?.name,
@@ -735,11 +747,23 @@ export default function DashboardOverview() {
                                     <span className="text-blue-600">🛬 {formatMiniDate(apt.arrivingCheckOut)}</span>
                                   </div>
                                 ) : apt.isOccupied ? (
-                                  formatMiniDate(apt.checkOut)
+                                  <div className="flex flex-col items-center">
+                                    <span>{formatMiniDate(apt.checkOut)}</span>
+                                    {apt.daysUntilNextBooking !== null && apt.daysUntilNextBooking > 0 && (
+                                      <span className="text-[8px] text-emerald-600 mt-0.5 whitespace-nowrap opacity-80">
+                                        (متاح {apt.daysUntilNextBooking} يوم حتى الحجز القادم)
+                                      </span>
+                                    )}
+                                  </div>
                                 ) : (
-                                  apt.lastCheckOut 
-                                    ? <span className="text-gray-400 font-bold opacity-60">آخر: {formatMiniDate(apt.lastCheckOut)}</span> 
-                                    : '—'
+                                  <div className="flex flex-col items-center">
+                                    {apt.lastCheckOut ? <span className="text-gray-400 font-bold opacity-60">آخر: {formatMiniDate(apt.lastCheckOut)}</span> : <span>—</span>}
+                                    {apt.daysUntilNextBooking !== null && apt.daysUntilNextBooking > 0 && (
+                                      <span className="text-[8px] text-emerald-600 mt-0.5 whitespace-nowrap opacity-80">
+                                        (متاح {apt.daysUntilNextBooking} يوم حتى الحجز القادم)
+                                      </span>
+                                    )}
+                                  </div>
                                 )}
                               </td>
                               <td className="px-4 py-2.5 text-center">
