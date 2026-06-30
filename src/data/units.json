@@ -4,7 +4,7 @@
     "branch": 1,
     "type": "studio",
     "title": {
-      "ar": "استوديو بريميوم 1",
+      "ar": "استوديو 1 (دبل)",
       "en": "Premium Studio 1"
     },
     "status": "متاح",
@@ -46,7 +46,7 @@
     "branch": 1,
     "type": "studio",
     "title": {
-      "ar": "استوديو بريميوم 2",
+      "ar": "استوديو 2 (سنجل)",
       "en": "Premium Studio 2"
     },
     "status": "متاح",
@@ -58,7 +58,7 @@
     "branch": 1,
     "type": "studio",
     "title": {
-      "ar": "استوديو بريميوم 3",
+      "ar": "استوديو 3 (سنجل)",
       "en": "Premium Studio 3"
     },
     "status": "متاح",
@@ -70,7 +70,7 @@
     "branch": 1,
     "type": "studio",
     "title": {
-      "ar": "استوديو بريميوم 4",
+      "ar": "استوديو 4 (تريبل)",
       "en": "Premium Studio 4"
     },
     "status": "متاح",
@@ -82,7 +82,7 @@
     "branch": 1,
     "type": "studio",
     "title": {
-      "ar": "استوديو بريميوم 5",
+      "ar": "استوديو 5 (دبل)",
       "en": "Premium Studio 5"
     },
     "status": "متاح",
@@ -94,7 +94,7 @@
     "branch": 1,
     "type": "studio",
     "title": {
-      "ar": "استوديو بريميوم 6",
+      "ar": "استوديو 6 (سنجل)",
       "en": "Premium Studio 6"
     },
     "status": "متاح",
@@ -106,7 +106,7 @@
     "branch": 1,
     "type": "studio",
     "title": {
-      "ar": "استوديو بريميوم 7",
+      "ar": "استوديو 7 (سنجل)",
       "en": "Premium Studio 7"
     },
     "status": "متاح",
@@ -118,7 +118,7 @@
     "branch": 1,
     "type": "studio",
     "title": {
-      "ar": "استوديو بريميوم 8",
+      "ar": "استوديو 8 (سنجل)",
       "en": "Premium Studio 8"
     },
     "status": "متاح",
@@ -130,7 +130,7 @@
     "branch": 1,
     "type": "studio",
     "title": {
-      "ar": "استوديو بريميوم 9",
+      "ar": "استوديو 9 (دبل)",
       "en": "Premium Studio 9"
     },
     "status": "متاح",
@@ -142,7 +142,7 @@
     "branch": 1,
     "type": "studio",
     "title": {
-      "ar": "استوديو بريميوم 10",
+      "ar": "استوديو 10 (دبل)",
       "en": "Premium Studio 10"
     },
     "status": "متاح",
@@ -154,7 +154,7 @@
     "branch": 1,
     "type": "studio",
     "title": {
-      "ar": "استوديو بريميوم 11",
+      "ar": "استوديو 11 (دبل)",
       "en": "Premium Studio 11"
     },
     "status": "متاح",
@@ -166,7 +166,7 @@
     "branch": 1,
     "type": "studio",
     "title": {
-      "ar": "استوديو بريميوم 12",
+      "ar": "استوديو 12 (دبل)",
       "en": "Premium Studio 12"
     },
     "status": "متاح",
@@ -178,7 +178,7 @@
     "branch": 2,
     "type": "studio",
     "title": {
-      "ar": "استوديو بريميوم 13",
+      "ar": "استوديو بريميوم 13 (دبل - سرير كبير)",
       "en": "Premium Studio 13"
     },
     "status": "متاح",
@@ -190,7 +190,7 @@
     "branch": 2,
     "type": "studio",
     "title": {
-      "ar": "استوديو بريميوم 14",
+      "ar": "استوديو بريميوم 14 (تريبل)",
       "en": "Premium Studio 14"
     },
     "status": "متاح",
@@ -202,7 +202,7 @@
     "branch": 2,
     "type": "studio",
     "title": {
-      "ar": "استوديو بريميوم 15",
+      "ar": "استوديو بريميوم 15 (تريبل)",
       "en": "Premium Studio 15"
     },
     "status": "متاح",
@@ -214,7 +214,7 @@
     "branch": 2,
     "type": "studio",
     "title": {
-      "ar": "استوديو بريميوم 16",
+      "ar": "استوديو بريميوم 16 (تريبل 2+1)",
       "en": "Premium Studio 16"
     },
     "status": "متاح",
@@ -226,7 +226,7 @@
     "branch": 2,
     "type": "studio",
     "title": {
-      "ar": "استوديو بريميوم 17",
+      "ar": "استوديو بريميوم 17 (سنجل)",
       "en": "Premium Studio 17"
     },
     "status": "متاح",
@@ -238,7 +238,7 @@
     "branch": 2,
     "type": "studio",
     "title": {
-      "ar": "استوديو بريميوم 18",
+      "ar": "استوديو بريميوم 18 (دبل)",
       "en": "Premium Studio 18"
     },
     "status": "متاح",
@@ -250,7 +250,7 @@
     "branch": 2,
     "type": "studio",
     "title": {
-      "ar": "استوديو بريميوم 19",
+      "ar": "استوديو بريميوم 19 (تريبل 2+1)",
       "en": "Premium Studio 19"
     },
     "status": "متاح",
@@ -262,7 +262,7 @@
     "branch": 2,
     "type": "studio",
     "title": {
-      "ar": "استوديو بريميوم 20",
+      "ar": "استوديو بريميوم 20 (دبل)",
       "en": "Premium Studio 20"
     },
     "status": "متاح",
@@ -274,7 +274,7 @@
     "branch": 2,
     "type": "studio",
     "title": {
-      "ar": "استوديو بريميوم 21",
+      "ar": "استوديو بريميوم 21 (تريبل 2+1)",
       "en": "Premium Studio 21"
     },
     "status": "متاح",
@@ -286,7 +286,7 @@
     "branch": 2,
     "type": "studio",
     "title": {
-      "ar": "استوديو بريميوم 22",
+      "ar": "استوديو بريميوم 22 (تريبل)",
       "en": "Premium Studio 22"
     },
     "status": "متاح",
@@ -298,7 +298,7 @@
     "branch": 2,
     "type": "studio",
     "title": {
-      "ar": "استوديو بريميوم 23",
+      "ar": "استوديو بريميوم 23 (تريبل)",
       "en": "Premium Studio 23"
     },
     "status": "متاح",
@@ -310,7 +310,7 @@
     "branch": 2,
     "type": "studio",
     "title": {
-      "ar": "استوديو بريميوم 24",
+      "ar": "استوديو بريميوم 24 (دبل - سرير كبير)",
       "en": "Premium Studio 24"
     },
     "status": "متاح",
@@ -322,7 +322,7 @@
     "branch": 1,
     "type": "apartment",
     "title": {
-      "ar": "شقة فندقية فاخرة 1",
+      "ar": "شقة فندقية فاخرة 1 (ذكي سيستم)",
       "en": "Luxury Hotel Apartment 1"
     },
     "status": "متاح",
@@ -334,7 +334,7 @@
     "branch": 1,
     "type": "apartment",
     "title": {
-      "ar": "شقة فندقية فاخرة 2",
+      "ar": "شقة فندقية فاخرة 2 (سيتي ستارز)",
       "en": "Luxury Hotel Apartment 2"
     },
     "status": "متاح",
@@ -346,7 +346,7 @@
     "branch": 1,
     "type": "apartment",
     "title": {
-      "ar": "شقة فندقية فاخرة 3",
+      "ar": "شقة فندقية فاخرة 3 (دائري التحرير)",
       "en": "Luxury Hotel Apartment 3"
     },
     "status": "متاح",
@@ -358,7 +358,7 @@
     "branch": 3,
     "type": "studio",
     "title": {
-      "ar": "شقة غرفتين (25)",
+      "ar": "شقة غرفتين (25) - 3 سرير",
       "en": "Two-room Apartment (25)"
     },
     "status": "متاح",
@@ -370,7 +370,7 @@
     "branch": 3,
     "type": "studio",
     "title": {
-      "ar": "شقة غرفتين (26)",
+      "ar": "شقة غرفتين (26) - 2 سرير",
       "en": "Two-room Apartment (26)"
     },
     "status": "متاح",
@@ -382,7 +382,7 @@
     "branch": 3,
     "type": "studio",
     "title": {
-      "ar": "شقة غرفتين (27)",
+      "ar": "شقة غرفتين (27) - 2 سرير",
       "en": "Two-room Apartment (27)"
     },
     "status": "متاح",
@@ -394,7 +394,7 @@
     "branch": 3,
     "type": "studio",
     "title": {
-      "ar": "شقة غرفتين (28)",
+      "ar": "شقة غرفتين (28) - 3 سرير",
       "en": "Two-room Apartment (28)"
     },
     "status": "متاح",
@@ -406,7 +406,7 @@
     "branch": 3,
     "type": "studio",
     "title": {
-      "ar": "شقة غرفتين (29)",
+      "ar": "شقة غرفتين (29) - 3 سرير",
       "en": "Two-room Apartment (29)"
     },
     "status": "متاح",
@@ -418,7 +418,7 @@
     "branch": 3,
     "type": "studio",
     "title": {
-      "ar": "شقة غرفتين (30)",
+      "ar": "شقة غرفتين (30) - 3 سرير",
       "en": "Two-room Apartment (30)"
     },
     "status": "متاح",
