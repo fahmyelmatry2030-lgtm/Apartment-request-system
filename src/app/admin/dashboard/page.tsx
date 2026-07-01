@@ -750,8 +750,8 @@ export default function DashboardOverview() {
                                   <div className="flex flex-col items-center">
                                     <span>{formatMiniDate(apt.checkOut)}</span>
                                     {apt.daysUntilNextBooking !== null && apt.daysUntilNextBooking > 0 && (
-                                      <span className="text-[8px] text-emerald-600 mt-0.5 whitespace-nowrap opacity-80">
-                                        (متاح {apt.daysUntilNextBooking} يوم حتى الحجز القادم)
+                                      <span className="text-[9px] font-black bg-emerald-100 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-md mt-1 whitespace-nowrap shadow-sm">
+                                        متاح {apt.daysUntilNextBooking} يوم حتى الحجز القادم
                                       </span>
                                     )}
                                   </div>
@@ -759,8 +759,8 @@ export default function DashboardOverview() {
                                   <div className="flex flex-col items-center">
                                     {apt.lastCheckOut ? <span className="text-gray-400 font-bold opacity-60">آخر: {formatMiniDate(apt.lastCheckOut)}</span> : <span>—</span>}
                                     {apt.daysUntilNextBooking !== null && apt.daysUntilNextBooking > 0 && (
-                                      <span className="text-[8px] text-emerald-600 mt-0.5 whitespace-nowrap opacity-80">
-                                        (متاح {apt.daysUntilNextBooking} يوم حتى الحجز القادم)
+                                      <span className="text-[9px] font-black bg-emerald-100 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-md mt-1 whitespace-nowrap shadow-sm">
+                                        متاح {apt.daysUntilNextBooking} يوم حتى الحجز القادم
                                       </span>
                                     )}
                                   </div>
