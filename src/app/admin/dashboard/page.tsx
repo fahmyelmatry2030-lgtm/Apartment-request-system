@@ -678,19 +678,19 @@ export default function DashboardOverview() {
 
             if (selectedCategory === 'all') {
               return (
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse text-right">
+                <div className="overflow-x-auto custom-scrollbar-horizontal pb-2">
+                  <table className="w-full min-w-[1100px] border-collapse text-right">
                     <thead>
                       <tr className="bg-[#2A2723] text-white">
                         <th className="px-4 py-3 text-[10px] font-black text-center w-12">#</th>
                         <th className="px-4 py-3 text-[10px] font-black">اسم الوحدة</th>
                         <th className="px-4 py-3 text-[10px] font-black">النوع</th>
                         <th className="px-4 py-3 text-[10px] font-black">الضيف</th>
+                        <th className="px-4 py-3 text-[10px] font-black min-w-[150px]">الملاحظات</th>
                         <th className="px-4 py-3 text-[10px] font-black text-center">تاريخ الخروج</th>
                         <th className="px-4 py-3 text-[10px] font-black text-center">حجوزات قادمة</th>
                         <th className="px-4 py-3 text-[10px] font-black text-center">الحالة</th>
                         <th className="px-4 py-3 text-[10px] font-black">حالة الإقامة</th>
-                        <th className="px-4 py-3 text-[10px] font-black">الملاحظات</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#EAE4D9]/30">
@@ -742,6 +742,21 @@ export default function DashboardOverview() {
                                   </div>
                                 ) : (
                                   apt.guest || (apt.isCheckingOut ? apt.leavingGuest : '—')
+                                )}
+                              </td>
+                              <td className="px-4 py-2.5 text-[10px] font-bold text-[#7A7061] max-w-[220px]">
+                                {apt.isTurnover ? (
+                                  <div className="flex flex-col gap-1 text-[9px]">
+                                    {apt.leavingNotes && <span className="text-rose-600 truncate" title={`خروج: ${apt.leavingNotes}`}>🛫 {apt.leavingNotes}</span>}
+                                    {apt.arrivingNotes && <span className="text-blue-600 truncate" title={`وصول: ${apt.arrivingNotes}`}>🛬 {apt.arrivingNotes}</span>}
+                                    {!apt.leavingNotes && !apt.arrivingNotes && <span className="text-gray-300">—</span>}
+                                  </div>
+                                ) : apt.notes ? (
+                                  <span className="truncate block max-w-[200px] bg-amber-50/80 border border-amber-200/60 px-2 py-0.5 rounded-md text-amber-800" title={apt.notes}>
+                                    📝 {apt.notes}
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-300">—</span>
                                 )}
                               </td>
                               <td className="px-4 py-2.5 text-[10px] text-center text-[#2A2723] font-black">
@@ -856,21 +871,6 @@ export default function DashboardOverview() {
                                     <option value="غادر">🚪 غادر</option>
                                   </select>
                                 ) : <span className="text-[10px] text-gray-300">—</span>}
-                              </td>
-                              <td className="px-4 py-2.5 text-[10px] font-bold text-[#7A7061] max-w-[200px]">
-                                {apt.isTurnover ? (
-                                  <div className="flex flex-col gap-1 text-[9px]">
-                                    {apt.leavingNotes && <span className="text-rose-600 truncate" title={`خروج: ${apt.leavingNotes}`}>🛫 {apt.leavingNotes}</span>}
-                                    {apt.arrivingNotes && <span className="text-blue-600 truncate" title={`وصول: ${apt.arrivingNotes}`}>🛬 {apt.arrivingNotes}</span>}
-                                    {!apt.leavingNotes && !apt.arrivingNotes && <span className="text-gray-300">—</span>}
-                                  </div>
-                                ) : apt.notes ? (
-                                  <span className="truncate block max-w-[180px] bg-amber-50/80 border border-amber-200/60 px-2 py-0.5 rounded-md text-amber-800" title={apt.notes}>
-                                    📝 {apt.notes}
-                                  </span>
-                                ) : (
-                                  <span className="text-gray-300">—</span>
-                                )}
                               </td>
                             </tr>
                           );
