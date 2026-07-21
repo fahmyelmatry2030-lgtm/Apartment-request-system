@@ -668,6 +668,7 @@ function ReportsContent() {
       clientStatus,
       bookingManager: booking.bookingManager || '',
       paymentMethod: booking.paymentMethod || '',
+      paymentStatus: booking.paymentStatus || (booking.paymentInfo === 'باقي' || booking.paymentInfo === 'unpaid' ? 'باقي' : 'خالص'),
       notes: typeof booking.notes === 'string' ? booking.notes.replace(/خصم بقيمة \d+/, '').trim() : '',
       isCarriedOver: booking.isCarriedOver,
       hasData: true,
@@ -694,7 +695,7 @@ function ReportsContent() {
     id: '', date: '', name: '', nationality: '', idNumber: '', phone: '',
     checkIn: '', checkOut: '', days: 0, pricePerNight: 0, total: 0,
     commission: 0, brokerName: '', netValue: 0, clientStatus: '',
-    bookingManager: '', paymentMethod: '', notes: '', isCarriedOver: false, hasData: false,
+    bookingManager: '', paymentMethod: '', paymentStatus: 'خالص', notes: '', isCarriedOver: false, hasData: false,
   }));
 
   const allRows = [...renumberedRows, ...emptyRows];
@@ -702,11 +703,12 @@ function ReportsContent() {
   // Export CSV
   const exportCSV = () => {
     const unitLabel = units.find(u => u.id === selectedUnit)?.title?.ar || selectedUnit;
-    const header = ['No', 'Date', 'Name', 'Nationality', 'ID Number', 'Phone Number', 'Check In', 'Check Out', 'No. of Days', 'Price Per Night', 'Total', 'Client Status', 'Commission', 'Broker Name', 'Net Value', 'Notes'];
+    const header = ['No', 'Date', 'Name', 'Nationality', 'ID Number', 'Phone Number', 'Check In', 'Check Out', 'No. of Days', 'Price Per Night', 'Total', 'Payment Status', 'Client Status', 'Commission', 'Broker Name', 'Net Value', 'Notes'];
 
     const csvRows = dataRows.map(r => [
       r.no, r.date, r.name, r.nationality, r.idNumber, r.phone,
       r.checkIn, r.checkOut, r.days, r.pricePerNight, r.total,
+      r.paymentStatus === 'باقي' ? 'باقي فلوس (❌)' : 'خالص (✔️)',
       r.clientStatus, r.commission, r.brokerName, r.netValue, r.notes,
     ].join(','));
 
@@ -1170,6 +1172,7 @@ function ReportsContent() {
                       <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">الصافي</th>
                       <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">مسئول الحجز</th>
                       <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">طريقة الدفع</th>
+                      <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">حالة الدفع</th>
                       <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap">ملاحظات</th>
                       <th className="px-3 py-4 no-print whitespace-nowrap border-l border-[#3a3730]">الإجراءات</th>
                       <th className="px-3 py-4 border-l border-[#3a3730] whitespace-nowrap sticky left-0 bg-[#2A2723] z-20 shadow-[-2px_0_5px_rgba(0,0,0,0.3)]">الحالة</th>
@@ -1178,13 +1181,13 @@ function ReportsContent() {
                   <tbody className="text-[10px] font-semibold">
                     {isLoading ? (
                       <tr>
-                        <td colSpan={15} className="px-6 py-20 text-center text-[#7A7061] italic font-bold opacity-40 uppercase tracking-widest">
+                        <td colSpan={16} className="px-6 py-20 text-center text-[#7A7061] italic font-bold opacity-40 uppercase tracking-widest">
                           جاري تحميل البيانات...
                         </td>
                       </tr>
                     ) : allRows.length === 0 ? (
                       <tr>
-                        <td colSpan={15} className="px-6 py-20 text-center text-[#7A7061] italic font-bold opacity-40 uppercase tracking-widest">لا توجد سجلات لهذا الشهر</td>
+                        <td colSpan={16} className="px-6 py-20 text-center text-[#7A7061] italic font-bold opacity-40 uppercase tracking-widest">لا توجد سجلات لهذا الشهر</td>
                       </tr>
                     ) : (
                       allRows.map((row, index) => (
@@ -1265,6 +1268,39 @@ function ReportsContent() {
                           <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
                             {row.hasData ? (
                               <EditableCell value={row.paymentMethod} bookingId={row.id} field="paymentMethod" onSave={handleCellSave} className="text-blue-600 font-bold" readOnly={row.isCarriedOver} />
+                            ) : <span className="text-[#EAE4D9]">—</span>}
+                          </td>
+
+                          {/* EDITABLE / TOGGLE: Payment Status (خالص / باقي) */}
+                          <td className="px-1 py-1 border-l border-[#EAE4D9]/20">
+                            {row.hasData ? (
+                              <button
+                                disabled={row.isCarriedOver}
+                                onClick={() => {
+                                  const nextStatus = row.paymentStatus === 'باقي' ? 'خالص' : 'باقي';
+                                  handleCellSave(row.id, 'paymentStatus', nextStatus);
+                                }}
+                                className={`px-2.5 py-1 rounded-full text-[10px] font-black transition-all shadow-sm flex items-center justify-center gap-1 mx-auto ${
+                                  row.isCarriedOver ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer hover:scale-105'
+                                } ${
+                                  row.paymentStatus === 'باقي'
+                                    ? 'bg-rose-100 text-rose-700 border border-rose-200 hover:bg-rose-200'
+                                    : 'bg-green-100 text-green-700 border border-green-200 hover:bg-green-200'
+                                }`}
+                                title={row.paymentStatus === 'باقي' ? 'باقي فلوس - اضغط للتغيير إلى خالص' : 'خالص - اضغط للتغيير إلى باقي فلوس'}
+                              >
+                                {row.paymentStatus === 'باقي' ? (
+                                  <>
+                                    <span className="text-xs font-black text-rose-600">❌</span>
+                                    <span>باقي</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span className="text-xs font-black text-green-600">✔️</span>
+                                    <span>خالص</span>
+                                  </>
+                                )}
+                              </button>
                             ) : <span className="text-[#EAE4D9]">—</span>}
                           </td>
 

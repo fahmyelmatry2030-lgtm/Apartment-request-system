@@ -97,6 +97,7 @@ export async function getFreshDbBookings(nonce?: string) {
         studio: b.studio,
         status: b.status,
         paymentInfo: b.payment_info,
+        paymentStatus: b.payment_status || (b.payment_info === 'باقي' || b.payment_info === 'unpaid' ? 'باقي' : 'خالص'),
         totalAmount: Number(b.total_amount || 0),
         numberOfDays: Number(b.number_of_days || 0),
         nationality: b.nationality,
@@ -123,6 +124,7 @@ export async function getFreshDbBookings(nonce?: string) {
         studio: b.studio,
         status: b.status,
         paymentInfo: b.payment_info,
+        paymentStatus: b.payment_status || (b.payment_info === 'باقي' || b.payment_info === 'unpaid' ? 'باقي' : 'خالص'),
         totalAmount: totalAmount,
         numberOfDays: days,
         pricePerNight: days > 0 ? (totalAmount / days) : 0,
@@ -245,6 +247,10 @@ export async function updateDbBookingStatus(id: string, updates: any) {
   if (updates.status !== undefined) patch.status = updates.status;
   if (updates.apartmentId !== undefined) patch.apartment_id = updates.apartmentId;
   if (updates.paymentInfo !== undefined) patch.payment_info = updates.paymentInfo;
+  if (updates.paymentStatus !== undefined) {
+    patch.payment_status = updates.paymentStatus;
+    patch.payment_info = updates.paymentStatus;
+  }
   if (updates.totalAmount !== undefined) patch.total_amount = updates.totalAmount;
   if (updates.numberOfDays !== undefined) patch.number_of_days = updates.numberOfDays;
   if (updates.nationality !== undefined) patch.nationality = updates.nationality;
@@ -253,7 +259,7 @@ export async function updateDbBookingStatus(id: string, updates: any) {
   if (updates.brokerName !== undefined) patch.broker_name = updates.brokerName;
   if (updates.clientStatus !== undefined) patch.client_status = updates.clientStatus;
   if (updates.guestsCount !== undefined) patch.guests_count = updates.guestsCount;
-  // booking_manager & payment_method: try to include, will be stripped on retry if columns don't exist
+  // booking_manager, payment_method & payment_status: try to include, will be stripped on retry if columns don't exist
   if (updates.bookingManager !== undefined) patch.booking_manager = updates.bookingManager;
   if (updates.paymentMethod !== undefined) patch.payment_method = updates.paymentMethod;
   if (updates.notes !== undefined) patch.notes = updates.notes;
@@ -272,13 +278,18 @@ export async function updateDbBookingStatus(id: string, updates: any) {
     error.code === '42703' ||
     error.message?.toLowerCase().includes('schema cache') ||
     error.message?.toLowerCase().includes('booking_manager') ||
-    error.message?.toLowerCase().includes('payment_method')
+    error.message?.toLowerCase().includes('payment_method') ||
+    error.message?.toLowerCase().includes('payment_status')
   );
 
   if (isSchemaError) {
-    console.warn('Retrying update without booking_manager/payment_method columns...');
+    console.warn('Retrying update without optional columns...');
     delete patch.booking_manager;
     delete patch.payment_method;
+    delete patch.payment_status;
+    if (updates.paymentStatus !== undefined) {
+      patch.payment_info = updates.paymentStatus;
+    }
     const retry = await supabase.from('bookings')
       .update(patch)
       .eq('id', id)

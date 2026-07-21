@@ -221,6 +221,9 @@ export default function DashboardOverview() {
         daysUntilNextBooking,
         // Turnover logic
         isTurnover,
+        notes: activeBooking?.notes || (outToday?.notes ? outToday.notes : inToday?.notes ? inToday.notes : ''),
+        leavingNotes: outToday?.notes || '',
+        arrivingNotes: inToday?.notes || '',
         leavingGuest: outToday?.name,
         leavingBookingId: outToday?.id,
         leavingClientStatus: outToday?.clientStatus || 'انتظار',
@@ -687,6 +690,7 @@ export default function DashboardOverview() {
                         <th className="px-4 py-3 text-[10px] font-black text-center">حجوزات قادمة</th>
                         <th className="px-4 py-3 text-[10px] font-black text-center">الحالة</th>
                         <th className="px-4 py-3 text-[10px] font-black">حالة الإقامة</th>
+                        <th className="px-4 py-3 text-[10px] font-black">الملاحظات</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#EAE4D9]/30">
@@ -853,6 +857,21 @@ export default function DashboardOverview() {
                                   </select>
                                 ) : <span className="text-[10px] text-gray-300">—</span>}
                               </td>
+                              <td className="px-4 py-2.5 text-[10px] font-bold text-[#7A7061] max-w-[200px]">
+                                {apt.isTurnover ? (
+                                  <div className="flex flex-col gap-1 text-[9px]">
+                                    {apt.leavingNotes && <span className="text-rose-600 truncate" title={`خروج: ${apt.leavingNotes}`}>🛫 {apt.leavingNotes}</span>}
+                                    {apt.arrivingNotes && <span className="text-blue-600 truncate" title={`وصول: ${apt.arrivingNotes}`}>🛬 {apt.arrivingNotes}</span>}
+                                    {!apt.leavingNotes && !apt.arrivingNotes && <span className="text-gray-300">—</span>}
+                                  </div>
+                                ) : apt.notes ? (
+                                  <span className="truncate block max-w-[180px] bg-amber-50/80 border border-amber-200/60 px-2 py-0.5 rounded-md text-amber-800" title={apt.notes}>
+                                    📝 {apt.notes}
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-300">—</span>
+                                )}
+                              </td>
                             </tr>
                           );
                         })}
@@ -900,6 +919,17 @@ export default function DashboardOverview() {
                         <div className="text-[9px] text-[#7A7061] mt-1 truncate">👤 {apt.guest || apt.leavingGuest}</div>
                       ) : apt.lastCheckOut ? (
                         <div className="text-[8px] text-gray-400 mt-1 font-bold italic">🕒 آخر خروج: {formatMiniDate(apt.lastCheckOut)}</div>
+                      ) : null}
+
+                      {apt.notes ? (
+                        <div className="text-[9px] text-amber-800 bg-amber-50/80 border border-amber-200/60 rounded-lg p-1.5 mt-2 font-bold line-clamp-2" title={apt.notes}>
+                          📝 {apt.notes}
+                        </div>
+                      ) : (apt.leavingNotes || apt.arrivingNotes) ? (
+                        <div className="text-[9px] mt-2 space-y-0.5 font-bold">
+                          {apt.leavingNotes && <div className="text-rose-600 truncate" title={apt.leavingNotes}>🛫 {apt.leavingNotes}</div>}
+                          {apt.arrivingNotes && <div className="text-blue-600 truncate" title={apt.arrivingNotes}>🛬 {apt.arrivingNotes}</div>}
+                        </div>
                       ) : null}
                     </div>
                   ))}
