@@ -669,11 +669,25 @@ function ReportsContent() {
       bookingManager: booking.bookingManager || '',
       paymentMethod: booking.paymentMethod || '',
       paymentStatus: (() => {
-        if (booking.paymentStatus === 'باقي' || booking.paymentStatus === 'خالص') return booking.paymentStatus;
-        const noteStr = String(booking.notes || '').toLowerCase();
-        const infoStr = String(booking.paymentInfo || '').toLowerCase();
-        const keywords = ['متبقي', 'باقي', 'باقى', 'علية', 'عليها', 'دين', 'مستحق', 'آجل', 'اجل'];
-        return keywords.some(kw => noteStr.includes(kw) || infoStr.includes(kw)) ? 'باقي' : 'خالص';
+        const noteStr = String(booking.notes || '').trim().toLowerCase();
+        const infoStr = String(booking.paymentInfo || '').trim().toLowerCase();
+        const combined = `${noteStr} ${infoStr}`;
+
+        const cleanKeywords = ['حساب خالص', 'الحساب خالص', 'خالص', 'تم الدفع', 'تم السداد', 'مدفوع بالكامل'];
+        const isExplicitlyClean = cleanKeywords.some(kw => combined.includes(kw));
+
+        const debtKeywords = ['متبقي', 'باقي', 'باقى', 'علية', 'عليها', 'دين', 'مستحق', 'آجل', 'اجل', 'عقد'];
+        const hasNumbers = /\d+/.test(noteStr);
+        const hasDebtKeyword = debtKeywords.some(kw => combined.includes(kw));
+
+        if (!isExplicitlyClean && (hasDebtKeyword || hasNumbers)) {
+          return 'باقي';
+        }
+        if (isExplicitlyClean) {
+          return 'خالص';
+        }
+        if (booking.paymentStatus === 'باقي') return 'باقي';
+        return 'خالص';
       })(),
       notes: typeof booking.notes === 'string' ? booking.notes.replace(/خصم بقيمة \d+/, '').trim() : '',
       isCarriedOver: booking.isCarriedOver,

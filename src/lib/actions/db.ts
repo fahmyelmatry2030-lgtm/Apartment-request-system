@@ -86,13 +86,26 @@ export async function getFreshDbBookings(nonce?: string) {
     
     // Filter them out of the current result set
     const detectPaymentStatus = (b: any) => {
-      if (b.payment_status === 'باقي' || b.payment_status === 'خالص') return b.payment_status;
-      const noteStr = String(b.notes || '').toLowerCase();
-      const infoStr = String(b.payment_info || '').toLowerCase();
-      const keywords = ['متبقي', 'باقي', 'باقى', 'علية', 'عليها', 'دين', 'مستحق', 'آجل', 'اجل'];
-      if (keywords.some(kw => noteStr.includes(kw) || infoStr.includes(kw))) {
+      const noteStr = String(b.notes || '').trim().toLowerCase();
+      const infoStr = String(b.payment_info || '').trim().toLowerCase();
+      const combined = `${noteStr} ${infoStr}`;
+
+      const cleanKeywords = ['حساب خالص', 'الحساب خالص', 'خالص', 'تم الدفع', 'تم السداد', 'مدفوع بالكامل'];
+      const isExplicitlyClean = cleanKeywords.some(kw => combined.includes(kw));
+
+      const debtKeywords = ['متبقي', 'باقي', 'باقى', 'علية', 'عليها', 'دين', 'مستحق', 'آجل', 'اجل', 'عقد'];
+      const hasNumbers = /\d+/.test(noteStr);
+      const hasDebtKeyword = debtKeywords.some(kw => combined.includes(kw));
+
+      if (!isExplicitlyClean && (hasDebtKeyword || hasNumbers)) {
         return 'باقي';
       }
+
+      if (isExplicitlyClean) {
+        return 'خالص';
+      }
+
+      if (b.payment_status === 'باقي') return 'باقي';
       return 'خالص';
     };
 
@@ -125,10 +138,26 @@ export async function getFreshDbBookings(nonce?: string) {
     return (data || []).map((b: any) => {
       const totalAmount = Number(b.total_amount || 0);
       const days = Number(b.number_of_days || 0);
-      const noteStr = String(b.notes || '').toLowerCase();
-      const infoStr = String(b.payment_info || '').toLowerCase();
-      const keywords = ['متبقي', 'باقي', 'باقى', 'علية', 'عليها', 'دين', 'مستحق', 'آجل', 'اجل'];
-      const autoStatus = keywords.some(kw => noteStr.includes(kw) || infoStr.includes(kw)) ? 'باقي' : 'خالص';
+      
+      const noteStr = String(b.notes || '').trim().toLowerCase();
+      const infoStr = String(b.payment_info || '').trim().toLowerCase();
+      const combined = `${noteStr} ${infoStr}`;
+
+      const cleanKeywords = ['حساب خالص', 'الحساب خالص', 'خالص', 'تم الدفع', 'تم السداد', 'مدفوع بالكامل'];
+      const isExplicitlyClean = cleanKeywords.some(kw => combined.includes(kw));
+
+      const debtKeywords = ['متبقي', 'باقي', 'باقى', 'علية', 'عليها', 'دين', 'مستحق', 'آجل', 'اجل', 'عقد'];
+      const hasNumbers = /\d+/.test(noteStr);
+      const hasDebtKeyword = debtKeywords.some(kw => combined.includes(kw));
+
+      let computedStatus = b.payment_status;
+      if (!isExplicitlyClean && (hasDebtKeyword || hasNumbers)) {
+        computedStatus = 'باقي';
+      } else if (isExplicitlyClean) {
+        computedStatus = 'خالص';
+      } else if (!computedStatus) {
+        computedStatus = 'خالص';
+      }
 
       return {
         id: b.id,
@@ -140,7 +169,7 @@ export async function getFreshDbBookings(nonce?: string) {
         studio: b.studio,
         status: b.status,
         paymentInfo: b.payment_info,
-        paymentStatus: b.payment_status || autoStatus,
+        paymentStatus: computedStatus,
         totalAmount: totalAmount,
         numberOfDays: days,
         pricePerNight: days > 0 ? (totalAmount / days) : 0,
