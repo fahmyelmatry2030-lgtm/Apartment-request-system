@@ -668,7 +668,13 @@ function ReportsContent() {
       clientStatus,
       bookingManager: booking.bookingManager || '',
       paymentMethod: booking.paymentMethod || '',
-      paymentStatus: booking.paymentStatus || (booking.paymentInfo === 'باقي' || booking.paymentInfo === 'unpaid' ? 'باقي' : 'خالص'),
+      paymentStatus: (() => {
+        if (booking.paymentStatus === 'باقي' || booking.paymentStatus === 'خالص') return booking.paymentStatus;
+        const noteStr = String(booking.notes || '').toLowerCase();
+        const infoStr = String(booking.paymentInfo || '').toLowerCase();
+        const keywords = ['متبقي', 'باقي', 'باقى', 'علية', 'عليها', 'دين', 'مستحق', 'آجل', 'اجل'];
+        return keywords.some(kw => noteStr.includes(kw) || infoStr.includes(kw)) ? 'باقي' : 'خالص';
+      })(),
       notes: typeof booking.notes === 'string' ? booking.notes.replace(/خصم بقيمة \d+/, '').trim() : '',
       isCarriedOver: booking.isCarriedOver,
       hasData: true,

@@ -85,6 +85,17 @@ export async function getFreshDbBookings(nonce?: string) {
     await supabase.from('bookings').delete().in('id', expiredIds);
     
     // Filter them out of the current result set
+    const detectPaymentStatus = (b: any) => {
+      if (b.payment_status === 'باقي' || b.payment_status === 'خالص') return b.payment_status;
+      const noteStr = String(b.notes || '').toLowerCase();
+      const infoStr = String(b.payment_info || '').toLowerCase();
+      const keywords = ['متبقي', 'باقي', 'باقى', 'علية', 'عليها', 'دين', 'مستحق', 'آجل', 'اجل'];
+      if (keywords.some(kw => noteStr.includes(kw) || infoStr.includes(kw))) {
+        return 'باقي';
+      }
+      return 'خالص';
+    };
+
     return data
       .filter((b: any) => !expiredIds.includes(b.id))
       .map((b: any) => ({
@@ -97,7 +108,7 @@ export async function getFreshDbBookings(nonce?: string) {
         studio: b.studio,
         status: b.status,
         paymentInfo: b.payment_info,
-        paymentStatus: b.payment_status || (b.payment_info === 'باقي' || b.payment_info === 'unpaid' ? 'باقي' : 'خالص'),
+        paymentStatus: detectPaymentStatus(b),
         totalAmount: Number(b.total_amount || 0),
         numberOfDays: Number(b.number_of_days || 0),
         nationality: b.nationality,
@@ -114,6 +125,11 @@ export async function getFreshDbBookings(nonce?: string) {
     return (data || []).map((b: any) => {
       const totalAmount = Number(b.total_amount || 0);
       const days = Number(b.number_of_days || 0);
+      const noteStr = String(b.notes || '').toLowerCase();
+      const infoStr = String(b.payment_info || '').toLowerCase();
+      const keywords = ['متبقي', 'باقي', 'باقى', 'علية', 'عليها', 'دين', 'مستحق', 'آجل', 'اجل'];
+      const autoStatus = keywords.some(kw => noteStr.includes(kw) || infoStr.includes(kw)) ? 'باقي' : 'خالص';
+
       return {
         id: b.id,
         name: b.name,
@@ -124,7 +140,7 @@ export async function getFreshDbBookings(nonce?: string) {
         studio: b.studio,
         status: b.status,
         paymentInfo: b.payment_info,
-        paymentStatus: b.payment_status || (b.payment_info === 'باقي' || b.payment_info === 'unpaid' ? 'باقي' : 'خالص'),
+        paymentStatus: b.payment_status || autoStatus,
         totalAmount: totalAmount,
         numberOfDays: days,
         pricePerNight: days > 0 ? (totalAmount / days) : 0,
