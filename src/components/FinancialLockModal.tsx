@@ -29,21 +29,21 @@ export default function FinancialLockModal({ isOpen, onUnlock }: FinancialLockMo
   };
 
   return (
-    <div className="fixed inset-0 z-[120] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in" dir="rtl">
-      <div className="bg-[#1F1C18] border border-[#C1A68D]/40 rounded-[2.5rem] p-8 md:p-10 max-w-md w-full shadow-2xl relative text-center">
-        {/* Glow Element */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-1 bg-[#C1A68D] rounded-full shadow-[0_0_20px_#C1A68D]" />
+    <div className="fixed inset-0 z-[200] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 md:p-6 overflow-y-auto animate-fade-in" dir="rtl">
+      <div className="my-auto bg-[#1F1C18] border border-[#C1A68D]/40 rounded-[2.5rem] p-8 md:p-10 max-w-md w-full shadow-2xl relative text-center flex flex-col items-center justify-center">
+        {/* Top Accent Line */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-36 h-1.5 bg-[#C1A68D] rounded-full shadow-[0_0_20px_#C1A68D]" />
 
-        <div className="w-16 h-16 bg-[#C1A68D]/10 border border-[#C1A68D]/30 rounded-2xl flex items-center justify-center mx-auto mb-6 text-[#C1A68D]">
-          <Lock size={32} className="animate-pulse" />
+        <div className="w-16 h-16 bg-[#C1A68D]/15 border border-[#C1A68D]/40 rounded-2xl flex items-center justify-center mx-auto mb-5 text-[#C1A68D] shadow-inner">
+          <Lock size={30} className="animate-pulse" />
         </div>
 
         <h3 className="text-2xl font-black text-white mb-2 tracking-tight">محمي بكلمة السر 🔒</h3>
-        <p className="text-xs font-bold text-gray-400 mb-8 leading-relaxed">
+        <p className="text-xs font-bold text-gray-400 mb-6 leading-relaxed">
           كشف الحساب الشهري والتقرير المالي الشامل محمي. يرجى إدخال كلمة مرور الإدارة لعرض البيانات المالية.
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="w-full space-y-4">
           <div className="relative">
             <input
               autoFocus
@@ -51,7 +51,7 @@ export default function FinancialLockModal({ isOpen, onUnlock }: FinancialLockMo
               placeholder="••••••••"
               value={password}
               onChange={(e) => { setPassword(e.target.value); setError(false); }}
-              className={`w-full bg-[#2A2723] border-2 rounded-2xl px-5 py-4 text-center text-white font-black tracking-widest outline-none transition-all placeholder:text-gray-600 ${
+              className={`w-full bg-[#2A2723] border-2 rounded-2xl px-5 py-3.5 text-center text-white font-black tracking-widest outline-none transition-all placeholder:text-gray-600 ${
                 error ? 'border-red-500/80 ring-2 ring-red-500/20' : 'border-[#C1A68D]/40 focus:border-[#C1A68D]'
               }`}
             />
@@ -59,9 +59,9 @@ export default function FinancialLockModal({ isOpen, onUnlock }: FinancialLockMo
           </div>
 
           {error && (
-            <div className="flex items-center justify-center gap-2 text-rose-400 text-xs font-black bg-rose-500/10 py-2 rounded-xl border border-rose-500/20 animate-shake">
+            <div className="flex items-center justify-center gap-2 text-rose-400 text-xs font-black bg-rose-500/10 py-2.5 rounded-xl border border-rose-500/20 animate-shake">
               <ShieldAlert size={14} />
-              <span>كلمة المرور غير صحيحة! يرجى المحاولة مرة أخرى</span>
+              <span>كلمة المرور غير صحيحة! (أدخل 1234 أو mazar2026)</span>
             </div>
           )}
 

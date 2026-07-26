@@ -844,16 +844,26 @@ function ReportsContent() {
           </a>
         </div>
 
-        {activeTab === 'expenses' && <ExpensesTab />}
+        {activeTab === 'expenses' && (
+          isUnlocked ? (
+            <ExpensesTab />
+          ) : (
+            <FinancialLockModal isOpen={true} onUnlock={() => setIsUnlocked(true)} />
+          )
+        )}
         {activeTab === 'financial' && (
-          <FinancialSummaryTab
-            bookings={bookings}
-            units={units}
-            selectedMonth={selectedMonth}
-            selectedYear={selectedYear}
-            setSelectedMonth={setSelectedMonth}
-            setSelectedYear={setSelectedYear}
-          />
+          isUnlocked ? (
+            <FinancialSummaryTab
+              bookings={bookings}
+              units={units}
+              selectedMonth={selectedMonth}
+              selectedYear={selectedYear}
+              setSelectedMonth={setSelectedMonth}
+              setSelectedYear={setSelectedYear}
+            />
+          ) : (
+            <FinancialLockModal isOpen={true} onUnlock={() => setIsUnlocked(true)} />
+          )
         )}
 
         {activeTab === 'operational' && (
