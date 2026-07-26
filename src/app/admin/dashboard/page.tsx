@@ -542,7 +542,6 @@ export default function DashboardOverview() {
                   <tr className="bg-[#2A2723] text-white text-xs font-black">
                     <th className="px-4 py-4 text-center w-12">#</th>
                     <th className="px-4 py-4">اسم الوحدة</th>
-                    <th className="px-4 py-4">النوع</th>
                     <th className="px-4 py-4 min-w-[180px]">اسم الضيف (اضغط للتفاصيل)</th>
                     <th className="px-4 py-4 min-w-[180px]">الملاحظات</th>
                     <th className="px-4 py-4 text-center">تاريخ الخروج</th>
@@ -591,9 +590,6 @@ export default function DashboardOverview() {
                               {apt.title?.ar || apt.id}
                             </button>
                           </td>
-                          <td className="px-4 py-3 text-xs text-[#7A7061] font-bold">{typeLabel[apt.category] || apt.category}</td>
-                          
-                          {/* GUEST NAME (PROMINENT, BOLD, CLICKABLE) */}
                           <td className="px-4 py-3 font-black text-sm text-[#2A2723]">
                             {apt.isTurnover ? (
                               <div className="flex flex-col gap-1.5 items-start justify-center">
