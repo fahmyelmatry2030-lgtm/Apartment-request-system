@@ -72,8 +72,23 @@ function statusLabel(status: string) {
   return status || '—';
 }
 
-// ─── Customer Drawer ──────────────────────────────────────────────────────────
-function CustomerDrawer({
+// ─── Avatar gradient palettes ─────────────────────────────────────────────────
+const GRADIENTS = [
+  'from-rose-400 to-pink-600',
+  'from-violet-400 to-purple-600',
+  'from-sky-400 to-blue-600',
+  'from-emerald-400 to-teal-600',
+  'from-amber-400 to-orange-500',
+  'from-fuchsia-400 to-pink-600',
+  'from-indigo-400 to-violet-600',
+  'from-cyan-400 to-sky-600',
+];
+function getGradient(name: string) {
+  return GRADIENTS[(name?.charCodeAt(0) || 0) % GRADIENTS.length];
+}
+
+// ─── Customer Modal (Premium Centered) ───────────────────────────────────────
+function CustomerModal({
   customer,
   onClose,
   onDelete,
@@ -86,283 +101,226 @@ function CustomerDrawer({
 }) {
   const [note, setNote] = useState('');
   const [editingNote, setEditingNote] = useState(false);
-  const [activeTab, setActiveTab] = useState<'history' | 'info'>('history');
+  const [activeTab, setActiveTab] = useState<'history' | 'notes' | 'units'>('history');
 
   useEffect(() => {
     if (customer?.phone) {
-      const saved = localStorage.getItem(`customer_note_${customer.phone}`) || '';
-      setNote(saved);
+      setNote(localStorage.getItem(`customer_note_${customer.phone}`) || '');
     }
     setEditingNote(false);
     setActiveTab('history');
   }, [customer?.phone]);
 
   const saveNote = () => {
-    if (customer?.phone) {
-      localStorage.setItem(`customer_note_${customer.phone}`, note);
-    }
+    if (customer?.phone) localStorage.setItem(`customer_note_${customer.phone}`, note);
     setEditingNote(false);
   };
 
   if (!customer) return null;
 
   const badge = getBadge(customer);
-  const avatarColor = getAvatarColor(customer.name);
+  const gradient = getGradient(customer.name);
   const cleanPhone = formatWhatsAppNumber(customer.phone);
   const avgAmount = customer.count > 0 ? Math.round(customer.totalRevenue / customer.count) : 0;
 
-  // Most booked unit
   const unitFreq: Record<string, number> = {};
   customer.bookings.forEach(b => { if (b.studio) unitFreq[b.studio] = (unitFreq[b.studio] || 0) + 1; });
   const favoriteUnit = Object.entries(unitFreq).sort((a, b) => b[1] - a[1])[0]?.[0];
 
+  const STATS = [
+    { label: 'إجمالي الإيراد', value: fmtMoney(customer.totalRevenue), icon: '💰', from: 'from-emerald-500', to: 'to-teal-600' },
+    { label: 'عدد الحجوزات',   value: `${customer.count} مرة`,         icon: '📅', from: 'from-blue-500',    to: 'to-indigo-600' },
+    { label: 'إجمالي الليالي', value: `${customer.totalNights} ليلة`,   icon: '🌙', from: 'from-violet-500',  to: 'to-purple-600' },
+    { label: 'متوسط الحجز',    value: fmtMoney(avgAmount),              icon: '📊', from: 'from-amber-500',   to: 'to-orange-600' },
+  ];
+
   return (
     <>
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-md" onClick={onClose} />
 
-      {/* Drawer */}
-      <div className="fixed inset-y-0 left-0 w-full max-w-2xl bg-[#FDFBF7] z-50 shadow-2xl overflow-y-auto flex flex-col"
+      {/* Modal */}
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
         dir="rtl"
-        style={{ animation: 'slideInLeft 0.3s ease-out' }}
       >
-        {/* ── Header ── */}
-        <div className="sticky top-0 z-10 bg-white border-b border-[#EAE4D9]/60 px-8 py-5 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className={`w-14 h-14 rounded-2xl ${avatarColor} flex items-center justify-center text-2xl font-black flex-shrink-0`}>
-              {customer.name?.substring(0, 1) || '?'}
-            </div>
-            <div>
-              <h2 className="text-xl font-black text-[#2A2723] leading-tight">{customer.name}</h2>
-              <div className="flex items-center gap-2 mt-1">
-                <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full border ${badge.color}`}>
-                  {badge.icon} {badge.label}
-                </span>
-                {customer.hasDiscount && (
-                  <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full border bg-purple-100 text-purple-700 border-purple-300">
-                    💎 خصم سابق
+        <div
+          className="relative w-full max-w-2xl max-h-[92vh] bg-white rounded-[2.5rem] shadow-[0_32px_80px_rgba(0,0,0,0.35)] overflow-hidden flex flex-col"
+          style={{ animation: 'modalPop 0.35s cubic-bezier(0.34,1.56,0.64,1)' }}
+          onClick={e => e.stopPropagation()}
+        >
+          {/* ── Gradient Hero Header ─────────────────────────────── */}
+          <div className={`relative bg-gradient-to-br ${gradient} px-8 pt-10 pb-16 overflow-hidden flex-shrink-0`}>
+            {/* Decorative circles */}
+            <div className="absolute -top-10 -left-10 w-48 h-48 bg-white/10 rounded-full blur-2xl" />
+            <div className="absolute -bottom-8 -right-8 w-40 h-40 bg-black/10 rounded-full blur-2xl" />
+
+            {/* Close */}
+            <button
+              onClick={onClose}
+              className="absolute top-5 left-5 w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center transition-all backdrop-blur-sm"
+            >
+              <X size={16} className="text-white" />
+            </button>
+
+            {/* Avatar + Name */}
+            <div className="relative flex items-center gap-5">
+              {/* Avatar ring */}
+              <div className="relative flex-shrink-0">
+                <div className="w-20 h-20 rounded-3xl bg-white/25 backdrop-blur-sm border-4 border-white/40 flex items-center justify-center shadow-xl">
+                  <span className="text-4xl font-black text-white drop-shadow">
+                    {customer.name?.substring(0, 1) || '?'}
                   </span>
+                </div>
+                {/* VIP crown */}
+                {customer.count >= 3 && (
+                  <div className="absolute -top-3 -right-3 text-xl animate-bounce">👑</div>
                 )}
               </div>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="w-10 h-10 rounded-full bg-[#F0EDE6] hover:bg-[#E5DDD1] flex items-center justify-center transition-all"
-          >
-            <X size={18} className="text-[#2A2723]" />
-          </button>
-        </div>
 
-        {/* ── Quick Stats ── */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 px-8 py-6 bg-[#FDFBF7] border-b border-[#EAE4D9]/40">
-          {[
-            { label: 'إجمالي الإيراد', value: fmtMoney(customer.totalRevenue), icon: '💰', color: 'text-emerald-600' },
-            { label: 'عدد الحجوزات', value: `${customer.count} ${customer.count > 1 ? 'مرات' : 'مرة'}`, icon: '📅', color: 'text-blue-600' },
-            { label: 'إجمالي الليالي', value: `${customer.totalNights} ليلة`, icon: '🌙', color: 'text-violet-600' },
-            { label: 'متوسط الحجز', value: fmtMoney(avgAmount), icon: '📊', color: 'text-amber-600' },
-          ].map((stat, i) => (
-            <div key={i} className="bg-white rounded-2xl p-4 border border-[#EAE4D9]/50 shadow-sm text-center">
-              <div className="text-2xl mb-1">{stat.icon}</div>
-              <div className={`text-sm font-black ${stat.color}`}>{stat.value}</div>
-              <div className="text-[9px] text-[#7A7061] font-bold mt-0.5 opacity-70">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* ── Contact & Info ── */}
-        <div className="px-8 py-5 border-b border-[#EAE4D9]/40 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-[#EAE4D9]/50 flex items-center justify-center">
-                <Phone size={15} className="text-[#7A7061]" />
+              <div className="flex-1 min-w-0">
+                <h2 className="text-2xl font-black text-white drop-shadow-sm leading-tight mb-2">
+                  {customer.name}
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  <span className="bg-white/25 backdrop-blur-sm text-white text-[10px] font-black px-3 py-1 rounded-full border border-white/30">
+                    {badge.icon} {badge.label}
+                  </span>
+                  {customer.hasDiscount && (
+                    <span className="bg-white/25 backdrop-blur-sm text-white text-[10px] font-black px-3 py-1 rounded-full border border-white/30">
+                      💎 خصم سابق
+                    </span>
+                  )}
+                  <span className="bg-white/25 backdrop-blur-sm text-white text-[10px] font-black px-3 py-1 rounded-full border border-white/30" dir="ltr">
+                    📞 {customer.phone}
+                  </span>
+                </div>
               </div>
-              <span className="font-bold text-[#2A2723] tracking-wider" dir="ltr">{customer.phone}</span>
             </div>
-            <div className="flex gap-2">
-              <a
-                href={`tel:${customer.phone}`}
-                className="px-4 py-2 bg-blue-50 text-blue-600 hover:bg-blue-500 hover:text-white rounded-xl text-xs font-black transition-all border border-blue-200"
-              >
-                📞 اتصال
-              </a>
+
+            {/* Contact buttons */}
+            <div className="flex gap-3 mt-6">
               <a
                 href={`https://wa.me/${cleanPhone}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-4 py-2 bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366] hover:text-white rounded-xl text-xs font-black transition-all border border-[#25D366]/20"
+                className="flex-1 flex items-center justify-center gap-2 bg-white text-emerald-600 font-black py-3 rounded-2xl text-sm hover:bg-emerald-50 transition-all shadow-lg"
               >
-                💬 واتساب
+                <MessageSquare size={15} /> واتساب
+              </a>
+              <a
+                href={`tel:${customer.phone}`}
+                className="flex-1 flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm text-white font-black py-3 rounded-2xl text-sm hover:bg-white/30 transition-all border border-white/30"
+              >
+                <Phone size={15} /> اتصال
               </a>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 text-xs">
-            <div className="flex items-center gap-2 bg-white rounded-xl p-3 border border-[#EAE4D9]/50">
-              <Calendar size={13} className="text-[#C1A68D]" />
-              <div>
-                <div className="font-black text-[#2A2723]">{fmt(customer.firstSeen)}</div>
-                <div className="text-[#7A7061] opacity-70">أول حجز</div>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 bg-white rounded-xl p-3 border border-[#EAE4D9]/50">
-              <Clock size={13} className="text-[#C1A68D]" />
-              <div>
-                <div className="font-black text-[#2A2723]">{fmt(customer.lastSeen)}</div>
-                <div className="text-[#7A7061] opacity-70">آخر زيارة</div>
-              </div>
+          {/* ── Stats Cards (floating over header) ──────────────── */}
+          <div className="px-6 -mt-8 flex-shrink-0 relative z-10">
+            <div className="grid grid-cols-4 gap-3">
+              {STATS.map((s, i) => (
+                <div
+                  key={i}
+                  className={`bg-gradient-to-br ${s.from} ${s.to} rounded-2xl p-3 text-center shadow-lg`}
+                  style={{ animation: `statPop 0.4s ${0.05 * i + 0.2}s both cubic-bezier(0.34,1.56,0.64,1)` }}
+                >
+                  <div className="text-xl mb-1">{s.icon}</div>
+                  <div className="text-white font-black text-xs leading-tight">{s.value}</div>
+                  <div className="text-white/70 text-[8px] font-bold mt-0.5">{s.label}</div>
+                </div>
+              ))}
             </div>
           </div>
 
-          {favoriteUnit && (
-            <div className="flex items-center gap-2 bg-amber-50 rounded-xl p-3 border border-amber-200">
-              <Home size={14} className="text-amber-600" />
-              <div className="text-xs">
-                <span className="font-black text-amber-700">الوحدة المفضلة: </span>
-                <span className="font-bold text-[#2A2723]">{favoriteUnit}</span>
-                <span className="text-amber-600 font-bold"> ({unitFreq[favoriteUnit]} مرات)</span>
-              </div>
+          {/* ── Timeline info row ───────────────────────────────── */}
+          <div className="flex items-center gap-4 px-6 py-4 flex-shrink-0">
+            <div className="flex-1 bg-[#FDFBF7] rounded-2xl px-4 py-3 border border-[#EAE4D9]/40 text-center">
+              <div className="text-[9px] text-[#7A7061] font-bold opacity-70 mb-0.5">أول حجز</div>
+              <div className="text-xs font-black text-[#2A2723]">{fmt(customer.firstSeen)}</div>
             </div>
-          )}
-        </div>
+            <div className="w-8 h-px bg-[#EAE4D9] flex-shrink-0" />
+            {favoriteUnit && (
+              <div className="flex-1 bg-amber-50 rounded-2xl px-4 py-3 border border-amber-200 text-center">
+                <div className="text-[9px] text-amber-600 font-bold mb-0.5">الوحدة المفضلة</div>
+                <div className="text-xs font-black text-amber-700 truncate">{favoriteUnit}</div>
+              </div>
+            )}
+            <div className="w-8 h-px bg-[#EAE4D9] flex-shrink-0" />
+            <div className="flex-1 bg-[#FDFBF7] rounded-2xl px-4 py-3 border border-[#EAE4D9]/40 text-center">
+              <div className="text-[9px] text-[#7A7061] font-bold opacity-70 mb-0.5">آخر زيارة</div>
+              <div className="text-xs font-black text-[#2A2723]">{fmt(customer.lastSeen)}</div>
+            </div>
+          </div>
 
-        {/* ── Tabs ── */}
-        <div className="flex border-b border-[#EAE4D9]/40 px-8">
-          {[
-            { key: 'history', label: 'سجل الحجوزات', icon: BookOpen },
-            { key: 'info', label: 'ملاحظات', icon: FileText },
-          ].map(tab => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key as any)}
-              className={`flex items-center gap-2 px-5 py-4 text-sm font-black border-b-2 transition-all -mb-px ${
-                activeTab === tab.key
-                  ? 'border-[#C1A68D] text-[#C1A68D]'
-                  : 'border-transparent text-[#7A7061] opacity-60 hover:opacity-100'
-              }`}
-            >
-              <tab.icon size={14} />
-              {tab.label}
-            </button>
-          ))}
-        </div>
+          {/* ── Tabs ────────────────────────────────────────────── */}
+          <div className="flex gap-1 px-6 pb-2 flex-shrink-0">
+            {[
+              { key: 'history', label: 'سجل الحجوزات', icon: BookOpen, count: customer.bookings.length },
+              { key: 'notes',   label: 'ملاحظات',       icon: FileText,  count: null },
+              { key: 'units',   label: 'الوحدات',        icon: Home,      count: customer.units.length },
+            ].map(tab => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key as any)}
+                className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-black transition-all ${
+                  activeTab === tab.key
+                    ? 'bg-[#2A2723] text-white shadow-md'
+                    : 'bg-[#F0EDE6] text-[#7A7061] hover:bg-[#E5DDD1]'
+                }`}
+              >
+                <tab.icon size={12} />
+                {tab.label}
+                {tab.count !== null && (
+                  <span className={`text-[8px] px-1.5 py-0.5 rounded-full font-black ${activeTab === tab.key ? 'bg-white/20' : 'bg-white'}`}>
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
 
-        {/* ── Tab Content ── */}
-        <div className="flex-1 px-8 py-6">
-          {activeTab === 'history' && (
-            <div className="space-y-3">
-              {customer.bookings.length === 0 ? (
-                <p className="text-center text-[#7A7061] opacity-50 font-bold py-12">لا توجد حجوزات مسجلة</p>
-              ) : (
-                customer.bookings.map((b: any, i: number) => (
-                  <div key={b.id || i} className="bg-white rounded-2xl border border-[#EAE4D9]/50 p-4 shadow-sm hover:shadow-md transition-all">
+          {/* ── Scrollable Content ──────────────────────────────── */}
+          <div className="flex-1 overflow-y-auto px-6 pb-6 min-h-0">
+
+            {/* History Tab */}
+            {activeTab === 'history' && (
+              <div className="space-y-3 pt-2">
+                {customer.bookings.length === 0 ? (
+                  <div className="text-center py-16 text-[#7A7061] opacity-40">
+                    <Calendar size={36} className="mx-auto mb-3 opacity-30" />
+                    <p className="font-black">لا توجد حجوزات مسجلة</p>
+                  </div>
+                ) : customer.bookings.map((b: any, i: number) => (
+                  <div
+                    key={b.id || i}
+                    className="group bg-[#FDFBF7] hover:bg-white rounded-2xl border border-[#EAE4D9]/50 hover:border-[#C1A68D]/40 p-4 hover:shadow-md transition-all"
+                    style={{ animation: `fadeSlideUp 0.3s ${i * 0.04}s both` }}
+                  >
                     <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1 space-y-2">
+                      <div className="flex-1 space-y-2 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
+                          <div className="w-7 h-7 rounded-xl bg-[#C1A68D]/15 flex items-center justify-center flex-shrink-0">
+                            <Home size={12} className="text-[#C1A68D]" />
+                          </div>
                           <span className="font-black text-[#2A2723] text-sm">{b.studio || 'وحدة غير محددة'}</span>
-                          <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${statusColor(b.status)}`}>
+                          <span className={`text-[9px] font-black px-2.5 py-0.5 rounded-full ${statusColor(b.status)}`}>
                             {statusLabel(b.status)}
                           </span>
                         </div>
-                        <div className="flex items-center gap-4 text-[11px] text-[#7A7061] font-bold">
-                          <span>📅 {fmt(b.checkIn)} → {fmt(b.checkOut)}</span>
-                          {b.numberOfDays && <span>🌙 {b.numberOfDays} ليلة</span>}
-                          {b.guestsCount && <span>👥 {b.guestsCount} أشخاص</span>}
+                        <div className="flex flex-wrap items-center gap-3 text-[10px] text-[#7A7061] font-bold pr-9">
+                          <span>📅 {fmt(b.checkIn)} ← {fmt(b.checkOut)}</span>
+                          {b.numberOfDays && <span className="bg-violet-50 text-violet-600 px-2 py-0.5 rounded-lg">🌙 {b.numberOfDays} ليلة</span>}
+                          {b.guestsCount  && <span className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-lg">👥 {b.guestsCount} أشخاص</span>}
                         </div>
                         {b.notes && (
-                          <p className="text-[10px] text-[#7A7061] bg-[#FDFBF7] rounded-lg px-3 py-2 border border-[#EAE4D9]/40 leading-relaxed">
+                          <p className="text-[10px] text-[#7A7061] bg-white rounded-xl px-3 py-2 border border-[#EAE4D9]/40 leading-relaxed pr-9">
                             📝 {b.notes}
                           </p>
                         )}
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <div className="font-black text-[#2A2723] text-sm">{fmtMoney(b.totalAmount || 0)}</div>
-                        {b.paidAmount && b.paidAmount !== b.totalAmount && (
-                          <div className="text-[9px] text-[#7A7061] opacity-70">مدفوع: {fmtMoney(b.paidAmount)}</div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          )}
-
-          {activeTab === 'info' && (
-            <div className="space-y-4">
-              <div className="bg-white rounded-2xl border border-[#EAE4D9]/50 p-5 shadow-sm">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-black text-[#2A2723] text-sm flex items-center gap-2">
-                    <FileText size={14} className="text-[#C1A68D]" />
-                    ملاحظات خاصة بالعميل
-                  </h3>
-                  {!editingNote && (
-                    <button
-                      onClick={() => setEditingNote(true)}
-                      className="text-[10px] font-black text-[#C1A68D] hover:text-[#2A2723] transition-colors border border-[#C1A68D]/30 px-3 py-1 rounded-lg hover:bg-[#C1A68D]/10"
-                    >
-                      ✏️ تعديل
-                    </button>
-                  )}
-                </div>
-
-                {editingNote ? (
-                  <div className="space-y-3">
-                    <textarea
-                      value={note}
-                      onChange={e => setNote(e.target.value)}
-                      rows={5}
-                      placeholder="اكتب ملاحظاتك عن هذا العميل هنا... مثلاً: عميل محترم، يفضل الغرف الهادئة، سبق وحصل على خصم..."
-                      className="w-full border border-[#EAE4D9] rounded-xl p-3 text-sm font-bold text-[#2A2723] focus:border-[#C1A68D] outline-none resize-none leading-relaxed"
-                      dir="rtl"
-                    />
-                    <div className="flex gap-2">
-                      <button
-                        onClick={saveNote}
-                        className="bg-[#2A2723] text-white font-black px-5 py-2 rounded-xl text-xs hover:bg-black transition-all"
-                      >
-                        ✅ حفظ
-                      </button>
-                      <button
-                        onClick={() => setEditingNote(false)}
-                        className="bg-[#F0EDE6] text-[#7A7061] font-black px-5 py-2 rounded-xl text-xs hover:bg-[#E5DDD1] transition-all"
-                      >
-                        إلغاء
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <p className={`text-sm leading-relaxed ${note ? 'text-[#2A2723] font-bold' : 'text-[#7A7061] opacity-50 font-bold'}`}>
-                    {note || 'لا توجد ملاحظات مضافة بعد. اضغط "تعديل" لإضافة ملاحظة.'}
-                  </p>
-                )}
-              </div>
-
-              {/* All Units */}
-              {customer.units.length > 0 && (
-                <div className="bg-white rounded-2xl border border-[#EAE4D9]/50 p-5 shadow-sm">
-                  <h3 className="font-black text-[#2A2723] text-sm flex items-center gap-2 mb-3">
-                    <Home size={14} className="text-[#C1A68D]" />
-                    الوحدات التي أقام بها
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {customer.units.map((u, i) => (
-                      <span key={i} className="bg-[#FDFBF7] border border-[#EAE4D9]/60 text-[#2A2723] font-black text-[10px] px-3 py-1.5 rounded-xl">
-                        🏠 {u} {unitFreq[u] > 1 && <span className="text-[#C1A68D]">×{unitFreq[u]}</span>}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* ── Footer: Delete ── */}
-        <div className="sticky bottom-0 bg-white border-t border-[#EAE4D9]/40 px-8 py-4">
           <button
             onClick={() => onDelete(customer.phone, customer.name)}
             disabled={isDeleting}
@@ -660,13 +618,14 @@ export default function CustomersDatabase() {
         </div>
       )}
 
-      {/* ── Customer Drawer ── */}
-      <CustomerDrawer
+      {/* ── Customer Modal ── */}
+      <CustomerModal
         customer={selectedCustomer}
         onClose={() => setSelectedCustomer(null)}
         onDelete={handleDelete}
         isDeleting={isDeleting}
       />
     </div>
+
   );
 }
