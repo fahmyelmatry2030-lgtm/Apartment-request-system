@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { getBookings, getSystemUnits } from '@/lib/data-init';
-import { getDbExpenses, getDbSalaries } from '@/lib/actions/db';
+import { getDbExpenses, getDbSalaries, saveDbExpense, deleteDbExpense } from '@/lib/actions/db';
+import { PlusCircle, Trash2, Receipt, X, Calendar, TrendingUp } from 'lucide-react';
 
 const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 
@@ -106,11 +107,36 @@ export default function FinancePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [adminRole, setAdminRole] = useState<string>('Super Admin');
 
+  // Expense modal & logging states
+  const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
+  const [savingExpense, setSavingExpense] = useState(false);
+  const [newExpense, setNewExpense] = useState({
+    amount: '',
+    description: '',
+    date: '',
+    branch: '12',
+    from_entity: '',
+    to_entity: '',
+    ordered_by: '',
+    invoice_number: '',
+    category: 'عام',
+  });
+
   useEffect(() => {
     const info = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem('adminInfo') || '{}') : {};
     if (info?.role) setAdminRole(info.role);
     setSelectedMonth(new Date().getMonth());
     setSelectedYear(new Date().getFullYear());
+
+    // Set default date to today
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    setNewExpense(prev => ({
+      ...prev,
+      date: `${y}-${m}-${d}`
+    }));
   }, []);
 
   const isAkoura = adminRole === 'Akoura';
@@ -136,6 +162,157 @@ export default function FinancePage() {
   };
 
   useEffect(() => { loadData(); }, []);
+
+  const handleAddExpense = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newExpense.amount || !newExpense.description || !newExpense.date) {
+      alert('الرجاء إدخال الحقول الإجبارية (المبلغ والبيان والتاريخ)');
+      return;
+    }
+    setSavingExpense(true);
+    try {
+      const expData = {
+        amount: parseFloat(newExpense.amount),
+        description: newExpense.description,
+        date: newExpense.date,
+        branch: parseInt(newExpense.branch, 10),
+        from_entity: newExpense.from_entity || null,
+        to_entity: newExpense.to_entity || null,
+        ordered_by: newExpense.ordered_by || null,
+        invoice_number: newExpense.invoice_number || null,
+        category: newExpense.category || 'عام'
+      };
+
+      const result = await saveDbExpense(expData);
+      if (result.success) {
+        alert('تم تسجيل المصروف بنجاح! 🎉');
+        setIsExpenseModalOpen(false);
+        // Reset inputs keeping date
+        setNewExpense(prev => ({
+          ...prev,
+          amount: '',
+          description: '',
+          from_entity: '',
+          to_entity: '',
+          ordered_by: '',
+          invoice_number: '',
+          category: 'عام',
+        }));
+        await loadData();
+      } else {
+        alert('حدث خطأ أثناء حفظ المصروف: ' + result.error);
+      }
+    } catch (err: any) {
+      alert('حدث خطأ: ' + err.message);
+    } finally {
+      setSavingExpense(false);
+    }
+  };
+
+  const handleDeleteExpense = async (id: string) => {
+    if (!confirm('هل أنت متأكد من رغبتك في حذف هذا المصروف نهائياً؟')) return;
+    try {
+      const res = await deleteDbExpense(id);
+      if (res.success) {
+        alert('تم حذف المصروف بنجاح.');
+        await loadData();
+      } else {
+        alert('حدث خطأ أثناء الحذف: ' + res.error);
+      }
+    } catch (err: any) {
+      alert('حدث خطأ: ' + err.message);
+    }
+  };
+
+  const getBranchLabel = (branch: any) => {
+    const b = parseInt(branch);
+    if (b === 1 || b === 2 || b === 12) return 'مزار 1 و 2';
+    if (b === 3) return 'مزار 3';
+    if (b === 4) return 'شقة فندقية 1';
+    if (b === 5) return 'شقة فندقية 2';
+    if (b === 6) return 'شقة فندقية 3';
+    return 'عام';
+  };
+
+  const exportToCSV = () => {
+    const headers = ['No', 'التاريخ', 'المبلغ', 'البيان', 'رقم الفاتورة', 'من خزينة', 'إلى مورد', 'طلب بواسطة', 'القسم'];
+    const rows = monthlyExpenses.map((exp, idx) => [
+      idx + 1,
+      exp.date || '',
+      exp.amount || 0,
+      exp.description || '',
+      exp.invoice_number || '',
+      exp.from_entity || '',
+      exp.to_entity || '',
+      exp.ordered_by || '',
+      getBranchLabel(exp.branch)
+    ]);
+    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Mazar_Expenses_${MONTHS_AR[selectedMonth]}_${selectedYear}.csv`;
+    a.style.visibility = 'hidden';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  const monthlyRollupData = useMemo(() => {
+    const activeYear = selectedYear !== -1 ? selectedYear : new Date().getFullYear();
+    const result = [];
+
+    for (let m = 0; m < 12; m++) {
+      // Month bookings
+      const mBookings = bookings.filter((b: any) => {
+        if (b.status === 'deleted') return false;
+        if (b.status !== 'approved' && b.status !== 'مؤكد') return false;
+        const parts = b.checkIn?.split('-');
+        if (!parts || parts.length < 2) return false;
+        const year = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        if (month !== m || year !== activeYear) return false;
+
+        const u = units.find((unit: any) => unit.id === b.apartmentId);
+        if (isAkoura) {
+          return u?.branch === 3 || String(b.apartmentId).startsWith('p-s');
+        }
+        return true;
+      });
+
+      // Month expenses
+      const mExpenses = expenses.filter((e: any) => {
+        if (!e.date) return false;
+        const parts = e.date.split('-');
+        if (parts.length < 2) return false;
+        const year = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        if (month !== m || year !== activeYear) return false;
+
+        if (isAkoura) {
+          return e.branch === 3 || e.branch === '3' || String(e.unitId || '').startsWith('p-s');
+        }
+        return true;
+      });
+
+      const rev = mBookings.reduce((acc, b) => acc + (parseFloat(b.totalAmount || 0) - parseFloat(b.commission || 0)), 0);
+      const exp = mExpenses.reduce((acc, e) => acc + parseFloat(e.amount || 0), 0);
+      const profit = rev - exp;
+
+      result.push({
+        monthIndex: m,
+        monthName: MONTHS_AR[m],
+        bookingsCount: mBookings.length,
+        revenue: rev,
+        expenses: exp,
+        netProfit: profit,
+        hasData: rev > 0 || exp > 0 || mBookings.length > 0
+      });
+    }
+
+    return result;
+  }, [bookings, expenses, units, selectedYear, isAkoura]);
 
   // ── الحجوزات المؤكدة للشهر المختار ──
   const monthlyBookings = useMemo(() => {
@@ -266,21 +443,31 @@ export default function FinancePage() {
             </span>
           </p>
         </div>
-        <div className="flex gap-3 bg-white p-2 rounded-[1.5rem] border border-[#EAE4D9]/50 shadow-sm">
-          <select
-            value={selectedMonth}
-            onChange={e => setSelectedMonth(Number(e.target.value))}
-            className="bg-[#FDFBF7] border-none rounded-xl px-4 py-2 text-xs font-black outline-none"
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={() => setIsExpenseModalOpen(true)}
+            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white text-xs font-black px-5 py-3 rounded-xl transition-all shadow-md"
           >
-            {MONTHS_AR.map((m, i) => <option key={i} value={i}>{m}</option>)}
-          </select>
-          <select
-            value={selectedYear}
-            onChange={e => setSelectedYear(Number(e.target.value))}
-            className="bg-[#FDFBF7] border-none rounded-xl px-4 py-2 text-xs font-black outline-none"
-          >
-            {[2025, 2026, 2027].map(y => <option key={y} value={y}>{y}</option>)}
-          </select>
+            <PlusCircle size={15} />
+            تسجيل مصروف جديد
+          </button>
+
+          <div className="flex gap-3 bg-white p-2 rounded-[1.5rem] border border-[#EAE4D9]/50 shadow-sm">
+            <select
+              value={selectedMonth}
+              onChange={e => setSelectedMonth(Number(e.target.value))}
+              className="bg-[#FDFBF7] border-none rounded-xl px-4 py-2 text-xs font-black outline-none"
+            >
+              {MONTHS_AR.map((m, i) => <option key={i} value={i}>{m}</option>)}
+            </select>
+            <select
+              value={selectedYear}
+              onChange={e => setSelectedYear(Number(e.target.value))}
+              className="bg-[#FDFBF7] border-none rounded-xl px-4 py-2 text-xs font-black outline-none"
+            >
+              {[2025, 2026, 2027].map(y => <option key={y} value={y}>{y}</option>)}
+            </select>
+          </div>
         </div>
       </header>
 
@@ -464,6 +651,324 @@ export default function FinancePage() {
           </div>
         </div>
       </div>
+      )}
+
+      {/* ════════════════ سجلات القيود المالية ════════════════ */}
+      <div className="space-y-6 bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 p-8 shadow-sm overflow-hidden">
+        <div className="flex justify-between items-end border-b border-[#EAE4D9]/40 pb-4">
+          <div>
+            <h3 className="text-xl font-black text-[#2A2723] flex items-center gap-2">
+              <span>💸</span> سجلات القيود المالية
+            </h3>
+            <p className="text-xs text-gray-500 font-bold mt-1">
+              عرض {monthlyExpenses.length} عملية مصروفات لشهر {MONTHS_AR[selectedMonth]} {selectedYear}
+            </p>
+          </div>
+          <div>
+            <button
+              onClick={exportToCSV}
+              className="bg-[#2A2723] hover:bg-black text-white text-xs font-black px-5 py-2.5 rounded-xl transition-all shadow-md"
+            >
+              تصدير Excel ↓
+            </button>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto rounded-2xl border border-[#EAE4D9]/50">
+          <table className="w-full text-center border-collapse text-xs">
+            <thead>
+              <tr className="bg-[#2A2723] text-white font-black">
+                <th className="px-4 py-4 w-12">No</th>
+                <th className="px-4 py-4">التاريخ</th>
+                <th className="px-4 py-4">البيان / السبب</th>
+                <th className="px-4 py-4">المبلغ (ج.م)</th>
+                <th className="px-4 py-4">رقم الفاتورة</th>
+                <th className="px-4 py-4">من خزينة</th>
+                <th className="px-4 py-4">إلى جهة</th>
+                <th className="px-4 py-4">طلب بواسطة</th>
+                <th className="px-4 py-4">القسم / الفرع</th>
+                <th className="px-4 py-4">الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#EAE4D9]/30 font-bold text-[#7A7061]">
+              {isLoading ? (
+                <tr>
+                  <td colSpan={10} className="py-12 text-center">
+                    <div className="inline-block w-6 h-6 border-2 border-[#C1A68D] border-t-transparent rounded-full animate-spin"></div>
+                  </td>
+                </tr>
+              ) : monthlyExpenses.length === 0 ? (
+                <tr>
+                  <td colSpan={10} className="py-12 text-center text-gray-300 font-black tracking-widest">
+                    لا توجد سجلات مصروفات لهذا الشهر
+                  </td>
+                </tr>
+              ) : (
+                monthlyExpenses.map((exp, idx) => (
+                   <tr key={exp.id || idx} className="hover:bg-[#FDFBF7] transition-all">
+                     <td className="px-4 py-4 font-black text-[#2A2723]">{idx + 1}</td>
+                     <td className="px-4 py-4 whitespace-nowrap">
+                       {exp.date ? new Date(exp.date).toLocaleDateString('ar-EG', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                     </td>
+                     <td className="px-4 py-4 text-right font-black text-[#2A2723] max-w-[200px] truncate" title={exp.description}>
+                       {exp.description || '—'}
+                     </td>
+                     <td className="px-4 py-4 text-red-600 font-black">-{parseFloat(exp.amount || 0).toLocaleString()}</td>
+                     <td className="px-4 py-4 text-amber-700">{exp.invoice_number || '—'}</td>
+                     <td className="px-4 py-4">{exp.from_entity || '—'}</td>
+                     <td className="px-4 py-4">{exp.to_entity || '—'}</td>
+                     <td className="px-4 py-4">{exp.ordered_by || '—'}</td>
+                     <td className="px-4 py-4 text-amber-800">{getBranchLabel(exp.branch)}</td>
+                     <td className="px-4 py-4">
+                       <button
+                         onClick={() => handleDeleteExpense(exp.id)}
+                         className="w-8 h-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center mx-auto transition-all border border-red-100"
+                         title="حذف المصروف"
+                       >
+                         <Trash2 size={13} />
+                       </button>
+                     </td>
+                   </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* ════════════════ مقارنة أداء الشهور ════════════════ */}
+      <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden p-8 space-y-6">
+        <div>
+          <h3 className="text-xl font-black text-[#2A2723] flex items-center gap-2">
+            <span>📈</span> جدول مقارنة الأداء المالي بين شهور السنة
+          </h3>
+          <p className="text-xs text-gray-500 font-bold mt-1">
+            مقارنة الإيرادات والمصروفات وصافي الربح في سطر كامل لكل شهر من شهور العام {selectedYear > 0 ? selectedYear : new Date().getFullYear()}
+          </p>
+        </div>
+
+        <div className="overflow-x-auto rounded-2xl border border-[#EAE4D9]/50">
+          <table className="w-full text-center border-collapse text-xs">
+            <thead>
+              <tr className="bg-[#2A2723] text-white font-black">
+                <th className="px-6 py-4 text-right">الشهر</th>
+                <th className="px-6 py-4 text-center">عدد الحجوزات</th>
+                <th className="px-6 py-4 text-center">الإيرادات (ج.م)</th>
+                <th className="px-6 py-4 text-center">المصروفات (ج.م)</th>
+                <th className="px-6 py-4 text-center">صافي الربح (ج.م)</th>
+                <th className="px-6 py-4 text-center">التحكم</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#EAE4D9]/30 font-bold text-[#7A7061]">
+              {monthlyRollupData.map((m) => {
+                const isSelected = m.monthIndex === selectedMonth;
+                const isCurrent = m.monthIndex === new Date().getMonth() && selectedYear === new Date().getFullYear();
+                return (
+                  <tr
+                    key={m.monthIndex}
+                    className={`transition-all hover:bg-[#FDFBF7] ${
+                      isSelected ? 'bg-[#C1A68D]/10 font-black' : isCurrent ? 'bg-[#FDFBF7]' : ''
+                    }`}
+                  >
+                    <td className="px-6 py-4 text-right font-black text-[#2A2723]">
+                      {m.monthName} ({m.monthIndex + 1})
+                      {isCurrent && (
+                        <span className="bg-[#C1A68D]/20 text-[#C1A68D] text-[9px] font-black px-2 py-0.5 rounded-full mr-2">
+                          الحالي
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-center">{m.bookingsCount} حجز</td>
+                    <td className="px-6 py-4 text-center text-emerald-600 font-black">{m.revenue.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-center text-red-500 font-black">-{m.expenses.toLocaleString()}</td>
+                    <td className={`px-6 py-4 text-center text-sm font-black ${m.netProfit >= 0 ? 'text-green-700' : 'text-red-600'}`}>
+                      {m.netProfit.toLocaleString()} ج.م
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <button
+                        onClick={() => setSelectedMonth(m.monthIndex)}
+                        className={`px-4 py-1.5 rounded-xl text-[10px] font-black transition-all ${
+                          isSelected ? 'bg-[#2A2723] text-white' : 'bg-[#EAE4D9]/50 hover:bg-[#C1A68D] hover:text-white text-[#7A7061]'
+                        }`}
+                      >
+                        عرض التفاصيل 🔍
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* ════════════════ نافذة تسجيل مصروف جديد ════════════════ */}
+      {isExpenseModalOpen && (
+        <div className="fixed inset-0 z-[150] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setIsExpenseModalOpen(false)}>
+          <div className="relative w-full max-w-lg bg-[#1F1C18] border border-white/10 rounded-[2rem] shadow-2xl p-6 text-white overflow-hidden"
+            onClick={e => e.stopPropagation()}
+            style={{ animation: 'modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+              <h3 className="text-lg font-black text-white flex items-center gap-2">
+                <Receipt size={18} className="text-[#C1A68D]" />
+                تسجيل مصروف تشغيلي جديد
+              </h3>
+              <button onClick={() => setIsExpenseModalOpen(false)} className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center">
+                <X size={15} />
+              </button>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleAddExpense} className="space-y-4 text-xs">
+              
+              <div className="grid grid-cols-2 gap-4">
+                {/* Amount */}
+                <div className="space-y-1.5">
+                  <label className="font-black text-gray-300">المبلغ بالجنيه *</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    required
+                    placeholder="مثال: 1500"
+                    value={newExpense.amount}
+                    onChange={e => setNewExpense({...newExpense, amount: e.target.value})}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white font-bold outline-none focus:border-[#C1A68D]"
+                  />
+                </div>
+
+                {/* Date */}
+                <div className="space-y-1.5">
+                  <label className="font-black text-gray-300">التاريخ *</label>
+                  <input
+                    type="date"
+                    required
+                    value={newExpense.date}
+                    onChange={e => setNewExpense({...newExpense, date: e.target.value})}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white font-bold outline-none focus:border-[#C1A68D]"
+                  />
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="space-y-1.5">
+                <label className="font-black text-gray-300">البيان / السبب بالتفصيل *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="مثال: فاتورة كهرباء، صيانة تكييف استوديو 3، أدوات نظافة"
+                  value={newExpense.description}
+                  onChange={e => setNewExpense({...newExpense, description: e.target.value})}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white font-bold outline-none focus:border-[#C1A68D]"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                {/* Branch / Entity */}
+                <div className="space-y-1.5">
+                  <label className="font-black text-gray-300">القسم / الفرع *</label>
+                  <select
+                    value={newExpense.branch}
+                    onChange={e => setNewExpense({...newExpense, branch: e.target.value})}
+                    disabled={isAkoura}
+                    className="w-full bg-[#2A2723] border border-white/10 rounded-xl px-4 py-2.5 text-white font-bold outline-none focus:border-[#C1A68D] cursor-pointer"
+                  >
+                    {!isAkoura && (
+                      <>
+                        <option value="12">مزار 1 و 2</option>
+                        <option value="4">شقة فندقية 1</option>
+                        <option value="5">شقة فندقية 2</option>
+                        <option value="6">شقة فندقية 3</option>
+                        <option value="0">عام</option>
+                      </>
+                    )}
+                    <option value="3">مزار 3 (أكورا)</option>
+                  </select>
+                </div>
+
+                {/* Category */}
+                <div className="space-y-1.5">
+                  <label className="font-black text-gray-300">فئة المصروف *</label>
+                  <select
+                    value={newExpense.category}
+                    onChange={e => setNewExpense({...newExpense, category: e.target.value})}
+                    className="w-full bg-[#2A2723] border border-white/10 rounded-xl px-4 py-2.5 text-white font-bold outline-none focus:border-[#C1A68D] cursor-pointer"
+                  >
+                    <option value="عام">عام / تشغيل</option>
+                    <option value="صيانة">صيانة وأعطال</option>
+                    <option value="فواتير">فواتير (كهرباء/ماء/إنترنت)</option>
+                    <option value="رواتب">رواتب / مكافآت</option>
+                    <option value="خامات">نظافة ومستهلكات</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Extra Details */}
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-1.5">
+                  <label className="font-bold text-gray-400">رقم الفاتورة</label>
+                  <input
+                    type="text"
+                    placeholder="—"
+                    value={newExpense.invoice_number}
+                    onChange={e => setNewExpense({...newExpense, invoice_number: e.target.value})}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white font-bold outline-none focus:border-[#C1A68D]"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-bold text-gray-400">من خزينة</label>
+                  <input
+                    type="text"
+                    placeholder="—"
+                    value={newExpense.from_entity}
+                    onChange={e => setNewExpense({...newExpense, from_entity: e.target.value})}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white font-bold outline-none focus:border-[#C1A68D]"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-bold text-gray-400">إلى جهة</label>
+                  <input
+                    type="text"
+                    placeholder="—"
+                    value={newExpense.to_entity}
+                    onChange={e => setNewExpense({...newExpense, to_entity: e.target.value})}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white font-bold outline-none focus:border-[#C1A68D]"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="font-bold text-gray-400">طلب بواسطة</label>
+                <input
+                  type="text"
+                  placeholder="اسم الشخص أو الموظف المسؤول"
+                  value={newExpense.ordered_by}
+                  onChange={e => setNewExpense({...newExpense, ordered_by: e.target.value})}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white font-bold outline-none focus:border-[#C1A68D]"
+                />
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={savingExpense}
+                className="w-full bg-[#C1A68D] hover:bg-[#b0947a] disabled:bg-gray-700 text-white font-black py-3 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 mt-6 text-sm"
+              >
+                {savingExpense ? (
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <>
+                    <Receipt size={16} />
+                    حفظ المصروف وتسجيل المعاملة
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
       )}
 
     </div>
