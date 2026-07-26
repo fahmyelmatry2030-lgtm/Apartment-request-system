@@ -52,6 +52,35 @@ https://wa.me/${cleanPhone}
   }
 }
 
+export async function sendSecurityTelegramAlert(username: string, details: string) {
+  try {
+    if (!TG_TOKEN || !TG_CHAT_ID) return;
+
+    const htmlMessage = `
+🚨 <b>تنبيه أمني: محاولة دخول إلى لوحة التحكم!</b>
+━━━━━━━━━━━━━━
+<b>👤 اسم المستخدم المحاول:</b> <code>${username}</code>
+<b>⚠️ النتيجة:</b> محاولة دخول غير مصرح بها / خاطئة
+<b>📝 التفاصيل:</b> ${details}
+<b>⏰ التوقيت:</b> ${new Date().toLocaleString('ar-EG', { timeZone: 'Africa/Cairo' })}
+━━━━━━━━━━━━━━
+<i>يرجى التاكد من سلامة الحسابات وكلمات المرور.</i>
+    `.trim();
+
+    await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TG_CHAT_ID,
+        text: htmlMessage,
+        parse_mode: 'HTML',
+      }),
+    });
+  } catch (error) {
+    console.error('Security alert Telegram network error:', error);
+  }
+}
+
 // --- BOOKINGS ---
 
 export async function getFreshDbBookings(nonce?: string) {
@@ -527,9 +556,14 @@ export async function verifyAdminAuth(username: string, pass: string) {
 
     const validAdmin = data?.[0];
     if (validAdmin) return { success: true, admin: validAdmin };
+
+    // Send security alert to Telegram on failed login attempt
+    await sendSecurityTelegramAlert(cleanUsername, 'محاولة دخول فاشلة - كلمة المرور أو اسم المستخدم غير صحيح.');
+
     return { success: false };
   } catch (error) {
     console.error('Error reading admins:', error);
+    await sendSecurityTelegramAlert(username || 'غير محدد', 'خطأ أثناء فحص بيانات الدخول في النظام.');
     return { success: false };
   }
 }
