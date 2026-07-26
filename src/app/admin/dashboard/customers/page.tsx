@@ -111,6 +111,19 @@ function CustomerModal({
     setActiveTab('history');
   }, [customer?.phone]);
 
+  // 🔒 Lock body scroll when modal is open
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    };
+  }, []);
+
+
   const saveNote = () => {
     if (customer?.phone) localStorage.setItem(`customer_note_${customer.phone}`, note);
     setEditingNote(false);
