@@ -333,22 +333,117 @@ function CustomerModal({
                           </p>
                         )}
                       </div>
-                      <div className="text-right flex-shrink-0">
-          <button
-            onClick={() => onDelete(customer.phone, customer.name)}
-            disabled={isDeleting}
-            className="w-full flex items-center justify-center gap-2 bg-red-50 hover:bg-red-500 text-red-500 hover:text-white border border-red-200 font-black py-3 rounded-2xl text-sm transition-all disabled:opacity-30"
-          >
-            <Trash2 size={15} />
-            {isDeleting ? 'جاري الحذف...' : 'حذف هذا العميل نهائياً'}
-          </button>
+                        <div className="font-black text-[#2A2723]">{fmtMoney(b.totalAmount || 0)}</div>
+                        {b.paidAmount && Number(b.paidAmount) !== Number(b.totalAmount) && (
+                          <div className="text-[9px] text-emerald-600 font-bold">مدفوع: {fmtMoney(b.paidAmount)}</div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Notes Tab */}
+            {activeTab === 'notes' && (
+              <div className="pt-2 space-y-4">
+                <div className="bg-[#FDFBF7] rounded-2xl border border-[#EAE4D9]/50 p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-black text-[#2A2723] flex items-center gap-2">
+                      <FileText size={15} className="text-[#C1A68D]" />
+                      ملاحظات خاصة
+                    </h3>
+                    {!editingNote && (
+                      <button
+                        onClick={() => setEditingNote(true)}
+                        className="text-[10px] font-black text-[#C1A68D] border border-[#C1A68D]/30 px-3 py-1.5 rounded-xl hover:bg-[#C1A68D]/10 transition-all"
+                      >
+                        ✏️ تعديل
+                      </button>
+                    )}
+                  </div>
+                  {editingNote ? (
+                    <div className="space-y-3">
+                      <textarea
+                        value={note}
+                        onChange={e => setNote(e.target.value)}
+                        rows={6}
+                        placeholder="مثلاً: عميل محترم، يفضل الغرف الهادئة، سبق وحصل على خصم 10%..."
+                        className="w-full border border-[#EAE4D9] rounded-2xl p-4 text-sm font-bold text-[#2A2723] focus:border-[#C1A68D] outline-none resize-none leading-relaxed bg-white"
+                        dir="rtl"
+                      />
+                      <div className="flex gap-2">
+                        <button onClick={saveNote} className="bg-[#2A2723] text-white font-black px-6 py-2.5 rounded-xl text-xs hover:bg-black transition-all flex-1">✅ حفظ الملاحظة</button>
+                        <button onClick={() => setEditingNote(false)} className="bg-[#F0EDE6] text-[#7A7061] font-black px-5 py-2.5 rounded-xl text-xs hover:bg-[#E5DDD1] transition-all">إلغاء</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className={`text-sm leading-relaxed rounded-xl p-4 ${note ? 'bg-white border border-[#EAE4D9]/50 text-[#2A2723] font-bold' : 'text-[#7A7061] opacity-50 font-bold'}`}>
+                      {note || '💬 لا توجد ملاحظات بعد — اضغط تعديل لإضافة ملاحظة عن هذا العميل.'}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Units Tab */}
+            {activeTab === 'units' && (
+              <div className="pt-2 space-y-3">
+                {customer.units.length === 0 ? (
+                  <div className="text-center py-16 text-[#7A7061] opacity-40">
+                    <Home size={36} className="mx-auto mb-3 opacity-30" />
+                    <p className="font-black">لا توجد وحدات مسجلة</p>
+                  </div>
+                ) : Object.entries(unitFreq).sort((a, b) => b[1] - a[1]).map(([unit, freq], i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between bg-[#FDFBF7] rounded-2xl px-5 py-4 border border-[#EAE4D9]/50 hover:border-[#C1A68D]/30 transition-all"
+                    style={{ animation: `fadeSlideUp 0.3s ${i * 0.05}s both` }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-[#C1A68D]/15 flex items-center justify-center">
+                        <Home size={16} className="text-[#C1A68D]" />
+                      </div>
+                      <div>
+                        <div className="font-black text-[#2A2723]">{unit}</div>
+                        {i === 0 && <div className="text-[9px] text-amber-600 font-black">⭐ الأكثر حجزاً</div>}
+                      </div>
+                    </div>
+                    <span className="bg-[#2A2723] text-white font-black text-xs px-3 py-1.5 rounded-full">
+                      {freq} {freq > 1 ? 'مرات' : 'مرة'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* ── Footer Delete ────────────────────────────────────── */}
+          <div className="flex-shrink-0 px-6 py-4 border-t border-[#EAE4D9]/30">
+            <button
+              onClick={() => onDelete(customer.phone, customer.name)}
+              disabled={isDeleting}
+              className="w-full flex items-center justify-center gap-2 bg-red-50 hover:bg-red-500 text-red-500 hover:text-white border border-red-200 font-black py-3 rounded-2xl text-sm transition-all disabled:opacity-30"
+            >
+              <Trash2 size={14} />
+              {isDeleting ? 'جاري الحذف...' : 'حذف هذا العميل نهائياً'}
+            </button>
+          </div>
         </div>
       </div>
 
       <style>{`
-        @keyframes slideInLeft {
-          from { transform: translateX(-100%); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
+        @keyframes modalPop {
+          from { opacity: 0; transform: scale(0.88) translateY(24px); }
+          to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes statPop {
+          from { opacity: 0; transform: scale(0.7) translateY(12px); }
+          to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes fadeSlideUp {
+          from { opacity: 0; transform: translateY(10px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
       `}</style>
     </>
