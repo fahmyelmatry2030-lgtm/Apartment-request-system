@@ -431,62 +431,6 @@ export default function FinancialSummaryTab({
         </div>
       </div>
 
-      {/* --- Monthly Comparison Table (مقارنة شهور السنة بالكامل سطر بسطر) --- */}
-      <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden space-y-6 p-8">
-        <div>
-          <h3 className="text-xl font-black text-[#2A2723] flex items-center gap-2">
-            <span>📈</span> جدول مقارنة الأداء المالي بين شهور السنة
-          </h3>
-          <p className="text-xs text-gray-500 font-bold mt-1">
-            مقارنة الإيرادات والمصروفات وصافي الربح في سطر كامل لكل شهر من شهور العام {selectedYear}
-          </p>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-right border-collapse text-xs">
-            <thead>
-              <tr className="bg-[#2A2723] text-white font-black">
-                <th className="px-6 py-4 rounded-r-2xl">الشهر</th>
-                <th className="px-6 py-4 text-center">عدد الحجوزات</th>
-                <th className="px-6 py-4 text-center">الإيرادات (ج.م)</th>
-                <th className="px-6 py-4 text-center">المصروفات (ج.م)</th>
-                <th className="px-6 py-4 text-center">صافي الربح (ج.م)</th>
-                <th className="px-6 py-4 text-center rounded-l-2xl">التحكم</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#EAE4D9]/30 font-bold text-[#7A7061]">
-              {monthlyRollupData.map((m) => {
-                const isSelected = m.monthIndex === selectedMonth;
-                return (
-                  <tr key={m.monthIndex} className={`hover:bg-[#FDFBF7] transition-all ${isSelected ? 'bg-amber-50/50' : ''}`}>
-                    <td className="px-6 py-4 font-black text-[#2A2723] text-sm">
-                      {m.monthName} ({m.monthIndex + 1})
-                      {isSelected && <span className="bg-[#C1A68D] text-white text-[9px] font-black px-2 py-0.5 rounded-full mr-2">الحالي</span>}
-                    </td>
-                    <td className="px-6 py-4 text-center font-black text-[#2A2723]">{m.bookingsCount} حجز</td>
-                    <td className="px-6 py-4 text-center text-emerald-600 font-black">{m.revenue.toLocaleString()}</td>
-                    <td className="px-6 py-4 text-center text-red-500 font-black">-{m.expenses.toLocaleString()}</td>
-                    <td className={`px-6 py-4 text-center text-sm font-black ${m.netProfit >= 0 ? 'text-green-700' : 'text-red-600'}`}>
-                      {m.netProfit.toLocaleString()} ج.م
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <button
-                        onClick={() => setSelectedMonth(m.monthIndex)}
-                        className={`px-4 py-1.5 rounded-xl text-[10px] font-black transition-all ${
-                          isSelected ? 'bg-[#2A2723] text-white' : 'bg-[#EAE4D9]/50 hover:bg-[#C1A68D] hover:text-white text-[#7A7061]'
-                        }`}
-                      >
-                        عرض التفاصيل 🔍
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
       {/* --- Branch-by-Branch breakdown details --- */}
       <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
         <div className="p-8 border-b border-[#EAE4D9]/50 bg-[#FDFBF7]/50">
@@ -571,6 +515,62 @@ export default function FinancialSummaryTab({
                 <td className="px-8 py-6 text-sm font-black text-red-600 border-t border-[#2A2723]">-{totalExpenses.toLocaleString()}</td>
                 <td className="px-8 py-6 text-lg font-black text-[#2A2723] border-t border-[#2A2723]">{netProfit.toLocaleString()} ج.م</td>
               </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* --- Monthly Comparison Table (مقارنة شهور السنة بالكامل سطر بسطر) --- */}
+      <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden space-y-6 p-8">
+        <div>
+          <h3 className="text-xl font-black text-[#2A2723] flex items-center gap-2">
+            <span>📈</span> جدول مقارنة الأداء المالي بين شهور السنة
+          </h3>
+          <p className="text-xs text-gray-500 font-bold mt-1">
+            مقارنة الإيرادات والمصروفات وصافي الربح في سطر كامل لكل شهر من شهور العام {selectedYear}
+          </p>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-right border-collapse text-xs">
+            <thead>
+              <tr className="bg-[#2A2723] text-white font-black">
+                <th className="px-6 py-4 rounded-r-2xl">الشهر</th>
+                <th className="px-6 py-4 text-center">عدد الحجوزات</th>
+                <th className="px-6 py-4 text-center">الإيرادات (ج.م)</th>
+                <th className="px-6 py-4 text-center">المصروفات (ج.م)</th>
+                <th className="px-6 py-4 text-center">صافي الربح (ج.م)</th>
+                <th className="px-6 py-4 text-center rounded-l-2xl">التحكم</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#EAE4D9]/30 font-bold text-[#7A7061]">
+              {monthlyRollupData.map((m) => {
+                const isSelected = m.monthIndex === selectedMonth;
+                return (
+                  <tr key={m.monthIndex} className={`hover:bg-[#FDFBF7] transition-all ${isSelected ? 'bg-amber-50/50' : ''}`}>
+                    <td className="px-6 py-4 font-black text-[#2A2723] text-sm">
+                      {m.monthName} ({m.monthIndex + 1})
+                      {isSelected && <span className="bg-[#C1A68D] text-white text-[9px] font-black px-2 py-0.5 rounded-full mr-2">الحالي</span>}
+                    </td>
+                    <td className="px-6 py-4 text-center font-black text-[#2A2723]">{m.bookingsCount} حجز</td>
+                    <td className="px-6 py-4 text-center text-emerald-600 font-black">{m.revenue.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-center text-red-500 font-black">-{m.expenses.toLocaleString()}</td>
+                    <td className={`px-6 py-4 text-center text-sm font-black ${m.netProfit >= 0 ? 'text-green-700' : 'text-red-600'}`}>
+                      {m.netProfit.toLocaleString()} ج.م
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <button
+                        onClick={() => setSelectedMonth(m.monthIndex)}
+                        className={`px-4 py-1.5 rounded-xl text-[10px] font-black transition-all ${
+                          isSelected ? 'bg-[#2A2723] text-white' : 'bg-[#EAE4D9]/50 hover:bg-[#C1A68D] hover:text-white text-[#7A7061]'
+                        }`}
+                      >
+                        عرض التفاصيل 🔍
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
