@@ -333,6 +333,7 @@ function CustomerModal({
                           </p>
                         )}
                       </div>
+                      <div className="text-right flex-shrink-0">
                         <div className="font-black text-[#2A2723]">{fmtMoney(b.totalAmount || 0)}</div>
                         {b.paidAmount && Number(b.paidAmount) !== Number(b.totalAmount) && (
                           <div className="text-[9px] text-emerald-600 font-bold">مدفوع: {fmtMoney(b.paidAmount)}</div>
