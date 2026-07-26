@@ -212,15 +212,11 @@ export default function FinancePage() {
   const handleDeleteExpense = async (id: string) => {
     if (!confirm('هل أنت متأكد من رغبتك في حذف هذا المصروف نهائياً؟')) return;
     try {
-      const res = await deleteDbExpense(id);
-      if (res.success) {
-        alert('تم حذف المصروف بنجاح.');
-        await loadData();
-      } else {
-        alert('حدث خطأ أثناء الحذف: ' + res.error);
-      }
+      await deleteDbExpense(id);
+      alert('تم حذف المصروف بنجاح.');
+      await loadData();
     } catch (err: any) {
-      alert('حدث خطأ: ' + err.message);
+      alert('حدث خطأ أثناء الحذف: ' + err.message);
     }
   };
 
