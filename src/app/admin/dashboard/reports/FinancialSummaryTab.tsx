@@ -245,6 +245,31 @@ export default function FinancialSummaryTab({
     return 'عام';
   };
 
+  const exportToCSV = () => {
+    const headers = ['No', 'التاريخ', 'المبلغ', 'البيان', 'رقم الفاتورة', 'من خزينة', 'إلى مورد', 'طلب بواسطة', 'القسم'];
+    const rows = filteredExpenses.map((exp, idx) => [
+      idx + 1,
+      exp.date || '',
+      exp.amount || 0,
+      exp.description || '',
+      exp.invoice_number || '',
+      exp.from_entity || '',
+      exp.to_entity || '',
+      exp.ordered_by || '',
+      getBranchLabel(exp.branch)
+    ]);
+    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Mazar_Expenses_${MONTHS_AR[selectedMonth]}_${selectedYear}.csv`;
+    a.style.visibility = 'hidden';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
   // Log new expense logic
   const handleAddExpense = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -377,57 +402,6 @@ export default function FinancialSummaryTab({
               {netProfit.toLocaleString()} <span className="text-xs text-[#C1A68D]">ج.م</span>
             </div>
           </div>
-        </div>
-
-        {/* Detailed Expenses Breakdown for the Current Month */}
-        <div className="space-y-4 pt-4 relative z-10">
-          <div className="flex items-center justify-between border-b border-white/5 pb-2">
-            <h3 className="text-sm font-black text-[#C1A68D] uppercase tracking-wider">تفاصيل المصروفات لشهر {MONTHS_AR[selectedMonth]}</h3>
-            <span className="text-[10px] text-gray-400 font-bold">{filteredExpenses.length} مصروف مسجل</span>
-          </div>
-
-          {filteredExpenses.length === 0 ? (
-            <div className="text-center py-8 text-gray-500 text-xs font-bold bg-white/5 rounded-2xl border border-white/5">
-              لا توجد مصروفات مسجلة لهذا الشهر.
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-right text-xs">
-                <thead>
-                  <tr className="text-gray-400 border-b border-white/10 pb-2">
-                    <th className="pb-3 pr-2">التاريخ</th>
-                    <th className="pb-3 pr-2">البيان / السبب</th>
-                    <th className="pb-3 text-center">القسم</th>
-                    <th className="pb-3 text-center">بواسطة</th>
-                    <th className="pb-3 text-center">المبلغ (ج.م)</th>
-                    <th className="pb-3 text-center">إجراءات</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/5">
-                  {filteredExpenses.map((exp, idx) => (
-                    <tr key={exp.id || idx} className="hover:bg-white/5 transition-all">
-                      <td className="py-3.5 pr-2 font-bold text-gray-300">
-                        {exp.date ? new Date(exp.date).toLocaleDateString('ar-EG', { day: 'numeric', month: 'short' }) : '—'}
-                      </td>
-                      <td className="py-3.5 pr-2 font-black text-white">{exp.description}</td>
-                      <td className="py-3.5 text-center font-bold text-gray-300">{getBranchLabel(exp.branch)}</td>
-                      <td className="py-3.5 text-center font-bold text-gray-400">{exp.ordered_by || '—'}</td>
-                      <td className="py-3.5 text-center font-black text-red-400">-{parseFloat(exp.amount || 0).toLocaleString()}</td>
-                      <td className="py-3.5 text-center">
-                        <button
-                          onClick={() => handleDeleteExpense(exp.id)}
-                          className="w-8 h-8 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white flex items-center justify-center mx-auto transition-all"
-                          title="حذف المصروف"
-                        >
-                          <Trash2 size={13} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
         </div>
       </div>
 
@@ -571,6 +545,83 @@ export default function FinancialSummaryTab({
                   </tr>
                 );
               })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* --- records of financial entries (سجلات القيود المالية) --- */}
+      <div className="space-y-6 bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 p-8 shadow-sm overflow-hidden">
+        <div className="flex justify-between items-end border-b border-[#EAE4D9]/40 pb-4">
+          <div>
+            <h3 className="text-xl font-black text-[#2A2723] flex items-center gap-2">
+              <span>💸</span> سجلات القيود المالية
+            </h3>
+            <p className="text-xs text-gray-500 font-bold mt-1">
+              عرض {filteredExpenses.length} عملية مصروفات لشهر {MONTHS_AR[selectedMonth]} {selectedYear}
+            </p>
+          </div>
+          <div>
+            <button
+              onClick={exportToCSV}
+              className="bg-[#2A2723] hover:bg-black text-white text-xs font-black px-5 py-2.5 rounded-xl transition-all shadow-md"
+            >
+              تصدير Excel ↓
+            </button>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto rounded-2xl border border-[#EAE4D9]/50">
+          <table className="w-full text-center border-collapse text-xs">
+            <thead>
+              <tr className="bg-[#2A2723] text-white font-black">
+                <th className="px-4 py-4 w-12">No</th>
+                <th className="px-4 py-4">التاريخ</th>
+                <th className="px-4 py-4">البيان / السبب</th>
+                <th className="px-4 py-4">المبلغ (ج.م)</th>
+                <th className="px-4 py-4">رقم الفاتورة</th>
+                <th className="px-4 py-4">من</th>
+                <th className="px-4 py-4">إلى</th>
+                <th className="px-4 py-4">طلب بواسطة</th>
+                <th className="px-4 py-4">القسم / الفرع</th>
+                <th className="px-4 py-4">الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#EAE4D9]/30 font-bold text-[#7A7061]">
+              {filteredExpenses.length === 0 ? (
+                <tr>
+                  <td colSpan={10} className="py-12 text-center text-gray-300 font-black tracking-widest">
+                    لا توجد سجلات مصروفات لهذا الشهر
+                  </td>
+                </tr>
+              ) : (
+                filteredExpenses.map((exp, idx) => (
+                   <tr key={exp.id || idx} className="hover:bg-[#FDFBF7] transition-all">
+                     <td className="px-4 py-4 font-black text-[#2A2723]">{idx + 1}</td>
+                     <td className="px-4 py-4 whitespace-nowrap">
+                       {exp.date ? new Date(exp.date).toLocaleDateString('ar-EG', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                     </td>
+                     <td className="px-4 py-4 text-right font-black text-[#2A2723] max-w-[200px] truncate" title={exp.description}>
+                       {exp.description || '—'}
+                     </td>
+                     <td className="px-4 py-4 text-red-600 font-black">-{parseFloat(exp.amount || 0).toLocaleString()}</td>
+                     <td className="px-4 py-4 text-amber-700">{exp.invoice_number || '—'}</td>
+                     <td className="px-4 py-4">{exp.from_entity || '—'}</td>
+                     <td className="px-4 py-4">{exp.to_entity || '—'}</td>
+                     <td className="px-4 py-4">{exp.ordered_by || '—'}</td>
+                     <td className="px-4 py-4 text-amber-800">{getBranchLabel(exp.branch)}</td>
+                     <td className="px-4 py-4">
+                       <button
+                         onClick={() => handleDeleteExpense(exp.id)}
+                         className="w-8 h-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center mx-auto transition-all border border-red-100"
+                         title="حذف المصروف"
+                       >
+                         <Trash2 size={13} />
+                       </button>
+                     </td>
+                   </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
