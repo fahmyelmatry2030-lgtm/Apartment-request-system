@@ -12,6 +12,8 @@ import {
 import { Pencil, Trash2 } from 'lucide-react';
 import ExpensesTab from './ExpensesTab';
 import FinancialSummaryTab from './FinancialSummaryTab';
+import FinancialLockModal from '@/components/FinancialLockModal';
+import CustomerProfileModal from '@/components/CustomerProfileModal';
 
 // Units will be fetched dynamically from the database
 const LAYOUT_VERSION = 'v2.0.0'; // Auto-increment this to force-clear client caches
@@ -200,6 +202,19 @@ function ReportsContent() {
     if (tab === 'operational' || tab === 'expenses' || tab === 'financial') return tab;
     return searchParams.get('unit') ? 'operational' : 'expenses';
   });
+
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [profileModal, setProfileModal] = useState<{ isOpen: boolean; name: string | null; phone?: string | null }>({
+    isOpen: false,
+    name: null,
+    phone: null,
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && sessionStorage.getItem('financialUnlocked') === 'true') {
+      setIsUnlocked(true);
+    }
+  }, []);
 
   // URL PARAM SYNC (for dynamic updates without full reload)
   useEffect(() => {
@@ -823,8 +838,10 @@ function ReportsContent() {
           </button>
         </div>
 
-        {activeTab === 'expenses' && <ExpensesTab />}
-        {activeTab === 'financial' && (
+        <FinancialLockModal isOpen={!isUnlocked} onUnlock={() => setIsUnlocked(true)} />
+
+        {isUnlocked && activeTab === 'expenses' && <ExpensesTab />}
+        {isUnlocked && activeTab === 'financial' && (
           <FinancialSummaryTab
             bookings={bookings}
             units={units}
@@ -1218,9 +1235,20 @@ function ReportsContent() {
                           <td className="px-3 py-3 border-l border-[#D5CBB8]/40 font-black text-[#1a1714] whitespace-nowrap">{formatDate(row.date)}</td>
                           
                           {/* EDITABLE: Name */}
-                          <td className="px-0 py-0 border-l border-[#EAE4D9]/20">
+                          <td className="px-0 py-0 border-l border-[#EAE4D9]/20 relative group/name flex items-center justify-between">
                             {row.hasData ? (
-                              <EditableCell value={row.name} bookingId={row.id} field="name" onSave={handleCellSave} className="text-[#1a1714] font-black" readOnly={row.isCarriedOver} />
+                              <>
+                                <EditableCell value={row.name} bookingId={row.id} field="name" onSave={handleCellSave} className="text-[#1a1714] font-black flex-1" readOnly={row.isCarriedOver} />
+                                {row.name && (
+                                  <button
+                                    onClick={() => setProfileModal({ isOpen: true, name: row.name, phone: row.phone })}
+                                    className="opacity-0 group-hover/name:opacity-100 text-[10px] bg-[#C1A68D] text-white px-1.5 py-0.5 rounded ml-1 transition-opacity shrink-0 font-black shadow-sm"
+                                    title="عرض سجل وحجوزات العميل"
+                                  >
+                                    👤 السجل
+                                  </button>
+                                )}
+                              </>
                             ) : <span className="text-[#D5CBB8]">—</span>}
                           </td>
 
@@ -1620,9 +1648,17 @@ function ReportsContent() {
                       </button>
                     </div>
                   </form>
-                </div>
-              </div>
             )}
+
+            {/* Customer Profile Modal */}
+            <CustomerProfileModal
+              isOpen={profileModal.isOpen}
+              customerName={profileModal.name}
+              customerPhone={profileModal.phone}
+              bookings={bookings}
+              onClose={() => setProfileModal({ isOpen: false, name: null })}
+              onRefresh={loadData}
+            />
           </>
         )}
       </div>

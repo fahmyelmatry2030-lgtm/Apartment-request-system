@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { getDbExpenses } from '@/lib/actions/db';
+import { Calendar, TrendingUp, DollarSign, ChevronDown, ChevronUp } from 'lucide-react';
 
 const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 
@@ -25,6 +26,7 @@ export default function FinancialSummaryTab({
   const [expenses, setExpenses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [adminRole, setAdminRole] = useState<string>('Super Admin');
+  const [showMultiMonthRollup, setShowMultiMonthRollup] = useState(true);
 
   useEffect(() => {
     const info = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem('adminInfo') || '{}') : {};
@@ -47,6 +49,62 @@ export default function FinancialSummaryTab({
     loadExpenses();
   }, []);
 
+  // Multi-Month Rollup Calculation (Months 1 to 12 for selectedYear)
+  const monthlyRollupData = useMemo(() => {
+    const activeYear = selectedYear !== -1 ? selectedYear : new Date().getFullYear();
+    const result = [];
+
+    for (let m = 0; m < 12; m++) {
+      // Month bookings
+      const mBookings = bookings.filter((b: any) => {
+        if (b.status === 'deleted') return false;
+        if (b.status !== 'approved' && b.status !== 'مؤكد') return false;
+        const parts = b.checkIn?.split('-');
+        if (!parts || parts.length < 2) return false;
+        const year = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        if (month !== m || year !== activeYear) return false;
+
+        const u = units.find((unit: any) => unit.id === b.apartmentId);
+        if (isAkoura) {
+          return u?.branch === 3 || String(b.apartmentId).startsWith('p-s');
+        }
+        return true;
+      });
+
+      // Month expenses
+      const mExpenses = expenses.filter((e: any) => {
+        if (!e.date) return false;
+        const parts = e.date.split('-');
+        if (parts.length < 2) return false;
+        const year = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        if (month !== m || year !== activeYear) return false;
+
+        if (isAkoura) {
+          return e.branch === 3 || e.branch === '3' || String(e.unitId || '').startsWith('p-s');
+        }
+        return true;
+      });
+
+      const rev = mBookings.reduce((acc, b) => acc + (parseFloat(b.totalAmount || 0) - parseFloat(b.commission || 0)), 0);
+      const exp = mExpenses.reduce((acc, e) => acc + parseFloat(e.amount || 0), 0);
+      const profit = rev - exp;
+
+      result.push({
+        monthIndex: m,
+        monthName: MONTHS_AR[m],
+        bookingsCount: mBookings.length,
+        revenue: rev,
+        expenses: exp,
+        netProfit: profit,
+        hasData: rev > 0 || exp > 0 || mBookings.length > 0
+      });
+    }
+
+    return result;
+  }, [bookings, expenses, units, selectedYear, isAkoura]);
+
   // Filter bookings: only approved, matching month/year
   const filteredBookings = useMemo(() => {
     if (selectedMonth === -1 || selectedYear === -1) return [];
@@ -54,22 +112,17 @@ export default function FinancialSummaryTab({
       if (b.status === 'deleted') return false;
       if (b.status !== 'approved' && b.status !== 'مؤكد') return false;
 
-      // Match month/year based on check-in date string
       const parts = b.checkIn?.split('-');
       if (!parts || parts.length < 2) return false;
       const year = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1; // 0-indexed
+      const month = parseInt(parts[1], 10) - 1;
       if (month !== selectedMonth || year !== selectedYear) return false;
 
       const u = units.find((unit: any) => unit.id === b.apartmentId);
-
       if (isAkoura) {
-        // Akoura: only Mazar 3 (branch === 3, p-s* ids)
         return u?.branch === 3 || String(b.apartmentId).startsWith('p-s');
-      } else {
-        // Super Admin: All bookings
-        return true;
       }
+      return true;
     });
   }, [bookings, units, selectedMonth, selectedYear, isAkoura]);
 
@@ -85,18 +138,14 @@ export default function FinancialSummaryTab({
       if (month !== selectedMonth || year !== selectedYear) return false;
 
       if (isAkoura) {
-        // For Akoura: only show expenses tagged to branch 3
         return e.branch === 3 || e.branch === '3' || String(e.unitId || '').startsWith('p-s');
-      } else {
-        // Super Admin: All expenses
-        return true;
       }
+      return true;
     });
   }, [expenses, selectedMonth, selectedYear, isAkoura]);
 
   // ── Calculation Helper ──
   const calculateEntityData = (entityKey: 'mazar12' | 'mazar3' | 'apt-1' | 'apt-2' | 'apt-3') => {
-    // 1. Filter Bookings
     const entityBookings = filteredBookings.filter((b: any) => {
       const u = units.find((unit: any) => unit.id === b.apartmentId);
       if (entityKey === 'mazar12') {
@@ -108,9 +157,8 @@ export default function FinancialSummaryTab({
       return b.apartmentId === entityKey;
     });
 
-    // 2. Filter Expenses
     const entityExpensesList = filteredExpenses.filter((e: any) => {
-      const b = parseInt(e.branch) || 12; // default to 12
+      const b = parseInt(e.branch) || 12;
       if (entityKey === 'mazar12') {
         return b === 1 || b === 2 || b === 12 || !e.branch;
       }
@@ -163,24 +211,25 @@ export default function FinancialSummaryTab({
     <div className="space-y-8 animate-fade-in" dir="rtl">
       {/* Header & Selectors */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
-        <div className="animate-in slide-in-from-right duration-700">
-          <h2 className="text-4xl md:text-6xl font-black text-mazar-coffee uppercase tracking-tighter leading-none">
-            التقرير المالي
+        <div>
+          <h2 className="text-4xl md:text-5xl font-black text-[#2A2723] tracking-tighter">
+            التقرير المالي <span className="text-[#C1A68D]">الشامل</span>
           </h2>
-          <div className="flex items-center gap-3 mt-3">
-             <span className="w-2 h-2 rounded-full bg-mazar-gold animate-pulse"></span>
-             <p className="text-mazar-gray font-bold uppercase tracking-widest text-[10px]">
-               التقرير المالي لشهر {selectedMonth !== -1 ? MONTHS_AR[selectedMonth] : MONTHS_AR[new Date().getMonth()]} {selectedYear !== -1 ? selectedYear : new Date().getFullYear()}
+          <div className="flex items-center gap-3 mt-2">
+             <span className="w-2.5 h-2.5 rounded-full bg-[#C1A68D] animate-pulse"></span>
+             <p className="text-gray-500 font-bold uppercase tracking-widest text-xs">
+               كشف الحساب وملخص الأداء لشهر {selectedMonth !== -1 ? MONTHS_AR[selectedMonth] : MONTHS_AR[new Date().getMonth()]} {selectedYear !== -1 ? selectedYear : new Date().getFullYear()}
              </p>
           </div>
         </div>
-        <div className="flex gap-3 bg-white p-2 rounded-[1.5rem] border border-[#EAE4D9]/50 shadow-sm">
+
+        <div className="flex gap-3 bg-white p-2 rounded-2xl border border-[#EAE4D9]/50 shadow-sm">
           <select value={selectedMonth} onChange={e => setSelectedMonth(Number(e.target.value))}
-            className="bg-[#FDFBF7] border-none rounded-xl px-4 py-2 text-xs font-black outline-none cursor-pointer">
+            className="bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-2 text-xs font-black outline-none cursor-pointer">
             {MONTHS_AR.map((m, i) => <option key={i} value={i}>{m}</option>)}
           </select>
           <select value={selectedYear} onChange={e => setSelectedYear(Number(e.target.value))}
-            className="bg-[#FDFBF7] border-none rounded-xl px-4 py-2 text-xs font-black outline-none cursor-pointer">
+            className="bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-4 py-2 text-xs font-black outline-none cursor-pointer">
             {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
           </select>
         </div>
@@ -190,34 +239,100 @@ export default function FinancialSummaryTab({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white p-8 rounded-[2.5rem] border border-green-100 shadow-xl shadow-green-600/5 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-24 h-24 bg-green-500/5 rounded-full blur-3xl -mr-12 -mt-12 group-hover:bg-green-500/10 transition-all" />
-          <p className="text-[10px] font-black text-green-600 uppercase tracking-widest mb-4">صافي إيرادات الحجوزات (بعد العمولات)</p>
+          <p className="text-xs font-black text-green-600 uppercase tracking-widest mb-4">صافي إيرادات الحجوزات (بعد العمولات)</p>
           <div className="text-4xl font-black text-[#2A2723]">{totalRevenue.toLocaleString()} <small className="text-sm">ج.م</small></div>
         </div>
 
         <div className="bg-white p-8 rounded-[2.5rem] border border-red-100 shadow-xl shadow-red-600/5 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/5 rounded-full blur-3xl -mr-12 -mt-12 group-hover:bg-red-500/10 transition-all" />
-          <p className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-4">إجمالي المصروفات التشغيلية</p>
+          <p className="text-xs font-black text-red-600 uppercase tracking-widest mb-4">إجمالي المصروفات التشغيلية</p>
           <div className="text-4xl font-black text-[#2A2723]">{totalExpenses.toLocaleString()} <small className="text-sm">ج.م</small></div>
         </div>
 
         <div className="bg-[#2A2723] p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden group border border-white/5">
           <div className="absolute top-0 right-0 w-24 h-24 bg-[#C1A68D]/10 rounded-full blur-3xl -mr-12 -mt-12" />
-          <p className="text-[10px] font-black text-[#C1A68D] uppercase tracking-widest mb-4">صافي الربح النهائي (الخزينة)</p>
+          <p className="text-xs font-black text-[#C1A68D] uppercase tracking-widest mb-4">صافي الربح النهائي (الخزينة)</p>
           <div className="text-4xl font-black text-white">{netProfit.toLocaleString()} <small className="text-sm">ج.م</small></div>
         </div>
+      </div>
+
+      {/* MULTI-MONTH SUMMARY ROLLUP (ملخص الشهور المتتالية شهر 7، 8، 9، 10...) */}
+      <div className="bg-[#1F1C18] p-8 rounded-[2.5rem] border border-white/10 shadow-2xl space-y-6 text-white">
+        <div className="flex items-center justify-between flex-wrap gap-4 border-b border-white/10 pb-5">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-[#C1A68D]/20 border border-[#C1A68D]/30 flex items-center justify-center text-[#C1A68D]">
+              <TrendingUp size={20} />
+            </div>
+            <div>
+              <h3 className="text-xl font-black text-white">ملخص الشهور المتتالية لعام {selectedYear !== -1 ? selectedYear : currentYear}</h3>
+              <p className="text-xs text-gray-400 font-bold">عرض ومقارنة الأداء المالي للشهور بالتسلسل (شهر 7، شهر 8، شهر 9، شهر 10...)</p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setShowMultiMonthRollup(!showMultiMonthRollup)}
+            className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-black px-4 py-2 rounded-xl transition-all"
+          >
+            <span>{showMultiMonthRollup ? 'إخفاء ملخص الشهور' : 'إظهار ملخص الشهور'}</span>
+            {showMultiMonthRollup ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </button>
+        </div>
+
+        {showMultiMonthRollup && (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-fade-in">
+            {monthlyRollupData.map((m) => {
+              const isCurrent = m.monthIndex === selectedMonth;
+              return (
+                <div
+                  key={m.monthIndex}
+                  onClick={() => setSelectedMonth(m.monthIndex)}
+                  className={`p-5 rounded-2xl border transition-all cursor-pointer relative overflow-hidden ${
+                    isCurrent
+                      ? 'bg-[#C1A68D] border-white text-white shadow-xl scale-102 ring-2 ring-white/40'
+                      : m.hasData
+                      ? 'bg-[#2A2723] border-white/10 hover:border-[#C1A68D] hover:scale-102'
+                      : 'bg-black/30 border-white/5 opacity-50 hover:opacity-100'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="font-black text-sm">{m.monthName} ({m.monthIndex + 1})</span>
+                    {isCurrent && <span className="bg-white/20 text-white text-[9px] font-black px-2 py-0.5 rounded-full">الشهر المحدد</span>}
+                  </div>
+
+                  <div className="space-y-1.5 text-xs">
+                    <div className="flex justify-between items-center text-emerald-300">
+                      <span className="opacity-70 text-[10px]">الإيرادات:</span>
+                      <span className="font-black">{m.revenue.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-rose-300">
+                      <span className="opacity-70 text-[10px]">المصروفات:</span>
+                      <span className="font-black">-{m.expenses.toLocaleString()}</span>
+                    </div>
+                    <div className="border-t border-white/10 pt-1.5 flex justify-between items-center font-black">
+                      <span className="opacity-70 text-[10px]">الصافي:</span>
+                      <span className={m.netProfit >= 0 ? 'text-green-300' : 'text-rose-400'}>
+                        {m.netProfit.toLocaleString()} ج.م
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Breakdown Table (Excel Style) */}
       <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
         <div className="p-8 border-b border-[#EAE4D9]/50 bg-[#FDFBF7]/50">
           <h3 className="text-xl font-black text-[#2A2723] flex items-center gap-3">
-            <span>📊</span> ملخص مالي مفصل للتحصيل والمصاريف
+            <span>📊</span> كشف الحساب التفصيلي للتحصيل والمصاريف لشهر {MONTHS_AR[selectedMonth !== -1 ? selectedMonth : new Date().getMonth()]}
           </h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-right border-collapse">
             <thead>
-              <tr className="bg-[#2A2723] text-white text-[11px] font-black uppercase tracking-widest">
+              <tr className="bg-[#2A2723] text-white text-xs font-black uppercase tracking-widest">
                 <th className="px-8 py-5 border-l border-white/10 text-center">القسم / الفرع</th>
                 <th className="px-8 py-5 border-l border-white/10 text-center">صافي الإيرادات (ج.م)</th>
                 <th className="px-8 py-5 border-l border-white/10 text-center">المصروفات التشغيلية (ج.م)</th>
