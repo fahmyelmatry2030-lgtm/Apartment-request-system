@@ -1648,6 +1648,8 @@ function ReportsContent() {
                       </button>
                     </div>
                   </form>
+                </div>
+              </div>
             )}
 
             {/* Customer Profile Modal */}
