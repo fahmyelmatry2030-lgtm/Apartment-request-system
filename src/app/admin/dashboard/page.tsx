@@ -168,6 +168,11 @@ export default function DashboardOverview() {
     });
 
     setFullMap(map);
+    if (selectedCategory === 'all') {
+      setApartmentMap(map);
+    } else {
+      setApartmentMap(map.filter((u: any) => u.category === selectedCategory));
+    }
 
     setInventoryStats([
       { id: 'single',   label: 'سنجل',    count: map.filter((u: any) => u.category === 'single' && !u.isOccupied).length, total: map.filter((u: any) => u.category === 'single').length, color: 'text-green-500'  },
