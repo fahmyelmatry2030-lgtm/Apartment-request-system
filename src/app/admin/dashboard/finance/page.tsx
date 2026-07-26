@@ -523,68 +523,74 @@ export default function FinancePage() {
       )}
 
       {/* ════════════════ مقارنة أداء الشهور ════════════════ */}
-      <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden p-8 space-y-6">
+      <div className="space-y-6">
         <div>
           <h3 className="text-xl font-black text-[#2A2723] flex items-center gap-2">
-            <span>📈</span> جدول مقارنة الأداء المالي بين شهور السنة
+            <span>📈</span> كشف الأداء المالي بين شهور السنة
           </h3>
           <p className="text-xs text-gray-500 font-bold mt-1">
-            مقارنة الإيرادات والمصروفات وصافي الربح في سطر كامل لكل شهر من شهور العام {selectedYear > 0 ? selectedYear : new Date().getFullYear()}
+            اضغط على أي شهر لعرض تفاصيله المالية وتوزيع الأرباح الخاص به للعام {selectedYear > 0 ? selectedYear : new Date().getFullYear()}
           </p>
         </div>
 
-        <div className="overflow-x-auto rounded-2xl border border-[#EAE4D9]/50">
-          <table className="w-full text-center border-collapse text-xs">
-            <thead>
-              <tr className="bg-[#2A2723] text-white font-black">
-                <th className="px-6 py-4 text-right">الشهر</th>
-                <th className="px-6 py-4 text-center">عدد الحجوزات</th>
-                <th className="px-6 py-4 text-center">الإيرادات (ج.م)</th>
-                <th className="px-6 py-4 text-center">المصروفات (ج.م)</th>
-                <th className="px-6 py-4 text-center">صافي الربح (ج.م)</th>
-                <th className="px-6 py-4 text-center">التحكم</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#EAE4D9]/30 font-bold text-[#7A7061]">
-              {monthlyRollupData.map((m) => {
-                const isSelected = m.monthIndex === selectedMonth;
-                const isCurrent = m.monthIndex === new Date().getMonth() && selectedYear === new Date().getFullYear();
-                return (
-                  <tr
-                    key={m.monthIndex}
-                    className={`transition-all hover:bg-[#FDFBF7] ${
-                      isSelected ? 'bg-[#C1A68D]/10 font-black' : isCurrent ? 'bg-[#FDFBF7]' : ''
-                    }`}
-                  >
-                    <td className="px-6 py-4 text-right font-black text-[#2A2723]">
-                      {m.monthName} ({m.monthIndex + 1})
-                      {isCurrent && (
-                        <span className="bg-[#C1A68D]/20 text-[#C1A68D] text-[9px] font-black px-2 py-0.5 rounded-full mr-2">
-                          الحالي
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-center">{m.bookingsCount} حجز</td>
-                    <td className="px-6 py-4 text-center text-emerald-600 font-black">{m.revenue.toLocaleString()}</td>
-                    <td className="px-6 py-4 text-center text-red-500 font-black">-{m.expenses.toLocaleString()}</td>
-                    <td className={`px-6 py-4 text-center text-sm font-black ${m.netProfit >= 0 ? 'text-green-700' : 'text-red-600'}`}>
-                      {m.netProfit.toLocaleString()} ج.م
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <button
-                        onClick={() => setSelectedMonth(m.monthIndex)}
-                        className={`px-4 py-1.5 rounded-xl text-[10px] font-black transition-all ${
-                          isSelected ? 'bg-[#2A2723] text-white' : 'bg-[#EAE4D9]/50 hover:bg-[#C1A68D] hover:text-white text-[#7A7061]'
-                        }`}
-                      >
-                        عرض التفاصيل 🔍
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-4">
+          {monthlyRollupData.map((m) => {
+            const isSelected = m.monthIndex === selectedMonth;
+            const isCurrent = m.monthIndex === new Date().getMonth() && selectedYear === new Date().getFullYear();
+            
+            return (
+              <div
+                key={m.monthIndex}
+                onClick={() => setSelectedMonth(m.monthIndex)}
+                className={`group cursor-pointer p-5 rounded-[1.8rem] border transition-all duration-300 flex flex-col justify-between min-h-[160px] ${
+                  isSelected
+                    ? 'bg-[#C1A68D] border-[#C1A68D] text-white shadow-xl scale-[1.03] ring-4 ring-[#C1A68D]/25'
+                    : m.hasData
+                    ? 'bg-white border-[#EAE4D9]/80 hover:border-[#C1A68D] hover:shadow-md hover:scale-[1.02] text-[#2A2723]'
+                    : 'bg-white/60 border-[#EAE4D9]/40 opacity-60 hover:opacity-100 text-[#7A7061]'
+                }`}
+              >
+                {/* Header */}
+                <div className="flex items-start justify-between">
+                  <div className="flex flex-col">
+                    <span className="font-black text-sm tracking-tight">{m.monthName} ({m.monthIndex + 1})</span>
+                    <span className={`text-[9px] font-bold mt-0.5 ${isSelected ? 'text-white/80' : 'text-gray-400'}`}>
+                      {m.bookingsCount} حجز مؤكد
+                    </span>
+                  </div>
+                  {isCurrent && (
+                    <span className={`text-[8px] font-black px-2 py-0.5 rounded-full ${isSelected ? 'bg-white/20 text-white' : 'bg-[#C1A68D]/15 text-[#C1A68D]'}`}>
+                      الحالي
+                    </span>
+                  )}
+                </div>
+
+                {/* Body Metrics */}
+                <div className="space-y-1.5 mt-4 pt-3 border-t border-[#EAE4D9]/10">
+                  <div className="flex justify-between items-center text-[10px]">
+                    <span className={isSelected ? 'text-white/70' : 'text-gray-400 font-bold'}>الإيراد:</span>
+                    <span className={`font-black ${isSelected ? 'text-white' : 'text-emerald-600'}`}>
+                      {m.revenue.toLocaleString()}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center text-[10px]">
+                    <span className={isSelected ? 'text-white/70' : 'text-gray-400 font-bold'}>المصاريف:</span>
+                    <span className={`font-black ${isSelected ? 'text-white' : 'text-red-500'}`}>
+                      -{m.expenses.toLocaleString()}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center text-[11px] font-black pt-1 border-t border-dashed border-[#EAE4D9]/20">
+                    <span className={isSelected ? 'text-white/85' : 'text-gray-500 font-bold'}>الصافي:</span>
+                    <span className={isSelected ? 'text-white' : m.netProfit >= 0 ? 'text-emerald-700' : 'text-red-600'}>
+                      {m.netProfit.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
