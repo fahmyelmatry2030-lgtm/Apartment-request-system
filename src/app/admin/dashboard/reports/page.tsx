@@ -817,31 +817,35 @@ function ReportsContent() {
 
       <div className="space-y-8 animate-fade-in relative z-0">
         {/* Tab Navigation */}
-        <div className="no-print bg-[#2A2723] p-2 rounded-[2rem] flex gap-2 w-full max-w-2xl mx-auto shadow-2xl border border-white/5 overflow-x-auto scrollbar-hide" dir="rtl">
+        <div className="no-print bg-[#2A2723] p-2 rounded-[2rem] flex gap-2 w-full max-w-3xl mx-auto shadow-2xl border border-white/5 overflow-x-auto scrollbar-hide" dir="rtl">
           <button
             onClick={() => setActiveTab('expenses')}
-            className={`flex-1 px-8 py-4 rounded-2xl text-[10px] md:text-xs font-black transition-all whitespace-nowrap ${activeTab === 'expenses' ? 'bg-[#C1A68D] text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+            className={`flex-1 px-6 py-4 rounded-2xl text-[10px] md:text-xs font-black transition-all whitespace-nowrap ${activeTab === 'expenses' ? 'bg-[#C1A68D] text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
           >
             💸 إدارة المصروفات
           </button>
           <button
             onClick={() => setActiveTab('operational')}
-            className={`flex-1 px-8 py-4 rounded-2xl text-[10px] md:text-xs font-black transition-all whitespace-nowrap ${activeTab === 'operational' ? 'bg-[#C1A68D] text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+            className={`flex-1 px-6 py-4 rounded-2xl text-[10px] md:text-xs font-black transition-all whitespace-nowrap ${activeTab === 'operational' ? 'bg-[#C1A68D] text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
           >
             📋 جدول الحجوزات التشغيلي
           </button>
           <button
             onClick={() => setActiveTab('financial')}
-            className={`flex-1 px-8 py-4 rounded-2xl text-[10px] md:text-xs font-black transition-all whitespace-nowrap ${activeTab === 'financial' ? 'bg-[#C1A68D] text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+            className={`flex-1 px-6 py-4 rounded-2xl text-[10px] md:text-xs font-black transition-all whitespace-nowrap ${activeTab === 'financial' ? 'bg-[#C1A68D] text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
           >
             📉 التقرير المالي الشامل
           </button>
+          <a
+            href="/admin/dashboard/customers"
+            className="flex-1 px-6 py-4 rounded-2xl text-[10px] md:text-xs font-black transition-all whitespace-nowrap text-[#C1A68D] hover:text-white hover:bg-white/10 text-center border border-[#C1A68D]/30"
+          >
+            👥 قاعدة بيانات العملاء
+          </a>
         </div>
 
-        <FinancialLockModal isOpen={!isUnlocked} onUnlock={() => setIsUnlocked(true)} />
-
-        {isUnlocked && activeTab === 'expenses' && <ExpensesTab />}
-        {isUnlocked && activeTab === 'financial' && (
+        {activeTab === 'expenses' && <ExpensesTab />}
+        {activeTab === 'financial' && (
           <FinancialSummaryTab
             bookings={bookings}
             units={units}

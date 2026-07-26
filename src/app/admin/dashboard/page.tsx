@@ -252,6 +252,12 @@ export default function DashboardOverview() {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <a
+            href="/admin/dashboard/customers"
+            className="bg-[#2A2723] hover:bg-black text-[#C1A68D] hover:text-white px-5 py-2.5 rounded-2xl text-xs font-black transition-all flex items-center gap-2 border border-[#C1A68D]/40 shadow-md"
+          >
+            👥 قاعدة بيانات العملاء
+          </a>
           <div className="flex items-center gap-2 bg-white border border-[#EAE4D9]/50 px-4 py-2 rounded-full shadow-sm">
             <div className={`w-2.5 h-2.5 rounded-full ${isLoading ? 'bg-amber-400 animate-ping' : 'bg-green-500'}`} />
             <span className="text-xs font-black uppercase tracking-widest text-[#7A7061]">
