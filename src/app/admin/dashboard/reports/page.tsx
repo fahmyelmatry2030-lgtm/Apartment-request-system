@@ -10,7 +10,7 @@ import {
   deleteDbBooking
 } from '@/lib/actions/db';
 import { Pencil, Trash2 } from 'lucide-react';
-import ExpensesTab from './ExpensesTab';
+
 import FinancialSummaryTab from './FinancialSummaryTab';
 import FinancialLockModal from '@/components/FinancialLockModal';
 import CustomerProfileModal from '@/components/CustomerProfileModal';
@@ -197,10 +197,10 @@ function ReportsContent() {
   const [saveStatus, setSaveStatus] = useState('');
   const [editingBooking, setEditingBooking] = useState<any>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'operational' | 'expenses' | 'financial'>(() => {
+  const [activeTab, setActiveTab] = useState<'operational' | 'financial'>(() => {
     const tab = searchParams.get('tab');
-    if (tab === 'operational' || tab === 'expenses' || tab === 'financial') return tab;
-    return searchParams.get('unit') ? 'operational' : 'expenses';
+    if (tab === 'operational' || tab === 'financial') return tab;
+    return searchParams.get('unit') ? 'operational' : 'financial';
   });
 
   const [isUnlocked, setIsUnlocked] = useState(false);
@@ -819,12 +819,6 @@ function ReportsContent() {
         {/* Tab Navigation */}
         <div className="no-print bg-[#2A2723] p-2 rounded-[2rem] flex gap-2 w-full max-w-3xl mx-auto shadow-2xl border border-white/5 overflow-x-auto scrollbar-hide" dir="rtl">
           <button
-            onClick={() => setActiveTab('expenses')}
-            className={`flex-1 px-6 py-4 rounded-2xl text-[10px] md:text-xs font-black transition-all whitespace-nowrap ${activeTab === 'expenses' ? 'bg-[#C1A68D] text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-          >
-            💸 إدارة المصروفات
-          </button>
-          <button
             onClick={() => setActiveTab('operational')}
             className={`flex-1 px-6 py-4 rounded-2xl text-[10px] md:text-xs font-black transition-all whitespace-nowrap ${activeTab === 'operational' ? 'bg-[#C1A68D] text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
           >
@@ -844,13 +838,6 @@ function ReportsContent() {
           </a>
         </div>
 
-        {activeTab === 'expenses' && (
-          isUnlocked ? (
-            <ExpensesTab />
-          ) : (
-            <FinancialLockModal isOpen={true} onUnlock={() => setIsUnlocked(true)} />
-          )
-        )}
         {activeTab === 'financial' && (
           isUnlocked ? (
             <FinancialSummaryTab
