@@ -1206,7 +1206,7 @@ function ReportsContent() {
                     >
                       <option value="" disabled>اختر الوحدة</option>
                       <optgroup label="الاستديوهات الفندقية">
-                        {units.filter(u => u && u.id && u.type === 'studio').sort((a, b) => String(a.id || '').localeCompare(String(b.id || ''), undefined, { numeric: true })).map(u => (
+                        {units.filter(u => u && u.id && (u.type === 'studio' || String(u.id).startsWith('b1-s') || String(u.id).startsWith('b2-s') || String(u.id).startsWith('p-s'))).sort((a, b) => String(a.id || '').localeCompare(String(b.id || ''), undefined, { numeric: true })).map(u => (
                           <option key={u.id} value={u.id}>{u.title?.ar || u.id}</option>
                         ))}
                       </optgroup>
@@ -1257,7 +1257,7 @@ function ReportsContent() {
                 <div className="text-[9px] font-black text-[#C1A68D] uppercase tracking-[0.25em] px-3 mb-2">الاستديوهات الفندقية — المبنى الأول (1-12)</div>
                 <div className="flex flex-wrap gap-1.5 mb-3">
                   {units
-                    .filter(u => u && u.id && u.type === 'studio' && String(u.id).startsWith('b1-s'))
+                    .filter(u => u && u.id && String(u.id).startsWith('b1-s'))
                     .sort((a, b) => {
                       const getNum = (u: any) => parseInt(String(u.id || '').replace('b1-s', ''), 10) || 99;
                       return getNum(a) - getNum(b);
@@ -1279,7 +1279,7 @@ function ReportsContent() {
                 <div className="text-[9px] font-black text-[#C1A68D] uppercase tracking-[0.25em] px-3 mb-2">الاستديوهات الفندقية — المبنى الثاني (13-24)</div>
                 <div className="flex flex-wrap gap-1.5 mb-3">
                   {units
-                    .filter(u => u && u.id && u.type === 'studio' && String(u.id).startsWith('b2-s'))
+                    .filter(u => u && u.id && String(u.id).startsWith('b2-s'))
                     .sort((a, b) => {
                       const getNum = (u: any) => parseInt(String(u.id || '').replace('b2-s', ''), 10) || 99;
                       return getNum(a) - getNum(b);
@@ -1305,7 +1305,7 @@ function ReportsContent() {
                 <div className="text-[9px] font-black text-[#C1A68D] uppercase tracking-[0.25em] px-3 mb-2">الاستديوهات الفندقية — مزار 3 (25-30)</div>
                 <div className="flex flex-wrap gap-1.5">
                   {units
-                    .filter(u => u && u.id && u.type === 'studio' && String(u.id).startsWith('p-s'))
+                    .filter(u => u && u.id && String(u.id).startsWith('p-s'))
                     .sort((a, b) => {
                       const getNum = (u: any) => parseInt(String(u.id || '').replace('p-s', ''), 10) || 99;
                       return getNum(a) - getNum(b);
