@@ -822,12 +822,6 @@ function ReportsContent() {
           >
             📋 جدول الحجوزات التشغيلي
           </button>
-          <a
-            href="/admin/dashboard/customers"
-            className="flex-1 px-6 py-4 rounded-2xl text-[10px] md:text-xs font-black transition-all whitespace-nowrap text-[#C1A68D] hover:text-white hover:bg-white/10 text-center border border-[#C1A68D]/30"
-          >
-            👥 قاعدة بيانات العملاء
-          </a>
         </div>
 
         {activeTab === 'expenses' && (
