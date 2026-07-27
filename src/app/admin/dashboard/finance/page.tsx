@@ -538,144 +538,121 @@ export default function FinancePage() {
 
 
       {/* ════════════════ مقارنة أداء الشهور ════════════════ */}
-      <div className="rounded-[2.5rem] overflow-hidden shadow-lg border border-[#EAE4D9]/40"
-        style={{ background: 'linear-gradient(135deg, #1a1713 0%, #2A2723 60%, #1a1713 100%)' }}
-      >
+      <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/60 shadow-sm overflow-hidden">
         {/* Header */}
-        <div className="px-8 py-6 border-b border-white/10 flex items-center justify-between">
-          <div>
-            <h3 className="text-xl font-black text-white flex items-center gap-3">
-              <span className="w-10 h-10 rounded-2xl flex items-center justify-center text-lg"
-                style={{ background: 'linear-gradient(135deg, #C1A68D, #8B6F5C)' }}>
-                📈
-              </span>
-              مقارنة الأداء المالي — شهور السنة
-            </h3>
-            <p className="text-xs text-white/40 font-bold mt-1 mr-13">
-              عرض تفصيلي لكل شهر من {selectedYear > 0 ? selectedYear : new Date().getFullYear()}
-            </p>
+        <div className="px-8 py-6 border-b border-[#EAE4D9]/60 flex items-center justify-between"
+          style={{ background: 'linear-gradient(135deg, #FDFBF7 0%, #F5EFE6 100%)' }}>
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-sm"
+              style={{ background: 'linear-gradient(135deg, #2A2723, #4A4438)' }}>
+              📈
+            </div>
+            <div>
+              <h3 className="text-lg font-black text-[#2A2723]">مقارنة الأداء المالي — {selectedYear > 0 ? selectedYear : new Date().getFullYear()}</h3>
+              <p className="text-[11px] text-[#7A7061] font-bold mt-0.5">إيرادات وتكاليف وصافي ربح كل شهر</p>
+            </div>
           </div>
-          <div className="flex items-center gap-4 text-[10px] font-black">
-            <span className="flex items-center gap-1.5 text-emerald-400"><span className="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span>إيرادات</span>
-            <span className="flex items-center gap-1.5 text-red-400"><span className="w-2.5 h-2.5 rounded-full bg-red-400 inline-block"></span>مصروفات</span>
-            <span className="flex items-center gap-1.5 text-amber-300"><span className="w-2.5 h-2.5 rounded-full bg-amber-300 inline-block"></span>صافي الربح</span>
+          <div className="hidden md:flex items-center gap-6 text-[11px] font-black">
+            <span className="flex items-center gap-2 text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-100">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>إيرادات
+            </span>
+            <span className="flex items-center gap-2 text-red-700 bg-red-50 px-3 py-1.5 rounded-xl border border-red-100">
+              <span className="w-2 h-2 rounded-full bg-red-500 inline-block"></span>مصروفات
+            </span>
+            <span className="flex items-center gap-2 text-amber-800 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-100">
+              <span className="w-2 h-2 rounded-full bg-amber-500 inline-block"></span>صافي الربح
+            </span>
           </div>
         </div>
 
         {/* Rows */}
-        <div className="divide-y divide-white/5">
+        <div className="divide-y divide-[#EAE4D9]/40">
           {monthlyRollupData.map((m) => {
             const isSelected = m.monthIndex === selectedMonth;
             const isCurrent = m.monthIndex === new Date().getMonth() && selectedYear === new Date().getFullYear();
-            const maxVal = Math.max(...monthlyRollupData.map(x => x.revenue), 1);
-            const revPct = Math.round((m.revenue / maxVal) * 100);
-            const expPct = m.revenue > 0 ? Math.min(Math.round((m.expenses / m.revenue) * 100), 100) : 0;
             const hasData = m.revenue > 0 || m.expenses > 0;
 
             return (
               <div
                 key={m.monthIndex}
                 onClick={() => setSelectedMonth(m.monthIndex)}
-                className="px-8 py-5 cursor-pointer transition-all duration-200"
+                className="px-8 py-4 cursor-pointer transition-all duration-150 flex items-center gap-6"
                 style={{
                   background: isSelected
-                    ? 'rgba(193,166,141,0.15)'
+                    ? 'linear-gradient(135deg, #F5EFE6, #EAE0D2)'
                     : isCurrent
-                    ? 'rgba(255,255,255,0.04)'
-                    : 'transparent',
+                    ? '#FDFBF7'
+                    : 'white',
                 }}
-                onMouseEnter={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'; }}
-                onMouseLeave={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = isCurrent ? 'rgba(255,255,255,0.04)' : 'transparent'; }}
+                onMouseEnter={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = '#FDFCFA'; }}
+                onMouseLeave={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = isCurrent ? '#FDFBF7' : 'white'; }}
               >
-                <div className="flex items-center gap-6">
-                  {/* Month name + badges */}
-                  <div className="w-36 shrink-0 text-right">
-                    <div className="flex items-center justify-end gap-2 flex-wrap">
-                      {isCurrent && (
-                        <span className="text-[9px] font-black px-2 py-0.5 rounded-full"
-                          style={{ background: 'rgba(193,166,141,0.3)', color: '#C1A68D' }}>
-                          الحالي
-                        </span>
-                      )}
-                      {isSelected && (
-                        <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-white/20 text-white">
-                          محدد
-                        </span>
-                      )}
-                      <span className={`text-sm font-black ${isSelected ? 'text-[#C1A68D]' : 'text-white/80'}`}>
-                        {m.monthName}
-                      </span>
-                    </div>
-                    <div className="text-[10px] text-white/30 font-bold mt-0.5 text-right">
-                      {m.bookingsCount} حجز
-                    </div>
-                  </div>
-
-                  {/* Bars + numbers */}
-                  <div className="flex-1 space-y-2">
-                    {hasData ? (
-                      <>
-                        {/* Revenue bar */}
-                        <div className="flex items-center gap-3">
-                          <div className="w-16 text-right text-[10px] font-black text-emerald-400 shrink-0">
-                            {m.revenue > 0 ? m.revenue.toLocaleString() : '—'}
-                          </div>
-                          <div className="flex-1 h-2 rounded-full bg-white/5 overflow-hidden">
-                            <div
-                              className="h-full rounded-full transition-all duration-700"
-                              style={{
-                                width: `${revPct}%`,
-                                background: 'linear-gradient(90deg, #34d399, #10b981)',
-                              }}
-                            />
-                          </div>
-                        </div>
-
-                        {/* Expenses bar */}
-                        <div className="flex items-center gap-3">
-                          <div className="w-16 text-right text-[10px] font-black text-red-400 shrink-0">
-                            {m.expenses > 0 ? `-${m.expenses.toLocaleString()}` : '—'}
-                          </div>
-                          <div className="flex-1 h-2 rounded-full bg-white/5 overflow-hidden">
-                            <div
-                              className="h-full rounded-full transition-all duration-700"
-                              style={{
-                                width: `${expPct}%`,
-                                background: 'linear-gradient(90deg, #f87171, #ef4444)',
-                              }}
-                            />
-                          </div>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="text-[10px] text-white/20 font-bold">لا توجد بيانات</div>
-                    )}
-                  </div>
-
-                  {/* Net profit */}
-                  <div className="w-32 shrink-0 text-center">
-                    <div className={`text-sm font-black ${m.netProfit > 0 ? 'text-amber-300' : m.netProfit < 0 ? 'text-red-400' : 'text-white/30'}`}>
-                      {m.netProfit !== 0 ? `${m.netProfit.toLocaleString()} ج.م` : '—'}
-                    </div>
-                    {m.netProfit > 0 && m.revenue > 0 && (
-                      <div className="text-[9px] text-white/30 font-bold mt-0.5">
-                        هامش {Math.round((m.netProfit / m.revenue) * 100)}%
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Arrow indicator */}
-                  <div className="w-8 shrink-0 flex justify-center">
-                    <span className={`text-lg transition-all ${isSelected ? 'text-[#C1A68D]' : 'text-white/20'}`}>
-                      {isSelected ? '◀' : '›'}
+                {/* Month + bookings */}
+                <div className="w-32 shrink-0">
+                  <div className="flex items-center gap-2">
+                    <span className={`text-sm font-black ${isSelected ? 'text-[#2A2723]' : 'text-[#2A2723]/80'}`}>
+                      {m.monthName}
                     </span>
+                    {isCurrent && (
+                      <span className="text-[8px] font-black px-1.5 py-0.5 rounded-full bg-[#C1A68D]/20 text-[#8B6F5C]">
+                        الحالي
+                      </span>
+                    )}
                   </div>
+                  <div className="text-[10px] text-[#7A7061]/60 font-bold mt-0.5">
+                    {m.bookingsCount} حجز
+                  </div>
+                </div>
+
+                {/* Revenue */}
+                <div className="flex-1 min-w-0">
+                  <div className="text-[10px] text-[#7A7061] font-bold mb-1">إيرادات</div>
+                  <div className={`text-sm font-black ${hasData ? 'text-emerald-700' : 'text-gray-300'}`}>
+                    {hasData && m.revenue > 0 ? `${m.revenue.toLocaleString()} ج.م` : '—'}
+                  </div>
+                </div>
+
+                {/* Expenses */}
+                <div className="flex-1 min-w-0">
+                  <div className="text-[10px] text-[#7A7061] font-bold mb-1">مصروفات</div>
+                  <div className={`text-sm font-black ${hasData && m.expenses > 0 ? 'text-red-600' : 'text-gray-300'}`}>
+                    {hasData && m.expenses > 0 ? `-${m.expenses.toLocaleString()} ج.م` : '—'}
+                  </div>
+                </div>
+
+                {/* Net profit */}
+                <div className="flex-1 min-w-0">
+                  <div className="text-[10px] text-[#7A7061] font-bold mb-1">صافي الربح</div>
+                  <div className={`text-sm font-black ${m.netProfit > 0 ? 'text-green-700' : m.netProfit < 0 ? 'text-red-600' : 'text-gray-300'}`}>
+                    {m.netProfit !== 0 ? `${m.netProfit.toLocaleString()} ج.م` : '—'}
+                  </div>
+                  {m.netProfit > 0 && m.revenue > 0 && (
+                    <div className="text-[9px] text-[#7A7061]/50 font-bold mt-0.5">
+                      هامش {Math.round((m.netProfit / m.revenue) * 100)}%
+                    </div>
+                  )}
+                </div>
+
+                {/* CTA button */}
+                <div className="shrink-0">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setSelectedMonth(m.monthIndex); }}
+                    className={`px-4 py-2 rounded-xl text-[10px] font-black transition-all ${
+                      isSelected
+                        ? 'bg-[#2A2723] text-white shadow-md'
+                        : 'bg-[#EAE4D9]/60 text-[#7A7061] hover:bg-[#C1A68D] hover:text-white'
+                    }`}
+                  >
+                    {isSelected ? '✓ محدد' : 'عرض'}
+                  </button>
                 </div>
               </div>
             );
           })}
         </div>
       </div>
+
+
 
 
 
