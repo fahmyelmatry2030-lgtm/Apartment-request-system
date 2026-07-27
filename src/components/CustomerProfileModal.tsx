@@ -170,73 +170,73 @@ export default function CustomerProfileModal({
         <div className="p-6 overflow-y-auto flex-1 custom-scrollbar-horizontal min-h-[300px]">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
             
-            {/* Column Right (5 cols): Notes & Global Profile Info */}
-            <div className="md:col-span-5 space-y-5">
+            {/* Column Right (6 cols): Notes & Global Profile Info */}
+            <div className="md:col-span-6 space-y-5">
               
               {/* 📝 Permanent Customer Profile Notes (Extensive) */}
-              <div className="bg-[#2A2723] border-2 border-[#C1A68D]/30 rounded-2xl p-5 space-y-4 shadow-lg relative">
-                <div className="absolute top-0 left-0 bg-[#C1A68D] text-[#1F1C18] text-[8px] font-black px-2.5 py-0.5 rounded-bl-xl rounded-tr-sm uppercase tracking-wider">
-                  ملف العميل الدائم
+              <div className="bg-[#2A2723] border-2 border-[#C1A68D]/40 rounded-3xl p-6 space-y-4 shadow-xl relative">
+                <div className="absolute top-0 left-0 bg-[#C1A68D] text-[#1F1C18] text-[9px] font-black px-3 py-1 rounded-bl-2xl rounded-tr-sm uppercase tracking-wider">
+                  ملف العميل الدائم الموحد
                 </div>
                 
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black text-[#C1A68D] flex items-center gap-1.5 mt-1">
-                    <FileText size={15} />
+                <div className="flex items-center justify-between border-b border-white/5 pb-2">
+                  <span className="text-sm font-black text-[#C1A68D] flex items-center gap-2 mt-1">
+                    <FileText size={18} />
                     <span>ملاحظات العميل الدائمة (باستفاضة)</span>
                   </span>
                   {!isEditingGlobalNote && phone && (
                     <button
                       onClick={() => setIsEditingGlobalNote(true)}
-                      className="text-[10px] text-gray-400 hover:text-white underline font-bold"
+                      className="text-xs text-[#C1A68D] hover:text-white underline font-black"
                     >
-                      تعديل ✏️
+                      تعديل الملاحظة ✏️
                     </button>
                   )}
                 </div>
 
                 {isEditingGlobalNote ? (
-                  <div className="space-y-2 mt-2">
+                  <div className="space-y-3 mt-2">
                     <textarea
-                      rows={8}
+                      rows={12}
                       value={globalNote}
                       onChange={(e) => setGlobalNote(e.target.value)}
-                      placeholder="اكتب ملاحظات باستفاضة عن العميل هنا (مثلاً: يفضل الطوابق العليا، عميل هادئ، لديه طلبات خاصة متكررة، إلخ)..."
-                      className="w-full bg-[#1F1C18] border border-[#C1A68D] rounded-xl p-3 text-xs text-white outline-none font-bold resize-none leading-relaxed"
+                      placeholder="اكتب ملاحظات باستفاضة عن العميل هنا (مثلاً: يفضل الطوابق العليا، يفضل الهدوء، العميل دقيق في المواعيد، لديه طلبات متكررة، إلخ)..."
+                      className="w-full bg-[#1E1B18] border-2 border-[#C1A68D] rounded-2xl p-4 text-sm text-white outline-none font-bold resize-none leading-relaxed focus:ring-2 focus:ring-[#C1A68D]/30"
                     />
                     <div className="flex items-center gap-2 justify-end">
                       <button
                         onClick={() => { setIsEditingGlobalNote(false); setGlobalNote(localStorage.getItem(`customer_note_${phone}`) || ''); }}
-                        className="px-3 py-1 rounded-lg text-xs bg-white/10 text-gray-300 hover:bg-white/20"
+                        className="px-4 py-2 rounded-xl text-xs bg-white/10 text-gray-300 hover:bg-white/20 font-bold"
                       >
                         إلغاء
                       </button>
                       <button
                         onClick={handleSaveGlobalNote}
-                        className="px-4 py-1.5 rounded-lg text-xs font-black bg-[#C1A68D] text-white hover:opacity-90 flex items-center gap-1"
+                        className="px-5 py-2 rounded-xl text-xs font-black bg-[#C1A68D] text-[#1F1C18] hover:bg-[#d5baa0] transition-all flex items-center gap-1.5 shadow-md"
                       >
                         حفظ الملاحظة الدائمة 💾
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-black/20 p-4 rounded-xl border border-white/5 min-h-[120px] flex flex-col justify-between">
-                    <p className="text-xs text-gray-200 font-bold leading-relaxed whitespace-pre-wrap">
-                      {globalNote ? globalNote : '💬 لا توجد ملاحظات عامة مسجلة في ملف هذا العميل حالياً. اضغط تعديل للبدء بالكتابة باستفاضة.'}
+                  <div className="bg-black/35 p-5 rounded-2xl border border-white/5 min-h-[260px] flex flex-col justify-between">
+                    <p className="text-sm text-amber-100 font-bold leading-relaxed whitespace-pre-wrap">
+                      {globalNote ? globalNote : '💬 لا توجد ملاحظات عامة مسجلة في ملف هذا العميل حالياً. اضغط على "تعديل الملاحظة" في الأعلى للبدء بالكتابة باستفاضة.'}
                     </p>
                   </div>
                 )}
               </div>
 
               {/* 🏠 Latest Booking Specific Note */}
-              <div className="bg-[#25221E] border border-white/5 rounded-2xl p-5 space-y-3 shadow-inner">
+              <div className="bg-[#25221E] border border-white/5 rounded-2xl p-4 space-y-3 shadow-inner">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-black text-gray-400 flex items-center gap-1.5">
-                    <span>🏠 ملاحظة الحجز الأخير</span>
+                    <span>🏠 ملاحظة الحجز الأخير (خاصة بهذا الحجز فقط)</span>
                   </span>
                   {!isEditingNote && latestBooking.id && (
                     <button
                       onClick={() => setIsEditingNote(true)}
-                      className="text-[10px] text-gray-400 hover:text-white underline font-bold"
+                      className="text-[10px] text-[#C1A68D] hover:underline font-bold"
                     >
                       تعديل ✏️
                     </button>
@@ -269,7 +269,7 @@ export default function CustomerProfileModal({
                     </div>
                   </div>
                 ) : (
-                  <p className="text-xs text-gray-400 font-bold leading-relaxed whitespace-pre-wrap bg-black/10 p-3 rounded-xl">
+                  <p className="text-xs text-gray-400 font-bold leading-relaxed whitespace-pre-wrap bg-black/10 p-3 rounded-xl border border-white/5">
                     {latestBooking.notes ? latestBooking.notes : 'لا توجد ملاحظة للحجز الأخير.'}
                   </p>
                 )}
@@ -277,8 +277,8 @@ export default function CustomerProfileModal({
 
             </div>
 
-            {/* Column Left (7 cols): Bookings Timeline */}
-            <div className="md:col-span-7 space-y-4">
+            {/* Column Left (6 cols): Bookings Timeline */}
+            <div className="md:col-span-6 space-y-4">
               <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
                 <History size={14} className="text-[#C1A68D]" />
                 <span>سجل الحجوزات والتفاصيل ({customerBookings.length})</span>
