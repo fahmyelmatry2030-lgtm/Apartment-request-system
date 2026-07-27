@@ -276,6 +276,7 @@ function ReportsContent() {
   const [smartCategory, setSmartCategory] = useState('all');
   const [smartSuggestions, setSmartSuggestions] = useState<any[]>([]);
   const [hasSearchedSmart, setHasSearchedSmart] = useState(false);
+  const [conflictDays, setConflictDays] = useState<string[]>([]);
 
   const printRef = useRef<HTMLDivElement>(null);
 
@@ -588,6 +589,30 @@ function ReportsContent() {
       }
     }
 
+    // 3. If still no suggestions, find the specific "problem days" where ALL units are fully booked
+    const problemDays: string[] = [];
+    if (suggestionsList.length === 0) {
+      const cursor = new Date(checkInDate);
+      while (cursor < checkOutDate) {
+        const dayStr = cursor.toISOString().split('T')[0];
+        const nextDay = new Date(cursor);
+        nextDay.setDate(cursor.getDate() + 1);
+        const nextDayStr = nextDay.toISOString().split('T')[0];
+
+        const anyFree = targetUnits.some((unit: any) => {
+          return !bookings.some((b: any) => {
+            if (b.status === 'deleted' || b.status === 'cancelled' || b.status === 'rejected') return false;
+            const bUnitId = b.apartmentId || b.studio;
+            return bUnitId === unit.id && (b.checkIn < nextDayStr) && (b.checkOut > dayStr);
+          });
+        });
+
+        if (!anyFree) problemDays.push(dayStr);
+        cursor.setDate(cursor.getDate() + 1);
+      }
+    }
+
+    setConflictDays(problemDays);
     setSmartSuggestions(suggestionsList);
   };
 
@@ -1168,8 +1193,23 @@ function ReportsContent() {
                       <h4 className="text-xs font-black text-[#C1A68D] uppercase tracking-wider">💡 مقترحات التسكين المتاحة:</h4>
                       
                       {smartSuggestions.length === 0 ? (
-                        <div className="bg-black/20 p-6 rounded-2xl text-center border border-white/5 text-xs text-gray-400 font-bold">
-                          ⚠️ لا توجد غرف متاحة بالكامل أو مقترحات تقسيم إقامة للفترة المطلوبة. يرجى تعديل الفترة أو الفئة.
+                        <div className="bg-black/20 p-4 rounded-2xl border border-white/5 space-y-3">
+                          <p className="text-xs text-gray-400 font-bold text-center">
+                            ⚠️ لا توجد غرف متاحة لهذه الفترة. يرجى تعديل التواريخ أو الفئة.
+                          </p>
+                          {conflictDays.length > 0 && (
+                            <div className="space-y-2">
+                              <p className="text-[10px] font-black text-red-400 text-center uppercase tracking-wider">🔴 الأيام المشكلة (كل الغرف محجوزة فيها):</p>
+                              <div className="flex flex-wrap gap-2 justify-center">
+                                {conflictDays.map(day => (
+                                  <span key={day} className="bg-red-500/15 text-red-300 border border-red-500/30 text-[10px] font-black px-3 py-1.5 rounded-full">
+                                    🔴 {new Date(day + 'T12:00:00').toLocaleDateString('ar-EG', { weekday: 'short', day: 'numeric', month: 'long' })}
+                                  </span>
+                                ))}
+                              </div>
+                              <p className="text-[10px] text-gray-500 font-bold text-center">يجب تعديل التواريخ لتتجنب هذه الأيام، أو مراجعة الحجوزات الموجودة.</p>
+                            </div>
+                          )}
                         </div>
                       ) : (
                         <div className="grid gap-3">
