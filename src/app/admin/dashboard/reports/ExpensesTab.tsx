@@ -492,34 +492,8 @@ create policy "Allow all access" on public.expenses for all using (true) with ch
         </form>
       </div>
 
-      {/* Summary Banner (Animated) */}
-      <div className="bg-mazar-coffee p-12 rounded-[3rem] text-white flex flex-col lg:flex-row justify-between items-center gap-10 relative overflow-hidden shadow-[0_30px_60px_-15px_rgba(44,38,28,0.4)] border border-white/5">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-mazar-gold/10 blur-[120px] rounded-full -mr-48 -mt-48"></div>
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 blur-[100px] rounded-full -ml-32 -mb-32"></div>
-        
-        <div className="relative z-10 text-center lg:text-right">
-          <p className="text-mazar-gold font-black uppercase tracking-[0.3em] text-[10px] mb-4 opacity-80">إجمالي التكاليف (كافة المصروفات)</p>
-          <h3 className="text-6xl md:text-8xl font-black tracking-tighter">
-            <AnimatedNumber value={totalAmount} />
-            <span className="text-xl md:text-3xl text-mazar-gold mr-4">ج.م</span>
-          </h3>
-        </div>
 
-        <div className="relative z-10 grid grid-cols-2 gap-6 w-full lg:w-auto">
-          <div className="glass-card bg-white/5 border-white/10 p-8 flex flex-col items-center justify-center min-w-[140px]">
-            <p className="text-mazar-gold text-[10px] font-black uppercase tracking-widest mb-2">العمليات</p>
-            <p className="text-3xl font-black"><AnimatedNumber value={filteredExpenses.length} /></p>
-          </div>
-          <div className="glass-card bg-white/5 border-white/10 p-8 flex flex-col items-center justify-center min-w-[140px]">
-            <p className="text-mazar-gold text-[10px] font-black uppercase tracking-widest mb-2">أعلى مصروف</p>
-            <p className="text-3xl font-black">
-              {filteredExpenses.length > 0 ? (
-                <AnimatedNumber value={Math.max(...filteredExpenses.map(e => e.amount || 0))} />
-              ) : '0'}
-            </p>
-          </div>
-        </div>
-      </div>
+
 
       {/* Records Section (Excel Style Table) */}
       <div className="space-y-8">

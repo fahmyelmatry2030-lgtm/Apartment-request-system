@@ -547,7 +547,6 @@ export default function DashboardOverview() {
                     <th className="px-4 py-4 text-center">تاريخ الخروج</th>
                     <th className="px-4 py-4 text-center">حجوزات قادمة</th>
                     <th className="px-4 py-4 text-center">الحالة</th>
-                    <th className="px-4 py-4">حالة الإقامة</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#EAE4D9]/40 text-xs">
@@ -682,68 +681,6 @@ export default function DashboardOverview() {
                                apt.status === 'صيانة' ? 'صيانة' : 
                                'متاح'}
                             </span>
-                          </td>
-
-                          <td className="px-4 py-3">
-                            {apt.isTurnover ? (
-                              <div className="flex flex-col gap-1.5 items-start">
-                                <div className="flex items-center gap-1">
-                                  <span className="text-rose-500 font-bold text-[10px]" title="النزيل المغادر">🛫</span>
-                                  <select 
-                                    disabled={isPartner || isAkoura}
-                                    value={apt.leavingClientStatus} 
-                                    onChange={(e) => handleStatusUpdate(apt.leavingBookingId, e.target.value)}
-                                    className={`text-[10px] font-black rounded-lg px-2 py-0.5 outline-none border transition-all ${
-                                      (isPartner || isAkoura) ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'
-                                    } ${
-                                      apt.leavingClientStatus === 'متواجد' ? 'bg-green-600 text-white border-green-700' :
-                                      apt.leavingClientStatus === 'غادر' ? 'bg-gray-600 text-white border-gray-700' :
-                                      'bg-amber-100 text-amber-700 border-amber-200'
-                                    }`}
-                                  >
-                                    <option value="انتظار">⏳ انتظار</option>
-                                    <option value="متواجد">👤 متواجد</option>
-                                    <option value="غادر">🚪 غادر</option>
-                                  </select>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <span className="text-blue-600 font-bold text-[10px]" title="النزيل القادم">🛬</span>
-                                  <select 
-                                    disabled={isPartner || isAkoura}
-                                    value={apt.arrivingClientStatus} 
-                                    onChange={(e) => handleStatusUpdate(apt.arrivingBookingId, e.target.value)}
-                                    className={`text-[10px] font-black rounded-lg px-2 py-0.5 outline-none border transition-all ${
-                                      (isPartner || isAkoura) ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'
-                                    } ${
-                                      apt.arrivingClientStatus === 'متواجد' ? 'bg-green-600 text-white border-green-700' :
-                                      apt.arrivingClientStatus === 'غادر' ? 'bg-gray-600 text-white border-gray-700' :
-                                      'bg-amber-100 text-amber-700 border-amber-200'
-                                    }`}
-                                  >
-                                    <option value="انتظار">⏳ انتظار</option>
-                                    <option value="متواجد">👤 متواجد</option>
-                                    <option value="غادر">🚪 غادر</option>
-                                  </select>
-                                </div>
-                              </div>
-                            ) : apt.isOccupied && apt.bookingId ? (
-                              <select 
-                                disabled={isPartner || isAkoura}
-                                value={apt.clientStatus} 
-                                onChange={(e) => handleStatusUpdate(apt.bookingId, e.target.value)}
-                                className={`text-[10px] font-black rounded-lg px-2 py-1 outline-none border transition-all ${
-                                  isPartner ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'
-                                } ${
-                                  apt.clientStatus === 'متواجد' ? 'bg-green-600 text-white border-green-700' :
-                                  apt.clientStatus === 'غادر' ? 'bg-gray-600 text-white border-gray-700' :
-                                  'bg-amber-100 text-amber-700 border-amber-200'
-                                }`}
-                              >
-                                <option value="انتظار">⏳ انتظار</option>
-                                <option value="متواجد">👤 متواجد</option>
-                                <option value="غادر">🚪 غادر</option>
-                              </select>
-                            ) : <span className="text-[10px] text-gray-300">—</span>}
                           </td>
                         </tr>
                       );
