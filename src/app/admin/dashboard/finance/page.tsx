@@ -109,11 +109,7 @@ export default function FinancePage() {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [adminRole, setAdminRole] = useState<string>('Super Admin');
 
-  useEffect(() => {
-    if (typeof window !== 'undefined' && sessionStorage.getItem('financialUnlocked') === 'true') {
-      setIsUnlocked(true);
-    }
-  }, []);
+
 
   useEffect(() => {
     const info = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem('adminInfo') || '{}') : {};
