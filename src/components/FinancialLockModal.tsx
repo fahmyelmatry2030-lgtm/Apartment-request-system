@@ -16,8 +16,8 @@ export default function FinancialLockModal({ isOpen, onUnlock }: FinancialLockMo
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Accept standard management passcodes (mazar2026, 1234, akoura2026, or admin)
-    const validPasscodes = ['1234', 'mazar2026', 'akoura2026', 'admin'];
+    // Accept standard management passcodes (mazar788, mazar2026, 1234, etc.)
+    const validPasscodes = ['mazar788', '1234', 'mazar2026', 'akoura2026', 'admin'];
     
     if (validPasscodes.includes(password.trim().toLowerCase())) {
       sessionStorage.setItem('financialUnlocked', 'true');
@@ -40,7 +40,7 @@ export default function FinancialLockModal({ isOpen, onUnlock }: FinancialLockMo
 
         <h3 className="text-2xl font-black text-white mb-2 tracking-tight">محمي بكلمة السر 🔒</h3>
         <p className="text-xs font-bold text-gray-400 mb-6 leading-relaxed">
-          كشف الحساب الشهري والتقرير المالي الشامل محمي. يرجى إدخال كلمة مرور الإدارة لعرض البيانات المالية.
+          هذه الصفحة محمية. يرجى إدخال كلمة مرور الإدارة لعرض البيانات الإدارية الحساسة.
         </p>
 
         <form onSubmit={handleSubmit} className="w-full space-y-4">
@@ -61,7 +61,7 @@ export default function FinancialLockModal({ isOpen, onUnlock }: FinancialLockMo
           {error && (
             <div className="flex items-center justify-center gap-2 text-rose-400 text-xs font-black bg-rose-500/10 py-2.5 rounded-xl border border-rose-500/20 animate-shake">
               <ShieldAlert size={14} />
-              <span>كلمة المرور غير صحيحة! (أدخل 1234 أو mazar2026)</span>
+              <span>كلمة المرور غير صحيحة! يرجى المحاولة مرة أخرى.</span>
             </div>
           )}
 
@@ -69,7 +69,7 @@ export default function FinancialLockModal({ isOpen, onUnlock }: FinancialLockMo
             type="submit"
             className="w-full bg-gradient-to-r from-[#C1A68D] to-[#9E8268] text-white font-black py-4 rounded-2xl hover:opacity-90 transition-all shadow-lg active:scale-98 text-sm"
           >
-            فتح التقرير المالي 🔓
+            تأكيد الدخول 🔓
           </button>
         </form>
 

@@ -2,11 +2,13 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { getDbStaff, saveDbStaff, deleteDbStaff, getDbSalaries, saveDbSalary, deleteDbSalary } from '@/lib/actions/db';
+import FinancialLockModal from '@/components/FinancialLockModal';
 
 export default function SalariesManagement() {
   const [staff, setStaff] = useState<any[]>([]);
   const [salaries, setSalaries] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isUnlocked, setIsUnlocked] = useState(false);
   const [showStaffModal, setShowStaffModal] = useState(false);
   const [showSalaryModal, setShowSalaryModal] = useState(false);
   const [editingStaff, setEditingStaff] = useState<any>({});
@@ -77,6 +79,14 @@ export default function SalariesManagement() {
     setShowSalaryModal(false);
     loadData();
   };
+
+  if (!isUnlocked) {
+    return (
+      <div className="flex items-center justify-center min-h-[65vh]">
+        <FinancialLockModal isOpen={true} onUnlock={() => setIsUnlocked(true)} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-12 animate-fade-in" dir="rtl">
