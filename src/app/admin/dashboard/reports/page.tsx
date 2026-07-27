@@ -196,9 +196,9 @@ function ReportsContent() {
   const [saveStatus, setSaveStatus] = useState('');
   const [editingBooking, setEditingBooking] = useState<any>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'operational' | 'expenses' | 'financial'>(() => {
+  const [activeTab, setActiveTab] = useState<'operational' | 'expenses'>(() => {
     const tab = searchParams.get('tab');
-    if (tab === 'operational' || tab === 'expenses' || tab === 'financial') return tab;
+    if (tab === 'operational' || tab === 'expenses') return tab;
     return searchParams.get('unit') ? 'operational' : 'expenses';
   });
 
@@ -822,12 +822,6 @@ function ReportsContent() {
           >
             📋 جدول الحجوزات التشغيلي
           </button>
-          <button
-            onClick={() => setActiveTab('financial')}
-            className={`flex-1 px-6 py-4 rounded-2xl text-[10px] md:text-xs font-black transition-all whitespace-nowrap ${activeTab === 'financial' ? 'bg-[#C1A68D] text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-          >
-            📉 التقرير المالي الشامل
-          </button>
           <a
             href="/admin/dashboard/customers"
             className="flex-1 px-6 py-4 rounded-2xl text-[10px] md:text-xs font-black transition-all whitespace-nowrap text-[#C1A68D] hover:text-white hover:bg-white/10 text-center border border-[#C1A68D]/30"
@@ -840,16 +834,7 @@ function ReportsContent() {
           <ExpensesTab />
         )}
 
-        {activeTab === 'financial' && (
-          <FinancialSummaryTab
-            bookings={bookings}
-            units={units}
-            selectedMonth={selectedMonth}
-            selectedYear={selectedYear}
-            setSelectedMonth={setSelectedMonth}
-            setSelectedYear={setSelectedYear}
-          />
-        )}
+
 
         {activeTab === 'operational' && (
           <>
