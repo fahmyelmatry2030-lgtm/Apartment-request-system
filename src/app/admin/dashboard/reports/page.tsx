@@ -259,6 +259,14 @@ function ReportsContent() {
     notes: ''
   });
 
+  // 🔮 Smart Accommodation Assistant States
+  const [smartAssistantOpen, setSmartAssistantOpen] = useState(false);
+  const [smartCheckIn, setSmartCheckIn] = useState('');
+  const [smartCheckOut, setSmartCheckOut] = useState('');
+  const [smartCategory, setSmartCategory] = useState('all');
+  const [smartSuggestions, setSmartSuggestions] = useState<any[]>([]);
+  const [hasSearchedSmart, setHasSearchedSmart] = useState(false);
+
   const printRef = useRef<HTMLDivElement>(null);
 
   // Update checkIn/Out safely if month/year changes
@@ -434,6 +442,132 @@ function ReportsContent() {
       console.error('Delete failed:', err);
       setSaveStatus('❌ فشل المسح');
       setTimeout(() => setSaveStatus(''), 3000);
+    }
+  };
+
+  // 🔮 Smart Booking Assistant Algorithm
+  const handleSmartSearch = () => {
+    if (!smartCheckIn || !smartCheckOut) {
+      alert('يرجى تحديد تاريخ الدخول وتاريخ الخروج أولاً.');
+      return;
+    }
+    if (new Date(smartCheckIn) >= new Date(smartCheckOut)) {
+      alert('تاريخ الخروج يجب أن يكون بعد تاريخ الدخول.');
+      return;
+    }
+
+    setHasSearchedSmart(true);
+
+    const checkInDate = new Date(smartCheckIn);
+    const checkOutDate = new Date(smartCheckOut);
+    const totalNights = Math.round((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
+
+    // Filter units matching category
+    let targetUnits = units;
+    if (smartCategory !== 'all') {
+      targetUnits = units.filter((u: any) => u.category === smartCategory);
+    }
+
+    const suggestionsList: any[] = [];
+
+    // 1. Find Fully Available Units
+    targetUnits.forEach((unit: any) => {
+      // Find overlap bookings
+      const overlaps = bookings.filter((b: any) => {
+        if (b.status === 'deleted' || b.status === 'cancelled' || b.status === 'rejected') return false;
+        const bUnitId = b.apartmentId || b.studio;
+        if (bUnitId !== unit.id) return false;
+        
+        // Overlap condition:
+        return (b.checkIn < smartCheckOut) && (b.checkOut > smartCheckIn);
+      });
+
+      if (overlaps.length === 0) {
+        suggestionsList.push({
+          type: 'full',
+          unit,
+          label: `${unit.title?.ar || unit.id} (${unit.category === 'single' ? 'سنجل' : unit.category === 'double' ? 'دبل' : unit.category === 'triple' ? 'تريبل' : unit.category === 'two-room' ? 'غرفتين' : 'شقة'})`
+        });
+      }
+    });
+
+    // 2. If no unit is fully available, suggest split-stays!
+    if (suggestionsList.length === 0 && totalNights >= 2) {
+      // Check every split point (e.g. splitting after 'splitNights' nights)
+      for (let splitNights = 1; splitNights < totalNights; splitNights++) {
+        const splitDate = new Date(checkInDate);
+        splitDate.setDate(checkInDate.getDate() + splitNights);
+        const splitDateStr = splitDate.toISOString().split('T')[0];
+
+        // Part 1: [smartCheckIn, splitDateStr)
+        const part1Available = targetUnits.filter((unit: any) => {
+          return !bookings.some((b: any) => {
+            if (b.status === 'deleted' || b.status === 'cancelled' || b.status === 'rejected') return false;
+            const bUnitId = b.apartmentId || b.studio;
+            return bUnitId === unit.id && (b.checkIn < splitDateStr) && (b.checkOut > smartCheckIn);
+          });
+        });
+
+        // Part 2: [splitDateStr, smartCheckOut)
+        const part2Available = targetUnits.filter((unit: any) => {
+          return !bookings.some((b: any) => {
+            if (b.status === 'deleted' || b.status === 'cancelled' || b.status === 'rejected') return false;
+            const bUnitId = b.apartmentId || b.studio;
+            return bUnitId === unit.id && (b.checkIn < smartCheckOut) && (b.checkOut > splitDateStr);
+          });
+        });
+
+        if (part1Available.length > 0 && part2Available.length > 0) {
+          // Add suggestion with the first available unit in each part
+          const u1 = part1Available[0];
+          const u2 = part2Available[0];
+          
+          suggestionsList.push({
+            type: 'split',
+            u1,
+            u2,
+            splitDateStr,
+            splitNights,
+            totalNights,
+            label: `تسكين مجزأ: الاستوديو (${u1.title?.ar || u1.id}) لمدة ${splitNights} ليالي، ثم الانتقال للاستوديو (${u2.title?.ar || u2.id}) لمدة ${totalNights - splitNights} ليالي.`
+          });
+          
+          // Show up to 2 variations of splits
+          if (suggestionsList.length >= 2) break;
+        }
+      }
+    }
+
+    setSmartSuggestions(suggestionsList);
+  };
+
+  const applyFullSuggestion = (unitId: string) => {
+    setSelectedUnit(unitId);
+    setNewRecord(prev => ({
+      ...prev,
+      checkIn: smartCheckIn,
+      checkOut: smartCheckOut
+    }));
+    setSmartAssistantOpen(false);
+    
+    // Smooth scroll to form
+    const formEl = document.getElementById('add-record-form');
+    if (formEl) {
+      formEl.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const applySplitPart = (unitId: string, checkIn: string, checkOut: string) => {
+    setSelectedUnit(unitId);
+    setNewRecord(prev => ({
+      ...prev,
+      checkIn,
+      checkOut
+    }));
+    
+    const formEl = document.getElementById('add-record-form');
+    if (formEl) {
+      formEl.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -910,6 +1044,142 @@ function ReportsContent() {
               >
                 <span>🖨️</span> طباعة
               </button>
+            </div>
+
+            {/* 🔮 Smart Booking Assistant Widget */}
+            <div className="no-print bg-gradient-to-br from-[#2A2723] to-[#1E1B18] p-6 rounded-[2rem] border-2 border-[#C1A68D]/40 shadow-xl text-white space-y-4" dir="rtl">
+              <button
+                type="button"
+                onClick={() => setSmartAssistantOpen(!smartAssistantOpen)}
+                className="w-full flex items-center justify-between text-right"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-[#C1A68D]/20 border border-[#C1A68D]/40 flex items-center justify-center text-[#C1A68D]">
+                    <span className="text-xl">🔮</span>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-white">مساعد التسكين الذكي واقتراح الغرف</h3>
+                    <p className="text-[10px] text-[#C1A68D] font-bold">ابحث عن الغرف المتاحة أو اقتراحات تقسيم الإقامة لفترة محددة.</p>
+                  </div>
+                </div>
+                <span className="text-[#C1A68D] font-black text-sm">{smartAssistantOpen ? 'إغلاق المساعد ▲' : 'فتح المساعد المساعد ▼'}</span>
+              </button>
+
+              {smartAssistantOpen && (
+                <div className="pt-4 border-t border-white/10 space-y-6 animate-fade-in">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-1">تاريخ الدخول</label>
+                      <input
+                        type="date"
+                        value={smartCheckIn}
+                        onChange={e => setSmartCheckIn(e.target.value)}
+                        className="w-full bg-[#1E1B18] border border-white/10 rounded-xl px-4 py-2.5 text-xs font-bold text-white outline-none focus:border-[#C1A68D]"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-1">تاريخ الخروج</label>
+                      <input
+                        type="date"
+                        value={smartCheckOut}
+                        onChange={e => setSmartCheckOut(e.target.value)}
+                        className="w-full bg-[#1E1B18] border border-white/10 rounded-xl px-4 py-2.5 text-xs font-bold text-white outline-none focus:border-[#C1A68D]"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-1">نوع الغرفة المطلوب</label>
+                      <select
+                        value={smartCategory}
+                        onChange={e => setSmartCategory(e.target.value)}
+                        className="w-full bg-[#1E1B18] border border-white/10 rounded-xl px-4 py-2.5 text-xs font-black text-[#C1A68D] outline-none"
+                      >
+                        <option value="all">الكل</option>
+                        <option value="single">سنجل (Single)</option>
+                        <option value="double">دبل (Double)</option>
+                        <option value="triple">تريبل (Triple)</option>
+                        <option value="two-room">غرفتين (Double Room)</option>
+                        <option value="apartment">شقق (Apartment)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={handleSmartSearch}
+                      className="bg-[#C1A68D] hover:bg-[#d5baa0] text-[#1E1B18] font-black px-8 py-3 rounded-xl text-xs transition-all shadow-md flex items-center gap-2"
+                    >
+                      🔍 ابحث عن المقترحات المتاحة
+                    </button>
+                  </div>
+
+                  {hasSearchedSmart && (
+                    <div className="space-y-3 pt-4 border-t border-white/10">
+                      <h4 className="text-xs font-black text-[#C1A68D] uppercase tracking-wider">💡 مقترحات التسكين المتاحة:</h4>
+                      
+                      {smartSuggestions.length === 0 ? (
+                        <div className="bg-black/20 p-6 rounded-2xl text-center border border-white/5 text-xs text-gray-400 font-bold">
+                          ⚠️ لا توجد غرف متاحة بالكامل أو مقترحات تقسيم إقامة للفترة المطلوبة. يرجى تعديل الفترة أو الفئة.
+                        </div>
+                      ) : (
+                        <div className="grid gap-3">
+                          {smartSuggestions.map((s, idx) => (
+                            <div
+                              key={idx}
+                              className={`p-4 rounded-2xl border flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-all ${
+                                s.type === 'full' ? 'bg-green-500/5 border-green-500/30' : 'bg-amber-500/5 border-amber-500/30'
+                              }`}
+                            >
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${
+                                    s.type === 'full' ? 'bg-green-500/20 text-green-400' : 'bg-amber-500/20 text-amber-400'
+                                  }`}>
+                                    {s.type === 'full' ? 'متاح بالكامل 🟢' : 'تقسيم إقامة مجزأ 🔀'}
+                                  </span>
+                                  <span className="font-bold text-xs text-white">{s.label}</span>
+                                </div>
+                                {s.type === 'split' && (
+                                  <p className="text-[10px] text-gray-400 font-bold">
+                                    💡 ستحتاج لتسجيل حجزين منفصلين للعميل لكي تكتمل الفترة المطلوبة.
+                                  </p>
+                                )}
+                              </div>
+
+                              {s.type === 'full' ? (
+                                <button
+                                  type="button"
+                                  onClick={() => applyFullSuggestion(s.unit.id)}
+                                  className="bg-green-600 hover:bg-green-500 text-white font-black px-4 py-2 rounded-xl text-[10px] transition-all flex items-center gap-1.5 shrink-0 self-stretch md:self-auto text-center justify-center"
+                                >
+                                  تطبيق وتسكين مباشر 📝
+                                </button>
+                              ) : (
+                                <div className="flex gap-2 w-full md:w-auto">
+                                  <button
+                                    type="button"
+                                    onClick={() => applySplitPart(s.u1.id, smartCheckIn, s.splitDateStr)}
+                                    className="flex-1 md:flex-none bg-amber-600 hover:bg-amber-500 text-white font-black px-3 py-2 rounded-xl text-[10px] transition-all"
+                                  >
+                                    تعبئة الجزء الأول 📝
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => applySplitPart(s.u2.id, s.splitDateStr, smartCheckOut)}
+                                    className="flex-1 md:flex-none bg-[#C1A68D] hover:bg-[#d5baa0] text-[#1E1B18] font-black px-3 py-2 rounded-xl text-[10px] transition-all"
+                                  >
+                                    تعبئة الجزء الثاني 📝
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* ADD MANUAL RECORD INLINE FORM */}
