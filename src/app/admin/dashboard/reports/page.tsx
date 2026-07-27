@@ -214,11 +214,21 @@ function ReportsContent() {
     const monthParam = searchParams.get('month');
     const yearParam = searchParams.get('year');
     const tabParam = searchParams.get('tab');
+    const checkInParam = searchParams.get('checkIn');
+    const checkOutParam = searchParams.get('checkOut');
 
     if (unitParam) setSelectedUnit(unitParam);
     if (monthParam) setSelectedMonth(parseInt(monthParam, 10));
     if (yearParam) setSelectedYear(parseInt(yearParam, 10));
     if (tabParam) setActiveTab(tabParam as any);
+    
+    if (checkInParam || checkOutParam) {
+      setNewRecord(prev => ({
+        ...prev,
+        checkIn: checkInParam || prev.checkIn,
+        checkOut: checkOutParam || prev.checkOut
+      }));
+    }
   }, [searchParams]);
 
   // AUTO-RESET LOGIC: Clears stale localStorage once per version update
@@ -270,12 +280,17 @@ function ReportsContent() {
   const printRef = useRef<HTMLDivElement>(null);
 
   // Update checkIn/Out safely if month/year changes
+  // Update checkIn/Out safely if month/year changes (only if not passed via URL parameters)
   useEffect(() => {
     if (selectedMonth === -1 || selectedYear === -1) return;
+    const urlCheckIn = searchParams.get('checkIn');
+    const urlCheckOut = searchParams.get('checkOut');
+    if (urlCheckIn || urlCheckOut) return; // Skip default month initialization if URL params are present
+
     const sStr = String(selectedMonth + 1).padStart(2, '0');
     const safeStr = `${selectedYear}-${sStr}-01`;
     setNewRecord(prev => ({ ...prev, checkIn: safeStr, checkOut: safeStr }));
-  }, [selectedMonth, selectedYear]);
+  }, [selectedMonth, selectedYear, searchParams]);
 
   const [adminRole, setAdminRole] = useState<string>('Super Admin');
 
