@@ -25,6 +25,8 @@ export default function CustomerProfileModal({
   const [noteText, setNoteText] = useState('');
   const [isEditingNote, setIsEditingNote] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [globalNote, setGlobalNote] = useState('');
+  const [isEditingGlobalNote, setIsEditingGlobalNote] = useState(false);
 
   // Normalize customer name and filter all matching bookings
   const normalize = (s: string) => String(s || '').trim().toLowerCase().replace(/^(أ|ا|إ|أ\.|د|م|مهندس|دكتور|استاذ)\s*/g, '');
@@ -53,6 +55,20 @@ export default function CustomerProfileModal({
     }
     setIsEditingNote(false);
   }, [customerName, latestBooking.notes]);
+
+  useEffect(() => {
+    if (phone) {
+      setGlobalNote(localStorage.getItem(`customer_note_${phone}`) || '');
+    }
+    setIsEditingGlobalNote(false);
+  }, [phone]);
+
+  const handleSaveGlobalNote = () => {
+    if (phone) {
+      localStorage.setItem(`customer_note_${phone}`, globalNote);
+      setIsEditingGlobalNote(false);
+    }
+  };
 
   if (!isOpen || !customerName) return null;
 
@@ -154,13 +170,68 @@ export default function CustomerProfileModal({
         <div className="p-6 overflow-y-auto flex-1 custom-scrollbar-horizontal min-h-[300px]">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
             
-            {/* Column Right (5 cols): Notes Box */}
-            <div className="md:col-span-5 space-y-4">
-              <div className="bg-[#2A2723] border border-white/10 rounded-2xl p-5 space-y-3">
+            {/* Column Right (5 cols): Notes & Global Profile Info */}
+            <div className="md:col-span-5 space-y-5">
+              
+              {/* 📝 Permanent Customer Profile Notes (Extensive) */}
+              <div className="bg-[#2A2723] border-2 border-[#C1A68D]/30 rounded-2xl p-5 space-y-4 shadow-lg relative">
+                <div className="absolute top-0 left-0 bg-[#C1A68D] text-[#1F1C18] text-[8px] font-black px-2.5 py-0.5 rounded-bl-xl rounded-tr-sm uppercase tracking-wider">
+                  ملف العميل الدائم
+                </div>
+                
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-black text-[#C1A68D] flex items-center gap-1.5">
+                  <span className="text-xs font-black text-[#C1A68D] flex items-center gap-1.5 mt-1">
                     <FileText size={15} />
-                    <span>ملاحظات وتقييم العميل</span>
+                    <span>ملاحظات العميل الدائمة (باستفاضة)</span>
+                  </span>
+                  {!isEditingGlobalNote && phone && (
+                    <button
+                      onClick={() => setIsEditingGlobalNote(true)}
+                      className="text-[10px] text-gray-400 hover:text-white underline font-bold"
+                    >
+                      تعديل ✏️
+                    </button>
+                  )}
+                </div>
+
+                {isEditingGlobalNote ? (
+                  <div className="space-y-2 mt-2">
+                    <textarea
+                      rows={8}
+                      value={globalNote}
+                      onChange={(e) => setGlobalNote(e.target.value)}
+                      placeholder="اكتب ملاحظات باستفاضة عن العميل هنا (مثلاً: يفضل الطوابق العليا، عميل هادئ، لديه طلبات خاصة متكررة، إلخ)..."
+                      className="w-full bg-[#1F1C18] border border-[#C1A68D] rounded-xl p-3 text-xs text-white outline-none font-bold resize-none leading-relaxed"
+                    />
+                    <div className="flex items-center gap-2 justify-end">
+                      <button
+                        onClick={() => { setIsEditingGlobalNote(false); setGlobalNote(localStorage.getItem(`customer_note_${phone}`) || ''); }}
+                        className="px-3 py-1 rounded-lg text-xs bg-white/10 text-gray-300 hover:bg-white/20"
+                      >
+                        إلغاء
+                      </button>
+                      <button
+                        onClick={handleSaveGlobalNote}
+                        className="px-4 py-1.5 rounded-lg text-xs font-black bg-[#C1A68D] text-white hover:opacity-90 flex items-center gap-1"
+                      >
+                        حفظ الملاحظة الدائمة 💾
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-black/20 p-4 rounded-xl border border-white/5 min-h-[120px] flex flex-col justify-between">
+                    <p className="text-xs text-gray-200 font-bold leading-relaxed whitespace-pre-wrap">
+                      {globalNote ? globalNote : '💬 لا توجد ملاحظات عامة مسجلة في ملف هذا العميل حالياً. اضغط تعديل للبدء بالكتابة باستفاضة.'}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* 🏠 Latest Booking Specific Note */}
+              <div className="bg-[#25221E] border border-white/5 rounded-2xl p-5 space-y-3 shadow-inner">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black text-gray-400 flex items-center gap-1.5">
+                    <span>🏠 ملاحظة الحجز الأخير</span>
                   </span>
                   {!isEditingNote && latestBooking.id && (
                     <button
@@ -175,11 +246,11 @@ export default function CustomerProfileModal({
                 {isEditingNote ? (
                   <div className="space-y-2 mt-2">
                     <textarea
-                      rows={4}
+                      rows={3}
                       value={noteText}
                       onChange={(e) => setNoteText(e.target.value)}
-                      placeholder="اكتب ملاحظات العميل هنا..."
-                      className="w-full bg-[#1F1C18] border border-[#C1A68D] rounded-xl p-2.5 text-xs text-white outline-none font-bold"
+                      placeholder="اكتب ملاحظة تخص الحجز الأخير فقط..."
+                      className="w-full bg-[#1F1C18] border border-white/10 rounded-xl p-2.5 text-xs text-white outline-none font-bold resize-none"
                     />
                     <div className="flex items-center gap-2 justify-end">
                       <button
@@ -193,16 +264,17 @@ export default function CustomerProfileModal({
                         onClick={handleSaveNote}
                         className="px-4 py-1 rounded-lg text-xs font-black bg-[#C1A68D] text-white hover:opacity-90 flex items-center gap-1"
                       >
-                        {isSaving ? 'جاري الحفظ...' : 'حفظ الملاحظة 💾'}
+                        {isSaving ? 'جاري الحفظ...' : 'حفظ 💾'}
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <p className="text-xs text-gray-200 font-bold leading-relaxed whitespace-pre-wrap bg-black/20 p-3.5 rounded-xl border border-white/5">
-                    {latestBooking.notes ? latestBooking.notes : 'لا توجد ملاحظات مسجلة حالياً.'}
+                  <p className="text-xs text-gray-400 font-bold leading-relaxed whitespace-pre-wrap bg-black/10 p-3 rounded-xl">
+                    {latestBooking.notes ? latestBooking.notes : 'لا توجد ملاحظة للحجز الأخير.'}
                   </p>
                 )}
               </div>
+
             </div>
 
             {/* Column Left (7 cols): Bookings Timeline */}
