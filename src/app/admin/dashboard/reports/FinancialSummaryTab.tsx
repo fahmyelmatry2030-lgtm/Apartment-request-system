@@ -213,7 +213,7 @@ export default function FinancialSummaryTab({
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
         <div>
           <h2 className="text-4xl md:text-5xl font-black text-[#2A2723] tracking-tighter">
-            التقرير المالي <span className="text-[#C1A68D]">الشامل</span>
+            المصروفات
           </h2>
           <div className="flex items-center gap-3 mt-2">
              <span className="w-2.5 h-2.5 rounded-full bg-[#C1A68D] animate-pulse"></span>
