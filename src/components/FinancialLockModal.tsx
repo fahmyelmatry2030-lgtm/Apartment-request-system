@@ -16,10 +16,10 @@ export default function FinancialLockModal({ isOpen, onUnlock }: FinancialLockMo
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Accept standard management passcodes (mazar788, mazar2026, 1234, etc.)
-    const validPasscodes = ['mazar788', '1234', 'mazar2026', 'akoura2026', 'admin'];
+    // Only allow the password mazar788 for both monthly statement and salaries
+    const validPasscodes = ['mazar788'];
     
-    if (validPasscodes.includes(password.trim().toLowerCase())) {
+    if (validPasscodes.includes(password.trim())) {
       sessionStorage.setItem('financialUnlocked', 'true');
       setError(false);
       onUnlock();
