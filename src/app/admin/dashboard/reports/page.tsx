@@ -1121,161 +1121,6 @@ function ReportsContent() {
               </button>
             </div>
 
-            {/* 🔮 Smart Booking Assistant Widget */}
-            <div className="no-print bg-gradient-to-br from-[#2A2723] to-[#1E1B18] p-6 rounded-[2rem] border-2 border-[#C1A68D]/40 shadow-xl text-white space-y-4" dir="rtl">
-              <button
-                type="button"
-                onClick={() => setSmartAssistantOpen(!smartAssistantOpen)}
-                className="w-full flex items-center justify-between text-right"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-[#C1A68D]/20 border border-[#C1A68D]/40 flex items-center justify-center text-[#C1A68D]">
-                    <span className="text-xl">🔮</span>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-black text-white">مساعد التسكين الذكي واقتراح الغرف</h3>
-                    <p className="text-[10px] text-[#C1A68D] font-bold">ابحث عن الغرف المتاحة أو اقتراحات تقسيم الإقامة لفترة محددة.</p>
-                  </div>
-                </div>
-                <span className="text-[#C1A68D] font-black text-sm">{smartAssistantOpen ? 'إغلاق المساعد ▲' : 'فتح المساعد المساعد ▼'}</span>
-              </button>
-
-              {smartAssistantOpen && (
-                <div className="pt-4 border-t border-white/10 space-y-6 animate-fade-in">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-1">تاريخ الدخول</label>
-                      <input
-                        type="date"
-                        value={smartCheckIn}
-                        onChange={e => setSmartCheckIn(e.target.value)}
-                        className="w-full bg-[#1E1B18] border border-white/10 rounded-xl px-4 py-2.5 text-xs font-bold text-white outline-none focus:border-[#C1A68D]"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-1">تاريخ الخروج</label>
-                      <input
-                        type="date"
-                        value={smartCheckOut}
-                        onChange={e => setSmartCheckOut(e.target.value)}
-                        className="w-full bg-[#1E1B18] border border-white/10 rounded-xl px-4 py-2.5 text-xs font-bold text-white outline-none focus:border-[#C1A68D]"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-1">نوع الغرفة المطلوب</label>
-                      <select
-                        value={smartCategory}
-                        onChange={e => setSmartCategory(e.target.value)}
-                        className="w-full bg-[#1E1B18] border border-white/10 rounded-xl px-4 py-2.5 text-xs font-black text-[#C1A68D] outline-none"
-                      >
-                        <option value="all">الكل</option>
-                        <option value="single">سنجل (Single)</option>
-                        <option value="double">دبل (Double)</option>
-                        <option value="triple">تريبل (Triple)</option>
-                        <option value="two-room">غرفتين (Double Room)</option>
-                        <option value="apartment">شقق (Apartment)</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end">
-                    <button
-                      type="button"
-                      onClick={handleSmartSearch}
-                      className="bg-[#C1A68D] hover:bg-[#d5baa0] text-[#1E1B18] font-black px-8 py-3 rounded-xl text-xs transition-all shadow-md flex items-center gap-2"
-                    >
-                      🔍 ابحث عن المقترحات المتاحة
-                    </button>
-                  </div>
-
-                  {hasSearchedSmart && (
-                    <div className="space-y-3 pt-4 border-t border-white/10">
-                      <h4 className="text-xs font-black text-[#C1A68D] uppercase tracking-wider">💡 مقترحات التسكين المتاحة:</h4>
-                      
-                      {smartSuggestions.length === 0 ? (
-                        <div className="bg-black/20 p-4 rounded-2xl border border-white/5 space-y-3">
-                          <p className="text-xs text-gray-400 font-bold text-center">
-                            ⚠️ لا توجد غرف متاحة لهذه الفترة. يرجى تعديل التواريخ أو الفئة.
-                          </p>
-                          {conflictDays.length > 0 && (
-                            <div className="space-y-2">
-                              <p className="text-[10px] font-black text-red-400 text-center uppercase tracking-wider">🔴 الأيام المشكلة (كل الغرف محجوزة فيها):</p>
-                              <div className="flex flex-wrap gap-2 justify-center">
-                                {conflictDays.map(day => (
-                                  <span key={day} className="bg-red-500/15 text-red-300 border border-red-500/30 text-[10px] font-black px-3 py-1.5 rounded-full">
-                                    🔴 {new Date(day + 'T12:00:00').toLocaleDateString('ar-EG', { weekday: 'short', day: 'numeric', month: 'long' })}
-                                  </span>
-                                ))}
-                              </div>
-                              <p className="text-[10px] text-gray-500 font-bold text-center">يجب تعديل التواريخ لتتجنب هذه الأيام، أو مراجعة الحجوزات الموجودة.</p>
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="grid gap-3">
-                          {smartSuggestions.map((s, idx) => (
-                            <div
-                              key={idx}
-                              className={`p-4 rounded-2xl border flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-all ${
-                                s.type === 'full' ? 'bg-green-500/5 border-green-500/30' : 'bg-amber-500/5 border-amber-500/30'
-                              }`}
-                            >
-                              <div className="space-y-1 flex-1">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${
-                                    s.type === 'full' ? 'bg-green-500/20 text-green-400' : 'bg-amber-500/20 text-amber-400'
-                                  }`}>
-                                    {s.type === 'full' ? 'متاح بالكامل 🟢' : 'خطة تسكين مجزأ 🔀'}
-                                  </span>
-                                  <span className="font-bold text-xs text-white">
-                                    {s.type === 'full'
-                                      ? `${s.unit.title?.ar || s.unit.id} (${s.unit.category === 'single' ? 'سنجل' : s.unit.category === 'double' ? 'دبل' : s.unit.category === 'triple' ? 'تريبل' : s.unit.category === 'two-room' ? 'غرفتين' : 'شقة'})`
-                                      : s.label}
-                                  </span>
-                                </div>
-                                {s.type === 'split' && (
-                                  <p className="text-[10px] text-gray-400 font-bold">
-                                    💡 ستحتاج لتسجيل حجزين منفصلين للعميل لكي تكتمل الفترة المطلوبة.
-                                  </p>
-                                )}
-                              </div>
-
-                              {s.type === 'full' ? (
-                                <button
-                                  type="button"
-                                  onClick={() => applyFullSuggestion(s.unit.id)}
-                                  className="bg-green-600 hover:bg-green-500 text-white font-black px-4 py-2 rounded-xl text-[10px] transition-all flex items-center gap-1.5 shrink-0 self-stretch md:self-auto text-center justify-center"
-                                >
-                                  تطبيق وتسكين مباشر 📝
-                                </button>
-                              ) : (
-                                <div className="flex gap-2 w-full md:w-auto">
-                                  <button
-                                    type="button"
-                                    onClick={() => applySplitPart(s.u1.id, smartCheckIn, s.splitDateStr)}
-                                    className="flex-1 md:flex-none bg-amber-600 hover:bg-amber-500 text-white font-black px-3 py-2 rounded-xl text-[10px] transition-all"
-                                  >
-                                    تعبئة الجزء الأول 📝
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => applySplitPart(s.u2.id, s.splitDateStr, smartCheckOut)}
-                                    className="flex-1 md:flex-none bg-[#C1A68D] hover:bg-[#d5baa0] text-[#1E1B18] font-black px-3 py-2 rounded-xl text-[10px] transition-all"
-                                  >
-                                    تعبئة الجزء الثاني 📝
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
             {/* ADD MANUAL RECORD INLINE FORM */}
             <div className="no-print bg-white p-6 rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm" dir="rtl">
               <form id="add-record-form" onSubmit={handleSaveNewRecord} className="flex flex-col gap-4">
@@ -1498,6 +1343,161 @@ function ReportsContent() {
               </div>
               )}
             </div>
+            </div>
+
+            {/* 🔮 Smart Booking Assistant Widget */}
+            <div className="no-print bg-gradient-to-br from-[#2A2723] to-[#1E1B18] p-6 rounded-[2rem] border-2 border-[#C1A68D]/40 shadow-xl text-white space-y-4" dir="rtl">
+              <button
+                type="button"
+                onClick={() => setSmartAssistantOpen(!smartAssistantOpen)}
+                className="w-full flex items-center justify-between text-right"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-[#C1A68D]/20 border border-[#C1A68D]/40 flex items-center justify-center text-[#C1A68D]">
+                    <span className="text-xl">🔮</span>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-white">مساعد التسكين الذكي واقتراح الغرف</h3>
+                    <p className="text-[10px] text-[#C1A68D] font-bold">ابحث عن الغرف المتاحة أو اقتراحات تقسيم الإقامة لفترة محددة.</p>
+                  </div>
+                </div>
+                <span className="text-[#C1A68D] font-black text-sm">{smartAssistantOpen ? 'إغلاق المساعد ▲' : 'فتح المساعد المساعد ▼'}</span>
+              </button>
+
+              {smartAssistantOpen && (
+                <div className="pt-4 border-t border-white/10 space-y-6 animate-fade-in">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-1">تاريخ الدخول</label>
+                      <input
+                        type="date"
+                        value={smartCheckIn}
+                        onChange={e => setSmartCheckIn(e.target.value)}
+                        className="w-full bg-[#1E1B18] border border-white/10 rounded-xl px-4 py-2.5 text-xs font-bold text-white outline-none focus:border-[#C1A68D]"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-1">تاريخ الخروج</label>
+                      <input
+                        type="date"
+                        value={smartCheckOut}
+                        onChange={e => setSmartCheckOut(e.target.value)}
+                        className="w-full bg-[#1E1B18] border border-white/10 rounded-xl px-4 py-2.5 text-xs font-bold text-white outline-none focus:border-[#C1A68D]"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black text-[#C1A68D] uppercase px-1">نوع الغرفة المطلوب</label>
+                      <select
+                        value={smartCategory}
+                        onChange={e => setSmartCategory(e.target.value)}
+                        className="w-full bg-[#1E1B18] border border-white/10 rounded-xl px-4 py-2.5 text-xs font-black text-[#C1A68D] outline-none"
+                      >
+                        <option value="all">الكل</option>
+                        <option value="single">سنجل (Single)</option>
+                        <option value="double">دبل (Double)</option>
+                        <option value="triple">تريبل (Triple)</option>
+                        <option value="two-room">غرفتين (Double Room)</option>
+                        <option value="apartment">شقق (Apartment)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={handleSmartSearch}
+                      className="bg-[#C1A68D] hover:bg-[#d5baa0] text-[#1E1B18] font-black px-8 py-3 rounded-xl text-xs transition-all shadow-md flex items-center gap-2"
+                    >
+                      🔍 ابحث عن المقترحات المتاحة
+                    </button>
+                  </div>
+
+                  {hasSearchedSmart && (
+                    <div className="space-y-3 pt-4 border-t border-white/10">
+                      <h4 className="text-xs font-black text-[#C1A68D] uppercase tracking-wider">💡 مقترحات التسكين المتاحة:</h4>
+                      
+                      {smartSuggestions.length === 0 ? (
+                        <div className="bg-black/20 p-4 rounded-2xl border border-white/5 space-y-3">
+                          <p className="text-xs text-gray-400 font-bold text-center">
+                            ⚠️ لا توجد غرف متاحة لهذه الفترة. يرجى تعديل التواريخ أو الفئة.
+                          </p>
+                          {conflictDays.length > 0 && (
+                            <div className="space-y-2">
+                              <p className="text-[10px] font-black text-red-400 text-center uppercase tracking-wider">🔴 الأيام المشكلة (كل الغرف محجوزة فيها):</p>
+                              <div className="flex flex-wrap gap-2 justify-center">
+                                {conflictDays.map(day => (
+                                  <span key={day} className="bg-red-500/15 text-red-300 border border-red-500/30 text-[10px] font-black px-3 py-1.5 rounded-full">
+                                    🔴 {new Date(day + 'T12:00:00').toLocaleDateString('ar-EG', { weekday: 'short', day: 'numeric', month: 'long' })}
+                                  </span>
+                                ))}
+                              </div>
+                              <p className="text-[10px] text-gray-500 font-bold text-center">يجب تعديل التواريخ لتتجنب هذه الأيام، أو مراجعة الحجوزات الموجودة.</p>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="grid gap-3">
+                          {smartSuggestions.map((s, idx) => (
+                            <div
+                              key={idx}
+                              className={`p-4 rounded-2xl border flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-all ${
+                                s.type === 'full' ? 'bg-green-500/5 border-green-500/30' : 'bg-amber-500/5 border-amber-500/30'
+                              }`}
+                            >
+                              <div className="space-y-1 flex-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${
+                                    s.type === 'full' ? 'bg-green-500/20 text-green-400' : 'bg-amber-500/20 text-amber-400'
+                                  }`}>
+                                    {s.type === 'full' ? 'متاح بالكامل 🟢' : 'خطة تسكين مجزأ 🔀'}
+                                  </span>
+                                  <span className="font-bold text-xs text-white">
+                                    {s.type === 'full'
+                                      ? `${s.unit.title?.ar || s.unit.id} (${s.unit.category === 'single' ? 'سنجل' : s.unit.category === 'double' ? 'دبل' : s.unit.category === 'triple' ? 'تريبل' : s.unit.category === 'two-room' ? 'غرفتين' : 'شقة'})`
+                                      : s.label}
+                                  </span>
+                                </div>
+                                {s.type === 'split' && (
+                                  <p className="text-[10px] text-gray-400 font-bold">
+                                    💡 ستحتاج لتسجيل حجزين منفصلين للعميل لكي تكتمل الفترة المطلوبة.
+                                  </p>
+                                )}
+                              </div>
+
+                              {s.type === 'full' ? (
+                                <button
+                                  type="button"
+                                  onClick={() => applyFullSuggestion(s.unit.id)}
+                                  className="bg-green-600 hover:bg-green-500 text-white font-black px-4 py-2 rounded-xl text-[10px] transition-all flex items-center gap-1.5 shrink-0 self-stretch md:self-auto text-center justify-center"
+                                >
+                                  تطبيق وتسكين مباشر 📝
+                                </button>
+                              ) : (
+                                <div className="flex gap-2 w-full md:w-auto">
+                                  <button
+                                    type="button"
+                                    onClick={() => applySplitPart(s.u1.id, smartCheckIn, s.splitDateStr)}
+                                    className="flex-1 md:flex-none bg-amber-600 hover:bg-amber-500 text-white font-black px-3 py-2 rounded-xl text-[10px] transition-all"
+                                  >
+                                    تعبئة الجزء الأول 📝
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => applySplitPart(s.u2.id, s.splitDateStr, smartCheckOut)}
+                                    className="flex-1 md:flex-none bg-[#C1A68D] hover:bg-[#d5baa0] text-[#1E1B18] font-black px-3 py-2 rounded-xl text-[10px] transition-all"
+                                  >
+                                    تعبئة الجزء الثاني 📝
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Summary Cards */}
