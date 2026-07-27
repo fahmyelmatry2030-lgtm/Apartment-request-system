@@ -538,68 +538,142 @@ export default function FinancePage() {
 
 
       {/* ════════════════ مقارنة أداء الشهور ════════════════ */}
-      <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden p-8 space-y-6">
-        <div>
-          <h3 className="text-xl font-black text-[#2A2723] flex items-center gap-2">
-            <span>📈</span> جدول مقارنة الأداء المالي بين شهور السنة
-          </h3>
-          <p className="text-xs text-gray-500 font-bold mt-1">
-            مقارنة الإيرادات والمصروفات وصافي الربح في سطر كامل لكل شهر من شهور العام {selectedYear > 0 ? selectedYear : new Date().getFullYear()}
-          </p>
+      <div className="rounded-[2.5rem] overflow-hidden shadow-lg border border-[#EAE4D9]/40"
+        style={{ background: 'linear-gradient(135deg, #1a1713 0%, #2A2723 60%, #1a1713 100%)' }}
+      >
+        {/* Header */}
+        <div className="px-8 py-6 border-b border-white/10 flex items-center justify-between">
+          <div>
+            <h3 className="text-xl font-black text-white flex items-center gap-3">
+              <span className="w-10 h-10 rounded-2xl flex items-center justify-center text-lg"
+                style={{ background: 'linear-gradient(135deg, #C1A68D, #8B6F5C)' }}>
+                📈
+              </span>
+              مقارنة الأداء المالي — شهور السنة
+            </h3>
+            <p className="text-xs text-white/40 font-bold mt-1 mr-13">
+              عرض تفصيلي لكل شهر من {selectedYear > 0 ? selectedYear : new Date().getFullYear()}
+            </p>
+          </div>
+          <div className="flex items-center gap-4 text-[10px] font-black">
+            <span className="flex items-center gap-1.5 text-emerald-400"><span className="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span>إيرادات</span>
+            <span className="flex items-center gap-1.5 text-red-400"><span className="w-2.5 h-2.5 rounded-full bg-red-400 inline-block"></span>مصروفات</span>
+            <span className="flex items-center gap-1.5 text-amber-300"><span className="w-2.5 h-2.5 rounded-full bg-amber-300 inline-block"></span>صافي الربح</span>
+          </div>
         </div>
 
-        <div className="overflow-x-auto rounded-2xl border border-[#EAE4D9]/50">
-          <table className="w-full text-center border-collapse text-xs">
-            <thead>
-              <tr className="bg-[#2A2723] text-white font-black">
-                <th className="px-6 py-4 text-right">الشهر</th>
-                <th className="px-6 py-4 text-center">عدد الحجوزات</th>
-                <th className="px-6 py-4 text-center">الإيرادات (ج.م)</th>
-                <th className="px-6 py-4 text-center">المصروفات (ج.م)</th>
-                <th className="px-6 py-4 text-center">صافي الربح (ج.م)</th>
-                <th className="px-6 py-4 text-center">التحكم</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#EAE4D9]/30 font-bold text-[#7A7061]">
-              {monthlyRollupData.map((m) => {
-                const isSelected = m.monthIndex === selectedMonth;
-                const isCurrent = m.monthIndex === new Date().getMonth() && selectedYear === new Date().getFullYear();
-                return (
-                  <tr
-                    key={m.monthIndex}
-                    className={`transition-all hover:bg-[#FDFBF7] ${
-                      isSelected ? 'bg-[#C1A68D]/10 font-black' : isCurrent ? 'bg-[#FDFBF7]' : ''
-                    }`}
-                  >
-                    <td className="px-6 py-4 text-right font-black text-[#2A2723]">
-                      {m.monthName} ({m.monthIndex + 1})
+        {/* Rows */}
+        <div className="divide-y divide-white/5">
+          {monthlyRollupData.map((m) => {
+            const isSelected = m.monthIndex === selectedMonth;
+            const isCurrent = m.monthIndex === new Date().getMonth() && selectedYear === new Date().getFullYear();
+            const maxVal = Math.max(...monthlyRollupData.map(x => x.revenue), 1);
+            const revPct = Math.round((m.revenue / maxVal) * 100);
+            const expPct = m.revenue > 0 ? Math.min(Math.round((m.expenses / m.revenue) * 100), 100) : 0;
+            const hasData = m.revenue > 0 || m.expenses > 0;
+
+            return (
+              <div
+                key={m.monthIndex}
+                onClick={() => setSelectedMonth(m.monthIndex)}
+                className="px-8 py-5 cursor-pointer transition-all duration-200"
+                style={{
+                  background: isSelected
+                    ? 'rgba(193,166,141,0.15)'
+                    : isCurrent
+                    ? 'rgba(255,255,255,0.04)'
+                    : 'transparent',
+                }}
+                onMouseEnter={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'; }}
+                onMouseLeave={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = isCurrent ? 'rgba(255,255,255,0.04)' : 'transparent'; }}
+              >
+                <div className="flex items-center gap-6">
+                  {/* Month name + badges */}
+                  <div className="w-36 shrink-0 text-right">
+                    <div className="flex items-center justify-end gap-2 flex-wrap">
                       {isCurrent && (
-                        <span className="bg-[#C1A68D]/20 text-[#C1A68D] text-[9px] font-black px-2 py-0.5 rounded-full mr-2">
+                        <span className="text-[9px] font-black px-2 py-0.5 rounded-full"
+                          style={{ background: 'rgba(193,166,141,0.3)', color: '#C1A68D' }}>
                           الحالي
                         </span>
                       )}
-                    </td>
-                    <td className="px-6 py-4 text-center">{m.bookingsCount} حجز</td>
-                    <td className="px-6 py-4 text-center text-emerald-600 font-black">{m.revenue.toLocaleString()}</td>
-                    <td className="px-6 py-4 text-center text-red-500 font-black">-{m.expenses.toLocaleString()}</td>
-                    <td className={`px-6 py-4 text-center text-sm font-black ${m.netProfit >= 0 ? 'text-green-700' : 'text-red-600'}`}>
-                      {m.netProfit.toLocaleString()} ج.م
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <button
-                        onClick={() => setSelectedMonth(m.monthIndex)}
-                        className={`px-4 py-1.5 rounded-xl text-[10px] font-black transition-all ${
-                          isSelected ? 'bg-[#2A2723] text-white' : 'bg-[#EAE4D9]/50 hover:bg-[#C1A68D] hover:text-white text-[#7A7061]'
-                        }`}
-                      >
-                        عرض التفاصيل 🔍
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                      {isSelected && (
+                        <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-white/20 text-white">
+                          محدد
+                        </span>
+                      )}
+                      <span className={`text-sm font-black ${isSelected ? 'text-[#C1A68D]' : 'text-white/80'}`}>
+                        {m.monthName}
+                      </span>
+                    </div>
+                    <div className="text-[10px] text-white/30 font-bold mt-0.5 text-right">
+                      {m.bookingsCount} حجز
+                    </div>
+                  </div>
+
+                  {/* Bars + numbers */}
+                  <div className="flex-1 space-y-2">
+                    {hasData ? (
+                      <>
+                        {/* Revenue bar */}
+                        <div className="flex items-center gap-3">
+                          <div className="w-16 text-right text-[10px] font-black text-emerald-400 shrink-0">
+                            {m.revenue > 0 ? m.revenue.toLocaleString() : '—'}
+                          </div>
+                          <div className="flex-1 h-2 rounded-full bg-white/5 overflow-hidden">
+                            <div
+                              className="h-full rounded-full transition-all duration-700"
+                              style={{
+                                width: `${revPct}%`,
+                                background: 'linear-gradient(90deg, #34d399, #10b981)',
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Expenses bar */}
+                        <div className="flex items-center gap-3">
+                          <div className="w-16 text-right text-[10px] font-black text-red-400 shrink-0">
+                            {m.expenses > 0 ? `-${m.expenses.toLocaleString()}` : '—'}
+                          </div>
+                          <div className="flex-1 h-2 rounded-full bg-white/5 overflow-hidden">
+                            <div
+                              className="h-full rounded-full transition-all duration-700"
+                              style={{
+                                width: `${expPct}%`,
+                                background: 'linear-gradient(90deg, #f87171, #ef4444)',
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-[10px] text-white/20 font-bold">لا توجد بيانات</div>
+                    )}
+                  </div>
+
+                  {/* Net profit */}
+                  <div className="w-32 shrink-0 text-center">
+                    <div className={`text-sm font-black ${m.netProfit > 0 ? 'text-amber-300' : m.netProfit < 0 ? 'text-red-400' : 'text-white/30'}`}>
+                      {m.netProfit !== 0 ? `${m.netProfit.toLocaleString()} ج.م` : '—'}
+                    </div>
+                    {m.netProfit > 0 && m.revenue > 0 && (
+                      <div className="text-[9px] text-white/30 font-bold mt-0.5">
+                        هامش {Math.round((m.netProfit / m.revenue) * 100)}%
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Arrow indicator */}
+                  <div className="w-8 shrink-0 flex justify-center">
+                    <span className={`text-lg transition-all ${isSelected ? 'text-[#C1A68D]' : 'text-white/20'}`}>
+                      {isSelected ? '◀' : '›'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
