@@ -1177,58 +1177,25 @@ function ReportsContent() {
                             <div
                               key={idx}
                               className={`p-4 rounded-2xl border flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-all ${
-                                s.type === 'full'
-                                  ? idx === 0 ? 'bg-green-500/10 border-green-400/50 ring-1 ring-green-400/20' : 'bg-green-500/5 border-green-500/20'
-                                  : 'bg-amber-500/5 border-amber-500/30'
+                                s.type === 'full' ? 'bg-green-500/5 border-green-500/30' : 'bg-amber-500/5 border-amber-500/30'
                               }`}
                             >
-                              <div className="space-y-2 flex-1">
+                              <div className="space-y-1 flex-1">
                                 <div className="flex items-center gap-2 flex-wrap">
-                                  {/* Priority badge */}
-                                  {s.type === 'full' && (
-                                    <span className={`text-[9px] font-black px-2.5 py-1 rounded-full border ${
-                                      idx === 0
-                                        ? 'bg-yellow-400/20 text-yellow-300 border-yellow-400/40'
-                                        : 'bg-white/5 text-gray-400 border-white/10'
-                                    }`}>
-                                      {idx === 0 ? '🏆 الأفضل' : `#${idx + 1}`}
-                                    </span>
-                                  )}
                                   <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${
                                     s.type === 'full' ? 'bg-green-500/20 text-green-400' : 'bg-amber-500/20 text-amber-400'
                                   }`}>
-                                    {s.type === 'full' ? 'متاح بالكامل 🟢' : 'تقسيم إقامة مجزأ 🔀'}
+                                    {s.type === 'full' ? 'متاح بالكامل 🟢' : 'خطة تسكين مجزأ 🔀'}
                                   </span>
-                                  <span className="font-bold text-xs text-white">{s.type === 'full' ? `${s.unit.title?.ar || s.unit.id} (${s.unit.category === 'single' ? 'سنجل' : s.unit.category === 'double' ? 'دبل' : s.unit.category === 'triple' ? 'تريبل' : s.unit.category === 'two-room' ? 'غرفتين' : 'شقة'})` : s.label}</span>
+                                  <span className="font-bold text-xs text-white">
+                                    {s.type === 'full'
+                                      ? `${s.unit.title?.ar || s.unit.id} (${s.unit.category === 'single' ? 'سنجل' : s.unit.category === 'double' ? 'دبل' : s.unit.category === 'triple' ? 'تريبل' : s.unit.category === 'two-room' ? 'غرفتين' : 'شقة'})`
+                                      : s.label}
+                                  </span>
                                 </div>
-
-                                {/* Gap efficiency row for full suggestions */}
-                                {s.type === 'full' && (
-                                  <div className="flex items-center gap-2 flex-wrap">
-                                    {s.gapBefore < 99 ? (
-                                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${
-                                        s.gapBefore === 0 ? 'bg-green-500/15 text-green-300 border-green-500/30' : 'bg-orange-500/10 text-orange-300 border-orange-500/20'
-                                      }`}>
-                                        {s.gapBefore === 0 ? '✅ متصل بحجز سابق (لا فراغ)' : `⚠️ ${s.gapBefore} يوم فراغ قبل الحجز`}
-                                      </span>
-                                    ) : (
-                                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-full border bg-white/5 text-gray-500 border-white/10">لا حجز سابق</span>
-                                    )}
-                                    {s.gapAfter < 99 ? (
-                                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${
-                                        s.gapAfter === 0 ? 'bg-green-500/15 text-green-300 border-green-500/30' : 'bg-orange-500/10 text-orange-300 border-orange-500/20'
-                                      }`}>
-                                        {s.gapAfter === 0 ? '✅ متصل بحجز تالٍ (لا فراغ)' : `⚠️ ${s.gapAfter} يوم فراغ بعد الحجز`}
-                                      </span>
-                                    ) : (
-                                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-full border bg-white/5 text-gray-500 border-white/10">لا حجز تالٍ</span>
-                                    )}
-                                  </div>
-                                )}
-
                                 {s.type === 'split' && (
                                   <p className="text-[10px] text-gray-400 font-bold">
-                                    💡 ستحتاج لتسجيل حجزين منفصلين للعميل لكي تكتمل الفترة المطلوبة. اضغط على الجزء الأول ثم أضف الجزء الثاني.
+                                    💡 ستحتاج لتسجيل حجزين منفصلين للعميل لكي تكتمل الفترة المطلوبة.
                                   </p>
                                 )}
                               </div>
@@ -1237,13 +1204,9 @@ function ReportsContent() {
                                 <button
                                   type="button"
                                   onClick={() => applyFullSuggestion(s.unit.id)}
-                                  className={`font-black px-5 py-2.5 rounded-xl text-[10px] transition-all flex items-center gap-1.5 shrink-0 self-stretch md:self-auto text-center justify-center shadow-md ${
-                                    idx === 0
-                                      ? 'bg-green-500 hover:bg-green-400 text-white'
-                                      : 'bg-green-700 hover:bg-green-600 text-white'
-                                  }`}
+                                  className="bg-green-600 hover:bg-green-500 text-white font-black px-4 py-2 rounded-xl text-[10px] transition-all flex items-center gap-1.5 shrink-0 self-stretch md:self-auto text-center justify-center"
                                 >
-                                  {idx === 0 ? '🏆 تطبيق الأفضل مباشرة 📝' : 'تطبيق وتسكين مباشر 📝'}
+                                  تطبيق وتسكين مباشر 📝
                                 </button>
                               ) : (
                                 <div className="flex gap-2 w-full md:w-auto">
