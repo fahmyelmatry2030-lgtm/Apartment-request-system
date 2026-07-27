@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { getBookings, getSystemUnits } from '@/lib/data-init';
 import { getDbExpenses, getDbSalaries } from '@/lib/actions/db';
 import { Calendar, TrendingUp } from 'lucide-react';
+import FinancialLockModal from '@/components/FinancialLockModal';
 
 const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 
@@ -105,7 +106,14 @@ export default function FinancePage() {
   const [selectedMonth, setSelectedMonth] = useState(-1);
   const [selectedYear, setSelectedYear] = useState(-1);
   const [isLoading, setIsLoading] = useState(true);
+  const [isUnlocked, setIsUnlocked] = useState(false);
   const [adminRole, setAdminRole] = useState<string>('Super Admin');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && sessionStorage.getItem('financialUnlocked') === 'true') {
+      setIsUnlocked(true);
+    }
+  }, []);
 
   useEffect(() => {
     const info = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem('adminInfo') || '{}') : {};
@@ -318,6 +326,14 @@ export default function FinancePage() {
   const apt1Net = aptRevenue('apt-1') - aptCommission('apt-1') - apt1Expenses;
   const apt2Net = aptRevenue('apt-2') - aptCommission('apt-2') - apt2Expenses;
   const apt3Net = aptRevenue('apt-3') - aptCommission('apt-3') - apt3Expenses;
+
+  if (!isUnlocked) {
+    return (
+      <div className="flex items-center justify-center min-h-[65vh]">
+        <FinancialLockModal isOpen={true} onUnlock={() => setIsUnlocked(true)} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-10 animate-fade-in" dir="rtl">

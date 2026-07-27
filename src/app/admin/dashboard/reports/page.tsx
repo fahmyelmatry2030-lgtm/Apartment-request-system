@@ -12,7 +12,6 @@ import {
 import { Pencil, Trash2 } from 'lucide-react';
 import ExpensesTab from './ExpensesTab';
 import FinancialSummaryTab from './FinancialSummaryTab';
-import FinancialLockModal from '@/components/FinancialLockModal';
 import CustomerProfileModal from '@/components/CustomerProfileModal';
 
 // Units will be fetched dynamically from the database
@@ -203,18 +202,11 @@ function ReportsContent() {
     return searchParams.get('unit') ? 'operational' : 'expenses';
   });
 
-  const [isUnlocked, setIsUnlocked] = useState(false);
   const [profileModal, setProfileModal] = useState<{ isOpen: boolean; name: string | null; phone?: string | null }>({
     isOpen: false,
     name: null,
     phone: null,
   });
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && sessionStorage.getItem('financialUnlocked') === 'true') {
-      setIsUnlocked(true);
-    }
-  }, []);
 
   // URL PARAM SYNC (for dynamic updates without full reload)
   useEffect(() => {
@@ -845,26 +837,18 @@ function ReportsContent() {
         </div>
 
         {activeTab === 'expenses' && (
-          isUnlocked ? (
-            <ExpensesTab />
-          ) : (
-            <FinancialLockModal isOpen={true} onUnlock={() => setIsUnlocked(true)} />
-          )
+          <ExpensesTab />
         )}
 
         {activeTab === 'financial' && (
-          isUnlocked ? (
-            <FinancialSummaryTab
-              bookings={bookings}
-              units={units}
-              selectedMonth={selectedMonth}
-              selectedYear={selectedYear}
-              setSelectedMonth={setSelectedMonth}
-              setSelectedYear={setSelectedYear}
-            />
-          ) : (
-            <FinancialLockModal isOpen={true} onUnlock={() => setIsUnlocked(true)} />
-          )
+          <FinancialSummaryTab
+            bookings={bookings}
+            units={units}
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+            setSelectedMonth={setSelectedMonth}
+            setSelectedYear={setSelectedYear}
+          />
         )}
 
         {activeTab === 'operational' && (
