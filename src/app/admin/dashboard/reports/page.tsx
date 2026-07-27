@@ -487,24 +487,61 @@ function ReportsContent() {
 
     // 1. Find Fully Available Units
     targetUnits.forEach((unit: any) => {
-      // Find overlap bookings
-      const overlaps = bookings.filter((b: any) => {
+      // Find all bookings for this unit to check gaps and overlap
+      const unitBookings = bookings.filter((b: any) => {
         if (b.status === 'deleted' || b.status === 'cancelled' || b.status === 'rejected') return false;
         const bUnitId = b.apartmentId || b.studio;
-        if (bUnitId !== unit.id) return false;
-        
-        // Overlap condition:
+        return bUnitId === unit.id;
+      });
+
+      const overlaps = unitBookings.filter((b: any) => {
         return (b.checkIn < smartCheckOut) && (b.checkOut > smartCheckIn);
       });
 
       if (overlaps.length === 0) {
+        // Find previous booking (closest ending on or before smartCheckIn)
+        const prevBooking = unitBookings
+          .filter((b: any) => b.checkOut <= smartCheckIn)
+          .sort((a: any, b: any) => b.checkOut.localeCompare(a.checkOut))[0];
+        
+        // Find next booking (closest starting on or after smartCheckOut)
+        const nextBooking = unitBookings
+          .filter((b: any) => b.checkIn >= smartCheckOut)
+          .sort((a: any, b: any) => a.checkIn.localeCompare(b.checkIn))[0];
+
+        const gapBefore = prevBooking 
+          ? Math.round((new Date(smartCheckIn).getTime() - new Date(prevBooking.checkOut).getTime()) / (1000 * 60 * 60 * 24))
+          : 99;
+
+        const gapAfter = nextBooking
+          ? Math.round((new Date(nextBooking.checkIn).getTime() - new Date(smartCheckOut).getTime()) / (1000 * 60 * 60 * 24))
+          : 99;
+
+        // Gap score (lower is better, 0 is perfect)
+        const score = gapBefore + gapAfter;
+
+        let efficiencyLabel = '';
+        if (gapBefore === 0 && gapAfter === 0) {
+          efficiencyLabel = ' (مثالي! يسد الفجوة بالكامل 🌟)';
+        } else if (gapBefore === 0 || gapAfter === 0) {
+          efficiencyLabel = ` (ممتاز! متصل بحجز آخر ➔)`;
+        } else if (gapBefore < 99 || gapAfter < 99) {
+          efficiencyLabel = ` (فجوة: ${gapBefore < 99 ? gapBefore + ' يوم قبل' : ''} ${gapAfter < 99 ? gapAfter + ' يوم بعد' : ''})`;
+        }
+
         suggestionsList.push({
           type: 'full',
           unit,
-          label: `${unit.title?.ar || unit.id} (${unit.category === 'single' ? 'سنجل' : unit.category === 'double' ? 'دبل' : unit.category === 'triple' ? 'تريبل' : unit.category === 'two-room' ? 'غرفتين' : 'شقة'})`
+          score,
+          gapBefore,
+          gapAfter,
+          label: `${unit.title?.ar || unit.id} (${unit.category === 'single' ? 'سنجل' : unit.category === 'double' ? 'دبل' : unit.category === 'triple' ? 'تريبل' : unit.category === 'two-room' ? 'غرفتين' : 'شقة'})${efficiencyLabel}`
         });
       }
     });
+
+    // Sort full suggestions by gap score (ascending: closest fit first to fill gaps)
+    suggestionsList.sort((a, b) => a.score - b.score);
 
     // 2. If no unit is fully available, suggest split-stays!
     if (suggestionsList.length === 0 && totalNights >= 2) {
@@ -533,7 +570,6 @@ function ReportsContent() {
         });
 
         if (part1Available.length > 0 && part2Available.length > 0) {
-          // Add suggestion with the first available unit in each part
           const u1 = part1Available[0];
           const u2 = part2Available[0];
           
@@ -547,7 +583,6 @@ function ReportsContent() {
             label: `تسكين مجزأ: الاستوديو (${u1.title?.ar || u1.id}) لمدة ${splitNights} ليالي، ثم الانتقال للاستوديو (${u2.title?.ar || u2.id}) لمدة ${totalNights - splitNights} ليالي.`
           });
           
-          // Show up to 2 variations of splits
           if (suggestionsList.length >= 2) break;
         }
       }
@@ -1142,21 +1177,58 @@ function ReportsContent() {
                             <div
                               key={idx}
                               className={`p-4 rounded-2xl border flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-all ${
-                                s.type === 'full' ? 'bg-green-500/5 border-green-500/30' : 'bg-amber-500/5 border-amber-500/30'
+                                s.type === 'full'
+                                  ? idx === 0 ? 'bg-green-500/10 border-green-400/50 ring-1 ring-green-400/20' : 'bg-green-500/5 border-green-500/20'
+                                  : 'bg-amber-500/5 border-amber-500/30'
                               }`}
                             >
-                              <div className="space-y-1">
-                                <div className="flex items-center gap-2">
+                              <div className="space-y-2 flex-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  {/* Priority badge */}
+                                  {s.type === 'full' && (
+                                    <span className={`text-[9px] font-black px-2.5 py-1 rounded-full border ${
+                                      idx === 0
+                                        ? 'bg-yellow-400/20 text-yellow-300 border-yellow-400/40'
+                                        : 'bg-white/5 text-gray-400 border-white/10'
+                                    }`}>
+                                      {idx === 0 ? '🏆 الأفضل' : `#${idx + 1}`}
+                                    </span>
+                                  )}
                                   <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${
                                     s.type === 'full' ? 'bg-green-500/20 text-green-400' : 'bg-amber-500/20 text-amber-400'
                                   }`}>
                                     {s.type === 'full' ? 'متاح بالكامل 🟢' : 'تقسيم إقامة مجزأ 🔀'}
                                   </span>
-                                  <span className="font-bold text-xs text-white">{s.label}</span>
+                                  <span className="font-bold text-xs text-white">{s.type === 'full' ? `${s.unit.title?.ar || s.unit.id} (${s.unit.category === 'single' ? 'سنجل' : s.unit.category === 'double' ? 'دبل' : s.unit.category === 'triple' ? 'تريبل' : s.unit.category === 'two-room' ? 'غرفتين' : 'شقة'})` : s.label}</span>
                                 </div>
+
+                                {/* Gap efficiency row for full suggestions */}
+                                {s.type === 'full' && (
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    {s.gapBefore < 99 ? (
+                                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${
+                                        s.gapBefore === 0 ? 'bg-green-500/15 text-green-300 border-green-500/30' : 'bg-orange-500/10 text-orange-300 border-orange-500/20'
+                                      }`}>
+                                        {s.gapBefore === 0 ? '✅ متصل بحجز سابق (لا فراغ)' : `⚠️ ${s.gapBefore} يوم فراغ قبل الحجز`}
+                                      </span>
+                                    ) : (
+                                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-full border bg-white/5 text-gray-500 border-white/10">لا حجز سابق</span>
+                                    )}
+                                    {s.gapAfter < 99 ? (
+                                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${
+                                        s.gapAfter === 0 ? 'bg-green-500/15 text-green-300 border-green-500/30' : 'bg-orange-500/10 text-orange-300 border-orange-500/20'
+                                      }`}>
+                                        {s.gapAfter === 0 ? '✅ متصل بحجز تالٍ (لا فراغ)' : `⚠️ ${s.gapAfter} يوم فراغ بعد الحجز`}
+                                      </span>
+                                    ) : (
+                                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-full border bg-white/5 text-gray-500 border-white/10">لا حجز تالٍ</span>
+                                    )}
+                                  </div>
+                                )}
+
                                 {s.type === 'split' && (
                                   <p className="text-[10px] text-gray-400 font-bold">
-                                    💡 ستحتاج لتسجيل حجزين منفصلين للعميل لكي تكتمل الفترة المطلوبة.
+                                    💡 ستحتاج لتسجيل حجزين منفصلين للعميل لكي تكتمل الفترة المطلوبة. اضغط على الجزء الأول ثم أضف الجزء الثاني.
                                   </p>
                                 )}
                               </div>
@@ -1165,9 +1237,13 @@ function ReportsContent() {
                                 <button
                                   type="button"
                                   onClick={() => applyFullSuggestion(s.unit.id)}
-                                  className="bg-green-600 hover:bg-green-500 text-white font-black px-4 py-2 rounded-xl text-[10px] transition-all flex items-center gap-1.5 shrink-0 self-stretch md:self-auto text-center justify-center"
+                                  className={`font-black px-5 py-2.5 rounded-xl text-[10px] transition-all flex items-center gap-1.5 shrink-0 self-stretch md:self-auto text-center justify-center shadow-md ${
+                                    idx === 0
+                                      ? 'bg-green-500 hover:bg-green-400 text-white'
+                                      : 'bg-green-700 hover:bg-green-600 text-white'
+                                  }`}
                                 >
-                                  تطبيق وتسكين مباشر 📝
+                                  {idx === 0 ? '🏆 تطبيق الأفضل مباشرة 📝' : 'تطبيق وتسكين مباشر 📝'}
                                 </button>
                               ) : (
                                 <div className="flex gap-2 w-full md:w-auto">
