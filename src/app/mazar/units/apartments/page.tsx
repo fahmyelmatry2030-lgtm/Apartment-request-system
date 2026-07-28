@@ -142,11 +142,21 @@ export default function ApartmentsListingPage() {
         )}
 
         {/* Units Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {displayedLuxuryApartments.map((unit: any) => (
-            <UnitCard key={unit.id} unit={unit} />
-          ))}
-        </div>
+        {(() => {
+          const sortedApts = [...displayedLuxuryApartments].sort((a, b) => {
+            const numA = parseInt(a.id.replace(/\D/g, ''), 10) || 0;
+            const numB = parseInt(b.id.replace(/\D/g, ''), 10) || 0;
+            return numA - numB;
+          });
+
+          return (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {sortedApts.map((unit: any) => (
+                <UnitCard key={unit.id} unit={unit} />
+              ))}
+            </div>
+          );
+        })()}
 
         {displayedLuxuryApartments.length === 0 && (
           <div className="text-center py-20 bg-white rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm mt-8">

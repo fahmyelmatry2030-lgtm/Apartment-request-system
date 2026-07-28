@@ -198,11 +198,48 @@ export default function StudiosPage() {
         )}
 
         {/* Units Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
-          {displayedStudios.map((unit: any) => (
-            <UnitCard key={unit.id} unit={unit} />
-          ))}
-        </div>
+        {(() => {
+          const categoryOrder: { [key: string]: number } = {
+            'single': 1,
+            'double': 2,
+            'triple': 3,
+            'tworoom': 4
+          };
+
+          const extractNumber = (id: string) => {
+            const match = id.match(/\d+/);
+            return match ? parseInt(match[0], 10) : 999;
+          };
+
+          const extractBranch = (id: string) => {
+            if (id.startsWith('b1-')) return 1;
+            if (id.startsWith('b2-')) return 2;
+            return 3;
+          };
+
+          const sortedStudios = [...displayedStudios].sort((a, b) => {
+            const catA = getStudioTypeCategory(a.id);
+            const catB = getStudioTypeCategory(b.id);
+            
+            const orderA = categoryOrder[catA] || 99;
+            const orderB = categoryOrder[catB] || 99;
+            if (orderA !== orderB) return orderA - orderB;
+            
+            const branchA = extractBranch(a.id);
+            const branchB = extractBranch(b.id);
+            if (branchA !== branchB) return branchA - branchB;
+
+            return extractNumber(a.id) - extractNumber(b.id);
+          });
+
+          return (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
+              {sortedStudios.map((unit: any) => (
+                <UnitCard key={unit.id} unit={unit} />
+              ))}
+            </div>
+          );
+        })()}
 
         {displayedStudios.length === 0 && (
           <div className="text-center py-20 bg-white rounded-[2rem] border border-[#EAE4D9]/50 shadow-sm mt-8">
