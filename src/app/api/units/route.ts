@@ -1,11 +1,17 @@
-import { NextResponse } from 'next/server';
-import { getPublicSystemUnits } from '@/lib/data-init';
+import { NextRequest, NextResponse } from 'next/server';
+import { getPublicSystemUnits, getPublicCategoryUnits } from '@/lib/data-init';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const units = await getPublicSystemUnits();
+    const { searchParams } = new URL(req.url);
+    const categoriesOnly = searchParams.get('categories') === 'true';
+    
+    const units = categoriesOnly 
+      ? await getPublicCategoryUnits()
+      : await getPublicSystemUnits();
+
     return NextResponse.json(units);
   } catch (error) {
     console.error('[API /api/units] Error fetching units:', error);

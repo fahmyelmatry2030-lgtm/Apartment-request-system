@@ -20,7 +20,7 @@ export default function HomeClient() {
   useEffect(() => {
     const loadUnits = async () => {
       try {
-        const res = await fetch('/api/units');
+        const res = await fetch('/api/units?categories=true');
         if (!res.ok) throw new Error('Failed to fetch units');
         const allUnits = await res.json();
         setUnits(allUnits);
