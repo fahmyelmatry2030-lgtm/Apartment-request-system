@@ -54,7 +54,8 @@
         "welcome": "مرحباً! كيف يمكننا مساعدتك اليوم؟ يمكنك مراسلتنا مباشرة عبر واتساب.",
         "startChat": "بدء المحادثة",
         "defaultMsg": "مرحباً مزار، أود الاستفسار عن حجز استوديو."
-      }
+      },
+      "ourUnits": "الوحدات"
     },
     "design4": {
       "cta": "بدء الحجز الان",
@@ -254,7 +255,8 @@
         "welcome": "Hello! How can we help you today? You can message us directly on WhatsApp.",
         "startChat": "Start Chat",
         "defaultMsg": "Hi Mazar, I would like to inquire about booking a studio."
-      }
+      },
+      "ourUnits": "Units"
     },
     "design4": {
       "cta": "INITIALIZE BOOKING",

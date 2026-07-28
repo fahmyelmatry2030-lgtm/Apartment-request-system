@@ -23,6 +23,7 @@ export default function HowToBookPage() {
         </Link>
         
         <div className="hidden md:flex gap-10 text-sm font-bold text-[#5C554B]">
+          <Link href="/mazar/units" className="hover:text-[#2A2723] transition-colors">{t.common.ourUnits}</Link>
           <Link href="/mazar/about" className="hover:text-[#2A2723] transition-colors">{t.common.about}</Link>
           <Link href="/mazar/rules" className="hover:text-[#2A2723] transition-colors">{t.common.rules}</Link>
           <Link href="/mazar/how-to-book" className="text-[#C1A68D] transition-colors">{t.common.howToBook}</Link>
@@ -35,6 +36,15 @@ export default function HowToBookPage() {
           </Link>
         </div>
       </nav>
+
+      {/* Mobile sub-navigation bar for quick links */}
+      <div className="md:hidden flex items-center justify-start gap-4 px-4 py-3 border-b border-[#EAE4D9]/50 overflow-x-auto scrollbar-hide bg-white/70 backdrop-blur-md sticky top-[58px] z-40 w-full text-xs font-black text-[#5C554B]" dir={isRTL ? 'rtl' : 'ltr'}>
+        <Link href="/mazar/units" className="hover:text-[#C1A68D] whitespace-nowrap bg-[#C1A68D]/10 text-[#C1A68D] px-3.5 py-1.5 rounded-full">{t.common.ourUnits}</Link>
+        <Link href="/mazar/about" className="hover:text-[#C1A68D] whitespace-nowrap px-2 py-1.5">{t.common.about}</Link>
+        <Link href="/mazar/how-to-book" className="hover:text-[#C1A68D] whitespace-nowrap px-2 py-1.5">{t.common.howToBook}</Link>
+        <Link href="/mazar/rules" className="hover:text-[#C1A68D] whitespace-nowrap px-2 py-1.5">{t.common.rules}</Link>
+        <Link href="/social" className="hover:text-[#C1A68D] whitespace-nowrap px-2 py-1.5">{isRTL ? 'روابطنا' : 'Social'}</Link>
+      </div>
 
       {/* Header */}
       <section className="pt-16 md:pt-24 pb-12 md:pb-16 px-6 text-center">
