@@ -9,15 +9,34 @@ import { useLanguage } from '@/lib/LanguageContext';
 
 import UnitCard from '@/components/UnitCard';
 
+const getStudioTypeCategory = (unitId: string) => {
+  const mapping: { [key: string]: string } = {
+    'b1-s1': 'double', 'b1-s2': 'single', 'b1-s3': 'single', 'b1-s4': 'triple', 'b1-s5': 'double',
+    'b1-s6': 'single', 'b1-s7': 'single', 'b1-s8': 'single', 'b1-s9': 'double', 'b1-s10': 'double',
+    'b1-s11': 'double', 'b1-s12': 'double',
+    'b2-s1': 'double', 'b2-s2': 'triple', 'b2-s3': 'triple', 'b2-s4': 'triple', 'b2-s5': 'single',
+    'b2-s6': 'double', 'b2-s7': 'triple', 'b2-s8': 'double', 'b2-s9': 'triple', 'b2-s10': 'triple',
+    'b2-s11': 'triple', 'b2-s12': 'double',
+    'p-s25': 'triple', 'p-s26': 'double', 'p-s27': 'double', 'p-s28': 'triple', 'p-s29': 'triple', 'p-s30': 'triple',
+  };
+  return mapping[unitId] || 'single';
+};
+
 export default function StudiosPage() {
   const { t, isRTL } = useLanguage();
   const router = useRouter();
 
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
+  const [selectedType, setSelectedType] = useState('all');
   const [allStudios, setAllStudios] = useState<any[]>([]);
   const [displayedStudios, setDisplayedStudios] = useState<any[]>([]);
   const [bookings, setBookings] = useState<any[]>([]);
+
+  const getCountForType = (type: string) => {
+    if (type === 'all') return allStudios.length;
+    return allStudios.filter((u) => getStudioTypeCategory(u.id) === type).length;
+  };
 
   useEffect(() => {
     const loadUnits = async () => {
@@ -43,21 +62,27 @@ export default function StudiosPage() {
   }, []);
 
   useEffect(() => {
-    if (!checkIn || !checkOut || new Date(checkOut) <= new Date(checkIn)) {
-      setDisplayedStudios(allStudios);
-      return;
+    let filtered = allStudios;
+
+    // 1. Date overlap filtering
+    if (checkIn && checkOut && new Date(checkOut) > new Date(checkIn)) {
+      filtered = filtered.filter((unit) => {
+        const hasOverlap = bookings.some((b: any) => {
+          if (b.apartmentId !== unit.id) return false;
+          if (['cancelled', 'deleted', 'rejected', 'مرفوض', 'ملغي'].includes(b.status)) return false;
+          return (checkIn < b.checkOut && checkOut > b.checkIn);
+        });
+        return !hasOverlap;
+      });
     }
 
-    const filtered = allStudios.filter((unit) => {
-      const hasOverlap = bookings.some((b: any) => {
-        if (b.apartmentId !== unit.id) return false;
-        if (['cancelled', 'deleted', 'rejected', 'مرفوض', 'ملغي'].includes(b.status)) return false;
-        return (checkIn < b.checkOut && checkOut > b.checkIn);
-      });
-      return !hasOverlap;
-    });
+    // 2. Type category filtering
+    if (selectedType !== 'all') {
+      filtered = filtered.filter((unit) => getStudioTypeCategory(unit.id) === selectedType);
+    }
+
     setDisplayedStudios(filtered);
-  }, [checkIn, checkOut, allStudios, bookings]);
+  }, [checkIn, checkOut, selectedType, allStudios, bookings]);
 
   return (
     <main className="min-h-screen bg-[#FDFBF7] text-[#2A2723] selection:bg-[#C1A68D] selection:text-white">
@@ -129,6 +154,35 @@ export default function StudiosPage() {
               {isRTL ? 'إعادة تعيين' : 'Reset'}
             </button>
           )}
+        </div>
+
+        {/* Type Filter Tabs */}
+        <div className="flex items-center gap-3 overflow-x-auto pb-4 mb-8 scrollbar-hide text-xs md:text-sm font-black" dir={isRTL ? 'rtl' : 'ltr'}>
+          {[
+            { id: 'all', ar: 'الكل', en: 'All' },
+            { id: 'single', ar: 'استوديو سنجل (فردي)', en: 'Single Studio' },
+            { id: 'double', ar: 'استوديو دبل (زوجي)', en: 'Double Studio' },
+            { id: 'triple', ar: 'استوديو تريبل (ثلاثي)', en: 'Triple Studio' },
+            { id: 'tworoom', ar: 'استوديو غرفتين', en: 'Two Rooms' },
+          ].map((tab) => {
+            const count = getCountForType(tab.id);
+            if (count === 0 && tab.id !== 'all') return null;
+
+            const isActive = selectedType === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setSelectedType(tab.id)}
+                className={`whitespace-nowrap px-6 py-3.5 rounded-full border transition-all duration-300 ${
+                  isActive
+                    ? 'bg-[#2A2723] text-white border-[#2A2723] shadow-md scale-105'
+                    : 'bg-white text-[#5C554B] border-[#EAE4D9] hover:border-[#C1A68D] hover:text-[#C1A68D]'
+                }`}
+              >
+                {isRTL ? tab.ar : tab.en} ({count})
+              </button>
+            );
+          })}
         </div>
 
         {/* Available Count Badge */}

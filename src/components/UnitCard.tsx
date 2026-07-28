@@ -10,6 +10,28 @@ interface UnitCardProps {
   unit: any;
 }
 
+const getUnitCategory = (unitId: string, currentType: string) => {
+  if (unitId.startsWith('apt-')) return 'apartment';
+  const mapping: { [key: string]: string } = {
+    'b1-s1': 'double', 'b1-s2': 'single', 'b1-s3': 'single', 'b1-s4': 'triple', 'b1-s5': 'double',
+    'b1-s6': 'single', 'b1-s7': 'single', 'b1-s8': 'single', 'b1-s9': 'double', 'b1-s10': 'double',
+    'b1-s11': 'double', 'b1-s12': 'double',
+    'b2-s1': 'double', 'b2-s2': 'triple', 'b2-s3': 'triple', 'b2-s4': 'triple', 'b2-s5': 'single',
+    'b2-s6': 'double', 'b2-s7': 'triple', 'b2-s8': 'double', 'b2-s9': 'triple', 'b2-s10': 'triple',
+    'b2-s11': 'triple', 'b2-s12': 'double',
+    'p-s25': 'triple', 'p-s26': 'double', 'p-s27': 'double', 'p-s28': 'triple', 'p-s29': 'triple', 'p-s30': 'triple',
+  };
+  return mapping[unitId] || currentType || 'single';
+};
+
+const getCategoryLabel = (category: string, isRTL: boolean) => {
+  if (category === 'single') return isRTL ? 'استوديو سنجل' : 'Single Studio';
+  if (category === 'double') return isRTL ? 'استوديو دبل' : 'Double Studio';
+  if (category === 'triple') return isRTL ? 'استوديو تريبل' : 'Triple Studio';
+  if (category === 'tworoom') return isRTL ? 'استوديو غرفتين' : 'Two Room Studio';
+  return isRTL ? 'شقة فندقية' : 'Hotel Apartment';
+};
+
 const UnitCard: React.FC<UnitCardProps> = ({ unit }) => {
   const { t, isRTL, language } = useLanguage();
   const [status, setStatus] = useState<string>('متاح');
@@ -30,6 +52,8 @@ const UnitCard: React.FC<UnitCardProps> = ({ unit }) => {
     };
     loadStatus();
   }, [unit.id]);
+
+  const category = getUnitCategory(unit.id, unit.type);
 
   return (
     <motion.div 
@@ -53,14 +77,17 @@ const UnitCard: React.FC<UnitCardProps> = ({ unit }) => {
           </div>
         )}
         <div className={`absolute top-4 ${isRTL ? 'right-4' : 'left-4'} bg-[#2A2723]/80 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full border border-white/10 flex gap-2`}>
-          <span>{unit?.type === 'studio' ? (isRTL ? 'استوديو' : 'STUDIO') : (isRTL ? 'شقة' : 'APARTMENT')}</span>
+          <span>{getCategoryLabel(category, isRTL)}</span>
         </div>
         <div className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} ${status === 'متاح' ? 'bg-green-500/90' : status === 'مشغول' ? 'bg-blue-500/90' : 'bg-red-500/90'} backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-md`}>
           {status}
         </div>
       </div>
       <div className={`p-6 flex flex-col flex-1 ${isRTL ? 'text-right' : 'text-left'}`}>
-        <h3 className="text-xl font-bold text-[#2A2723] mb-2">{unit?.title?.[language] || (isRTL ? 'وحدة بدون اسم' : 'Unnamed Unit')}</h3>
+        <h3 className="text-xl font-bold text-[#2A2723] mb-1">{unit?.title?.[language] || (isRTL ? 'وحدة بدون اسم' : 'Unnamed Unit')}</h3>
+        <div className="text-xs font-black text-[#C1A68D] mb-3">
+          {getCategoryLabel(category, isRTL)}
+        </div>
         <p className="text-sm text-[#7A7061] mb-2 line-clamp-2 leading-relaxed">
           {unit?.description?.[language] || ''}
         </p>
