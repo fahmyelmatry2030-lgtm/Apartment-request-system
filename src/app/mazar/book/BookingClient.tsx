@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import Calendar from '@/components/Calendar';
 import { useLanguage } from '@/lib/LanguageContext';
+import { uploadImage } from '@/lib/actions/upload';
 
 
 export default function BookingPage() {
@@ -39,6 +40,9 @@ export default function BookingPage() {
   const [error, setError] = useState<string | null>(null);
   const [bookedDates, setBookedDates] = useState<string[]>([]);
   const [rulesAccepted, setRulesAccepted] = useState(false);
+  const [receiptUrl, setReceiptUrl] = useState('');
+  const [isUploadingReceipt, setIsUploadingReceipt] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const ADMIN_WHATSAPP = '201108109969';
 
@@ -142,8 +146,21 @@ export default function BookingPage() {
       if (!res.ok) throw new Error('Failed to fetch units');
       const allUnits = await res.json();
 
+      // Fetch bookings to check for overlaps
+      const bookingsRes = await fetch('/api/bookings');
+      const allBookings = bookingsRes.ok ? await bookingsRes.json() : [];
+
       const activeUnitsByStatus = allUnits.filter((u: any) => u.status === 'متاح' || !u.status);
-      const available = activeUnitsByStatus;
+      
+      const available = activeUnitsByStatus.filter((unit: any) => {
+        const hasOverlap = allBookings.some((b: any) => {
+          if (b.apartmentId !== unit.id) return false;
+          if (['cancelled', 'deleted', 'rejected', 'مرفوض', 'ملغي'].includes(b.status)) return false;
+          // Overlap check
+          return (checkIn < b.checkOut && checkOut > b.checkIn);
+        });
+        return !hasOverlap;
+      });
 
       setAvailableUnits(available);
       if (available.length > 0) {
@@ -179,6 +196,8 @@ export default function BookingPage() {
       guest: name,
       guestsCount: guestsCount,
       studio: selectedUnit ? (selectedUnit.title?.[language] || selectedUnitId) : selectedUnitId,
+      paymentInfo: receiptUrl ? `صورة التحويل: ${receiptUrl}` : 'كاش / تحويل بنكي',
+      notes: receiptUrl ? `رابط صورة إيصال التحويل: ${receiptUrl}` : '',
     };
 
     try {
@@ -195,7 +214,7 @@ export default function BookingPage() {
       const start = new Date(checkIn).getTime();
       const end = new Date(checkOut).getTime();
       const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-      const adminMsg = `🔔 *طلب حجز جديد من الموقع!*\n\n👤 *العميل:* ${name}\n📱 *الموبايل:* ${phone}\n👥 *عدد الأشخاص:* ${guestsCount}\n🏠 *الوحدة:* ${selectedUnit ? (selectedUnit.title?.['ar'] || selectedUnitId) : selectedUnitId}\n📅 *الفترة:* من ${formatDate(checkIn)} إلى ${formatDate(checkOut)} (إجمالي ${nights} ليالي)\n\nيرجى تأكيد الحجز معي.`;
+      const adminMsg = `🔔 *طلب حجز جديد من الموقع!*\n\n👤 *العميل:* ${name}\n📱 *الموبايل:* ${phone}\n👥 *عدد الأشخاص:* ${guestsCount}\n🏠 *الوحدة:* ${selectedUnit ? (selectedUnit.title?.['ar'] || selectedUnitId) : selectedUnitId}\n📅 *الفترة:* من ${formatDate(checkIn)} إلى ${formatDate(checkOut)} (إجمالي ${nights} ليالي)${receiptUrl ? `\n📸 *إيصال التحويل:* ${receiptUrl}` : ''}\n\nيرجى تأكيد الحجز معي.`;
       const waUrl = `https://api.whatsapp.com/send?phone=${ADMIN_WHATSAPP}&text=${encodeURIComponent(adminMsg)}`;
       window.location.href = waUrl;
       
@@ -754,6 +773,56 @@ export default function BookingPage() {
                               {num}
                             </button>
                           ))}
+                        </div>
+                      </div>
+
+                      {/* Payment Details & Receipt Upload Section */}
+                      <div className="p-5 md:p-6 bg-[#F7F5F0] rounded-[24px] border border-[#EAE4D9] space-y-4">
+                        <h4 className={`text-xs font-black text-[#2A2723] pb-2 border-b border-[#EAE4D9]/60 ${isRTL ? 'text-right' : 'text-left'}`}>
+                          💳 {isRTL ? 'بيانات الدفع والتحويل للتأكيد' : 'Payment & Transfer Details'}
+                        </h4>
+                        
+                        <div className={`space-y-2 text-[11px] font-bold text-[#5C554B] leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+                          <p>📱 <strong>فودافون كاش:</strong> <span className="font-black text-rose-600 select-all">01108109969</span></p>
+                          <p>🔗 <strong>إنستاباي (Instapay):</strong> <span className="font-black text-blue-600 select-all">mazar788@instapay</span></p>
+                          <p>🏦 <strong>الحساب البنكي (QNB):</strong> <span className="font-black select-all">2031788788998</span></p>
+                        </div>
+
+                        <div className="space-y-2 pt-2">
+                          <label className={`block text-[9px] md:text-[10px] font-black text-[#5C554B] uppercase ${isRTL ? 'text-right' : 'text-left'}`}>
+                            📸 {isRTL ? 'إرفاق صورة التحويل (إيصال الدفع)' : 'Attach Transfer Receipt Image'}
+                          </label>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              setIsUploadingReceipt(true);
+                              setUploadError(null);
+                              try {
+                                const formData = new FormData();
+                                formData.append('file', file);
+                                const url = await uploadImage(formData);
+                                setReceiptUrl(url);
+                              } catch (err: any) {
+                                console.error('Receipt upload failed:', err);
+                                setUploadError(isRTL ? 'فشل رفع الصورة. تأكد من حجم الملف (الحد الأقصى 4 ميجا)' : 'Upload failed. Max size is 4MB.');
+                              } finally {
+                                setIsUploadingReceipt(false);
+                              }
+                            }}
+                            className="w-full text-xs text-[#7A7061] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-[#2A2723] file:text-white hover:file:bg-black file:cursor-pointer cursor-pointer"
+                          />
+                          {isUploadingReceipt && (
+                            <p className="text-[9px] font-black text-amber-600 animate-pulse">{isRTL ? '⏳ جاري رفع الإيصال...' : '⏳ Uploading receipt...'}</p>
+                          )}
+                          {receiptUrl && (
+                            <p className="text-[9px] font-black text-green-600">✓ {isRTL ? 'تم رفع إيصال التحويل بنجاح!' : 'Receipt uploaded successfully!'}</p>
+                          )}
+                          {uploadError && (
+                            <p className="text-[9px] font-black text-red-500">⚠️ {uploadError}</p>
+                          )}
                         </div>
                       </div>
 

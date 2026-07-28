@@ -71,10 +71,10 @@ export const getSystemUnits = async () => {
   return units;
 };
 
-// Returns only the 7 display categories (hides the 24 physical studios)
+// Returns all physical units and apartments, excluding the 4 abstract master categories
 export const getPublicSystemUnits = async () => {
   const allUnits = await getSystemUnits();
-  return allUnits.filter(u => !String(u.id).startsWith('b1-s') && !String(u.id).startsWith('b2-s') && u.branch !== 3);
+  return allUnits.filter(u => u.id !== 's-single' && u.id !== 's-double' && u.id !== 's-triple' && u.id !== 's-tworoom');
 };
 
 export const updateUnitDetails = async (id: string, updates: any) => {
