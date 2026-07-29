@@ -17,7 +17,6 @@ const getStudioTypeCategory = (unitId: string) => {
     'b2-s1': 'double', 'b2-s2': 'triple', 'b2-s3': 'triple', 'b2-s4': 'triple', 'b2-s5': 'single',
     'b2-s6': 'double', 'b2-s7': 'triple', 'b2-s8': 'double', 'b2-s9': 'triple', 'b2-s10': 'triple',
     'b2-s11': 'triple', 'b2-s12': 'double',
-    'p-s25': 'triple', 'p-s26': 'double', 'p-s27': 'double', 'p-s28': 'triple', 'p-s29': 'triple', 'p-s30': 'triple',
   };
   return mapping[unitId] || 'single';
 };

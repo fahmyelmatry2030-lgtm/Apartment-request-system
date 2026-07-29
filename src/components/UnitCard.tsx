@@ -14,6 +14,7 @@ interface UnitCardProps {
 
 const getUnitCategory = (unitId: string, currentType: string) => {
   if (unitId.startsWith('apt-')) return 'apartment';
+  if (unitId.startsWith('p-s')) return 'apartment';
   const mapping: { [key: string]: string } = {
     'b1-s1': 'double', 'b1-s2': 'single', 'b1-s3': 'single', 'b1-s4': 'triple', 'b1-s5': 'double',
     'b1-s6': 'single', 'b1-s7': 'single', 'b1-s8': 'single', 'b1-s9': 'double', 'b1-s10': 'double',
@@ -21,7 +22,6 @@ const getUnitCategory = (unitId: string, currentType: string) => {
     'b2-s1': 'double', 'b2-s2': 'triple', 'b2-s3': 'triple', 'b2-s4': 'triple', 'b2-s5': 'single',
     'b2-s6': 'double', 'b2-s7': 'triple', 'b2-s8': 'double', 'b2-s9': 'triple', 'b2-s10': 'triple',
     'b2-s11': 'triple', 'b2-s12': 'double',
-    'p-s25': 'triple', 'p-s26': 'double', 'p-s27': 'double', 'p-s28': 'triple', 'p-s29': 'triple', 'p-s30': 'triple',
   };
   return mapping[unitId] || currentType || 'single';
 };

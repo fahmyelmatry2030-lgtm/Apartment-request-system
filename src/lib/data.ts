@@ -969,7 +969,7 @@ export const units = [
   {
     "id": "p-s25",
     "branch": 3,
-    "type": "studio",
+    "type": "apartment",
     "title": {
       "ar": "شقة غرفتين (25)",
       "en": "Two-room Apartment (25)"
@@ -988,7 +988,7 @@ export const units = [
   {
     "id": "p-s26",
     "branch": 3,
-    "type": "studio",
+    "type": "apartment",
     "title": {
       "ar": "شقة غرفتين (26)",
       "en": "Two-room Apartment (26)"
@@ -1007,7 +1007,7 @@ export const units = [
   {
     "id": "p-s27",
     "branch": 3,
-    "type": "studio",
+    "type": "apartment",
     "title": {
       "ar": "شقة غرفتين (27)",
       "en": "Two-room Apartment (27)"
@@ -1026,7 +1026,7 @@ export const units = [
   {
     "id": "p-s28",
     "branch": 3,
-    "type": "studio",
+    "type": "apartment",
     "title": {
       "ar": "شقة غرفتين (28)",
       "en": "Two-room Apartment (28)"
@@ -1045,7 +1045,7 @@ export const units = [
   {
     "id": "p-s29",
     "branch": 3,
-    "type": "studio",
+    "type": "apartment",
     "title": {
       "ar": "شقة غرفتين (29)",
       "en": "Two-room Apartment (29)"
@@ -1064,7 +1064,7 @@ export const units = [
   {
     "id": "p-s30",
     "branch": 3,
-    "type": "studio",
+    "type": "apartment",
     "title": {
       "ar": "شقة غرفتين (30)",
       "en": "Two-room Apartment (30)"
