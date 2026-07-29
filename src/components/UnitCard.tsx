@@ -8,6 +8,8 @@ import { motion } from 'framer-motion';
 
 interface UnitCardProps {
   unit: any;
+  checkIn?: string;
+  checkOut?: string;
 }
 
 const getUnitCategory = (unitId: string, currentType: string) => {
@@ -32,7 +34,7 @@ const getCategoryLabel = (category: string, isRTL: boolean) => {
   return isRTL ? 'شقة فندقية' : 'Hotel Apartment';
 };
 
-const UnitCard: React.FC<UnitCardProps> = ({ unit }) => {
+const UnitCard: React.FC<UnitCardProps> = ({ unit, checkIn, checkOut }) => {
   const { t, isRTL, language } = useLanguage();
   const [status, setStatus] = useState<string>('متاح');
 
@@ -110,7 +112,7 @@ const UnitCard: React.FC<UnitCardProps> = ({ unit }) => {
         </div>
 
         <Link 
-          href={`/mazar/units/${unit?.id}`}
+          href={`/mazar/units/${unit?.id}${checkIn && checkOut ? `?checkIn=${checkIn}&checkOut=${checkOut}` : ''}`}
           className="mt-auto w-full bg-[#2A2723] text-white text-sm font-black py-4 rounded-2xl text-center hover:bg-black transition-all shadow-xl shadow-black/5 flex items-center justify-center gap-2 group/btn"
         >
           {t?.unitsPage?.viewDetails || 'Details'}

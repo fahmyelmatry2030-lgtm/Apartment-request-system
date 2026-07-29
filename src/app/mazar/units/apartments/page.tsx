@@ -152,7 +152,7 @@ export default function ApartmentsListingPage() {
           return (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {sortedApts.map((unit: any) => (
-                <UnitCard key={unit.id} unit={unit} />
+                <UnitCard key={unit.id} unit={unit} checkIn={checkIn} checkOut={checkOut} />
               ))}
             </div>
           );

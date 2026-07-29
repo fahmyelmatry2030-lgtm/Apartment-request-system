@@ -267,7 +267,7 @@ export default function UnitsListingPage() {
               {displayedUnits.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {displayedUnits.map((unit) => (
-                    <UnitCard key={unit.id} unit={unit} />
+                    <UnitCard key={unit.id} unit={unit} checkIn={checkIn} checkOut={checkOut} />
                   ))}
                 </div>
               ) : (

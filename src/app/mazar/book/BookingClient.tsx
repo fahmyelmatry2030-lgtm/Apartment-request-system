@@ -57,6 +57,14 @@ export default function BookingPage() {
     const init = async () => {
       const params = new URLSearchParams(window.location.search);
       const unitParam = params.get('unit');
+      const checkInParam = params.get('checkIn');
+      const checkOutParam = params.get('checkOut');
+
+      if (checkInParam && checkOutParam) {
+        setCheckIn(checkInParam);
+        setCheckOut(checkOutParam);
+      }
+
       if (unitParam) {
         setSelectedUnitId(unitParam);
         try {
@@ -81,9 +89,52 @@ export default function BookingPage() {
           // ignore — no booked dates blocked
         }
       }
+
+      // If dates are provided, fetch units, check availability, and skip Step 1!
+      if (checkInParam && checkOutParam) {
+        setIsLoading(true);
+        setError(null);
+        try {
+          const res = await fetch('/api/units');
+          if (!res.ok) throw new Error('Failed to fetch units');
+          const allUnits = await res.json();
+
+          const bookingsRes = await fetch('/api/bookings');
+          const allBookings = bookingsRes.ok ? await bookingsRes.json() : [];
+
+          const activeUnitsByStatus = allUnits.filter((u: any) => u.status === 'متاح' || !u.status);
+          
+          const available = activeUnitsByStatus.filter((unit: any) => {
+            const hasOverlap = allBookings.some((b: any) => {
+              if (b.apartmentId !== unit.id) return false;
+              if (['cancelled', 'deleted', 'rejected', 'مرفوض', 'ملغي'].includes(b.status)) return false;
+              return (checkInParam < b.checkOut && checkOutParam > b.checkIn);
+            });
+            return !hasOverlap;
+          });
+
+          setAvailableUnits(available);
+          if (available.length > 0) {
+            const currentSTillAvailable = available.find((u: any) => u.id === (unitParam || selectedUnitId));
+            if (currentSTillAvailable) {
+              setSelectedUnitId(currentSTillAvailable.id);
+            } else {
+              setSelectedUnitId(available[0].id);
+            }
+            setStep(2);
+          } else {
+            setSelectedUnitId('');
+            setError(isRTL ? 'عذراً، لا توجد وحدات متاحة في هذه المواعيد. جرب تغيير التاريخ.' : 'Sorry, no units are available for these dates. Try changing the dates.');
+          }
+        } catch (err) {
+          console.error('Auto availability check failed:', err);
+        } finally {
+          setIsLoading(false);
+        }
+      }
     };
     init();
-  }, []);
+  }, [isRTL]);
 
   const openWhatsAppAdmin = useCallback(() => {
     const selectedUnit = availableUnits.find((u: any) => u.id === selectedUnitId);

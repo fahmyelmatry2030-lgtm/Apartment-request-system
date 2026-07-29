@@ -22,6 +22,17 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
   );
   const [status, setStatus] = useState<string>(initialUnit?.status || 'متاح');
   const [isLoading, setIsLoading] = useState(!initialUnit);
+  
+  const [checkIn, setCheckIn] = useState<string | null>(null);
+  const [checkOut, setCheckOut] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const query = new URLSearchParams(window.location.search);
+      setCheckIn(query.get('checkIn'));
+      setCheckOut(query.get('checkOut'));
+    }
+  }, []);
 
   useEffect(() => {
     if (initialUnit) return;
@@ -192,13 +203,13 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
                 </div>
              </div>
 
-             <Link 
-               href={`/mazar/book?unit=${unit?.id}`} 
-               className="w-full bg-[#E63946] text-white text-lg font-black py-5 rounded-3xl text-center hover:bg-[#c1121f] transition-all shadow-2xl shadow-red-500/30 active:scale-95 transform flex items-center justify-center gap-4"
-             >
-                <span className="text-2xl">🗓️</span>
-                {t.unitsPage.bookThisUnit}
-             </Link>
+              <Link 
+                href={`/mazar/book?unit=${unit?.id}${checkIn && checkOut ? `&checkIn=${checkIn}&checkOut=${checkOut}` : ''}`} 
+                className="w-full bg-[#E63946] text-white text-lg font-black py-5 rounded-3xl text-center hover:bg-[#c1121f] transition-all shadow-2xl shadow-red-500/30 active:scale-95 transform flex items-center justify-center gap-4"
+              >
+                 <span className="text-2xl">🗓️</span>
+                 {t.unitsPage.bookThisUnit}
+              </Link>
 
              <div className="mt-8 flex items-center gap-4 justify-center">
                 <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#9A8F82] uppercase tracking-[0.2em]">
