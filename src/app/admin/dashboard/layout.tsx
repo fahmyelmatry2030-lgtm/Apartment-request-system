@@ -191,7 +191,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
     { name: 'مرتبات الموظفين', href: '/admin/dashboard/hr/salaries', icon: '💸', roles: ['Super Admin'] },
     { name: 'إجازات الموظفين', href: '/admin/dashboard/hr/vacations', icon: '🌴', roles: ['Super Admin'] },
     { name: 'إدارة المحتوى', href: '/admin/dashboard/content', icon: '📝', roles: ['Super Admin'] },
-    { name: 'التقارير المالي', href: '/admin/dashboard/reports', icon: '💰', roles: ['Super Admin', 'Akoura'] },
+    { name: 'المصروفات', href: '/admin/dashboard/reports', icon: '💰', roles: ['Super Admin', 'Akoura'] },
     { name: 'كشف الحساب الشهري', href: '/admin/dashboard/finance', icon: '🏛️', roles: ['Super Admin', 'Akoura'] },
     { name: 'فريق الإدارة', href: '/admin/dashboard/admins', icon: '👥', roles: ['Super Admin'] },
   ].filter(item => item.roles.includes(adminRole as string));
