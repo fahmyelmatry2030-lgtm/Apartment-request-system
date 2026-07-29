@@ -76,7 +76,7 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
   return (
     <main className="min-h-screen bg-[#FDFBF7] text-[#2A2723] selection:bg-[#C1A68D] selection:text-white">
       {/* Navigation */}
-      <nav className="w-full px-6 py-4 flex justify-between items-center max-w-screen-2xl mx-auto z-50 sticky top-0 bg-white/70 backdrop-blur-xl border-b border-[#EAE4D9]">
+      <nav className="w-full px-6 py-4 hidden md:flex justify-between items-center max-w-screen-2xl mx-auto z-50 sticky top-0 bg-white/70 backdrop-blur-xl border-b border-[#EAE4D9]">
         <Link href="/">
            <Logo size={42} />
         </Link>

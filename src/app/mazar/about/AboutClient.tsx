@@ -29,7 +29,7 @@ export default function AboutClient() {
          <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-[#D5C5B3]/20 rounded-full blur-[100px] -z-10 pointer-events-none" />
 
          {/* Navigation */}
-         <nav className="w-full px-4 md:px-8 py-3 md:py-5 flex justify-between items-center max-w-screen-2xl mx-auto z-50 sticky top-0 bg-white/70 backdrop-blur-xl border-b border-[#EAE4D9]">
+         <nav className="w-full px-4 md:px-8 py-3 md:py-5 hidden md:flex justify-between items-center max-w-screen-2xl mx-auto z-50 sticky top-0 bg-white/70 backdrop-blur-xl border-b border-[#EAE4D9]">
             <Link href="/" className="shrink-0">
                <Logo size={45} mdSize={54} />
             </Link>
