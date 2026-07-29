@@ -198,16 +198,6 @@ export default function HomeClient() {
         </ScrollReveal>
       </section>
 
-      {/* Mobile Floating Action Button */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] sm:hidden w-[90%] pointer-events-none">
-        <Link
-          href="/mazar/book"
-          className="pointer-events-auto w-full bg-[#2A2723] text-white flex items-center justify-between px-8 py-5 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] border-2 border-white/10 active:scale-95 transition-all"
-        >
-          <span className="font-black text-lg tracking-tight">{isRTL ? 'احجز إقامتك الآن' : 'BOOK YOUR STAY'}</span>
-          <span className="text-2xl animate-pulse">→</span>
-        </Link>
-      </div>
 
       <Footer />
     </main>
