@@ -43,6 +43,7 @@ export default function BookingPage() {
   const [receiptUrl, setReceiptUrl] = useState('');
   const [isUploadingReceipt, setIsUploadingReceipt] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [showUnitSelector, setShowUnitSelector] = useState(true);
 
   const ADMIN_WHATSAPP = '201108109969';
 
@@ -67,6 +68,7 @@ export default function BookingPage() {
 
       if (unitParam) {
         setSelectedUnitId(unitParam);
+        setShowUnitSelector(false);
         try {
           const res = await fetch('/api/bookings');
           if (res.ok) {
@@ -667,120 +669,201 @@ export default function BookingPage() {
 
               {/* UNIT SELECTION SIDE (Left/Main) */}
               <div className="flex-1 space-y-8 md:space-y-12 w-full order-2 lg:order-1">
-                <header className={`space-y-3 md:space-y-4 ${isRTL ? 'text-right' : 'text-left'}`}>
-                  <button
-                    type="button"
-                    onClick={() => setStep(1)}
-                    className="text-[9px] md:text-[10px] font-black text-[#C1A68D] hover:text-[#2A2723] mb-2 inline-flex items-center gap-2 uppercase tracking-widest transition-all bg-white px-4 py-2 rounded-full border border-[#EAE4D9] hover:shadow-md"
-                  >
-                    {isRTL ? '← تعديل المواعيد' : '← Edit Dates'}
-                  </button>
-                  <div className="flex items-center gap-2 md:gap-3">
-                    <div className="w-1.5 h-8 md:h-10 bg-[#C1A68D] rounded-full" />
-                    <h2 className="text-3xl md:text-5xl font-black text-[#2A2723] tracking-tighter">
-                      {isRTL ? 'اختر وحدتك' : 'Select Your Unit'}
-                    </h2>
-                  </div>
-                  <p className="text-xs md:text-sm font-bold text-[#7A7061] opacity-70">
-                    {isRTL ? 'تصفح جميع الوحدات واختر الأنسب لك' : 'Browse all units and select your preference'}
-                  </p>
-                </header>
+                {!showUnitSelector && selectedUnitId ? (
+                  <div className="space-y-8">
+                    {/* Header */}
+                    <header className={`space-y-3 md:space-y-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+                      <button
+                        type="button"
+                        onClick={() => setStep(1)}
+                        className="text-[9px] md:text-[10px] font-black text-[#C1A68D] hover:text-[#2A2723] mb-2 inline-flex items-center gap-2 uppercase tracking-widest transition-all bg-white px-4 py-2 rounded-full border border-[#EAE4D9] hover:shadow-md"
+                      >
+                        {isRTL ? '← تعديل المواعيد' : '← Edit Dates'}
+                      </button>
+                      <div className="flex justify-between items-center flex-wrap gap-4">
+                        <div className="flex items-center gap-2 md:gap-3">
+                          <div className="w-1.5 h-8 md:h-10 bg-[#C1A68D] rounded-full" />
+                          <h2 className="text-3xl md:text-5xl font-black text-[#2A2723] tracking-tighter">
+                            {isRTL ? 'الوحدة المختارة' : 'Selected Unit'}
+                          </h2>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setShowUnitSelector(true)}
+                          className="text-xs font-black text-[#C1A68D] hover:text-[#2A2723] bg-white border border-[#EAE4D9] px-4 py-2.5 rounded-full shadow-sm hover:shadow-md transition-all active:scale-95"
+                        >
+                          {isRTL ? '🔁 تغيير الوحدة' : '🔁 Change Unit'}
+                        </button>
+                      </div>
+                      <p className="text-xs md:text-sm font-bold text-[#7A7061] opacity-70">
+                        {isRTL 
+                          ? 'لقد اخترت هذه الوحدة لإقامتك. يرجى إتمام بيانات الدفع والحجز على اليمين لتأكيد طلبك.' 
+                          : 'You have selected this unit. Please complete payment and contact details on the right to confirm.'}
+                      </p>
+                    </header>
 
-                {/* SEARCH RESULTS GROUPS */}
-                <div className="space-y-10 md:space-y-14">
-
-                  {/* HELPER COMPONENT FOR UNIT CARDS */}
-                  {(() => {
-                    const UnitGroup = ({ title, icon, units, badgeColor }: any) => {
-                      if (units.length === 0) return null;
+                    {/* Selected Unit Details Card */}
+                    {(() => {
+                      const selectedUnit = availableUnits.find(u => u.id === selectedUnitId);
+                      if (!selectedUnit) return (
+                        <div className="p-8 bg-[#F7F5F0] rounded-[2rem] border border-[#EAE4D9] text-center font-bold text-sm text-[#7A7061]">
+                          {isRTL ? 'جاري تحميل تفاصيل الوحدة...' : 'Loading unit details...'}
+                        </div>
+                      );
                       return (
-                        <div className="space-y-6 md:space-y-8">
-                          <div className={`flex items-center justify-between pb-3 border-b border-[#F0EBE3] ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
-                            <div className="flex items-center gap-2 md:gap-3">
-                              <span className="text-xl md:text-2xl">{icon}</span>
-                              <h3 className="text-xs md:text-sm font-black uppercase text-[#2A2723] tracking-[0.1em] md:tracking-[0.2em]">{title}</h3>
-                            </div>
-                            <span className="bg-white border border-[#EAE4D9]/50 text-[8px] md:text-[9px] font-black px-3 py-1 rounded-full text-[#7A7061] shadow-sm">
-                              {units.length} {isRTL ? 'متوفرة' : 'Available'}
-                            </span>
+                        <div className="bg-white rounded-[2rem] border border-[#EAE4D9] overflow-hidden shadow-md flex flex-col md:flex-row gap-6 p-6">
+                          {/* Image */}
+                          <div className="w-full md:w-1/3 aspect-[4/3] rounded-2xl overflow-hidden bg-[#F7F5F0] relative shrink-0">
+                            {selectedUnit.images && selectedUnit.images[0] ? (
+                              <img src={selectedUnit.images[0]} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-3xl">🏢</div>
+                            )}
                           </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
-                            {units.map((u: any) => (
-                              <div
-                                key={u.id}
-                                onClick={() => setSelectedUnitId(u.id)}
-                                className={`cursor-pointer group relative flex flex-col text-right transition-all duration-500 rounded-3xl md:rounded-[32px] overflow-hidden border-2 ${selectedUnitId === u.id
-                                  ? 'bg-[#2A2723] border-[#2A2723] shadow-xl scale-[1.02] z-10'
-                                  : 'bg-white border-[#EAE4D9]/50 hover:border-[#C1A68D] hover:shadow-lg'
-                                  }`}
-                              >
-                                {/* Photo */}
-                                <div className="h-24 md:h-28 w-full relative overflow-hidden bg-[#F7F5F0]">
-                                  {u.images && u.images[0] ? (
-                                    <img src={u.images[0]} alt="" className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" />
-                                  ) : (
-                                    <div className={`w-full h-full flex items-center justify-center opacity-30 ${selectedUnitId === u.id ? 'bg-white/10' : 'bg-[#EAE4D9]/20'}`}>
-                                      <span className="text-2xl">🏢</span>
-                                    </div>
-                                  )}
-                                  <div className="absolute top-2 right-2 bg-white/95 backdrop-blur-sm px-2 py-0.5 rounded-full text-[6px] md:text-[7px] font-black text-[#2A2723] uppercase">
-                                    {u.type === 'studio' ? (isRTL ? 'استوديو' : 'Studio') : (isRTL ? 'شقة' : 'Apartment')}
-                                  </div>
-                                </div>
-
-                                <div className="p-3 md:p-4 space-y-2 flex-grow">
-                                  <div className="flex items-center justify-between">
-                                    <span className={`text-[7px] md:text-[8px] font-black uppercase tracking-widest ${selectedUnitId === u.id ? 'text-[#C1A68D]' : 'text-[#7A7061] opacity-50'}`}>
-                                      {u.id}
-                                    </span>
-                                    {selectedUnitId === u.id && (
-                                      <div className="w-4 h-4 rounded-full bg-[#E63946] flex items-center justify-center text-[7px] text-white">✓</div>
-                                    )}
-                                  </div>
-                                  <h4 className={`text-xs md:text-sm font-black leading-snug transition-colors ${selectedUnitId === u.id ? 'text-white' : 'text-[#2A2723]'}`}>
-                                    {u?.title?.[language] || u.id}
-                                  </h4>
-                                  <div className={`p-1.5 md:p-2 rounded-xl text-[7px] md:text-[8px] font-bold text-center transition-all ${selectedUnitId === u.id ? 'bg-white/10 text-white/70' : 'bg-[#F7F5F0] text-[#7A7061]'}`}>
-                                    ✨ {isRTL ? 'إقامة بريميوم' : 'Premium Stay'}
-                                  </div>
-                                </div>
-
-                                <div className="px-3 pb-3 pt-0 mt-auto">
-                                  <button
-                                    type="button"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setQuickViewUnit(u);
-                                      setQuickViewActiveImage(u.video || (u.images && u.images[0]) || '');
-                                    }}
-                                    className={`w-full inline-flex justify-center items-center py-2 md:py-2.5 rounded-xl border text-[9px] md:text-[10px] font-bold transition-colors ${selectedUnitId === u.id ? 'border-white/20 text-white hover:bg-white/10' : 'border-[#EAE4D9] text-[#5C554B] hover:bg-[#F7F5F0]'}`}
-                                  >
-                                    {isRTL ? '👁️ تفاصيل الوحدة' : '👁️ View Details'}
-                                  </button>
-                                </div>
-                              </div>
-                            ))}
+                          {/* Details */}
+                          <div className={`flex-grow flex flex-col justify-between ${isRTL ? 'text-right' : 'text-left'}`}>
+                            <div className="space-y-3">
+                              <span className="inline-block bg-[#C1A68D]/10 text-[#C1A68D] px-3 py-1 rounded-full text-[9px] font-black uppercase">
+                                {selectedUnit.type === 'studio' ? (isRTL ? 'استوديو' : 'Studio') : (isRTL ? 'شقة فندقية' : 'Apartment')}
+                              </span>
+                              <h3 className="text-xl md:text-2xl font-bold text-[#2A2723]">
+                                {selectedUnit.title?.[language] || selectedUnit.id}
+                              </h3>
+                              <p className="text-xs md:text-sm text-[#7A7061] leading-relaxed">
+                                {selectedUnit.description?.[language]}
+                              </p>
+                            </div>
+                            <div className="flex justify-between items-center pt-4 border-t border-[#F0EBE3] mt-6">
+                              <span className="text-xs font-bold text-[#7A7061]">
+                                {isRTL ? 'سعر الليلة' : 'Price per Night'}
+                              </span>
+                              <span className="text-base md:text-lg font-black text-[#C1A68D]">
+                                {selectedUnit.price}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       );
-                    };
-
-                    return (
-                      <div className="space-y-12 md:space-y-16">
-                        <UnitGroup
-                          title={isRTL ? 'الاستديوهات المتاحة' : 'Available Studios'}
-                          icon="✨"
-                          units={studioUnits}
-                        />
-                        <UnitGroup
-                          title={isRTL ? 'الشقق العائلية المتاحة' : 'Available Apartments'}
-                          icon="🏘️"
-                          units={apartmentUnits}
-                        />
+                    })()}
+                  </div>
+                ) : (
+                  <>
+                    <header className={`space-y-3 md:space-y-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+                      <button
+                        type="button"
+                        onClick={() => setStep(1)}
+                        className="text-[9px] md:text-[10px] font-black text-[#C1A68D] hover:text-[#2A2723] mb-2 inline-flex items-center gap-2 uppercase tracking-widest transition-all bg-white px-4 py-2 rounded-full border border-[#EAE4D9] hover:shadow-md"
+                      >
+                        {isRTL ? '← تعديل المواعيد' : '← Edit Dates'}
+                      </button>
+                      <div className="flex items-center gap-2 md:gap-3">
+                        <div className="w-1.5 h-8 md:h-10 bg-[#C1A68D] rounded-full" />
+                        <h2 className="text-3xl md:text-5xl font-black text-[#2A2723] tracking-tighter">
+                          {isRTL ? 'اختر وحدتك' : 'Select Your Unit'}
+                        </h2>
                       </div>
-                    );
-                  })()}
-                </div>
+                      <p className="text-xs md:text-sm font-bold text-[#7A7061] opacity-70">
+                        {isRTL ? 'تصفح جميع الوحدات واختر الأنسب لك' : 'Browse all units and select your preference'}
+                      </p>
+                    </header>
+
+                    {/* SEARCH RESULTS GROUPS */}
+                    <div className="space-y-10 md:space-y-14">
+
+                      {/* HELPER COMPONENT FOR UNIT CARDS */}
+                      {(() => {
+                        const UnitGroup = ({ title, icon, units, badgeColor }: any) => {
+                          if (units.length === 0) return null;
+                          return (
+                            <div className="space-y-6 md:space-y-8">
+                              <div className={`flex items-center justify-between pb-3 border-b border-[#F0EBE3] ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
+                                <div className="flex items-center gap-2 md:gap-3">
+                                  <span className="text-xl md:text-2xl">{icon}</span>
+                                  <h3 className="text-xs md:text-sm font-black uppercase text-[#2A2723] tracking-[0.1em] md:tracking-[0.2em]">{title}</h3>
+                                </div>
+                                <span className="bg-white border border-[#EAE4D9]/50 text-[8px] md:text-[9px] font-black px-3 py-1 rounded-full text-[#7A7061] shadow-sm">
+                                  {units.length} {isRTL ? 'متوفرة' : 'Available'}
+                                </span>
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+                                {units.map((u: any) => (
+                                  <div
+                                    key={u.id}
+                                    onClick={() => setSelectedUnitId(u.id)}
+                                    className={`cursor-pointer group relative flex flex-col text-right transition-all duration-500 rounded-3xl md:rounded-[32px] overflow-hidden border-2 ${selectedUnitId === u.id
+                                      ? 'bg-[#2A2723] border-[#2A2723] shadow-xl scale-[1.02] z-10'
+                                      : 'bg-white border-[#EAE4D9]/50 hover:border-[#C1A68D] hover:shadow-lg'
+                                      }`}
+                                  >
+                                    {/* Photo */}
+                                    <div className="h-24 md:h-28 w-full relative overflow-hidden bg-[#F7F5F0]">
+                                      {u.images && u.images[0] ? (
+                                        <img src={u.images[0]} alt="" className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" />
+                                      ) : (
+                                        <div className={`w-full h-full flex items-center justify-center opacity-30 ${selectedUnitId === u.id ? 'bg-white/10' : 'bg-[#EAE4D9]/20'}`}>
+                                          <span className="text-2xl">🏢</span>
+                                        </div>
+                                      )}
+                                      <div className="absolute top-2 right-2 bg-white/95 backdrop-blur-sm px-2 py-0.5 rounded-full text-[6px] md:text-[7px] font-black text-[#2A2723] uppercase">
+                                        {u.type === 'studio' ? (isRTL ? 'استوديو' : 'Studio') : (isRTL ? 'شقة' : 'Apartment')}
+                                      </div>
+                                    </div>
+
+                                    <div className="p-3 md:p-4 space-y-2 flex-grow">
+                                      <div className="flex items-center justify-between">
+                                        <span className={`text-[7px] md:text-[8px] font-black uppercase tracking-widest ${selectedUnitId === u.id ? 'text-[#C1A68D]' : 'text-[#7A7061] opacity-50'}`}>
+                                          {u.id}
+                                        </span>
+                                        {selectedUnitId === u.id && (
+                                          <div className="w-4 h-4 rounded-full bg-[#E63946] flex items-center justify-center text-[7px] text-white">✓</div>
+                                        )}
+                                      </div>
+                                      <h4 className={`text-xs md:text-sm font-black leading-snug transition-colors ${selectedUnitId === u.id ? 'text-white' : 'text-[#2A2723]'}`}>
+                                        {u?.title?.[language] || u.id}
+                                      </h4>
+                                      <div className={`p-1.5 md:p-2 rounded-xl text-[7px] md:text-[8px] font-bold text-center transition-all ${selectedUnitId === u.id ? 'bg-white/10 text-white/70' : 'bg-[#F7F5F0] text-[#7A7061]'}`}>
+                                        ✨ {isRTL ? 'إقامة بريميوم' : 'Premium Stay'}
+                                      </div>
+                                    </div>
+
+                                    <div className="px-3 pb-3 pt-0 mt-auto">
+                                      <button
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setQuickViewUnit(u);
+                                          setQuickViewActiveImage(u.video || (u.images && u.images[0]) || '');
+                                        }}
+                                        className={`w-full inline-flex justify-center items-center py-2 md:py-2.5 rounded-xl border text-[9px] md:text-[10px] font-bold transition-colors ${selectedUnitId === u.id ? 'border-white/20 text-white hover:bg-white/10' : 'border-[#EAE4D9] text-[#5C554B] hover:bg-[#F7F5F0]'}`}
+                                      >
+                                        {isRTL ? '👁️ تفاصيل الوحدة' : '👁️ View Details'}
+                                      </button>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        };
+
+                        return (
+                          <div className="space-y-12 md:space-y-16">
+                            <UnitGroup
+                              title={isRTL ? 'الاستديوهات المتاحة' : 'Available Studios'}
+                              icon="✨"
+                              units={studioUnits}
+                            />
+                            <UnitGroup
+                              title={isRTL ? 'الشقق العائلية المتاحة' : 'Available Apartments'}
+                              icon="🏘️"
+                              units={apartmentUnits}
+                            />
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* FINAL FORM SIDE (Right/Sticky) */}
@@ -851,9 +934,9 @@ export default function BookingPage() {
                         </h4>
                         
                         <div className={`space-y-2 text-[11px] font-bold text-[#5C554B] leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
-                          <p>📱 <strong>فودافون كاش:</strong> <span className="font-black text-rose-600 select-all">01108109969</span></p>
-                          <p>🔗 <strong>إنستاباي (Instapay):</strong> <span className="font-black text-blue-600 select-all">mazar788@instapay</span></p>
-                          <p>🏦 <strong>الحساب البنكي (QNB):</strong> <span className="font-black select-all">2031788788998</span></p>
+                          <p>📱 <strong>فودافون كاش (Vodafone Cash):</strong> <span className="font-black text-rose-600">{isRTL ? 'قريباً' : 'Soon'}</span></p>
+                          <p>🔗 <strong>إنستاباي (Instapay):</strong> <span className="font-black text-blue-600">{isRTL ? 'قريباً' : 'Soon'}</span></p>
+                          <p>🏦 <strong>التحويل البنكي (Bank Transfer):</strong> <span className="font-black text-amber-800">{isRTL ? 'قريباً' : 'Soon'}</span></p>
                         </div>
 
                         <div className="space-y-2 pt-2">
