@@ -198,37 +198,18 @@ export default function StudiosPage() {
 
         {/* Units Grid */}
         {(() => {
-          const categoryOrder: { [key: string]: number } = {
-            'single': 1,
-            'double': 2,
-            'triple': 3,
-            'tworoom': 4
-          };
-
-          const extractNumber = (id: string) => {
-            const match = id.match(/\d+/);
-            return match ? parseInt(match[0], 10) : 999;
-          };
-
-          const extractBranch = (id: string) => {
-            if (id.startsWith('b1-')) return 1;
-            if (id.startsWith('b2-')) return 2;
-            return 3;
+          const getStudioRealNumber = (id: string) => {
+            if (id.startsWith('b1-s')) {
+              return parseInt(id.replace('b1-s', ''), 10) || 0;
+            }
+            if (id.startsWith('b2-s')) {
+              return (parseInt(id.replace('b2-s', ''), 10) || 0) + 12;
+            }
+            return 999;
           };
 
           const sortedStudios = [...displayedStudios].sort((a, b) => {
-            const catA = getStudioTypeCategory(a.id);
-            const catB = getStudioTypeCategory(b.id);
-            
-            const orderA = categoryOrder[catA] || 99;
-            const orderB = categoryOrder[catB] || 99;
-            if (orderA !== orderB) return orderA - orderB;
-            
-            const branchA = extractBranch(a.id);
-            const branchB = extractBranch(b.id);
-            if (branchA !== branchB) return branchA - branchB;
-
-            return extractNumber(a.id) - extractNumber(b.id);
+            return getStudioRealNumber(a.id) - getStudioRealNumber(b.id);
           });
 
           return (
