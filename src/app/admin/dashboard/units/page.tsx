@@ -33,10 +33,38 @@ export default function UnitsManagement() {
     refreshData();
   }, [refreshData]);
 
-  const filteredUnits = allUnits.filter(u => {
-    if (activeTab === 'studios') return u.type === 'studio';
-    return u.type === 'apartment';
-  });
+  const getStudioRealNumber = (id: string) => {
+    if (id.startsWith('b1-s')) {
+      return parseInt(id.replace('b1-s', ''), 10) || 0;
+    }
+    if (id.startsWith('b2-s')) {
+      return (parseInt(id.replace('b2-s', ''), 10) || 0) + 12;
+    }
+    return 999;
+  };
+
+  const getApartmentRealNumber = (id: string) => {
+    if (id.startsWith('apt-')) {
+      return parseInt(id.replace('apt-', ''), 10) || 0;
+    }
+    if (id.startsWith('p-s')) {
+      return parseInt(id.replace('p-s', ''), 10) || 0;
+    }
+    return 999;
+  };
+
+  const filteredUnits = allUnits
+    .filter(u => {
+      if (activeTab === 'studios') return u.type === 'studio';
+      return u.type === 'apartment';
+    })
+    .sort((a, b) => {
+      if (activeTab === 'studios') {
+        return getStudioRealNumber(a.id) - getStudioRealNumber(b.id);
+      } else {
+        return getApartmentRealNumber(a.id) - getApartmentRealNumber(b.id);
+      }
+    });
 
   const toggleStatus = async (id: string, currentStatus: string) => {
     setIsLoading(true);
