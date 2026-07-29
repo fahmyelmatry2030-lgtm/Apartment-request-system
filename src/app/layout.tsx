@@ -6,6 +6,7 @@ import { translations as fallbackTranslations } from "@/lib/translations";
 import { getDbTranslations } from "@/lib/actions/db";
 import ScrollProgress from "@/components/ScrollProgress";
 import WhatsAppWidget from "@/components/WhatsAppWidget";
+import MobileBottomNav from "@/components/MobileBottomNav";
 
 export const dynamic = 'force-dynamic';
 
@@ -127,6 +128,7 @@ export default async function RootLayout({
           <ScrollProgress />
           {children}
           <WhatsAppWidget />
+          <MobileBottomNav />
         </LanguageProvider>
         <script
           dangerouslySetInnerHTML={{
