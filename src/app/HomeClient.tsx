@@ -41,10 +41,10 @@ export default function HomeClient() {
       <div className="absolute bottom-0 right-0 w-[250px] md:w-[600px] h-[250px] md:h-[600px] bg-[#D5C5B3]/20 rounded-full blur-[50px] md:blur-[100px] -z-10 pointer-events-none" />
 
       {/* Navigation */}
-      <nav className="w-full px-4 md:px-8 py-5 md:py-8 flex justify-between items-center max-w-screen-2xl mx-auto z-50 sticky top-0 bg-white/85 backdrop-blur-xl border-b border-[#EAE4D9] shadow-sm">
+      <nav className="w-full px-4 md:px-8 py-3 md:py-6 flex justify-between items-center max-w-screen-2xl mx-auto z-50 sticky top-0 bg-white/85 backdrop-blur-xl border-b border-[#EAE4D9] shadow-sm">
         {/* Logo */}
         <Link href="/" className="shrink-0 flex items-center">
-          <Logo size={isRTL ? 60 : 65} mdSize={90} imageClassName="max-h-[100px]" transparent />
+          <Logo size={45} mdSize={75} imageClassName="max-h-[70px]" transparent />
         </Link>
 
         {/* Center: Desktop Nav & Lang Switcher */}
@@ -57,7 +57,7 @@ export default function HomeClient() {
             <Link href="/social" className="hover:text-[#C1A68D] transition-colors">روابطنا</Link>
           </div>
           <div className="w-px h-6 bg-[#EAE4D9] hidden md:block" />
-          <div className="scale-110 md:scale-125 origin-center">
+          <div className="flex items-center">
              <LanguageSwitcher />
           </div>
         </div>
@@ -67,15 +67,6 @@ export default function HomeClient() {
           {isRTL ? 'احجز\nالآن' : 'BOOK\nNOW'}
         </Link>
       </nav>
-
-      {/* Mobile sub-navigation bar for quick links */}
-      <div className="md:hidden flex items-center justify-start gap-4 px-4 py-3 border-b border-[#EAE4D9]/50 overflow-x-auto scrollbar-hide bg-white/70 backdrop-blur-md sticky top-[68px] z-40 w-full text-xs font-black text-[#5C554B]" dir={isRTL ? 'rtl' : 'ltr'}>
-        <Link href="/mazar/units" className="hover:text-[#C1A68D] whitespace-nowrap bg-[#C1A68D]/10 text-[#C1A68D] px-3.5 py-1.5 rounded-full">{t.common.ourUnits}</Link>
-        <Link href="/mazar/about" className="hover:text-[#C1A68D] whitespace-nowrap px-2 py-1.5">{t.common.about}</Link>
-        <Link href="/mazar/how-to-book" className="hover:text-[#C1A68D] whitespace-nowrap px-2 py-1.5">{t.common.howToBook}</Link>
-        <Link href="/mazar/rules" className="hover:text-[#C1A68D] whitespace-nowrap px-2 py-1.5">{t.common.rules}</Link>
-        <Link href="/social" className="hover:text-[#C1A68D] whitespace-nowrap px-2 py-1.5">{isRTL ? 'روابطنا' : 'Social'}</Link>
-      </div>
 
       {/* Hero Section */}
       <section className="pt-12 md:pt-20 pb-16 px-6 flex flex-col items-center text-center relative z-10 w-full max-w-screen-2xl mx-auto">

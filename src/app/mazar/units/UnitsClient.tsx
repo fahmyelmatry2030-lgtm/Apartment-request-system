@@ -103,9 +103,9 @@ export default function UnitsListingPage() {
     <main className="min-h-screen bg-[#FDFBF7] text-[#2A2723] font-sans pb-24 selection:bg-[#C1A68D] selection:text-white" dir={isRTL ? 'rtl' : 'ltr'}>
       
       {/* Navigation */}
-      <nav className="w-full px-4 md:px-8 py-4 md:py-5 flex justify-between items-center max-w-screen-2xl mx-auto z-50 sticky top-0 bg-white/70 backdrop-blur-xl border-b border-[#EAE4D9]">
+      <nav className="w-full px-4 md:px-8 py-3 md:py-5 flex justify-between items-center max-w-screen-2xl mx-auto z-50 sticky top-0 bg-white/70 backdrop-blur-xl border-b border-[#EAE4D9]">
          <Link href="/" className="shrink-0">
-            <Logo size={isRTL ? 42 : 46} mdSize={54} />
+            <Logo size={45} mdSize={54} />
          </Link>
 
          <div className="hidden md:flex gap-10 text-sm font-bold text-[#5C554B]">
@@ -122,15 +122,6 @@ export default function UnitsListingPage() {
             </Link>
          </div>
       </nav>
-
-      {/* Mobile sub-navigation bar for quick links */}
-      <div className="md:hidden flex items-center justify-start gap-4 px-4 py-3 border-b border-[#EAE4D9]/50 overflow-x-auto scrollbar-hide bg-white/70 backdrop-blur-md sticky top-[58px] z-40 w-full text-xs font-black text-[#5C554B]">
-        <Link href="/mazar/units" className="hover:text-[#C1A68D] whitespace-nowrap bg-[#C1A68D]/10 text-[#C1A68D] px-3.5 py-1.5 rounded-full">{t.common.ourUnits}</Link>
-        <Link href="/mazar/about" className="hover:text-[#C1A68D] whitespace-nowrap px-2 py-1.5">{t.common.about}</Link>
-        <Link href="/mazar/how-to-book" className="hover:text-[#C1A68D] whitespace-nowrap px-2 py-1.5">{t.common.howToBook}</Link>
-        <Link href="/mazar/rules" className="hover:text-[#C1A68D] whitespace-nowrap px-2 py-1.5">{t.common.rules}</Link>
-        <Link href="/social" className="hover:text-[#C1A68D] whitespace-nowrap px-2 py-1.5">{isRTL ? 'روابطنا' : 'Social'}</Link>
-      </div>
 
       <div className="max-w-screen-2xl mx-auto px-6 py-12 md:py-20 space-y-16">
         
