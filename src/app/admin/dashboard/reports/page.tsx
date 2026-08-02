@@ -1349,7 +1349,7 @@ function ReportsContent() {
               <div>
                 <div className="text-[9px] font-black text-[#C1A68D] uppercase tracking-[0.25em] px-3 mb-2">الشقق الفندقية</div>
                 <div className="flex flex-wrap gap-1.5">
-                  {units.filter(u => u && u.id && u.type === 'apartment').map(u => (
+                  {units.filter(u => u && u.id && u.type === 'apartment' && !String(u.id).startsWith('p-s')).map(u => (
                     <button key={u.id} onClick={() => setSelectedUnit(u.id)}
                       className={`px-3 py-2 rounded-xl text-[10px] font-black transition-all ${selectedUnit === u.id
                           ? 'bg-[#C1A68D] text-white shadow-lg shadow-[#C1A68D]/20'
