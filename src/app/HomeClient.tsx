@@ -52,6 +52,7 @@ const EXTERNAL_APARTMENTS = [
     title: 'شقة مزار الخارجية 1',
     address: 'مدينة نصر، القاهرة',
     mapsUrl: 'https://maps.google.com/?q=Nasr+City+Cairo',
+    price: 'يبدأ من 1500 ج.م / الليلة',
     images: [
       '/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.33_361d04a7.jpg',
       '/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.35_8ae4078a.jpg',
@@ -65,6 +66,7 @@ const EXTERNAL_APARTMENTS = [
     title: 'شقة مزار الخارجية 2',
     address: 'مدينة نصر، القاهرة',
     mapsUrl: 'https://maps.google.com/?q=Nasr+City+Cairo',
+    price: 'يبدأ من 1800 ج.م / الليلة',
     images: [
       '/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.37_46a06ccb.jpg',
       '/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.38_e7c5836c.jpg',
@@ -78,6 +80,7 @@ const EXTERNAL_APARTMENTS = [
     title: 'شقة مزار الخارجية 3',
     address: 'مدينة نصر، القاهرة',
     mapsUrl: 'https://maps.google.com/?q=Nasr+City+Cairo',
+    price: 'يبدأ من 2000 ج.م / الليلة',
     images: [
       '/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.40_789a6fdb.jpg',
       '/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.40_ebec746d.jpg',
@@ -139,12 +142,18 @@ function ExternalApartmentCard({ apt }: { apt: typeof EXTERNAL_APARTMENTS[0] }) 
           href={apt.mapsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 text-sm font-bold text-[#7A7061] hover:text-[#C1A68D] transition-colors"
+          className="flex items-center gap-2 text-sm font-bold text-[#7A7061] hover:text-[#C1A68D] transition-colors mb-2"
         >
           <span>📍</span>
           <span>{apt.address}</span>
           <span className="text-[10px] underline">فتح الخريطة</span>
         </a>
+
+        {/* Price Tag */}
+        <div className="flex items-center gap-2 bg-green-50 text-green-700 font-bold px-4 py-2 rounded-xl text-sm border border-green-100">
+          <span>💰</span>
+          <span>{apt.price}</span>
+        </div>
 
         <Link
           href={apt.browseHref}
@@ -307,18 +316,23 @@ export default function HomeClient() {
         {/* Branch 1 Studios Grid */}
         <div className="space-y-4">
           <h3 className="text-xl font-black text-[#2A2723]">استوديوهات الفرع الأول</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {Array.from({ length: 12 }, (_, i) => i + 1).map((num) => (
               <Link
                 key={num}
                 href={`/mazar/units/studios/b1-s${num}`}
-                className="group flex flex-col items-center bg-white border border-[#EAE4D9] hover:border-[#C1A68D] rounded-2xl p-4 text-center transition-all hover:shadow-lg active:scale-95"
+                className="group flex items-center justify-between bg-white border border-[#EAE4D9] hover:border-[#C1A68D] rounded-2xl p-5 transition-all hover:shadow-lg active:scale-95"
               >
-                <div className="w-10 h-10 rounded-full bg-[#C1A68D]/10 flex items-center justify-center mb-2 group-hover:bg-[#C1A68D]/20 transition-colors">
-                  <span className="text-sm font-black text-[#C1A68D]">{num}</span>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-[#C1A68D]/10 flex items-center justify-center group-hover:bg-[#C1A68D]/20 transition-colors">
+                    <span className="text-lg font-black text-[#C1A68D]">{num}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-black text-[#2A2723]">استوديو {num}</span>
+                    <span className="text-[10px] font-bold text-[#7A7061]">الفرع الأول</span>
+                  </div>
                 </div>
-                <span className="text-[10px] font-black text-[#2A2723]">استوديو {num}</span>
-                <span className="mt-1 text-[9px] font-bold text-[#7A7061]">الفرع الأول</span>
+                <span className="text-[#C1A68D] group-hover:-translate-x-1 transition-transform">←</span>
               </Link>
             ))}
           </div>
@@ -345,27 +359,38 @@ export default function HomeClient() {
         {/* Branch 2 Studios Grid */}
         <div className="space-y-4 mt-8">
           <h3 className="text-xl font-black text-[#2A2723]">استوديوهات الفرع الثاني</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            {Array.from({ length: 12 }, (_, i) => i + 1).map((num) => (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {Array.from({ length: 12 }, (_, i) => i + 13).map((num) => (
               <Link
                 key={`b2-${num}`}
                 href={`/mazar/units/studios/b2-s${num}`}
-                className="group flex flex-col items-center bg-white border border-[#EAE4D9] hover:border-[#8B7355] rounded-2xl p-4 text-center transition-all hover:shadow-lg active:scale-95"
+                className="group flex items-center justify-between bg-white border border-[#EAE4D9] hover:border-[#8B7355] rounded-2xl p-5 transition-all hover:shadow-lg active:scale-95"
               >
-                <div className="w-10 h-10 rounded-full bg-[#8B7355]/10 flex items-center justify-center mb-2 group-hover:bg-[#8B7355]/20 transition-colors">
-                  <span className="text-sm font-black text-[#8B7355]">{num}</span>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-[#8B7355]/10 flex items-center justify-center group-hover:bg-[#8B7355]/20 transition-colors">
+                    <span className="text-lg font-black text-[#8B7355]">{num}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-black text-[#2A2723]">استوديو {num}</span>
+                    <span className="text-[10px] font-bold text-[#7A7061]">الفرع الثاني</span>
+                  </div>
                 </div>
-                <span className="text-[10px] font-black text-[#2A2723]">استوديو {num}</span>
-                <span className="mt-1 text-[9px] font-bold text-[#7A7061]">الفرع الثاني</span>
+                <span className="text-[#8B7355] group-hover:-translate-x-1 transition-transform">←</span>
               </Link>
             ))}
           </div>
         </div>
 
         {/* Branch 2 Rooms */}
-        <div className="space-y-4 mt-12">
-          <h3 className="text-xl font-black text-[#2A2723]">شقق الغرفتين — الفرع الثاني</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="space-y-4 mt-12 bg-[#2A2723] p-6 md:p-8 rounded-3xl border border-[#443F38]">
+          <div className="flex items-center gap-3 mb-6">
+            <span className="text-3xl">✨</span>
+            <div>
+              <h3 className="text-xl font-black text-white">شقق الغرفتين — الفرع الثاني</h3>
+              <p className="text-[#A68D74] text-xs font-bold mt-1">شقق فندقية عائلية متميزة ومستقلة تماماً</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               { id: 'p-s25', label: 'شقة 25 — 3 أسرة',  href: '/mazar/units/studios/p-s25' },
               { id: 'p-s26', label: 'شقة 26 — 2 سرير',  href: '/mazar/units/studios/p-s26' },
@@ -377,16 +402,18 @@ export default function HomeClient() {
               <Link
                 key={room.id}
                 href={room.href}
-                className="group flex items-center gap-4 bg-white border border-[#EAE4D9] hover:border-[#C1A68D] rounded-2xl p-5 transition-all hover:shadow-lg active:scale-95"
+                className="group flex items-center justify-between gap-4 bg-[#39342E] hover:bg-[#4A443D] border border-[#504A43] hover:border-[#C1A68D] rounded-2xl p-5 transition-all hover:shadow-lg active:scale-95"
               >
-                <div className="w-12 h-12 rounded-2xl bg-[#EAE4D9] flex items-center justify-center shrink-0 group-hover:bg-[#C1A68D]/20 transition-colors">
-                  <span className="text-2xl">🛏️</span>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-[#C1A68D]/20 transition-colors">
+                    <span className="text-2xl">🛏️</span>
+                  </div>
+                  <div>
+                    <span className="block text-sm font-black text-white group-hover:text-[#C1A68D] transition-colors">{room.label}</span>
+                    <span className="text-[10px] font-bold text-[#A68D74]">شقة غرفتين — مزار 2</span>
+                  </div>
                 </div>
-                <div>
-                  <span className="block text-sm font-black text-[#2A2723] group-hover:text-[#C1A68D] transition-colors">{room.label}</span>
-                  <span className="text-[10px] font-bold text-[#7A7061]">شقة غرفتين — الفرع الثاني</span>
-                </div>
-                <span className="mr-auto text-[#C1A68D] group-hover:-translate-x-1 transition-transform">←</span>
+                <span className="text-[#C1A68D] group-hover:-translate-x-1 transition-transform">←</span>
               </Link>
             ))}
           </div>

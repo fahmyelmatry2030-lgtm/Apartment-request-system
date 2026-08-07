@@ -132,14 +132,14 @@ export default function BranchCard({
           href={mapsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-3 bg-[#F7F5F0] hover:bg-[#EAE4D9] border border-[#EAE4D9] rounded-2xl px-5 py-3 transition-all group/maps"
+          className="flex items-center justify-center gap-3 bg-[#C1A68D] hover:bg-[#A68D74] text-white rounded-2xl px-5 py-4 transition-all group/maps shadow-md"
         >
           <span className="text-xl">📍</span>
-          <div className="flex-1">
-            <div className="text-xs font-black text-[#7A7061] uppercase tracking-wider mb-0.5">العنوان</div>
-            <div className="text-sm font-bold text-[#2A2723] group-hover/maps:text-[#C1A68D] transition-colors">{address}</div>
+          <div className="flex-1 text-right">
+            <div className="text-sm font-black tracking-wider mb-0.5">فتح اللوكيشن على الخريطة</div>
+            <div className="text-xs font-bold opacity-90">{address}</div>
           </div>
-          <span className="text-[#C1A68D] text-lg group-hover/maps:translate-x-1 transition-transform">←</span>
+          <span className="text-white text-lg group-hover/maps:-translate-x-1 transition-transform">←</span>
         </a>
 
         {/* CTA Button */}
