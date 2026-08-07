@@ -349,7 +349,7 @@ export default function HomeClient() {
           mapsUrl="https://maps.google.com/?q=Mazar+Nasr+City+Cairo+Branch+2"
           heroImage={BRANCH2_IMAGES[0]}
           galleryImages={BRANCH2_IMAGES}
-          videoSrc="/images/Mazar%202%20Pictures/WhatsApp%20Video%202026-02-19%20at%209.16.14%20AM.mp4"
+          videoSrc="/images/Mazar%202%20Pictures/mazar2-video.mp4"
           unitCount={12}
           unitLabel="وحدة"
           browseHref="/"
