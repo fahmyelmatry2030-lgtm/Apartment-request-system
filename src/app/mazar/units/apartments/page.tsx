@@ -69,8 +69,8 @@ export default function ApartmentsListingPage() {
         </Link>
         <div className="flex items-center gap-6">
           <LanguageSwitcher />
-          <Link href="/mazar/units" className="text-xs font-bold text-[#7A7061] hover:text-[#2A2723]">
-            {t.unitsPage.backToCategories}
+          <Link href="/" className="text-xs font-bold text-[#7A7061] hover:text-[#2A2723]">
+            {t.common.home}
           </Link>
         </div>
       </nav>
@@ -81,10 +81,10 @@ export default function ApartmentsListingPage() {
         <header className="mb-16">
            <div className="mb-6">
               <button 
-                onClick={() => router.push('/mazar/units')}
+                onClick={() => router.push('/')}
                 className={`text-sm font-bold text-[#C1A68D] hover:opacity-80 flex items-center gap-2`}
               >
-                 {isRTL ? `← ${t.unitsPage.backToCategories}` : `← ${t.unitsPage.backToCategories}`}
+                 {isRTL ? `← ${t.common.home}` : `← ${t.common.home}`}
               </button>
            </div>
            <h1 className="text-5xl md:text-6xl font-black text-[#2A2723] mb-4 leading-tight">

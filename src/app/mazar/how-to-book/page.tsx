@@ -23,7 +23,7 @@ export default function HowToBookPage() {
         </Link>
         
         <div className="hidden md:flex gap-10 text-sm font-bold text-[#5C554B]">
-          <Link href="/mazar/units" className="hover:text-[#2A2723] transition-colors">{t.common.ourUnits}</Link>
+          <Link href="/" className="hover:text-[#2A2723] transition-colors">{t.common.home}</Link>
           <Link href="/mazar/about" className="hover:text-[#2A2723] transition-colors">{t.common.about}</Link>
           <Link href="/mazar/rules" className="hover:text-[#2A2723] transition-colors">{t.common.rules}</Link>
           <Link href="/mazar/how-to-book" className="text-[#C1A68D] transition-colors">{t.common.howToBook}</Link>

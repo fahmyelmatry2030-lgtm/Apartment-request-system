@@ -10,7 +10,7 @@
       "about": "عن المكان",
       "rules": "قوانين المكان",
       "appName": "مزار",
-      "bookNow": "احجز الآن",
+      "bookNow": "ابدأ الحجز الان",
       "explore": "استكشف الوحدات ",
       "features": {
         "quiet": "هدوء تام",
@@ -55,7 +55,8 @@
         "startChat": "بدء المحادثة",
         "defaultMsg": "مرحباً مزار، أود الاستفسار عن حجز استوديو."
       },
-      "ourUnits": "الوحدات"
+      "ourUnits": "الوحدات",
+      "home": "الرئيسية"
     },
     "design4": {
       "cta": "بدء الحجز الان",
@@ -145,7 +146,7 @@
       "apartments": "الشقق الفاخرة",
       "backToList": "العودة لقائمة الوحدات",
       "viewDetails": "تفاصيل الوحدة",
-      "bookThisUnit": "احجز الآن",
+      "bookThisUnit": "ابدأ الحجز الان",
       "unitFeatures": "مميزات الوحدة",
       "availableUnits": "وحدات متاحة",
       "backToCategories": "العودة للتصنيفات"
@@ -256,7 +257,8 @@
         "startChat": "Start Chat",
         "defaultMsg": "Hi Mazar, I would like to inquire about booking a studio."
       },
-      "ourUnits": "Units"
+      "ourUnits": "Units",
+      "home": "Home"
     },
     "design4": {
       "cta": "INITIALIZE BOOKING",

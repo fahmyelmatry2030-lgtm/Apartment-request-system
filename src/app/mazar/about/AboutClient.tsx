@@ -35,7 +35,7 @@ export default function AboutClient() {
             </Link>
 
             <div className="hidden md:flex gap-10 text-sm font-bold text-[#5C554B]">
-               <Link href="/mazar/units" className="hover:text-[#2A2723] transition-colors">{t.common.ourUnits}</Link>
+               <Link href="/" className="hover:text-[#2A2723] transition-colors">{t.common.home}</Link>
                <Link href="/mazar/about" className="text-[#C1A68D] transition-colors">{t.common.about}</Link>
                <Link href="/mazar/rules" className="hover:text-[#2A2723] transition-colors">{t.common.rules}</Link>
                <Link href="/mazar/how-to-book" className="hover:text-[#2A2723] transition-colors">{t.common.howToBook}</Link>
@@ -78,12 +78,34 @@ export default function AboutClient() {
                {/* Column 1: Text Content */}
                <div className={`${isRTL ? 'lg:order-2 text-right' : 'lg:order-1 text-left'} space-y-6 md:space-y-8`}>
                   <div className={`w-12 md:w-16 h-1.5 bg-[#C1A68D] rounded-full ${isRTL ? 'ml-auto' : ''}`} />
-                  <p className="text-2xl md:text-5xl text-[#2A2723] leading-tight font-black">
-                     {t.aboutPage.description1}
-                  </p>
-                  <p className="text-lg md:text-2xl text-[#5C554B] leading-relaxed font-bold opacity-70 italic">
-                     بنسعى في مزار لتقديم تجربة إقامة حقيقية تجمع بين الفخامة والخصوصية، حيث نولي اهتماماً فائقاً لكل التفاصيل لضمان راحتكم وسعادتكم طوال فترة إقامتكم.
-                  </p>
+                  {isRTL ? (
+                     <div className="space-y-6">
+                        <p className="text-2xl md:text-4xl text-[#2A2723] leading-tight font-black">
+                           مزار هو مفهوم جديد للإقامة الفندقية في مدينة نصر، يجمع بين راحة المنزل وجودة خدمات الفنادق في تجربة إقامة عصرية تناسب الزوار من داخل مصر وخارجها.
+                        </p>
+                        <p className="text-lg md:text-xl text-[#5C554B] leading-relaxed font-bold opacity-80">
+                           نوفر استوديوهات وشققًا فندقية مجهزة بالكامل، بتصميم حديث، ومستوى عالٍ من النظافة، مع فريق دعم واستقبال متاح على مدار الساعة لضمان تجربة مريحة من لحظة الحجز وحتى تسجيل المغادرة.
+                        </p>
+                        <p className="text-lg md:text-xl text-[#5C554B] leading-relaxed font-bold opacity-80">
+                           في مزار، نهتم بكل التفاصيل التي تجعل إقامتك أكثر راحة، بدايةً من الإنترنت فائق السرعة والمطابخ المجهزة، مرورًا بخدمات التنظيف الدورية، وصولًا إلى أنظمة الدخول الذكية التي توفر أعلى مستويات الأمان والخصوصية.
+                        </p>
+                        <p className="text-lg md:text-xl text-[#5C554B] leading-relaxed font-bold opacity-80">
+                           نؤمن أن الإقامة المميزة لا تعتمد فقط على المكان، بل على جودة الخدمة وسهولة التعامل والاهتمام الحقيقي براحة الضيف. لذلك نسعى دائمًا لتقديم تجربة احترافية تليق بثقة عملائنا، سواء كانت زيارتهم للعلاج، أو العمل، أو الدراسة، أو السياحة.
+                        </p>
+                        <p className="text-xl md:text-2xl text-[#C1A68D] leading-relaxed font-black mt-8 italic">
+                           مزار... حيث تلتقي الراحة، والخصوصية، والخدمة الفندقية في مكان واحد.
+                        </p>
+                     </div>
+                  ) : (
+                     <>
+                        <p className="text-2xl md:text-5xl text-[#2A2723] leading-tight font-black">
+                           {t.aboutPage.description1}
+                        </p>
+                        <p className="text-lg md:text-2xl text-[#5C554B] leading-relaxed font-bold opacity-70 italic">
+                           {t.aboutPage.description2 || 'We strive to provide an authentic stay experience...'}
+                        </p>
+                     </>
+                  )}
                </div>
 
                {/* Column 2: Featured Image Box */}

@@ -112,10 +112,10 @@ const UnitCard: React.FC<UnitCardProps> = ({ unit, checkIn, checkOut }) => {
         </div>
 
         <Link 
-          href={`/mazar/units/${unit?.id}${checkIn && checkOut ? `?checkIn=${checkIn}&checkOut=${checkOut}` : ''}`}
+          href={`/mazar/book?unit=${unit?.id}${checkIn && checkOut ? `&checkIn=${checkIn}&checkOut=${checkOut}` : ''}`}
           className="mt-auto w-full bg-[#2A2723] text-white text-sm font-black py-4 rounded-2xl text-center hover:bg-black transition-all shadow-xl shadow-black/5 flex items-center justify-center gap-2 group/btn"
         >
-          {t?.unitsPage?.viewDetails || 'Details'}
+          {isRTL ? 'ابدأ الحجز الان' : 'Book Now'}
           <span className={`transition-transform duration-300 ${isRTL ? 'group-hover:-translate-x-1' : 'group-hover:translate-x-1'}`}>
             {isRTL ? '←' : '→'}
           </span>

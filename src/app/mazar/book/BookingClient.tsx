@@ -70,7 +70,7 @@ export default function BookingPage() {
         setSelectedUnitId(unitParam);
         setShowUnitSelector(false);
         try {
-          const res = await fetch('/api/bookings');
+          const res = await fetch('/api/bookings', { cache: 'no-store' });
           if (res.ok) {
             const allBookings = await res.json();
             const unitBooked = allBookings
@@ -101,7 +101,7 @@ export default function BookingPage() {
           if (!res.ok) throw new Error('Failed to fetch units');
           const allUnits = await res.json();
 
-          const bookingsRes = await fetch('/api/bookings');
+          const bookingsRes = await fetch('/api/bookings', { cache: 'no-store' });
           const allBookings = bookingsRes.ok ? await bookingsRes.json() : [];
 
           const activeUnitsByStatus = allUnits.filter((u: any) => u.status === 'متاح' || !u.status);
@@ -156,7 +156,7 @@ export default function BookingPage() {
      if (selectedUnitId) {
         const fetchBooked = async () => {
            try {
-             const res = await fetch('/api/bookings');
+             const res = await fetch('/api/bookings', { cache: 'no-store' });
              if (!res.ok) return;
              const allBookings = await res.json();
              const unitBooked = allBookings
@@ -200,7 +200,7 @@ export default function BookingPage() {
       const allUnits = await res.json();
 
       // Fetch bookings to check for overlaps
-      const bookingsRes = await fetch('/api/bookings');
+      const bookingsRes = await fetch('/api/bookings', { cache: 'no-store' });
       const allBookings = bookingsRes.ok ? await bookingsRes.json() : [];
 
       const activeUnitsByStatus = allUnits.filter((u: any) => u.status === 'متاح' || !u.status);
@@ -375,7 +375,7 @@ export default function BookingPage() {
         </Link>
         
         <div className="hidden md:flex gap-10 text-sm font-bold text-[#5C554B]">
-          <Link href="/mazar/units" className="hover:text-[#2A2723] transition-colors">{t.common.ourUnits}</Link>
+          <Link href="/" className="hover:text-[#2A2723] transition-colors">{t.common.home}</Link>
           <Link href="/mazar/about" className="hover:text-[#2A2723] transition-colors">{t.common.about}</Link>
           <Link href="/mazar/rules" className="hover:text-[#2A2723] transition-colors">{t.common.rules}</Link>
           <Link href="/mazar/how-to-book" className="hover:text-[#2A2723] transition-colors">{t.common.howToBook}</Link>
