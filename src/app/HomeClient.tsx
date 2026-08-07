@@ -362,6 +362,51 @@ export default function HomeClient() {
           </div>
         </div>
 
+        {/* Branch 2 Rooms */}
+        <div className="space-y-4 mt-12">
+          <h3 className="text-xl font-black text-[#2A2723]">شقق الغرفتين — الفرع الثاني</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {[
+              { id: 'p-s25', label: 'شقة 25 — 3 أسرة',  href: '/mazar/units/studios/p-s25' },
+              { id: 'p-s26', label: 'شقة 26 — 2 سرير',  href: '/mazar/units/studios/p-s26' },
+              { id: 'p-s27', label: 'شقة 27 — 2 سرير',  href: '/mazar/units/studios/p-s27' },
+              { id: 'p-s28', label: 'شقة 28 — 3 أسرة',  href: '/mazar/units/studios/p-s28' },
+              { id: 'p-s29', label: 'شقة 29 — 3 أسرة',  href: '/mazar/units/studios/p-s29' },
+              { id: 'p-s30', label: 'شقة 30 — 3 أسرة',  href: '/mazar/units/studios/p-s30' },
+            ].map((room) => (
+              <Link
+                key={room.id}
+                href={room.href}
+                className="group flex items-center gap-4 bg-white border border-[#EAE4D9] hover:border-[#C1A68D] rounded-2xl p-5 transition-all hover:shadow-lg active:scale-95"
+              >
+                <div className="w-12 h-12 rounded-2xl bg-[#EAE4D9] flex items-center justify-center shrink-0 group-hover:bg-[#C1A68D]/20 transition-colors">
+                  <span className="text-2xl">🛏️</span>
+                </div>
+                <div>
+                  <span className="block text-sm font-black text-[#2A2723] group-hover:text-[#C1A68D] transition-colors">{room.label}</span>
+                  <span className="text-[10px] font-bold text-[#7A7061]">شقة غرفتين — الفرع الثاني</span>
+                </div>
+                <span className="mr-auto text-[#C1A68D] group-hover:-translate-x-1 transition-transform">←</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* ─── شقق مزار الخارجية ─── */}
+        <div className="mt-16">
+          <SectionDivider label="🏡 شقق مزار الخارجية" />
+          <div className="space-y-4 mt-8">
+            <p className="text-[#7A7061] font-bold text-sm text-right">
+              3 شقق خارجية فاخرة ومجهزة بالكامل — كل شقة بصور وفيديو وموقع على الخريطة
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {EXTERNAL_APARTMENTS.map((apt) => (
+                <ExternalApartmentCard key={apt.id} apt={apt} />
+              ))}
+            </div>
+          </div>
+        </div>
+
       </section>
 
       {/* ══════════════════════════════════════════════════════════════
