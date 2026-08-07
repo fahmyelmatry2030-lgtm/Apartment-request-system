@@ -58,8 +58,8 @@ const EXTERNAL_APARTMENTS = [
       '/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.35_8ae4078a.jpg',
       '/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.36_a209e979.jpg',
     ],
-    browseHref: '/mazar/units/apartments',
-    unitId: 'p-s25',
+    browseHref: '/mazar/units/apt-1',
+    unitId: 'apt-1',
   },
   {
     id: 'ext-2',
@@ -72,8 +72,8 @@ const EXTERNAL_APARTMENTS = [
       '/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.38_e7c5836c.jpg',
       '/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.39_9b4da674.jpg',
     ],
-    browseHref: '/mazar/units/apartments',
-    unitId: 'p-s26',
+    browseHref: '/mazar/units/apt-2',
+    unitId: 'apt-2',
   },
   {
     id: 'ext-3',
@@ -86,8 +86,8 @@ const EXTERNAL_APARTMENTS = [
       '/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.40_ebec746d.jpg',
       '/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.40_5586b607.jpg',
     ],
-    browseHref: '/mazar/units/apartments',
-    unitId: 'p-s27',
+    browseHref: '/mazar/units/apt-3',
+    unitId: 'apt-3',
   },
 ];
 
