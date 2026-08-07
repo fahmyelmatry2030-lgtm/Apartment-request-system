@@ -336,20 +336,20 @@ export default function HomeClient() {
           heroImage={BRANCH2_IMAGES[0]}
           galleryImages={BRANCH2_IMAGES}
           videoSrc="/images/Mazar%202%20Pictures/WhatsApp%20Video%202026-02-19%20at%209.16.14%20AM.mp4"
-          unitCount={14}
+          unitCount={12}
           unitLabel="وحدة"
           browseHref="/"
           accentColor="#8B7355"
         />
 
         {/* Branch 2 Studios Grid */}
-        <div className="space-y-4">
+        <div className="space-y-4 mt-8">
           <h3 className="text-xl font-black text-[#2A2723]">استوديوهات الفرع الثاني</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            {Array.from({ length: 12 }, (_, i) => i + 13).map((num) => (
+            {Array.from({ length: 12 }, (_, i) => i + 1).map((num) => (
               <Link
-                key={num}
-                href={`/mazar/units/studios/b2-s${num - 12}`}
+                key={`b2-${num}`}
+                href={`/mazar/units/studios/b2-s${num}`}
                 className="group flex flex-col items-center bg-white border border-[#EAE4D9] hover:border-[#8B7355] rounded-2xl p-4 text-center transition-all hover:shadow-lg active:scale-95"
               >
                 <div className="w-10 h-10 rounded-full bg-[#8B7355]/10 flex items-center justify-center mb-2 group-hover:bg-[#8B7355]/20 transition-colors">
@@ -358,51 +358,6 @@ export default function HomeClient() {
                 <span className="text-[10px] font-black text-[#2A2723]">استوديو {num}</span>
                 <span className="mt-1 text-[9px] font-bold text-[#7A7061]">الفرع الثاني</span>
               </Link>
-            ))}
-          </div>
-        </div>
-
-
-        {/* Branch 2 Rooms */}
-        <div className="space-y-4">
-          <h3 className="text-xl font-black text-[#2A2723]">شقق الغرفتين — الفرع الثاني</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {[
-              { id: 'p-s25', label: 'شقة 25 — 3 أسرة',  href: '/mazar/units/studios/p-s25' },
-              { id: 'p-s26', label: 'شقة 26 — 2 سرير',  href: '/mazar/units/studios/p-s26' },
-              { id: 'p-s27', label: 'شقة 27 — 2 سرير',  href: '/mazar/units/studios/p-s27' },
-              { id: 'p-s28', label: 'شقة 28 — 3 أسرة',  href: '/mazar/units/studios/p-s28' },
-              { id: 'p-s29', label: 'شقة 29 — 3 أسرة',  href: '/mazar/units/studios/p-s29' },
-              { id: 'p-s30', label: 'شقة 30 — 3 أسرة',  href: '/mazar/units/studios/p-s30' },
-            ].map((room) => (
-              <Link
-                key={room.id}
-                href={room.href}
-                className="group flex items-center gap-4 bg-white border border-[#EAE4D9] hover:border-[#C1A68D] rounded-2xl p-5 transition-all hover:shadow-lg active:scale-95"
-              >
-                <div className="w-12 h-12 rounded-2xl bg-[#EAE4D9] flex items-center justify-center shrink-0 group-hover:bg-[#C1A68D]/20 transition-colors">
-                  <span className="text-2xl">🛏️</span>
-                </div>
-                <div>
-                  <span className="block text-sm font-black text-[#2A2723] group-hover:text-[#C1A68D] transition-colors">{room.label}</span>
-                  <span className="text-[10px] font-bold text-[#7A7061]">شقة غرفتين — الفرع الثاني</span>
-                </div>
-                <span className="mr-auto text-[#C1A68D] group-hover:-translate-x-1 transition-transform">←</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* ─── شقق مزار الخارجية ─── */}
-        <SectionDivider label="🏡 شقق مزار الخارجية" />
-
-        <div className="space-y-4">
-          <p className="text-[#7A7061] font-bold text-sm text-right">
-            3 شقق خارجية فاخرة ومجهزة بالكامل — كل شقة بصور وفيديو وموقع على الخريطة
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {EXTERNAL_APARTMENTS.map((apt) => (
-              <ExternalApartmentCard key={apt.id} apt={apt} />
             ))}
           </div>
         </div>
