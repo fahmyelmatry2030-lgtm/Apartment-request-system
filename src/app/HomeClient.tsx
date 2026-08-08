@@ -320,7 +320,7 @@ export default function HomeClient() {
             {Array.from({ length: 12 }, (_, i) => i + 1).map((num) => (
               <Link
                 key={num}
-                href={`/mazar/units/studios/b1-s${num}`}
+                href={`/mazar/units/b1-s${num}`}
                 className="group flex items-center justify-between bg-white border border-[#EAE4D9] hover:border-[#C1A68D] rounded-2xl p-5 transition-all hover:shadow-lg active:scale-95"
               >
                 <div className="flex items-center gap-4">
@@ -363,7 +363,7 @@ export default function HomeClient() {
             {Array.from({ length: 12 }, (_, i) => i + 13).map((num) => (
               <Link
                 key={`b2-${num}`}
-                href={`/mazar/units/studios/b2-s${num}`}
+                href={`/mazar/units/b2-s${num}`}
                 className="group flex items-center justify-between bg-white border border-[#EAE4D9] hover:border-[#8B7355] rounded-2xl p-5 transition-all hover:shadow-lg active:scale-95"
               >
                 <div className="flex items-center gap-4">
@@ -392,12 +392,12 @@ export default function HomeClient() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              { id: 'p-s25', label: 'شقة 25 — 3 أسرة',  href: '/mazar/units/studios/p-s25' },
-              { id: 'p-s26', label: 'شقة 26 — 2 سرير',  href: '/mazar/units/studios/p-s26' },
-              { id: 'p-s27', label: 'شقة 27 — 2 سرير',  href: '/mazar/units/studios/p-s27' },
-              { id: 'p-s28', label: 'شقة 28 — 3 أسرة',  href: '/mazar/units/studios/p-s28' },
-              { id: 'p-s29', label: 'شقة 29 — 3 أسرة',  href: '/mazar/units/studios/p-s29' },
-              { id: 'p-s30', label: 'شقة 30 — 3 أسرة',  href: '/mazar/units/studios/p-s30' },
+              { id: 'p-s25', label: 'شقة 25 — 3 أسرة',  href: '/mazar/units/p-s25' },
+              { id: 'p-s26', label: 'شقة 26 — 2 سرير',  href: '/mazar/units/p-s26' },
+              { id: 'p-s27', label: 'شقة 27 — 2 سرير',  href: '/mazar/units/p-s27' },
+              { id: 'p-s28', label: 'شقة 28 — 3 أسرة',  href: '/mazar/units/p-s28' },
+              { id: 'p-s29', label: 'شقة 29 — 3 أسرة',  href: '/mazar/units/p-s29' },
+              { id: 'p-s30', label: 'شقة 30 — 3 أسرة',  href: '/mazar/units/p-s30' },
             ].map((room) => (
               <Link
                 key={room.id}
@@ -419,9 +419,9 @@ export default function HomeClient() {
           </div>
         </div>
 
-        {/* ─── شقق مزار الخارجية ─── */}
+        {/* ─── الـ 3 شقق ─── */}
         <div className="mt-16">
-          <SectionDivider label="🏡 شقق مزار الخارجية" />
+          <SectionDivider label="🏡 الـ 3 شقق" />
           <div className="space-y-4 mt-8">
             <p className="text-[#7A7061] font-bold text-sm text-right">
               3 شقق خارجية فاخرة ومجهزة بالكامل — كل شقة بصور وفيديو وموقع على الخريطة
