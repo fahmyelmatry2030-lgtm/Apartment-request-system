@@ -10,6 +10,7 @@ import { useLanguage } from '@/lib/LanguageContext';
 import UnitCard from '@/components/UnitCard';
 
 const getStudioTypeCategory = (unitId: string) => {
+  if (unitId.startsWith('p-s') || unitId.startsWith('apt-')) return 'tworoom';
   const mapping: { [key: string]: string } = {
     'b1-s1': 'double', 'b1-s2': 'single', 'b1-s3': 'single', 'b1-s4': 'triple', 'b1-s5': 'double',
     'b1-s6': 'single', 'b1-s7': 'single', 'b1-s8': 'single', 'b1-s9': 'double', 'b1-s10': 'double',
@@ -48,8 +49,10 @@ export default function StudiosPage() {
         const branchParam = urlParams.get('branch');
         
         const filtered = allUnits.filter((u: any) => {
-          if (u.type !== 'studio') return false;
-          if (branchParam && u.branch !== parseInt(branchParam) && !(branchParam === '2' && u.branch === 3)) return false; // Branch 2 page also shows Branch 3 (2-bedroom rooms 25-30)
+          if (branchParam) {
+            const b = parseInt(branchParam);
+            if (u.branch !== b && !(b === 2 && u.branch === 3)) return false;
+          }
           return true;
         });
         
