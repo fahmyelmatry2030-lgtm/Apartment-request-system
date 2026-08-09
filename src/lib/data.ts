@@ -248,7 +248,7 @@ export const units = [
       "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776799815081-WhatsApp-Image-2026-02-19-at-9.16.09-AM.jpeg",
       "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776799902588-1.jpeg"
     ],
-    "video": "/images/video/studio 1.mp4",
+    "video": "/images/video/studio-1.mp4",
     "features": {
       "ar": [
         "سرير كينج",
@@ -388,7 +388,7 @@ export const units = [
       "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776800884832-WhatsApp-Image-2026-04-21-at-9.41.57-PM.jpeg",
       "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776800891868-WhatsApp-2026-04-21-at-9.41.57-PM.jpeg"
     ],
-    "video": "/images/video/studio 4.mp4",
+    "video": "/images/video/studio-4.mp4",
     "features": {
       "ar": [
         "غرفتين",
@@ -698,7 +698,7 @@ export const units = [
       "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776800656581-WhatsApp-Image-2026-04-21-at-9.41.57-PM-.jpeg",
       "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776800676699-WhatsApp-2026-04-21-at-9.41.57-PM.jpeg"
     ],
-    "video": "/images/video/studio 2.mp4",
+    "video": "/images/video/studio-2.mp4",
     "features": {
       "ar": [
         "سرير مزدوج",
@@ -740,7 +740,7 @@ export const units = [
       "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776800222170-20260218_195119.jpg",
       "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776800274163-20260218_195101.jpg"
     ],
-    "video": "/images/video/studio 3.mp4",
+    "video": "/images/video/studio-3.mp4",
     "features": {
       "ar": [
         "٣ أسرة فردية",
@@ -965,7 +965,7 @@ export const units = [
       "/images/mazar1/WhatsApp-Image-2025-12-15-at-12.39.16_ff8ccd08.jpg",
       "/images/mazar1/WhatsApp-Image-2025-12-15-at-12.39.17_3a943570.jpg"
     ],
-    "video": "/images/video/studio 1.mp4",
+    "video": "/images/video/studio-1.mp4",
     "features": {
       "ar": [
         "سرير مزدوج",
