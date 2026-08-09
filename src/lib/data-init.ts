@@ -38,7 +38,7 @@ export const getSystemUnits = async () => {
           
           const merged: any = { ...su };
           Object.keys(dbUnit).forEach(key => {
-            const val = dbUnit[key];
+            const val = (dbUnit as any)[key];
             if (val !== null && val !== undefined && val !== '') {
               if (Array.isArray(val) && val.length === 0) return;
               if (typeof val === 'object' && !Array.isArray(val)) {
