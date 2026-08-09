@@ -32,8 +32,9 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
   const id = params.id as string;
 
   const [unit, setUnit] = useState<any>(initialUnit);
+  const [activeMedia, setActiveMedia] = useState<'image' | 'video'>('image');
   const [activeImage, setActiveImage] = useState<string>(
-    (initialUnit?.images && initialUnit?.images[0]) || initialUnit?.video || '/images/logo-en.jpg'
+    (initialUnit?.images && initialUnit?.images[0]) || '/images/logo-en.jpg'
   );
   const [status, setStatus] = useState<string>(initialUnit?.status || 'متاح');
   const [isLoading, setIsLoading] = useState(!initialUnit);
@@ -64,7 +65,9 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
         const foundUnit: any = allUnits.find((u: any) => u.id === id);
         if (foundUnit) {
           setUnit(foundUnit);
-          setActiveImage((foundUnit.images && foundUnit.images[0]) || foundUnit.video || '/images/logo-en.jpg');
+          if (foundUnit.images && foundUnit.images.length > 0) {
+            setActiveImage(foundUnit.images[0]);
+          }
           setStatus(foundUnit.status || 'متاح');
         }
       } catch { /* silently fail */ }
@@ -235,8 +238,8 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
           <div className="space-y-6">
             {/* Main media */}
             <div className="relative h-[360px] md:h-[480px] rounded-[32px] overflow-hidden shadow-md bg-black flex items-center justify-center group">
-              {activeImage.match(/\.(mp4|mov|webm)$/i) ? (
-                <video src={encodeURI(activeImage)} controls autoPlay muted playsInline className="w-full h-full object-contain" />
+              {activeMedia === 'video' && unit?.video ? (
+                <video src={encodeURI(unit.video)} controls autoPlay muted playsInline className="w-full h-full object-contain" />
               ) : (
                 <Image
                   src={activeImage}
@@ -259,8 +262,8 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
             <div className="grid grid-cols-5 sm:grid-cols-6 gap-2">
               {unit?.video && (
                 <button
-                  onClick={() => setActiveImage(unit.video)}
-                  className={`relative aspect-square rounded-2xl overflow-hidden border-2 bg-black flex items-center justify-center transition-all ${activeImage === unit.video ? 'border-[#C1A68D] scale-95' : 'border-[#EAE4D9] hover:border-[#C1A68D]/50'}`}
+                  onClick={() => setActiveMedia('video')}
+                  className={`relative aspect-square rounded-2xl overflow-hidden border-2 bg-black flex items-center justify-center transition-all ${activeMedia === 'video' ? 'border-[#C1A68D] scale-95 shadow-md' : 'border-[#EAE4D9] hover:border-[#C1A68D]/50'}`}
                 >
                   <span className="text-white text-xl">▶</span>
                 </button>
@@ -268,8 +271,8 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
               {unit?.images?.map((img: string, i: number) => (
                 <button
                   key={i}
-                  onClick={() => setActiveImage(img)}
-                  className={`relative aspect-square rounded-2xl overflow-hidden border-2 transition-all ${activeImage === img ? 'border-[#C1A68D] scale-95' : 'border-[#EAE4D9] hover:border-[#C1A68D]/50'}`}
+                  onClick={() => { setActiveMedia('image'); setActiveImage(img); }}
+                  className={`relative aspect-square rounded-2xl overflow-hidden border-2 transition-all ${activeMedia === 'image' && activeImage === img ? 'border-[#C1A68D] scale-95 shadow-md' : 'border-[#EAE4D9] hover:border-[#C1A68D]/50'}`}
                 >
                   <Image src={img} alt={`Thumb ${i}`} fill sizes="80px" className="object-cover" />
                 </button>
