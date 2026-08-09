@@ -319,13 +319,13 @@ export default function HomeClient() {
         <BranchCard
           branchNumber={2}
           title="مزار 2 — الفرع الثاني"
-          subtitle="12 استوديو بريميوم + شقق فندقية عائلية + غرف مزدوجة، مجهزة بأحدث المعايير الفندقية"
+          subtitle="12 استوديو بريميوم + 6 شقق غرفتين عائلية، مجهزة بأحدث المعايير الفندقية"
           address="مدينة نصر، القاهرة — الفرع الثاني"
           mapsUrl="https://maps.google.com/?q=Mazar+Nasr+City+Cairo+Branch+2"
           heroImage={BRANCH2_IMAGES[0]}
           galleryImages={BRANCH2_IMAGES}
           videoSrc="/images/mazar2/mazar2-video.mp4"
-          unitCount={12}
+          unitCount={18}
           unitLabel="وحدة"
           browseHref="/mazar/units/studios?branch=2"
           accentColor="#8B7355"
