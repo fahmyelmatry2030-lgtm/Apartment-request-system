@@ -63,7 +63,7 @@ const UnitCard: React.FC<UnitCardProps> = ({ unit, checkIn, checkOut }) => {
       transition={{ duration: 0.3 }}
       className={`bg-white rounded-[2rem] border border-[#EAE4D9] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col group h-full`}
     >
-      <div className="relative h-64 overflow-hidden">
+      <Link href={`/mazar/units/${unit?.id}${checkIn && checkOut ? `?checkIn=${checkIn}&checkOut=${checkOut}` : ''}`} className="relative h-64 overflow-hidden block">
         {unit?.images?.[0] ? (
           <Image 
             src={unit.images[0]} 
@@ -84,9 +84,11 @@ const UnitCard: React.FC<UnitCardProps> = ({ unit, checkIn, checkOut }) => {
         <div className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} ${status === 'متاح' ? 'bg-green-500/90' : status === 'مشغول' ? 'bg-blue-500/90' : 'bg-red-500/90'} backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-md`}>
           {status}
         </div>
-      </div>
+      </Link>
       <div className={`p-6 flex flex-col flex-1 ${isRTL ? 'text-right' : 'text-left'}`}>
-        <h3 className="text-xl font-bold text-[#2A2723] mb-1">{unit?.title?.[language] || (isRTL ? 'وحدة بدون اسم' : 'Unnamed Unit')}</h3>
+        <Link href={`/mazar/units/${unit?.id}${checkIn && checkOut ? `?checkIn=${checkIn}&checkOut=${checkOut}` : ''}`}>
+          <h3 className="text-xl font-bold text-[#2A2723] mb-1 hover:text-[#C1A68D] transition-colors">{unit?.title?.[language] || (isRTL ? 'وحدة بدون اسم' : 'Unnamed Unit')}</h3>
+        </Link>
         <div className="text-xs font-black text-[#C1A68D] mb-3">
           {getCategoryLabel(category, isRTL)}
         </div>
@@ -112,10 +114,10 @@ const UnitCard: React.FC<UnitCardProps> = ({ unit, checkIn, checkOut }) => {
         </div>
 
         <Link 
-          href={`/mazar/book?unit=${unit?.id}${checkIn && checkOut ? `&checkIn=${checkIn}&checkOut=${checkOut}` : ''}`}
+          href={`/mazar/units/${unit?.id}${checkIn && checkOut ? `?checkIn=${checkIn}&checkOut=${checkOut}` : ''}`}
           className="mt-auto w-full bg-[#2A2723] text-white text-sm font-black py-4 rounded-2xl text-center hover:bg-black transition-all shadow-xl shadow-black/5 flex items-center justify-center gap-2 group/btn"
         >
-          {isRTL ? 'ابدأ الحجز الان' : 'Book Now'}
+          {isRTL ? 'عرض الوحدة والحجز الان' : 'View & Book Now'}
           <span className={`transition-transform duration-300 ${isRTL ? 'group-hover:-translate-x-1' : 'group-hover:translate-x-1'}`}>
             {isRTL ? '←' : '→'}
           </span>
