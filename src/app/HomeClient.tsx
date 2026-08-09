@@ -71,7 +71,7 @@ const EXTERNAL_APARTMENTS = [
       '/images/apt1/apt1-15.jpg',
       '/images/apt1/apt1-16.jpg',
     ],
-    videoSrc: '/images/apt1/apt1-video.mp4',
+    videoSrc: '/images/video/studio 1.mp4',
     browseHref: '/mazar/units/apt-1',
     unitId: 'apt-1',
   },
