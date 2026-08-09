@@ -309,34 +309,33 @@ export default function HomeClient() {
           galleryImages={BRANCH1_IMAGES}
           unitCount={12}
           unitLabel="استوديو"
-          browseHref="/mazar/units/studios"
           accentColor="#C1A68D"
-        />
-
-        {/* Branch 1 Studios Grid */}
-        <div className="space-y-4">
-          <h3 className="text-xl font-black text-[#2A2723]">استوديوهات الفرع الأول</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {Array.from({ length: 12 }, (_, i) => i + 1).map((num) => (
-              <Link
-                key={num}
-                href={`/mazar/units/studios/b1-s${num}`}
-                className="group flex items-center justify-between bg-white border border-[#EAE4D9] hover:border-[#C1A68D] rounded-2xl p-5 transition-all hover:shadow-lg active:scale-95"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-[#C1A68D]/10 flex items-center justify-center group-hover:bg-[#C1A68D]/20 transition-colors">
-                    <span className="text-lg font-black text-[#C1A68D]">{num}</span>
+        >
+          {/* Branch 1 Studios Grid */}
+          <div className="space-y-4">
+            <h3 className="text-xl font-black text-[#2A2723]">استوديوهات الفرع الأول</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((num) => (
+                <Link
+                  key={num}
+                  href={`/mazar/units/studios/b1-s${num}`}
+                  className="group flex items-center justify-between bg-white border border-[#EAE4D9] hover:border-[#C1A68D] rounded-2xl p-5 transition-all hover:shadow-lg active:scale-95"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-[#C1A68D]/10 flex items-center justify-center group-hover:bg-[#C1A68D]/20 transition-colors">
+                      <span className="text-lg font-black text-[#C1A68D]">{num}</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-black text-[#2A2723]">استوديو {num}</span>
+                      <span className="text-[10px] font-bold text-[#7A7061]">الفرع الأول</span>
+                    </div>
                   </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-black text-[#2A2723]">استوديو {num}</span>
-                    <span className="text-[10px] font-bold text-[#7A7061]">الفرع الأول</span>
-                  </div>
-                </div>
-                <span className="text-[#C1A68D] group-hover:-translate-x-1 transition-transform">←</span>
-              </Link>
-            ))}
+                  <span className="text-[#C1A68D] group-hover:-translate-x-1 transition-transform">←</span>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
+        </BranchCard>
 
         {/* ─── الفرع الثاني ─── */}
         <SectionDivider label="🏨 الفرع الثاني — مزار 2" />
@@ -352,14 +351,12 @@ export default function HomeClient() {
           videoSrc="/images/Mazar%202%20Pictures/mazar2-video.mp4"
           unitCount={12}
           unitLabel="وحدة"
-          browseHref="/"
           accentColor="#8B7355"
-        />
-
-        {/* Branch 2 Studios Grid */}
-        <div className="space-y-4 mt-8">
-          <h3 className="text-xl font-black text-[#2A2723]">استوديوهات الفرع الثاني</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        >
+          {/* Branch 2 Studios Grid */}
+          <div className="space-y-4">
+            <h3 className="text-xl font-black text-[#2A2723]">استوديوهات الفرع الثاني</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {Array.from({ length: 12 }, (_, i) => i + 13).map((num) => (
               <Link
                 key={`b2-${num}`}
@@ -412,6 +409,7 @@ export default function HomeClient() {
             ))}
           </div>
         </div>
+        </BranchCard>
 
         {/* ─── شقق مزار الخارجية ─── */}
         <div className="mt-16">
