@@ -309,33 +309,9 @@ export default function HomeClient() {
           galleryImages={BRANCH1_IMAGES}
           unitCount={12}
           unitLabel="استوديو"
+          browseHref="/mazar/units/studios?branch=1"
           accentColor="#C1A68D"
-        >
-          {/* Branch 1 Studios Grid */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-black text-[#2A2723]">استوديوهات الفرع الأول</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {Array.from({ length: 12 }, (_, i) => i + 1).map((num) => (
-                <Link
-                  key={num}
-                  href={`/mazar/units/studios/b1-s${num}`}
-                  className="group flex items-center justify-between bg-white border border-[#EAE4D9] hover:border-[#C1A68D] rounded-2xl p-5 transition-all hover:shadow-lg active:scale-95"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-[#C1A68D]/10 flex items-center justify-center group-hover:bg-[#C1A68D]/20 transition-colors">
-                      <span className="text-lg font-black text-[#C1A68D]">{num}</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-black text-[#2A2723]">استوديو {num}</span>
-                      <span className="text-[10px] font-bold text-[#7A7061]">الفرع الأول</span>
-                    </div>
-                  </div>
-                  <span className="text-[#C1A68D] group-hover:-translate-x-1 transition-transform">←</span>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </BranchCard>
+        />
 
         {/* ─── الفرع الثاني ─── */}
         <SectionDivider label="🏨 الفرع الثاني — مزار 2" />
@@ -351,65 +327,9 @@ export default function HomeClient() {
           videoSrc="/images/Mazar%202%20Pictures/mazar2-video.mp4"
           unitCount={12}
           unitLabel="وحدة"
+          browseHref="/mazar/units/studios?branch=2"
           accentColor="#8B7355"
-        >
-          {/* Branch 2 Studios Grid */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-black text-[#2A2723]">استوديوهات الفرع الثاني</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {Array.from({ length: 12 }, (_, i) => i + 13).map((num) => (
-              <Link
-                key={`b2-${num}`}
-                href={`/mazar/units/studios/b2-s${num}`}
-                className="group flex items-center justify-between bg-white border border-[#EAE4D9] hover:border-[#8B7355] rounded-2xl p-5 transition-all hover:shadow-lg active:scale-95"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-[#8B7355]/10 flex items-center justify-center group-hover:bg-[#8B7355]/20 transition-colors">
-                    <span className="text-lg font-black text-[#8B7355]">{num}</span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-black text-[#2A2723]">استوديو {num}</span>
-                    <span className="text-[10px] font-bold text-[#7A7061]">الفرع الثاني</span>
-                  </div>
-                </div>
-                <span className="text-[#8B7355] group-hover:-translate-x-1 transition-transform">←</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* Branch 2 Rooms (25-30) */}
-        <div className="space-y-4 mt-8">
-          <h3 className="text-xl font-black text-[#2A2723]">شقق الغرفتين (الفرع الثاني)</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[
-              { id: 'p-s25', label: 'شقة 25 — 3 أسرة',  href: '/mazar/units/studios/p-s25' },
-              { id: 'p-s26', label: 'شقة 26 — 2 سرير',  href: '/mazar/units/studios/p-s26' },
-              { id: 'p-s27', label: 'شقة 27 — 2 سرير',  href: '/mazar/units/studios/p-s27' },
-              { id: 'p-s28', label: 'شقة 28 — 3 أسرة',  href: '/mazar/units/studios/p-s28' },
-              { id: 'p-s29', label: 'شقة 29 — 3 أسرة',  href: '/mazar/units/studios/p-s29' },
-              { id: 'p-s30', label: 'شقة 30 — 3 أسرة',  href: '/mazar/units/studios/p-s30' },
-            ].map((room) => (
-              <Link
-                key={room.id}
-                href={room.href}
-                className="group flex items-center justify-between gap-4 bg-[#39342E] hover:bg-[#4A443D] border border-[#504A43] hover:border-[#C1A68D] rounded-2xl p-5 transition-all hover:shadow-lg active:scale-95"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-[#C1A68D]/20 transition-colors">
-                    <span className="text-2xl">🛏️</span>
-                  </div>
-                  <div>
-                    <span className="block text-sm font-black text-white group-hover:text-[#C1A68D] transition-colors">{room.label}</span>
-                    <span className="text-[10px] font-bold text-[#A68D74]">شقة غرفتين — مزار 2</span>
-                  </div>
-                </div>
-                <span className="text-[#C1A68D] group-hover:-translate-x-1 transition-transform">←</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-        </BranchCard>
+        />
 
         {/* ─── شقق مزار الخارجية ─── */}
         <div className="mt-16">

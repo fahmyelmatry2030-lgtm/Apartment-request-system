@@ -13,8 +13,8 @@ interface BranchCardProps {
   videoSrc?: string;
   unitCount: number;
   unitLabel: string;
+  browseHref: string;
   accentColor?: string;
-  children?: React.ReactNode;
 }
 
 export default function BranchCard({
@@ -28,8 +28,8 @@ export default function BranchCard({
   videoSrc,
   unitCount,
   unitLabel,
+  browseHref,
   accentColor = '#C1A68D',
-  children
 }: BranchCardProps) {
   const [activeMedia, setActiveMedia] = useState<'image' | 'video'>('image');
   const [activeImg, setActiveImg] = useState(0);
@@ -142,12 +142,14 @@ export default function BranchCard({
           <span className="text-white text-lg group-hover/maps:-translate-x-1 transition-transform">←</span>
         </a>
 
-        {/* Children (Units Grid) */}
-        {children && (
-          <div className="mt-8 pt-8 border-t border-[#EAE4D9]/60">
-            {children}
-          </div>
-        )}
+        {/* CTA Button */}
+        <Link
+          href={browseHref}
+          className="flex items-center justify-center gap-2 w-full bg-[#2A2723] hover:bg-black text-white font-black py-4 rounded-2xl text-sm transition-all hover:shadow-xl active:scale-95"
+        >
+          <span>تصفح وحدات هذا الفرع</span>
+          <span>←</span>
+        </Link>
       </div>
     </div>
   );

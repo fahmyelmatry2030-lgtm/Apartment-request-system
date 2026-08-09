@@ -43,7 +43,16 @@ export default function StudiosPage() {
         const res = await fetch('/api/units');
         if (!res.ok) return;
         const allUnits = await res.json();
-        const filtered = allUnits.filter((u: any) => u.type === 'studio');
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const branchParam = urlParams.get('branch');
+        
+        const filtered = allUnits.filter((u: any) => {
+          if (u.type !== 'studio') return false;
+          if (branchParam && u.branch !== parseInt(branchParam) && !(branchParam === '2' && u.branch === 3)) return false; // Branch 2 page also shows Branch 3 (2-bedroom rooms 25-30)
+          return true;
+        });
+        
         setAllStudios(filtered);
         setDisplayedStudios(filtered);
 
@@ -113,6 +122,8 @@ export default function StudiosPage() {
            </div>
            <h1 className="text-4xl md:text-6xl font-black text-[#2A2723] mb-4 md:mb-6 leading-tight">
              {isRTL ? 'الاستوديوهات الفندقية' : 'Hotel Studios'}
+             {typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('branch') === '1' && ' (الفرع الأول)'}
+             {typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('branch') === '2' && ' (الفرع الثاني)'}
            </h1>
            <p className="text-base md:text-xl text-[#5C554B] opacity-70 max-w-3xl leading-relaxed">
               {isRTL 
