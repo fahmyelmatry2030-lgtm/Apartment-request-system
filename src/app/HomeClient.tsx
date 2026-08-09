@@ -49,15 +49,29 @@ const BRANCH2_IMAGES = [
 const EXTERNAL_APARTMENTS = [
   {
     id: 'ext-1',
-    title: 'شقة مزار الخارجية 1',
-    address: 'مدينة نصر، القاهرة',
-    mapsUrl: 'https://maps.google.com/?q=Nasr+City+Cairo',
-    price: 'يبدأ من 1500 ج.م / الليلة',
+    title: 'شقة رقم ( ١ )',
+    address: 'عمارة 7أ زكي رستم - متفرع من حسنين هيكل- عباس العقاد - بجوار قهوة مصر',
+    mapsUrl: 'https://maps.google.com/?q=7A+Zaki+Rostom+Abbas+El+Akkad+Nasr+City+Cairo',
+    price: 'يبدأ من 3000 ج.م / الليلة',
     images: [
-      '/images/mazar1/WhatsApp-Image-2025-12-15-at-12.39.33_361d04a7.jpg',
-      '/images/mazar1/WhatsApp-Image-2025-12-15-at-12.39.35_8ae4078a.jpg',
-      '/images/mazar1/WhatsApp-Image-2025-12-15-at-12.39.36_a209e979.jpg',
+      '/images/apt1/apt1-1.jpg',
+      '/images/apt1/apt1-2.jpg',
+      '/images/apt1/apt1-3.jpg',
+      '/images/apt1/apt1-4.jpg',
+      '/images/apt1/apt1-5.jpg',
+      '/images/apt1/apt1-6.jpg',
+      '/images/apt1/apt1-7.jpg',
+      '/images/apt1/apt1-8.jpg',
+      '/images/apt1/apt1-9.jpg',
+      '/images/apt1/apt1-10.jpg',
+      '/images/apt1/apt1-11.jpg',
+      '/images/apt1/apt1-12.jpg',
+      '/images/apt1/apt1-13.jpg',
+      '/images/apt1/apt1-14.jpg',
+      '/images/apt1/apt1-15.jpg',
+      '/images/apt1/apt1-16.jpg',
     ],
+    videoSrc: '/images/apt1/apt1-video.mp4',
     browseHref: '/mazar/units/apt-1',
     unitId: 'apt-1',
   },
@@ -93,46 +107,79 @@ const EXTERNAL_APARTMENTS = [
 
 // ─── External Apartment Card ─────────────────────────────────────────
 function ExternalApartmentCard({ apt }: { apt: typeof EXTERNAL_APARTMENTS[0] }) {
+  const [activeMedia, setActiveMedia] = useState<'image' | 'video'>('image');
   const [activeImg, setActiveImg] = useState(0);
   const [imgError, setImgError] = useState(false);
 
   return (
-    <div className="group bg-white border border-[#EAE4D9] rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500" dir="rtl">
-      {/* Image */}
+    <div className="group bg-white border border-[#EAE4D9] rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col justify-between" dir="rtl">
+      {/* Media */}
       <div className="relative aspect-[4/3] overflow-hidden bg-[#F0EBE3]">
-        <img
-          src={!imgError ? apt.images[activeImg] : apt.images[0]}
-          alt={apt.title}
-          onError={() => setImgError(true)}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-        {/* Thumbnail dots */}
-        <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
-          {apt.images.map((_, i) => (
+        {/* Toggle Buttons */}
+        {apt.videoSrc && (
+          <div className="absolute top-3 left-3 z-20 flex gap-1.5">
             <button
-              key={i}
-              onClick={() => { setActiveImg(i); setImgError(false); }}
-              className={`w-2 h-2 rounded-full transition-all ${activeImg === i ? 'bg-white scale-125' : 'bg-white/50'}`}
+              onClick={() => setActiveMedia('image')}
+              className={`px-2.5 py-1 rounded-full text-[10px] font-black transition-all ${
+                activeMedia === 'image'
+                  ? 'bg-white text-[#2A2723] shadow-md'
+                  : 'bg-black/50 text-white backdrop-blur-sm'
+              }`}
+            >
+              📸 صور
+            </button>
+            <button
+              onClick={() => setActiveMedia('video')}
+              className={`px-2.5 py-1 rounded-full text-[10px] font-black transition-all ${
+                activeMedia === 'video'
+                  ? 'bg-white text-[#2A2723] shadow-md'
+                  : 'bg-black/50 text-white backdrop-blur-sm'
+              }`}
+            >
+              🎬 فيديو
+            </button>
+          </div>
+        )}
+
+        {apt.videoSrc && activeMedia === 'video' ? (
+          <video
+            src={apt.videoSrc}
+            controls
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <>
+            <img
+              src={!imgError ? apt.images[activeImg] : apt.images[0]}
+              alt={apt.title}
+              onError={() => setImgError(true)}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
             />
-          ))}
-        </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+          </>
+        )}
       </div>
 
       {/* Thumbnail Strip */}
-      <div className="flex gap-2 px-4 py-3 overflow-x-auto bg-[#FDFBF7] border-b border-[#EAE4D9]">
-        {apt.images.map((img, i) => (
-          <button
-            key={i}
-            onClick={() => { setActiveImg(i); setImgError(false); }}
-            className={`flex-shrink-0 w-12 h-12 rounded-xl overflow-hidden border-2 transition-all ${
-              activeImg === i ? 'border-[#C1A68D] scale-105' : 'border-transparent opacity-60 hover:opacity-100'
-            }`}
-          >
-            <img src={img} alt="" className="w-full h-full object-cover" />
-          </button>
-        ))}
-      </div>
+      {activeMedia === 'image' && (
+        <div className="flex gap-2 px-4 py-3 overflow-x-auto bg-[#FDFBF7] border-b border-[#EAE4D9]">
+          {apt.images.slice(0, 8).map((img, i) => (
+            <button
+              key={i}
+              onClick={() => { setActiveImg(i); setImgError(false); }}
+              className={`flex-shrink-0 w-12 h-12 rounded-xl overflow-hidden border-2 transition-all ${
+                activeImg === i ? 'border-[#C1A68D] scale-105' : 'border-transparent opacity-60 hover:opacity-100'
+              }`}
+            >
+              <img src={img} alt="" className="w-full h-full object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Content */}
       <div className="p-5 space-y-3">

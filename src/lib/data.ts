@@ -815,29 +815,35 @@ export const units = [
     "branch": 4,
     "type": "apartment",
     "title": {
-      "ar": "شقة فندقية فاخرة ( 1 )",
-      "en": "Luxury Apartment ( 1 )"
+      "ar": "شقة رقم ( ١ )",
+      "en": "Apartment No. (1)"
     },
     "status": "متاح",
     "housekeeping": "نظيف",
     "next_booking": "لا يوجد",
     "description": {
-      "ar": "شقة فندقية واسعة متكاملة الخدمات للعائلات والباحثين عن الرقي في مدينة نصر في شارع عباس العقاد",
-      "en": "Spacious hotel apartment with complete services for families and luxury seekers in Nasr City."
+      "ar": "عمارة 7أ زكي رستم - متفرع من حسنين هيكل- عباس العقاد - بجوار قهوة مصر",
+      "en": "Building 7A Zaki Rostom - off Hassanain Heikal - Abbas El Akkad - Next to Qahwat Misr"
     },
     "images": [
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776806205219-1.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776806209335-2.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776806212877-3.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776806217855-4.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776806221482-5.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776806227788-6.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776806241768-7.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776806246271-8.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776806252149-12.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776806524295-15.jpeg"
+      "/images/apt1/apt1-1.jpg",
+      "/images/apt1/apt1-2.jpg",
+      "/images/apt1/apt1-3.jpg",
+      "/images/apt1/apt1-4.jpg",
+      "/images/apt1/apt1-5.jpg",
+      "/images/apt1/apt1-6.jpg",
+      "/images/apt1/apt1-7.jpg",
+      "/images/apt1/apt1-8.jpg",
+      "/images/apt1/apt1-9.jpg",
+      "/images/apt1/apt1-10.jpg",
+      "/images/apt1/apt1-11.jpg",
+      "/images/apt1/apt1-12.jpg",
+      "/images/apt1/apt1-13.jpg",
+      "/images/apt1/apt1-14.jpg",
+      "/images/apt1/apt1-15.jpg",
+      "/images/apt1/apt1-16.jpg"
     ],
-    "video": "/images/video/studio 1.mp4",
+    "video": "/images/apt1/apt1-video.mp4",
     "features": {
       "ar": [
         "ريسبشن 3 قطع",
