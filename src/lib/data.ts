@@ -764,30 +764,45 @@ export const units = [
     "branch": 4,
     "type": "apartment",
     "title": {
-      "ar": "شقة فندقية فاخرة ( 2 )",
-      "en": "Luxury Hotel Apartment ( 2 )"
+      "ar": "شقة مزار الخارجية 2",
+      "en": "Mazar External Apartment 2"
     },
     "status": "متاح",
     "housekeeping": "نظيف",
     "next_booking": "لا يوجد",
     "description": {
-      "ar": "شقة فندقية واسعة متكاملة الخدمات للعائلات والباحثين عن الرقي في مدينة نصر أمام سيتي ستارز",
-      "en": "Spacious hotel apartment with complete services for families and luxury seekers in Nasr City."
+      "ar": "عمائر المدفعية - تطل علي سيتي ستارز مباشرة",
+      "en": "El Medfaaeya Buildings - Direct view of City Stars"
     },
     "images": [
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814571969-631.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814591993-13.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814605272-63.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814636652-89.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814643426-6321.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814653858-521.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814693094-55.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814701884-2.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814712344-33.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814720647-99.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814733944-5.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814757737-66.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776814770007-321.jpeg"
+      "/images/apt2/apt2-1.jpg",
+      "/images/apt2/apt2-2.jpg",
+      "/images/apt2/apt2-3.jpg",
+      "/images/apt2/apt2-4.jpg",
+      "/images/apt2/apt2-5.jpg",
+      "/images/apt2/apt2-6.jpg",
+      "/images/apt2/apt2-7.jpg",
+      "/images/apt2/apt2-8.jpg",
+      "/images/apt2/apt2-9.jpg",
+      "/images/apt2/apt2-10.jpg",
+      "/images/apt2/apt2-11.jpg",
+      "/images/apt2/apt2-12.jpg",
+      "/images/apt2/apt2-13.jpg",
+      "/images/apt2/apt2-14.jpg",
+      "/images/apt2/apt2-15.jpg",
+      "/images/apt2/apt2-16.jpg",
+      "/images/apt2/apt2-17.jpg",
+      "/images/apt2/apt2-18.jpg",
+      "/images/apt2/apt2-19.jpg",
+      "/images/apt2/apt2-20.jpg",
+      "/images/apt2/apt2-21.jpg",
+      "/images/apt2/apt2-22.jpg",
+      "/images/apt2/apt2-23.jpg",
+      "/images/apt2/apt2-24.jpg",
+      "/images/apt2/apt2-25.jpg",
+      "/images/apt2/apt2-26.jpg",
+      "/images/apt2/apt2-27.jpg",
+      "/images/apt2/apt2-28.jpg"
     ],
     "video": "/images/video/studio 1.mp4",
     "features": {
@@ -875,30 +890,29 @@ export const units = [
     "branch": 4,
     "type": "apartment",
     "title": {
-      "ar": "شقة فندقية فاخرة 3",
-      "en": "Luxury Hotel Apartment ( 3 )"
+      "ar": "شقة مزار الخارجية 3",
+      "en": "Mazar External Apartment 3"
     },
     "status": "متاح",
     "housekeeping": "نظيف",
     "next_booking": "لا يوجد",
     "description": {
-      "ar": "شقة فندقية واسعة متكاملة الخدمات للعائلات والباحثين عن الرقي في مدينة نصر في شارع عباس العقاد الرئيسي",
-      "en": "Spacious hotel apartment with complete services for families and luxury seekers in Nasr City."
+      "ar": "شارع محمد مصطفي حمام - امام مستشفي العقاد - مطلة علي عباس العقاد الرئيسي",
+      "en": "Mohamed Mostafa Hamam St. - In front of Al-Akkad Hospital - View of main Abbas El Akkad"
     },
     "images": [
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776813438830-1.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776813458568-12.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776813462462-15.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776813467691-10.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776813481815-9.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776813487822-7.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776813491943-6.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776813526993-14.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776813540060-112.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776813547906-65.jpeg",
-      "https://xhvikeyigduvayrbvura.supabase.co/storage/v1/object/public/uploads/1776813551134-56.jpeg"
+      "/images/apt3/apt3-1.jpg",
+      "/images/apt3/apt3-2.jpg",
+      "/images/apt3/apt3-3.jpg",
+      "/images/apt3/apt3-4.jpg",
+      "/images/apt3/apt3-5.jpg",
+      "/images/apt3/apt3-6.jpg",
+      "/images/apt3/apt3-7.jpg",
+      "/images/apt3/apt3-8.jpg",
+      "/images/apt3/apt3-9.jpg",
+      "/images/apt3/apt3-10.jpg"
     ],
-    "video": "/images/video/studio 1.mp4",
+    "video": "/images/apt3/apt3-video.mp4",
     "features": {
       "ar": [
         "ريسبشن فندقي 3 قطع",
