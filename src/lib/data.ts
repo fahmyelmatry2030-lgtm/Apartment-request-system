@@ -761,7 +761,7 @@ export const units = [
   },
   {
     "id": "apt-2",
-    "branch": 1,
+    "branch": 4,
     "type": "apartment",
     "title": {
       "ar": "شقة فندقية فاخرة ( 2 )",
@@ -812,7 +812,7 @@ export const units = [
   },
   {
     "id": "apt-1",
-    "branch": 1,
+    "branch": 4,
     "type": "apartment",
     "title": {
       "ar": "شقة فندقية فاخرة ( 1 )",
@@ -866,7 +866,7 @@ export const units = [
   },
   {
     "id": "apt-3",
-    "branch": 1,
+    "branch": 4,
     "type": "apartment",
     "title": {
       "ar": "شقة فندقية فاخرة 3",

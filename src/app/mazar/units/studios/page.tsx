@@ -49,6 +49,7 @@ export default function StudiosPage() {
         const branchParam = urlParams.get('branch');
         
         const filtered = allUnits.filter((u: any) => {
+          if (u.id.startsWith('apt-')) return false;
           if (branchParam) {
             const b = parseInt(branchParam);
             if (u.branch !== b && !(b === 2 && u.branch === 3)) return false;
