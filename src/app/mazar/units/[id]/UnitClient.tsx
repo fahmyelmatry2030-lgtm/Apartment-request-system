@@ -236,7 +236,7 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
             {/* Main media */}
             <div className="relative h-[360px] md:h-[480px] rounded-[32px] overflow-hidden shadow-md bg-black flex items-center justify-center group">
               {activeImage.match(/\.(mp4|mov|webm)$/i) ? (
-                <video src={activeImage} controls autoPlay muted playsInline className="w-full h-full object-contain" />
+                <video src={encodeURI(activeImage)} controls autoPlay muted playsInline className="w-full h-full object-contain" />
               ) : (
                 <Image
                   src={activeImage}

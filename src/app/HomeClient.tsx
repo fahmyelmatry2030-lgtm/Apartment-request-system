@@ -176,7 +176,7 @@ function ExternalApartmentCard({ apt }: { apt: typeof EXTERNAL_APARTMENTS[0] }) 
 
         {apt.videoSrc && activeMedia === 'video' ? (
           <video
-            src={apt.videoSrc}
+            src={encodeURI(apt.videoSrc)}
             controls
             autoPlay
             muted

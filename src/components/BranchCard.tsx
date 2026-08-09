@@ -77,7 +77,7 @@ export default function BranchCard({
         {/* Video */}
         {videoSrc && activeMedia === 'video' ? (
           <video
-            src={videoSrc}
+            src={encodeURI(videoSrc)}
             controls
             autoPlay
             muted
