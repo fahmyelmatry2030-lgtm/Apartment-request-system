@@ -939,11 +939,11 @@ export const units = [
       "en": "Luxury hotel studio equipped with the latest smart services in the heart of Nasr City."
     },
     "images": [
-      "/images/Mazar%201%20Pictures/2026%201.jpeg",
-      "/images/Mazar%201%20Pictures/2026.jpeg",
-      "/images/Mazar%201%20Pictures/WhatsApp%20Imag6e%202025-12-31%20at%203.00.24%20PM.jpeg",
-      "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.16_ff8ccd08.jpg",
-      "/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.17_3a943570.jpg"
+      "/images/mazar1/2026-1.jpeg",
+      "/images/mazar1/2026.jpeg",
+      "/images/mazar1/WhatsApp-Imag6e-2025-12-31-at-3.00.24-PM.jpeg",
+      "/images/mazar1/WhatsApp-Image-2025-12-15-at-12.39.16_ff8ccd08.jpg",
+      "/images/mazar1/WhatsApp-Image-2025-12-15-at-12.39.17_3a943570.jpg"
     ],
     "video": "/images/video/studio 1.mp4",
     "features": {

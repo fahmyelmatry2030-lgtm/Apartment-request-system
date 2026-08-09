@@ -31,25 +31,24 @@ export const getSystemUnits = async () => {
   // Try server-side first
   try {
     const dbUnits = await getDbUnits();
-    if (dbUnits && dbUnits.length > 0) {
-      units = dbUnits.map((dbUnit: any) => {
-        const baseUnit = staticUnits.find(u => u.id === dbUnit.id) || ({} as any);
-        const merged: any = { ...baseUnit };
-        
-        Object.keys(dbUnit).forEach(key => {
-          const val = dbUnit[key];
-          if (val !== null && val !== undefined && val !== '') {
-            // For arrays or objects, check if they are empty
-            if (Array.isArray(val) && val.length === 0) return;
-            if (typeof val === 'object' && !Array.isArray(val)) {
-              if (Object.keys(val).length === 0) return;
+      if (dbUnits && dbUnits.length > 0) {
+        units = staticUnits.map((su: any) => {
+          const dbUnit = dbUnits.find((d: any) => d.id === su.id);
+          if (!dbUnit) return su;
+          
+          const merged: any = { ...su };
+          Object.keys(dbUnit).forEach(key => {
+            const val = dbUnit[key];
+            if (val !== null && val !== undefined && val !== '') {
+              if (Array.isArray(val) && val.length === 0) return;
+              if (typeof val === 'object' && !Array.isArray(val)) {
+                if (Object.keys(val).length === 0) return;
+              }
+              merged[key] = val;
             }
-            merged[key] = val;
-          }
+          });
+          return merged;
         });
-        
-        return merged;
-      });
     }
   } catch (e) {
     console.warn('DB Fetch failed, falling back to static');

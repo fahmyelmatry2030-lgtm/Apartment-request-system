@@ -111,7 +111,7 @@ export default function AboutClient() {
                {/* Column 2: Featured Image Box */}
                <div className={`${isRTL ? 'lg:order-1' : 'lg:order-2'} relative h-[300px] md:h-[650px] rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl group`}>
                   <NextImage
-                     src="/images/Mazar 1 Pictures/WhatsApp Image 2025-12-15 at 12.39.39_9b4da674.jpg"
+                     src="/images/mazar1/WhatsApp-Image-2025-12-15-at-12.39.39_9b4da674.jpg"
                      alt="Luxury Studio Interior"
                      fill
                      className="object-cover group-hover:scale-105 transition-transform duration-[2s]"

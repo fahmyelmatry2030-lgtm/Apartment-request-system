@@ -27,22 +27,22 @@ const NAV_BOXES = [
 
 // ─── Branch 1 Images ────────────────────────────────────────────────
 const BRANCH1_IMAGES = [
-  '/images/Mazar%201%20Pictures/mazar1-hero.jpg',
-  '/images/Mazar%201%20Pictures/2026%201.jpeg',
-  '/images/Mazar%201%20Pictures/2026.jpeg',
-  '/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.16_ff8ccd08.jpg',
-  '/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.24_989640c4.jpg',
-  '/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.25_2995ad23.jpg',
+  '/images/mazar1/mazar1-hero.jpg',
+  '/images/mazar1/2026-1.jpeg',
+  '/images/mazar1/2026.jpeg',
+  '/images/mazar1/WhatsApp-Image-2025-12-15-at-12.39.16_ff8ccd08.jpg',
+  '/images/mazar1/WhatsApp-Image-2025-12-15-at-12.39.24_989640c4.jpg',
+  '/images/mazar1/WhatsApp-Image-2025-12-15-at-12.39.25_2995ad23.jpg',
 ];
 
 // ─── Branch 2 Images ────────────────────────────────────────────────
 const BRANCH2_IMAGES = [
-  '/images/Mazar%202%20Pictures/20260218_015423.jpg',
-  '/images/Mazar%202%20Pictures/20260218_015425.jpg',
-  '/images/Mazar%202%20Pictures/20260218_023924.jpg',
-  '/images/Mazar%202%20Pictures/20260218_171702.jpg',
-  '/images/Mazar%202%20Pictures/20260218_183029.jpg',
-  '/images/Mazar%202%20Pictures/20260218_185108.jpg',
+  '/images/mazar2/20260218_015423.jpg',
+  '/images/mazar2/20260218_015425.jpg',
+  '/images/mazar2/20260218_023924.jpg',
+  '/images/mazar2/20260218_171702.jpg',
+  '/images/mazar2/20260218_183029.jpg',
+  '/images/mazar2/20260218_185108.jpg',
 ];
 
 // ─── External Apartments ────────────────────────────────────────────
@@ -54,9 +54,9 @@ const EXTERNAL_APARTMENTS = [
     mapsUrl: 'https://maps.google.com/?q=Nasr+City+Cairo',
     price: 'يبدأ من 1500 ج.م / الليلة',
     images: [
-      '/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.33_361d04a7.jpg',
-      '/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.35_8ae4078a.jpg',
-      '/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.36_a209e979.jpg',
+      '/images/mazar1/WhatsApp-Image-2025-12-15-at-12.39.33_361d04a7.jpg',
+      '/images/mazar1/WhatsApp-Image-2025-12-15-at-12.39.35_8ae4078a.jpg',
+      '/images/mazar1/WhatsApp-Image-2025-12-15-at-12.39.36_a209e979.jpg',
     ],
     browseHref: '/mazar/units/apt-1',
     unitId: 'apt-1',
@@ -68,9 +68,9 @@ const EXTERNAL_APARTMENTS = [
     mapsUrl: 'https://maps.google.com/?q=Nasr+City+Cairo',
     price: 'يبدأ من 1800 ج.م / الليلة',
     images: [
-      '/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.37_46a06ccb.jpg',
-      '/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.38_e7c5836c.jpg',
-      '/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.39_9b4da674.jpg',
+      '/images/mazar1/WhatsApp-Image-2025-12-15-at-12.39.37_46a06ccb.jpg',
+      '/images/mazar1/WhatsApp-Image-2025-12-15-at-12.39.38_e7c5836c.jpg',
+      '/images/mazar1/WhatsApp-Image-2025-12-15-at-12.39.39_9b4da674.jpg',
     ],
     browseHref: '/mazar/units/apt-2',
     unitId: 'apt-2',
@@ -82,9 +82,9 @@ const EXTERNAL_APARTMENTS = [
     mapsUrl: 'https://maps.google.com/?q=Nasr+City+Cairo',
     price: 'يبدأ من 2000 ج.م / الليلة',
     images: [
-      '/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.40_789a6fdb.jpg',
-      '/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.40_ebec746d.jpg',
-      '/images/Mazar%201%20Pictures/WhatsApp%20Image%202025-12-15%20at%2012.39.40_5586b607.jpg',
+      '/images/mazar1/WhatsApp-Image-2025-12-15-at-12.39.40_789a6fdb.jpg',
+      '/images/mazar1/WhatsApp-Image-2025-12-15-at-12.39.40_ebec746d.jpg',
+      '/images/mazar1/WhatsApp-Image-2025-12-15-at-12.39.40_5586b607.jpg',
     ],
     browseHref: '/mazar/units/apt-3',
     unitId: 'apt-3',
@@ -324,7 +324,7 @@ export default function HomeClient() {
           mapsUrl="https://maps.google.com/?q=Mazar+Nasr+City+Cairo+Branch+2"
           heroImage={BRANCH2_IMAGES[0]}
           galleryImages={BRANCH2_IMAGES}
-          videoSrc="/images/Mazar%202%20Pictures/mazar2-video.mp4"
+          videoSrc="/images/mazar2/mazar2-video.mp4"
           unitCount={12}
           unitLabel="وحدة"
           browseHref="/mazar/units/studios?branch=2"
