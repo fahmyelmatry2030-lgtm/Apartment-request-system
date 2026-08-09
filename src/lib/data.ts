@@ -815,8 +815,8 @@ export const units = [
     "branch": 4,
     "type": "apartment",
     "title": {
-      "ar": "شقة رقم ( ١ )",
-      "en": "Apartment No. (1)"
+      "ar": "شقة مزار الخارجية 1",
+      "en": "Mazar External Apartment 1"
     },
     "status": "متاح",
     "housekeeping": "نظيف",

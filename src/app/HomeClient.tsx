@@ -49,7 +49,7 @@ const BRANCH2_IMAGES = [
 const EXTERNAL_APARTMENTS = [
   {
     id: 'ext-1',
-    title: 'شقة رقم ( ١ )',
+    title: 'شقة مزار الخارجية 1',
     address: 'عمارة 7أ زكي رستم - متفرع من حسنين هيكل- عباس العقاد - بجوار قهوة مصر',
     mapsUrl: 'https://maps.google.com/?q=7A+Zaki+Rostom+Abbas+El+Akkad+Nasr+City+Cairo',
     price: 'يبدأ من 3000 ج.م / الليلة',
