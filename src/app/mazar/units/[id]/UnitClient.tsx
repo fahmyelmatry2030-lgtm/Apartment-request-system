@@ -33,7 +33,7 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
 
   const [unit, setUnit] = useState<any>(initialUnit);
   const [activeImage, setActiveImage] = useState<string>(
-    initialUnit?.video || (initialUnit?.images && initialUnit?.images[0]) || '/images/logo-en.jpg'
+    (initialUnit?.images && initialUnit?.images[0]) || initialUnit?.video || '/images/logo-en.jpg'
   );
   const [status, setStatus] = useState<string>(initialUnit?.status || 'متاح');
   const [isLoading, setIsLoading] = useState(!initialUnit);
@@ -64,7 +64,7 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
         const foundUnit: any = allUnits.find((u: any) => u.id === id);
         if (foundUnit) {
           setUnit(foundUnit);
-          setActiveImage(foundUnit.video || (foundUnit.images && foundUnit.images[0]) || '/images/logo-en.jpg');
+          setActiveImage((foundUnit.images && foundUnit.images[0]) || foundUnit.video || '/images/logo-en.jpg');
           setStatus(foundUnit.status || 'متاح');
         }
       } catch { /* silently fail */ }

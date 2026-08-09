@@ -804,7 +804,7 @@ export const units = [
       "/images/apt2/apt2-27.jpg",
       "/images/apt2/apt2-28.jpg"
     ],
-    "video": "/images/video/studio 1.mp4",
+    "video": null,
     "features": {
       "ar": [
         "غرفتين نوم",
@@ -858,7 +858,7 @@ export const units = [
       "/images/apt1/apt1-15.jpg",
       "/images/apt1/apt1-16.jpg"
     ],
-    "video": "/images/apt1/apt1-video.mp4",
+    "video": null,
     "features": {
       "ar": [
         "ريسبشن 3 قطع",
@@ -912,7 +912,7 @@ export const units = [
       "/images/apt3/apt3-9.jpg",
       "/images/apt3/apt3-10.jpg"
     ],
-    "video": "/images/apt3/apt3-video.mp4",
+    "video": null,
     "features": {
       "ar": [
         "ريسبشن فندقي 3 قطع",
