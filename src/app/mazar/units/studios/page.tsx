@@ -102,9 +102,6 @@ export default function StudiosPage() {
         </Link>
         <div className="flex items-center gap-6">
           <LanguageSwitcher />
-          <Link href="/mazar/units" className="text-xs font-bold text-[#7A7061] hover:text-[#2A2723]">
-            {t.unitsPage.backToCategories}
-          </Link>
         </div>
       </nav>
 
@@ -112,14 +109,7 @@ export default function StudiosPage() {
         
         {/* Header */}
         <header className="mb-12 md:mb-16">
-           <div className="mb-6">
-              <button 
-                onClick={() => router.push('/mazar/units')}
-                className={`text-sm font-bold text-[#C1A68D] hover:opacity-80 flex items-center gap-2`}
-              >
-                 {isRTL ? `← ${t.unitsPage.backToCategories}` : `← ${t.unitsPage.backToCategories}`}
-              </button>
-           </div>
+
            <h1 className="text-4xl md:text-6xl font-black text-[#2A2723] mb-4 md:mb-6 leading-tight">
              {isRTL ? 'الاستوديوهات الفندقية' : 'Hotel Studios'}
              {typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('branch') === '1' && ' (الفرع الأول)'}

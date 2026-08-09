@@ -82,9 +82,6 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
         </Link>
         <div className="flex items-center gap-6">
           <LanguageSwitcher />
-          <Link href="/mazar/units" className="text-xs font-bold text-[#7A7061] hover:text-[#2A2723]">
-            {t.unitsPage.backToList}
-          </Link>
         </div>
       </nav>
 
