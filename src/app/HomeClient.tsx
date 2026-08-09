@@ -313,10 +313,11 @@ export default function HomeClient() {
           accentColor="#C1A68D"
         />
 
-        {/* Branch 1 Studios Grid */}
+        {/* Branch 1 Units Grid */}
         <div className="space-y-4">
-          <h3 className="text-xl font-black text-[#2A2723]">استوديوهات الفرع الأول</h3>
+          <h3 className="text-xl font-black text-[#2A2723]">وحدات الفرع الأول (استوديوهات وشقق فاخرة)</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* Studios 1 to 12 */}
             {Array.from({ length: 12 }, (_, i) => i + 1).map((num) => (
               <Link
                 key={num}
@@ -329,6 +330,30 @@ export default function HomeClient() {
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-black text-[#2A2723]">استوديو {num}</span>
+                    <span className="text-[10px] font-bold text-[#7A7061]">الفرع الأول</span>
+                  </div>
+                </div>
+                <span className="text-[#C1A68D] group-hover:-translate-x-1 transition-transform">←</span>
+              </Link>
+            ))}
+
+            {/* The 3 Apartments */}
+            {[
+              { id: 'apt-1', label: 'شقة فندقية فاخرة 1' },
+              { id: 'apt-2', label: 'شقة فندقية فاخرة 2' },
+              { id: 'apt-3', label: 'شقة فندقية فاخرة 3' },
+            ].map((room) => (
+              <Link
+                key={room.id}
+                href={`/mazar/units/${room.id}`}
+                className="group flex items-center justify-between bg-white border border-[#EAE4D9] hover:border-[#C1A68D] rounded-2xl p-5 transition-all hover:shadow-lg active:scale-95"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-[#C1A68D]/10 flex items-center justify-center group-hover:bg-[#C1A68D]/20 transition-colors">
+                    <span className="text-2xl">🏢</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-black text-[#2A2723]">{room.label}</span>
                     <span className="text-[10px] font-bold text-[#7A7061]">الفرع الأول</span>
                   </div>
                 </div>
@@ -409,20 +434,7 @@ export default function HomeClient() {
           </div>
         </div>
 
-        {/* ─── الـ 3 شقق ─── */}
-        <div className="mt-16">
-          <SectionDivider label="🏡 الـ 3 شقق" />
-          <div className="space-y-4 mt-8">
-            <p className="text-[#7A7061] font-bold text-sm text-right">
-              3 شقق خارجية فاخرة ومجهزة بالكامل — كل شقة بصور وفيديو وموقع على الخريطة
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {EXTERNAL_APARTMENTS.map((apt) => (
-                <ExternalApartmentCard key={apt.id} apt={apt} />
-              ))}
-            </div>
-          </div>
-        </div>
+
 
       </section>
 
