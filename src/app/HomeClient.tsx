@@ -52,7 +52,7 @@ const EXTERNAL_APARTMENTS = [
     title: 'شقة مزار الخارجية 1',
     address: 'عمارة 7أ زكي رستم - متفرع من حسنين هيكل- عباس العقاد - بجوار قهوة مصر',
     mapsUrl: 'https://maps.google.com/?q=7A+Zaki+Rostom+Abbas+El+Akkad+Nasr+City+Cairo',
-    price: 'يبدأ من 3000 ج.م / الليلة',
+    price: 'يبدأ من 4000 ج.م / الليلة',
     images: [
       '/images/apt1/apt1-1.jpg',
       '/images/apt1/apt1-2.jpg',
@@ -79,7 +79,7 @@ const EXTERNAL_APARTMENTS = [
     title: 'شقة مزار الخارجية 2',
     address: 'عمائر المدفعية - تطل علي سيتي ستارز مباشرة',
     mapsUrl: 'https://maps.google.com/?q=City+Stars+Nasr+City+Cairo',
-    price: 'يبدأ من 1800 ج.م / الليلة',
+    price: 'يبدأ من 4000 ج.م / الليلة',
     images: [
       '/images/apt2/apt2-1.jpg',
       '/images/apt2/apt2-2.jpg',
@@ -118,7 +118,7 @@ const EXTERNAL_APARTMENTS = [
     title: 'شقة مزار الخارجية 3',
     address: 'شارع محمد مصطفي حمام - امام مستشفي العقاد - مطلة علي عباس العقاد الرئيسي',
     mapsUrl: 'https://maps.google.com/?q=Mohamed+Mostafa+Hamam+Abbas+El+Akkad+Nasr+City+Cairo',
-    price: 'يبدأ من 2000 ج.م / الليلة',
+    price: 'يبدأ من 4000 ج.م / الليلة',
     images: [
       '/images/apt3/apt3-1.jpg',
       '/images/apt3/apt3-2.jpg',
