@@ -239,6 +239,16 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
 
     setAllBookings(bookings);
 
+    // Auto-clean mock test records in DB
+    const mockBookings = bookings.filter((b: any) => {
+      const name = String(b.name || '');
+      return ['مراد لاغا', 'مينا صبرى', 'عاصم بن صالح', 'محمد عبدالحفيظ', 'عبدالحفيظ', 'حسني معمر', 'صبرى يوسف'].some(m => name.includes(m));
+    });
+    if (mockBookings.length > 0) {
+      Promise.all(mockBookings.map((b: any) => updateDbBookingStatus(b.id, { status: 'ملغى', approvedByAdmin: false })))
+        .catch(() => {});
+    }
+
     setTodaySchedule({
       in:  confirmed.filter((b: any) => b.checkIn  === targetDateStr),
       out: confirmed.filter((b: any) => b.checkOut === targetDateStr),
@@ -299,13 +309,17 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
     }
   };
 
-  const pendingWebRequests = (allBookings || []).filter((b: any) => 
-    b.status === 'رد جديد' || 
-    b.status === 'جديد' || 
-    b.status === 'في الانتظار' || 
-    b.status === 'بانتظار التأكيد' ||
-    b.status === 'pending'
-  );
+  const mockNames = ['مراد لاغا', 'مينا صبرى', 'عاصم بن صالح', 'محمد عبدالحفيظ', 'عبدالحفيظ', 'حسني معمر', 'صبرى يوسف'];
+  const isMockRequest = (b: any) => {
+    const name = String(b.name || '');
+    return mockNames.some(m => name.includes(m)) || String(b.id || '').startsWith('mock-');
+  };
+
+  const pendingWebRequests = (allBookings || []).filter((b: any) => {
+    if (isMockRequest(b)) return false;
+    const st = String(b.status || '');
+    return st === 'رد جديد' || st === 'جديد' || st === 'في الانتظار' || st === 'بانتظار التأكيد' || st === 'pending';
+  });
 
   useEffect(() => {
     loadOverviewData();
