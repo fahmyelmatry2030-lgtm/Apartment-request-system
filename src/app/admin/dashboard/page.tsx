@@ -241,8 +241,8 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
 
     // Hard delete mock test records from DB
     const mockBookings = bookings.filter((b: any) => {
-      const name = String(b.name || '');
-      return ['مراد لاغا', 'مينا صبرى', 'عاصم بن صالح', 'محمد عبدالحفيظ', 'عبدالحفيظ', 'حسني معمر', 'صبرى يوسف'].some(m => name.includes(m));
+      const name = String(b.name || '').trim();
+      return ['مراد لاغا', 'مينا صبرى', 'عاصم بن صالح', 'محمد عبدالحفيظ', 'عبدالحفيظ', 'حسني معمر', 'صبرى يوسف', 'MFl', 'mfl', 'احمد الحسنى', 'احمد فارس شيخو', 'رعد سلمان', 'مصطفي احمد', 'Ahmed', 'ahmed', 'محمد خليل'].some(m => name.toLowerCase().includes(m.toLowerCase()));
     });
     if (mockBookings.length > 0) {
       Promise.all(mockBookings.map((b: any) => deleteDbBooking(b.id)))
@@ -307,16 +307,22 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
     }
   };
 
-  const mockNames = ['مراد لاغا', 'مينا صبرى', 'عاصم بن صالح', 'محمد عبدالحفيظ', 'عبدالحفيظ', 'حسني معمر', 'صبرى يوسف'];
+  const mockNames = [
+    'مراد لاغا', 'مينا صبرى', 'عاصم بن صالح', 'محمد عبدالحفيظ', 'عبدالحفيظ', 
+    'حسني معمر', 'صبرى يوسف', 'MFl', 'mfl', 'احمد الحسنى', 'احمد فارس شيخو', 
+    'رعد سلمان', 'مصطفي احمد', 'Ahmed', 'ahmed', 'محمد خليل'
+  ];
+  
   const isMockRequest = (b: any) => {
-    const name = String(b.name || '');
-    return mockNames.some(m => name.includes(m)) || String(b.id || '').startsWith('mock-');
+    const name = String(b.name || '').trim();
+    return mockNames.some(m => name.toLowerCase().includes(m.toLowerCase())) || String(b.id || '').startsWith('mock-');
   };
 
   const pendingWebRequests = (allBookings || []).filter((b: any) => {
     if (isMockRequest(b)) return false;
-    const st = String(b.status || '');
-    return st === 'رد جديد' || st === 'جديد' || st === 'في الانتظار' || st === 'بانتظار التأكيد' || st === 'pending';
+    const st = String(b.status || '').trim();
+    const isConfirmed = CONFIRMED_STATUSES.some(cs => st === cs || st.includes('مؤكد') || st === 'approved');
+    return !isConfirmed && st !== 'ملغى';
   });
 
   useEffect(() => {

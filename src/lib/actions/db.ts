@@ -424,7 +424,7 @@ export async function deleteAllPendingDbBookings() {
   const supabase = getSupabaseServerClient();
   if (!supabase) return [];
 
-  const pendingStatuses = ['جديد', 'قيد المراجعة', 'pending', 'رد جديد', 'في الانتظار', 'بانتظار التأكيد'];
+  const pendingStatuses = ['جديد', 'طلب جديد', 'قيد المراجعة', 'pending', 'رد جديد', 'في الانتظار', 'بانتظار التأكيد'];
   const { error } = await supabase
     .from('bookings')
     .delete()
