@@ -1330,6 +1330,10 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
             >
               إغلاق
             </button>
+          </div>
+        </div>
+      )}
+
       {/* ── RECEIPT VIEWER MODAL ── */}
       {activeReceiptModal.isOpen && activeReceiptModal.url && (
         <div className="fixed inset-0 z-[150] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in" dir="rtl">
