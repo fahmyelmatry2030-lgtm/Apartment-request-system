@@ -150,6 +150,10 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
         .sort((a: any, b: any) => a.checkIn.localeCompare(b.checkIn));
       const nextBooking = upcomingBookings[0];
 
+      const currentAndFutureBookings = aptBookings.filter((b: any) => b.checkOut >= targetDateStr);
+      const latestFutureBooking = [...currentAndFutureBookings].sort((a: any, b: any) => b.checkOut.localeCompare(a.checkOut))[0];
+      const finalCheckOut = latestFutureBooking ? latestFutureBooking.checkOut : (activeBooking?.checkOut || lastBooking?.checkOut || null);
+
       let daysUntilNextBooking: number | null = null;
       if (nextBooking) {
         const nextCheckInDate = nextBooking.checkIn;
@@ -188,6 +192,7 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
         phone: activeBooking?.phone,
         clientStatus: activeBooking?.clientStatus || 'انتظار',
         checkOut: activeBooking?.checkOut,
+        finalCheckOut,
         guestsCount: activeBooking?.guestsCount,
         lastCheckOut: lastBooking?.checkOut,
         upcomingBookingsCount: upcomingBookings.length,
@@ -921,9 +926,9 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
                     <th className="px-4 py-4">اسم الوحدة</th>
                     <th className="px-4 py-4 min-w-[180px]">اسم الضيف (اضغط للتفاصيل)</th>
                     <th className="px-4 py-4 min-w-[180px]">الملاحظات</th>
-                    <th className="px-4 py-4 text-center">تاريخ الخروج</th>
-                    <th className="px-4 py-4 text-center">حجوزات قادمة</th>
                     <th className="px-4 py-4 text-center">الحالة</th>
+                    <th className="px-4 py-4 text-center">حجوزات قادمة</th>
+                    <th className="px-4 py-4 text-center">تاريخ خروج آخر حجز</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#EAE4D9]/40 text-xs">
@@ -945,7 +950,6 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
                       const num = isB1 ? parseInt(apt.id.replace('b1-s',''),10) : isB2 ? parseInt(apt.id.replace('b2-s',''),10)+12 : isPs ? parseInt(apt.id.replace('p-s',''),10) : 0;
                       const rowBg = isB1 ? 'bg-blue-50/40 hover:bg-blue-50/80' : isB2 ? 'bg-emerald-50/40 hover:bg-emerald-50/80' : isPs ? 'bg-purple-50/40 hover:bg-purple-50/80' : 'bg-amber-50/40 hover:bg-amber-50/80';
                       const badgeColor = isB1 ? 'bg-blue-600 text-white' : isB2 ? 'bg-emerald-600 text-white' : isPs ? 'bg-purple-600 text-white' : 'bg-[#C1A68D] text-white';
-                      const typeLabel: Record<string,string> = { single:'سنجل', double:'دبل', triple:'تريبل', 'two-room':'غرفتين', apartment:'شقة' };
 
                       return (
                         <tr key={apt.id} className={`${rowBg} transition-colors`}>
@@ -995,7 +999,7 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
                             )}
                           </td>
 
-                          {/* NOTES COLUMN (EXPANDABLE ON CLICK) */}
+                          {/* NOTES COLUMN */}
                           <td className="px-4 py-3 text-xs font-bold text-[#7A7061] max-w-[220px]">
                             {apt.notes ? (
                               <button
@@ -1010,38 +1014,7 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
                             )}
                           </td>
 
-                          <td className="px-4 py-3 text-xs text-center text-[#2A2723] font-black">
-                            {apt.isTurnover ? (
-                              <div className="flex flex-col gap-1 items-center justify-center">
-                                <span className="text-rose-500">🛫 {formatMiniDate(apt.leavingCheckOut)}</span>
-                                <span className="text-blue-600">🛬 {formatMiniDate(apt.arrivingCheckOut)}</span>
-                              </div>
-                            ) : apt.isOccupied ? (
-                              <div className="flex flex-col items-center">
-                                <span>{formatMiniDate(apt.checkOut)}</span>
-                                {apt.daysUntilNextBooking !== null && apt.daysUntilNextBooking > 0 && (
-                                  <span className="text-[9px] font-black bg-emerald-100 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-md mt-1 whitespace-nowrap shadow-sm">
-                                    متاح {apt.daysUntilNextBooking} يوم حتى الحجز القادم
-                                  </span>
-                                )}
-                              </div>
-                            ) : (
-                              <div className="flex flex-col items-center">
-                                {apt.lastCheckOut ? <span className="text-gray-400 font-bold opacity-60">آخر: {formatMiniDate(apt.lastCheckOut)}</span> : <span>—</span>}
-                              </div>
-                            )}
-                          </td>
-
-                          <td className="px-4 py-3 text-center">
-                            {apt.upcomingBookingsCount > 0 ? (
-                              <span className="text-xs font-black text-white bg-blue-500 shadow-sm px-3 py-1 rounded-lg">
-                                {apt.upcomingBookingsCount}
-                              </span>
-                            ) : (
-                              <span className="text-xs font-bold text-gray-400">—</span>
-                            )}
-                          </td>
-
+                          {/* STATUS COLUMN (RIGHT AFTER NOTES) */}
                           <td className="px-4 py-3 text-center">
                             <span className={`text-xs font-black px-3 py-1.5 rounded-full shadow-sm whitespace-nowrap ${
                               apt.isTurnover ? 'bg-orange-500 text-white animate-pulse' :
@@ -1060,6 +1033,37 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
                                apt.status === 'صيانة' ? 'صيانة' : 
                                'متاح'}
                             </span>
+                          </td>
+
+                          {/* UPCOMING BOOKINGS COUNT */}
+                          <td className="px-4 py-3 text-center">
+                            {apt.upcomingBookingsCount > 0 ? (
+                              <span className="text-xs font-black text-white bg-blue-500 shadow-sm px-3 py-1 rounded-lg">
+                                {apt.upcomingBookingsCount}
+                              </span>
+                            ) : (
+                              <span className="text-xs font-bold text-gray-400">—</span>
+                            )}
+                          </td>
+
+                          {/* LAST BOOKING CHECK-OUT DATE (VERY LAST COLUMN) */}
+                          <td className="px-4 py-3 text-xs text-center text-[#2A2723] font-black">
+                            {apt.finalCheckOut ? (
+                              <div className="flex flex-col items-center">
+                                <span className="bg-amber-100 border border-amber-300 text-amber-950 font-black px-2.5 py-1 rounded-lg text-xs shadow-sm whitespace-nowrap">
+                                  🗓️ {formatMiniDate(apt.finalCheckOut)}
+                                </span>
+                                {apt.daysUntilNextBooking !== null && apt.daysUntilNextBooking > 0 && (
+                                  <span className="text-[9px] font-black bg-emerald-100 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-md mt-1 whitespace-nowrap shadow-sm">
+                                    متاح {apt.daysUntilNextBooking} يوم حتى الحجز القادم
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <div className="flex flex-col items-center">
+                                {apt.lastCheckOut ? <span className="text-gray-400 font-bold opacity-60">آخر: {formatMiniDate(apt.lastCheckOut)}</span> : <span>—</span>}
+                              </div>
+                            )}
                           </td>
                         </tr>
                       );
