@@ -320,6 +320,18 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
 
   const pendingWebRequests = (allBookings || []).filter((b: any) => {
     if (isMockRequest(b)) return false;
+
+    const isFromWebsite = 
+      b.source === 'website' || 
+      b.isWebsiteBooking === true || 
+      b.is_website_booking === true || 
+      String(b.notes || '').includes('موقع') || 
+      String(b.notes || '').includes('ويب') || 
+      String(b.paymentInfo || '').includes('موقع') || 
+      String(b.payment_info || '').includes('موقع');
+
+    if (!isFromWebsite) return false;
+
     const st = String(b.status || '').trim();
     const isConfirmed = CONFIRMED_STATUSES.some(cs => st === cs || st.includes('مؤكد') || st === 'approved');
     return !isConfirmed && st !== 'ملغى';

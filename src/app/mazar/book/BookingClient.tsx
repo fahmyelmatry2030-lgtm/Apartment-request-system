@@ -249,8 +249,10 @@ export default function BookingPage() {
       guest: name,
       guestsCount: guestsCount,
       studio: selectedUnit ? (selectedUnit.title?.[language] || selectedUnitId) : selectedUnitId,
-      paymentInfo: receiptUrl ? `صورة التحويل: ${receiptUrl}` : 'كاش / تحويل بنكي',
-      notes: receiptUrl ? `رابط صورة إيصال التحويل: ${receiptUrl}` : '',
+      paymentInfo: receiptUrl ? `[طلب من الموقع] صورة التحويل: ${receiptUrl}` : '[طلب حجز من الموقع الإلكتروني]',
+      notes: receiptUrl ? `[طلب ويب سايت] رابط صورة إيصال التحويل: ${receiptUrl}` : '[طلب حجز من الموقع الإلكتروني]',
+      source: 'website',
+      isWebsiteBooking: true,
     };
 
     try {
