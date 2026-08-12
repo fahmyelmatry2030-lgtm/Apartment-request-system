@@ -6,7 +6,7 @@ import { getBookings, getSystemUnits } from '@/lib/data-init';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { updateDbBookingStatus } from '@/lib/actions/db';
 import CustomerProfileModal from '@/components/CustomerProfileModal';
-import { User, Phone, MessageSquare, FileText, Calendar, CheckCircle2, Home, X } from 'lucide-react';
+import { User, Phone, MessageSquare, FileText, Calendar, CheckCircle2, Home, X, Trash2 } from 'lucide-react';
 import { formatWhatsAppNumber } from '@/lib/utils';
 
 const CONFIRMED_STATUSES = ['مؤكد', 'approved', 'مؤكد/دخول', 'مغادر/تنظيف', 'مغادر/تم'];
@@ -255,6 +255,33 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
     setLastUpdated(new Date());
     setIsLoading(false);
   }, [selectedDate, selectedCategory, adminRole]);
+
+  const handleConfirmWebBooking = async (req: any) => {
+    try {
+      await updateDbBookingStatus(req.id, { status: 'مؤكد', approvedByAdmin: true });
+      loadOverviewData();
+    } catch {
+      alert('حدث خطأ أثناء تأكيد الحجز.');
+    }
+  };
+
+  const handleRejectWebBooking = async (reqId: string) => {
+    if (!confirm('هل أنت تأكد من رفض وحذف هذا الطلب؟')) return;
+    try {
+      await updateDbBookingStatus(reqId, { status: 'ملغى', approvedByAdmin: false });
+      loadOverviewData();
+    } catch {
+      alert('حدث خطأ أثناء رفض الطلب.');
+    }
+  };
+
+  const pendingWebRequests = (allBookings || []).filter((b: any) => 
+    b.status === 'رد جديد' || 
+    b.status === 'جديد' || 
+    b.status === 'في الانتظار' || 
+    b.status === 'بانتظار التأكيد' ||
+    b.status === 'pending'
+  );
 
   useEffect(() => {
     loadOverviewData();
@@ -659,6 +686,114 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
                 )}
               </div>
             )}
+          </div>
+        )}
+      </div>
+
+      {/* ── WEBSITE INCOMING BOOKING REQUESTS SECTION (قسم طلبات الحجز القادمة من الويب سايت) ── */}
+      <div className="bg-gradient-to-br from-[#1F1C18] to-[#2A241F] p-6 md:p-8 rounded-[2.5rem] shadow-2xl border border-amber-500/30 text-white relative overflow-hidden space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-5">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 font-black text-xl shadow-inner">
+              🌐
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-xl font-black text-white">طلبات الحجز الجديدة القادمة من الويب سايت</h3>
+                {pendingWebRequests.length > 0 && (
+                  <span className="bg-amber-500 text-black text-xs font-black px-3 py-1 rounded-full animate-pulse shadow-md">
+                    {pendingWebRequests.length} طلب جديد
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-gray-400 font-bold mt-0.5">
+                طلبات الحجوزات المرسلة مباشر من العملاء عبر الموقع الإلكتروني للمعاينة، التواصل والتأكيد
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {pendingWebRequests.length === 0 ? (
+          <div className="bg-[#2A2723]/60 p-6 rounded-2xl border border-white/5 text-center space-y-1.5">
+            <p className="text-sm font-black text-gray-300">
+              ✨ لا يوجد طلبات حجز معلقة من الويب سايت حالياً
+            </p>
+            <p className="text-xs text-gray-500 font-bold">
+              جميع الحجوزات المرفوعة عبر الموقع تم التأكد منها ومراجعتها بنجاح.
+            </p>
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {pendingWebRequests.map((req: any, idx: number) => {
+              const cleanP = formatWhatsAppNumber(req.phone);
+              return (
+                <div key={req.id || idx} className="bg-[#2A2723] border border-amber-500/30 hover:border-amber-400 rounded-2xl p-5 space-y-4 shadow-xl transition-all relative group">
+                  <div className="flex items-start justify-between gap-2 border-b border-white/10 pb-3">
+                    <div className="space-y-1">
+                      <button
+                        onClick={() => openCustomerProfile(req.name, req.phone)}
+                        className="text-base font-black text-white hover:text-amber-300 transition-colors text-right flex items-center gap-1.5"
+                      >
+                        <User size={16} className="text-amber-400 shrink-0" />
+                        <span className="truncate max-w-[180px]">{req.name || 'عميل جديد'}</span>
+                      </button>
+                      <p className="text-[10px] text-gray-400 font-bold">
+                        📞 {req.phone || 'بدون رقم'}
+                      </p>
+                    </div>
+                    <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black px-2.5 py-1 rounded-full shrink-0">
+                      طلب جديد 🆕
+                    </span>
+                  </div>
+
+                  <div className="space-y-2 text-xs font-bold text-gray-300">
+                    <div className="flex justify-between bg-[#1F1C18] p-2.5 rounded-xl border border-white/5">
+                      <span className="text-gray-400">🏠 الوحدة المطلوبة:</span>
+                      <span className="text-amber-300 font-black">{req.studio || req.apartmentId || req.type || 'استوديو'}</span>
+                    </div>
+                    <div className="flex justify-between bg-[#1F1C18] p-2.5 rounded-xl border border-white/5">
+                      <span className="text-gray-400">📅 فترة الإقامة:</span>
+                      <span className="text-blue-300 font-black">{req.checkIn || req.check_in} ➔ {req.checkOut || req.check_out}</span>
+                    </div>
+                    {req.totalAmount && (
+                      <div className="flex justify-between bg-[#1F1C18] p-2.5 rounded-xl border border-white/5">
+                        <span className="text-gray-400">💰 المبلغ المقدر:</span>
+                        <span className="text-emerald-400 font-black">{req.totalAmount} ج.م</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-2 border-t border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => handleConfirmWebBooking(req)}
+                      className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2.5 rounded-xl text-xs transition-all shadow-md flex items-center justify-center gap-1.5"
+                    >
+                      <span>تأكيد الحجز 🟢</span>
+                    </button>
+                    {cleanP && (
+                      <a
+                        href={`https://wa.me/${cleanP}?text=${encodeURIComponent(`أهلاً بك أستاذ ${req.name}، بخصوص طلب حجزك في مزار للفترة من ${req.checkIn || req.check_in} إلى ${req.checkOut || req.check_out}...`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 p-2.5 rounded-xl text-xs font-black flex items-center justify-center transition-all"
+                        title="تواصل واتساب"
+                      >
+                        <MessageSquare size={16} />
+                      </a>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => handleRejectWebBooking(req.id)}
+                      className="bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 p-2.5 rounded-xl text-xs font-black transition-all"
+                      title="رفض / حذف الطلب"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
