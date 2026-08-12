@@ -287,6 +287,18 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
     }
   };
 
+  const handleClearAllPendingWebRequests = async () => {
+    if (!confirm(`هل تريد مسح وإلغاء كافة الطلبات التجريبية الـ (${pendingWebRequests.length}) دفعة واحدة؟`)) return;
+    try {
+      await Promise.all(
+        pendingWebRequests.map((req: any) => updateDbBookingStatus(req.id, { status: 'ملغى', approvedByAdmin: false }))
+      );
+      loadOverviewData();
+    } catch {
+      alert('حدث خطأ أثناء مسح الطلبات.');
+    }
+  };
+
   const pendingWebRequests = (allBookings || []).filter((b: any) => 
     b.status === 'رد جديد' || 
     b.status === 'جديد' || 
@@ -710,7 +722,7 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
               🌐
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="text-xl font-black text-white">طلبات الحجز الجديدة القادمة من الويب سايت</h3>
                 {pendingWebRequests.length > 0 && (
                   <span className="bg-amber-500 text-black text-xs font-black px-3 py-1 rounded-full animate-pulse shadow-md">
@@ -723,6 +735,17 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
               </p>
             </div>
           </div>
+
+          {pendingWebRequests.length > 0 && (
+            <button
+              type="button"
+              onClick={handleClearAllPendingWebRequests}
+              className="bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 font-black px-4 py-2 rounded-xl text-xs transition-all shadow-md flex items-center gap-1.5 shrink-0"
+              title="مسح وتفريغ كافة الطلبات التجريبية الوهمية بضغطة واحدة"
+            >
+              <span>🧹 تنظيف ومسح الطلبات الوهمية ({pendingWebRequests.length})</span>
+            </button>
+          )}
         </div>
 
         {pendingWebRequests.length === 0 ? (
