@@ -101,13 +101,44 @@ export default function DashboardOverview() {
 
     const confirmed = bookings.filter((b: any) => CONFIRMED_STATUSES.includes(b.status));
 
+const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
+  if (!b || !unitId) return false;
+  const targetId = String(unitId).trim().toLowerCase();
+  const bAptId = String(b.apartmentId || '').trim().toLowerCase();
+  const bStudio = String(b.studio || '').trim().toLowerCase();
+  const bUnitId = String(b.unitId || '').trim().toLowerCase();
+  const titleAr = String(unitTitleAr || '').trim();
+
+  if (bAptId === targetId || bStudio === targetId || bUnitId === targetId) return true;
+  if (titleAr && (bAptId === titleAr || bStudio === titleAr || bUnitId === titleAr)) return true;
+
+  if (targetId === 'b1-s5') {
+    if (['s5', '5', 'b1-s5', 'استوديو 5', 'استوديو 5 (دبل)'].some(alias => 
+      bAptId === alias || bStudio === alias || bUnitId === alias || bAptId.includes('استوديو 5') || bStudio.includes('استوديو 5')
+    )) return true;
+  }
+  
+  if (targetId.startsWith('b1-s')) {
+    const num = targetId.replace('b1-s', '');
+    if (bAptId === num || bStudio === num || bAptId === `استوديو ${num}` || bStudio === `استوديو ${num}`) return true;
+  }
+
+  if (targetId.startsWith('b2-s')) {
+    const num = targetId.replace('b2-s', '');
+    if (bAptId === `b2-s${num}` || bStudio === `b2-s${num}`) return true;
+  }
+
+  return false;
+};
+
     const map = apts.map((apt: any) => {
       const targetDateStr = selectedDate;
-      const aptBookings = confirmed.filter((b: any) => b.apartmentId === apt.id);
+      const aptBookings = confirmed.filter((b: any) => isUnitMatch(b, apt.id, apt.title?.ar));
       
       const activeBooking = aptBookings.find((b: any) => targetDateStr >= b.checkIn && targetDateStr < b.checkOut);
       const outToday = aptBookings.find((b: any) => b.checkOut === targetDateStr);
       const inToday = aptBookings.find((b: any) => b.checkIn === targetDateStr);
+      const outTomorrow = aptBookings.find((b: any) => b.checkOut === nextDayStr);
       
       const pastBookings = aptBookings
         .filter((b: any) => b.checkOut <= targetDateStr)
@@ -130,18 +161,7 @@ export default function DashboardOverview() {
       let isTurnover = !!outToday && !!inToday;
       let isCheckingOut = !!outToday && !inToday;
       let isCheckingIn = !!inToday && !outToday;
-
-      const currentHour = new Date().getHours();
-      
-      if (currentHour >= 14) {
-        if (isTurnover) {
-          isTurnover = false;
-          isCheckingIn = true;
-        }
-        if (isCheckingOut) {
-          isCheckingOut = false;
-        }
-      }
+      let isCheckingOutTomorrow = !isCheckingOut && !isTurnover && (!!outTomorrow || (!!activeBooking && activeBooking.checkOut === nextDayStr));
 
       const getUnitCategory = (unitId: string, currentType: string) => {
         if (unitId.startsWith('apt-')) return 'apartment';
@@ -187,6 +207,7 @@ export default function DashboardOverview() {
         arrivingClientStatus: inToday?.clientStatus || 'انتظار',
         arrivingCheckOut: inToday?.checkOut,
         isCheckingOut,
+        isCheckingOutTomorrow,
         isCheckingIn,
       };
     });
@@ -1022,18 +1043,20 @@ export default function DashboardOverview() {
                           </td>
 
                           <td className="px-4 py-3 text-center">
-                            <span className={`text-xs font-black px-3 py-1 rounded-full ${
+                            <span className={`text-xs font-black px-3 py-1.5 rounded-full shadow-sm whitespace-nowrap ${
                               apt.isTurnover ? 'bg-orange-500 text-white animate-pulse' :
-                              apt.isCheckingOut ? 'bg-rose-100 text-rose-600' :
-                              apt.isCheckingIn ? 'bg-blue-100 text-blue-600' :
+                              apt.isCheckingOut ? 'bg-rose-600 text-white font-black' :
+                              apt.isCheckingOutTomorrow ? 'bg-amber-500 text-white font-black' :
+                              apt.isCheckingIn ? 'bg-blue-600 text-white font-black' :
                               apt.status === 'صيانة' ? 'bg-gray-100 text-gray-500' : 
-                              apt.isOccupied ? 'bg-red-100 text-red-600' : 
-                              'bg-green-100 text-green-700'
+                              apt.isOccupied ? 'bg-red-100 text-red-700' : 
+                              'bg-emerald-100 text-emerald-800'
                             }`}>
-                              {apt.isTurnover ? '🔄 تبديل' : 
+                              {apt.isTurnover ? '🔄 تبديل اليوم' : 
                                apt.isCheckingOut ? '🛫 خروج اليوم' :
+                               apt.isCheckingOutTomorrow ? `🛫 خروج غداً (${formatMiniDate(apt.checkOut || apt.leavingCheckOut)})` :
                                apt.isCheckingIn ? '🛬 وصول اليوم' :
-                               apt.isOccupied ? 'مشغول' : 
+                               apt.isOccupied ? (apt.checkOut ? `مشغول (خروج: ${formatMiniDate(apt.checkOut)})` : 'مشغول') : 
                                apt.status === 'صيانة' ? 'صيانة' : 
                                'متاح'}
                             </span>
