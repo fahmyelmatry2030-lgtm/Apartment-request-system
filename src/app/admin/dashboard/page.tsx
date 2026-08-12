@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { getBookings, getSystemUnits } from '@/lib/data-init';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
-import { updateDbBookingStatus } from '@/lib/actions/db';
+import { updateDbBookingStatus, deleteDbBooking, deleteAllPendingDbBookings } from '@/lib/actions/db';
 import CustomerProfileModal from '@/components/CustomerProfileModal';
 import { User, Phone, MessageSquare, FileText, Calendar, CheckCircle2, Home, X, Trash2 } from 'lucide-react';
 import { formatWhatsAppNumber } from '@/lib/utils';
@@ -239,13 +239,13 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
 
     setAllBookings(bookings);
 
-    // Auto-clean mock test records in DB
+    // Hard delete mock test records from DB
     const mockBookings = bookings.filter((b: any) => {
       const name = String(b.name || '');
       return ['مراد لاغا', 'مينا صبرى', 'عاصم بن صالح', 'محمد عبدالحفيظ', 'عبدالحفيظ', 'حسني معمر', 'صبرى يوسف'].some(m => name.includes(m));
     });
     if (mockBookings.length > 0) {
-      Promise.all(mockBookings.map((b: any) => updateDbBookingStatus(b.id, { status: 'ملغى', approvedByAdmin: false })))
+      Promise.all(mockBookings.map((b: any) => deleteDbBooking(b.id)))
         .catch(() => {});
     }
 
@@ -288,21 +288,19 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
   };
 
   const handleRejectWebBooking = async (reqId: string) => {
-    if (!confirm('هل أنت تأكد من رفض وحذف هذا الطلب؟')) return;
+    if (!confirm('هل أنت تأكد من مسح وحذف هذا الطلب نهائياً؟')) return;
     try {
-      await updateDbBookingStatus(reqId, { status: 'ملغى', approvedByAdmin: false });
+      await deleteDbBooking(reqId);
       loadOverviewData();
     } catch {
-      alert('حدث خطأ أثناء رفض الطلب.');
+      alert('حدث خطأ أثناء حذف الطلب.');
     }
   };
 
   const handleClearAllPendingWebRequests = async () => {
-    if (!confirm(`هل تريد مسح وإلغاء كافة الطلبات التجريبية الـ (${pendingWebRequests.length}) دفعة واحدة؟`)) return;
+    if (!confirm('هل تريد مسح كافة الطلبات الوهمية والتجريبية نهائياً من قاعدة البيانات؟')) return;
     try {
-      await Promise.all(
-        pendingWebRequests.map((req: any) => updateDbBookingStatus(req.id, { status: 'ملغى', approvedByAdmin: false }))
-      );
+      await deleteAllPendingDbBookings();
       loadOverviewData();
     } catch {
       alert('حدث خطأ أثناء مسح الطلبات.');

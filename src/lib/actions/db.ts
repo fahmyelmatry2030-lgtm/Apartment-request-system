@@ -420,6 +420,26 @@ export async function deleteDbBooking(id: string) {
   return await getFreshDbBookings(Date.now().toString());
 }
 
+export async function deleteAllPendingDbBookings() {
+  const supabase = getSupabaseServerClient();
+  if (!supabase) return [];
+
+  const pendingStatuses = ['جديد', 'قيد المراجعة', 'pending', 'رد جديد', 'في الانتظار', 'بانتظار التأكيد'];
+  const { error } = await supabase
+    .from('bookings')
+    .delete()
+    .in('status', pendingStatuses);
+
+  if (error) {
+    console.error('Error deleting pending bookings:', error);
+  } else {
+    console.log('✅ Successfully deleted all pending/dummy bookings from DB');
+  }
+
+  revalidatePath('/admin/dashboard');
+  return await getFreshDbBookings(Date.now().toString());
+}
+
 export async function deleteDbBookingsByPhone(phone: string) {
   const supabase = getSupabaseServerClient();
   if (!supabase) return [];
