@@ -150,9 +150,12 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
         .sort((a: any, b: any) => a.checkIn.localeCompare(b.checkIn));
       const nextBooking = upcomingBookings[0];
 
-      const currentAndFutureBookings = aptBookings.filter((b: any) => b.checkOut >= targetDateStr);
+      const currentAndFutureBookings = aptBookings
+        .filter((b: any) => b.checkOut >= targetDateStr)
+        .sort((a: any, b: any) => a.checkIn.localeCompare(b.checkIn));
       const latestFutureBooking = [...currentAndFutureBookings].sort((a: any, b: any) => b.checkOut.localeCompare(a.checkOut))[0];
       const finalCheckOut = latestFutureBooking ? latestFutureBooking.checkOut : (activeBooking?.checkOut || lastBooking?.checkOut || null);
+      const upcomingThree = currentAndFutureBookings.slice(0, 3);
 
       let daysUntilNextBooking: number | null = null;
       if (nextBooking) {
@@ -193,6 +196,7 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
         clientStatus: activeBooking?.clientStatus || 'انتظار',
         checkOut: activeBooking?.checkOut,
         finalCheckOut,
+        upcomingThree,
         guestsCount: activeBooking?.guestsCount,
         lastCheckOut: lastBooking?.checkOut,
         upcomingBookingsCount: upcomingBookings.length,
@@ -1049,12 +1053,26 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
                           {/* LAST BOOKING CHECK-OUT DATE (VERY LAST COLUMN) */}
                           <td className="px-4 py-3 text-xs text-center text-[#2A2723] font-black">
                             {apt.finalCheckOut ? (
-                              <div className="flex flex-col items-center">
+                              <div className="flex flex-col items-center gap-1 min-w-[150px]">
                                 <span className="bg-amber-100 border border-amber-300 text-amber-950 font-black px-2.5 py-1 rounded-lg text-xs shadow-sm whitespace-nowrap">
-                                  🗓️ {formatMiniDate(apt.finalCheckOut)}
+                                  🗓️ آخر خروج: {formatMiniDate(apt.finalCheckOut)}
                                 </span>
+                                {apt.upcomingThree && apt.upcomingThree.length > 0 && (
+                                  <div className="flex flex-col gap-1 w-full text-[10px] font-bold mt-0.5">
+                                    {apt.upcomingThree.map((b: any, idx: number) => (
+                                      <div 
+                                        key={b.id || idx} 
+                                        className="bg-white/90 border border-gray-200 px-2 py-0.5 rounded text-gray-700 flex items-center justify-between gap-1 shadow-2xs"
+                                        title={`حجز ${idx + 1}: ${b.name || 'ضيف'} (${b.checkIn} ➔ ${b.checkOut})`}
+                                      >
+                                        <span className="text-[#C1A68D] font-black">#{idx + 1}</span>
+                                        <span>{formatMiniDate(b.checkIn)} ➔ {formatMiniDate(b.checkOut)}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
                                 {apt.daysUntilNextBooking !== null && apt.daysUntilNextBooking > 0 && (
-                                  <span className="text-[9px] font-black bg-emerald-100 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-md mt-1 whitespace-nowrap shadow-sm">
+                                  <span className="text-[9px] font-black bg-emerald-100 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-md mt-0.5 whitespace-nowrap shadow-sm">
                                     متاح {apt.daysUntilNextBooking} يوم حتى الحجز القادم
                                   </span>
                                 )}
