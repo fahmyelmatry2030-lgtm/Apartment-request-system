@@ -256,6 +256,18 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
     setIsLoading(false);
   }, [selectedDate, selectedCategory, adminRole]);
 
+  const [activeReceiptModal, setActiveReceiptModal] = useState<{ isOpen: boolean; url: string | null; name?: string }>({ isOpen: false, url: null });
+
+  const getReceiptUrl = (req: any) => {
+    if (!req) return null;
+    if (req.receiptUrl && typeof req.receiptUrl === 'string' && req.receiptUrl.startsWith('http')) return req.receiptUrl;
+    if (req.receipt && typeof req.receipt === 'string' && req.receipt.startsWith('http')) return req.receipt;
+    
+    const text = `${req.paymentInfo || ''} ${req.notes || ''} ${req.paymentProof || ''}`;
+    const match = text.match(/(https?:\/\/[^\s"']+\.(?:jpg|jpeg|png|webp|gif|svg))/i) || text.match(/(https?:\/\/res\.cloudinary\.com[^\s"']+)/i);
+    return match ? match[0] : null;
+  };
+
   const handleConfirmWebBooking = async (req: any) => {
     try {
       await updateDbBookingStatus(req.id, { status: 'مؤكد', approvedByAdmin: true });
@@ -761,6 +773,25 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
                         <span className="text-emerald-400 font-black">{req.totalAmount} ج.م</span>
                       </div>
                     )}
+
+                    {/* RECEIPT / PAY PROOF BADGE & MODAL TRIGGER */}
+                    {(() => {
+                      const receipt = getReceiptUrl(req);
+                      return receipt ? (
+                        <button
+                          type="button"
+                          onClick={() => setActiveReceiptModal({ isOpen: true, url: receipt, name: req.name })}
+                          className="w-full bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 px-3 py-2.5 rounded-xl text-xs font-black flex items-center justify-between transition-all shadow-sm"
+                        >
+                          <span className="flex items-center gap-1.5">🧾 إيصال جدية الحجز / التحويل</span>
+                          <span className="text-[10px] bg-emerald-500 text-black px-2.5 py-0.5 rounded-full font-black">معاينة 📸</span>
+                        </button>
+                      ) : (
+                        <div className="text-[10px] text-gray-500 font-bold text-center bg-white/5 py-1.5 rounded-xl border border-white/5">
+                          ⚠️ لم يرفق إيصال تحويل
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   <div className="flex items-center gap-2 pt-2 border-t border-white/10">
@@ -1264,6 +1295,48 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
             >
               إغلاق
             </button>
+      {/* ── RECEIPT VIEWER MODAL ── */}
+      {activeReceiptModal.isOpen && activeReceiptModal.url && (
+        <div className="fixed inset-0 z-[150] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in" dir="rtl">
+          <div className="bg-[#1F1C18] border border-[#C1A68D]/40 rounded-[2.5rem] p-6 max-w-xl w-full text-white space-y-4 shadow-2xl relative">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div className="flex items-center gap-2 text-amber-400 font-black text-base">
+                <span>🧾 إيصال جدية الحجز / التحويل</span>
+                {activeReceiptModal.name && <span className="text-gray-300 text-xs">({activeReceiptModal.name})</span>}
+              </div>
+              <button
+                onClick={() => setActiveReceiptModal({ isOpen: false, url: null })}
+                className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/20 transition-all"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="relative rounded-2xl overflow-hidden bg-black/60 border border-white/10 flex items-center justify-center max-h-[70vh] p-2">
+              <img
+                src={activeReceiptModal.url}
+                alt="إيصال جدية الحجز"
+                className="max-h-[65vh] w-auto object-contain rounded-xl shadow-lg"
+              />
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <a
+                href={activeReceiptModal.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 bg-[#C1A68D] hover:bg-[#b09378] text-black font-black py-2.5 rounded-xl text-xs text-center transition-all shadow-md flex items-center justify-center gap-2"
+              >
+                <span>🔍 فتح الصورة بالحجم الكامل في نافذة جديدة</span>
+              </a>
+              <button
+                type="button"
+                onClick={() => setActiveReceiptModal({ isOpen: false, url: null })}
+                className="bg-white/10 hover:bg-white/20 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition-all"
+              >
+                إغلاق
+              </button>
+            </div>
           </div>
         </div>
       )}
