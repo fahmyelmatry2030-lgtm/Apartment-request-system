@@ -284,7 +284,7 @@ export default function CustomerProfileModal({
                 <span>سجل الحجوزات والتفاصيل ({customerBookings.length})</span>
               </h4>
 
-              <div className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {customerBookings.length === 0 ? (
                   <div className="text-center py-10 text-gray-500 text-xs font-bold">لا يوجد سجلات حجوزات سابقة لهذا العميل</div>
                 ) : (
