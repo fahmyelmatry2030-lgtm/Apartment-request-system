@@ -290,9 +290,28 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
     return null;
   };
 
+  const getLoggedInAdminName = () => {
+    if (typeof window === 'undefined') return 'قائد الشيفت';
+    try {
+      const info = sessionStorage.getItem('adminInfo') || localStorage.getItem('adminInfo');
+      if (info) {
+        const parsed = JSON.parse(info);
+        if (parsed.name) return parsed.name;
+        if (parsed.username) return parsed.username;
+      }
+    } catch (e) {}
+    return 'قائد الشيفت';
+  };
+
   const handleConfirmWebBooking = async (req: any) => {
     try {
-      await updateDbBookingStatus(req.id, { status: 'مؤكد', approvedByAdmin: true });
+      const shiftLead = getLoggedInAdminName();
+      await updateDbBookingStatus(req.id, { 
+        status: 'مؤكد', 
+        approvedByAdmin: true,
+        bookingManager: shiftLead,
+        notes: req.notes ? `${req.notes} [اعتماد: ${shiftLead}]` : `[اعتماد: ${shiftLead}]`
+      });
       loadOverviewData();
     } catch {
       alert('حدث خطأ أثناء تأكيد الحجز.');

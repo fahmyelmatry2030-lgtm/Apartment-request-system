@@ -130,6 +130,17 @@ export default function BookingsManagement() {
     
     setIsLoading(true);
     setError(null);
+
+    let shiftLead = 'قائد الشيفت';
+    try {
+      const raw = sessionStorage.getItem('adminInfo') || localStorage.getItem('adminInfo');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed.name) shiftLead = parsed.name;
+        else if (parsed.username) shiftLead = parsed.username;
+      }
+    } catch(e) {}
+
     try {
       await updateBookingStatus(selectedBooking.id, { 
           status: 'approved', 
@@ -141,7 +152,8 @@ export default function BookingsManagement() {
           idNumber: idNumber || undefined,
           commission: commission || undefined,
           brokerName: brokerName || undefined,
-          notes: bookingNotes || undefined,
+          bookingManager: shiftLead,
+          notes: bookingNotes ? `${bookingNotes} [اعتماد: ${shiftLead}]` : `[اعتماد: ${shiftLead}]`,
       });
       
       if (typeof window !== 'undefined') {

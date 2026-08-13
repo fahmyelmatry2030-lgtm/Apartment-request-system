@@ -329,6 +329,22 @@ export default function CustomerProfileModal({
                         </div>
                       </div>
 
+                      {/* Shift Lead Approver Badge */}
+                      <div className="flex items-center justify-between text-[11px] bg-blue-500/10 border border-blue-500/20 px-3.5 py-2.5 rounded-xl text-blue-300 font-bold mt-2">
+                        <span className="flex items-center gap-1.5">
+                          <span>🛡️ اعتمد بواسطة:</span>
+                          <strong className="text-white font-black">{(() => {
+                            if (b.bookingManager && b.bookingManager.trim() !== '' && b.bookingManager !== b.name && b.bookingManager !== b.guest) {
+                              return b.bookingManager;
+                            }
+                            const match = String(b.notes || '').match(/\[اعتماد:\s*([^\]]+)\]/i);
+                            if (match && match[1]) return match[1].trim();
+                            return 'قائد الشيفت (المشرف)';
+                          })()}</strong>
+                        </span>
+                        {b.paymentMethod && <span className="text-emerald-400 font-black">💳 {b.paymentMethod}</span>}
+                      </div>
+
                       {b.notes && b.id !== latestBooking.id && (
                         <div className="bg-black/10 p-2.5 rounded-xl border border-white/5 text-[11px] text-gray-400 font-medium">
                           <span className="text-[#C1A68D] font-bold">ملاحظة الحجز السابق:</span> {b.notes}

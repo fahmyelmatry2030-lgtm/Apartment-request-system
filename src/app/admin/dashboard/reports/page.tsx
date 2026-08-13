@@ -901,7 +901,14 @@ function ReportsContent() {
       brokerName: booking.brokerName || '',
       netValue,
       clientStatus,
-      bookingManager: booking.bookingManager || '',
+      bookingManager: (() => {
+        if (booking.bookingManager && booking.bookingManager.trim() !== '' && booking.bookingManager !== booking.name && booking.bookingManager !== booking.guest) {
+          return booking.bookingManager;
+        }
+        const match = String(booking.notes || '').match(/\[اعتماد:\s*([^\]]+)\]/i);
+        if (match && match[1]) return match[1].trim();
+        return 'قائد الشيفت';
+      })(),
       paymentMethod: booking.paymentMethod || '',
       paymentStatus: (() => {
         const noteStr = String(booking.notes || '').trim().toLowerCase();
