@@ -242,7 +242,7 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
     // Hard delete mock test records from DB
     const mockBookings = bookings.filter((b: any) => {
       const name = String(b.name || '').trim();
-      return ['مراد لاغا', 'مينا صبرى', 'عاصم بن صالح', 'محمد عبدالحفيظ', 'عبدالحفيظ', 'حسني معمر', 'صبرى يوسف', 'MFl', 'mfl', 'احمد الحسنى', 'احمد فارس شيخو', 'رعد سلمان', 'مصطفي احمد', 'Ahmed', 'ahmed', 'محمد خليل'].some(m => name.toLowerCase().includes(m.toLowerCase()));
+      return ['مراد لاغا', 'مينا صبرى', 'عاصم بن صالح', 'محمد عبدالحفيظ', 'عبدالحفيظ', 'حسني معمر', 'صبرى يوسف', 'MFl', 'mfl', 'احمد الحسنى', 'احمد فارس شيخو', 'رعد سلمان', 'مصطفي احمد', 'Ahmed', 'ahmed', 'محمد خليل', 'ابودراز', 'أبودراز'].some(m => name.toLowerCase().includes(m.toLowerCase()));
     });
     if (mockBookings.length > 0) {
       Promise.all(mockBookings.map((b: any) => deleteDbBooking(b.id)))
@@ -310,7 +310,7 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
   const mockNames = [
     'مراد لاغا', 'مينا صبرى', 'عاصم بن صالح', 'محمد عبدالحفيظ', 'عبدالحفيظ', 
     'حسني معمر', 'صبرى يوسف', 'MFl', 'mfl', 'احمد الحسنى', 'احمد فارس شيخو', 
-    'رعد سلمان', 'مصطفي احمد', 'Ahmed', 'ahmed', 'محمد خليل'
+    'رعد سلمان', 'مصطفي احمد', 'Ahmed', 'ahmed', 'محمد خليل', 'ابودراز', 'أبودراز', 'ابو دراز'
   ];
   
   const isMockRequest = (b: any) => {
@@ -325,10 +325,8 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
       b.source === 'website' || 
       b.isWebsiteBooking === true || 
       b.is_website_booking === true || 
-      String(b.notes || '').includes('موقع') || 
-      String(b.notes || '').includes('ويب') || 
-      String(b.paymentInfo || '').includes('موقع') || 
-      String(b.payment_info || '').includes('موقع');
+      String(b.paymentInfo || '').includes('[طلب من الموقع]') || 
+      String(b.payment_info || '').includes('[طلب من الموقع]');
 
     if (!isFromWebsite) return false;
 
