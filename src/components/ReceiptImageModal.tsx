@@ -123,23 +123,12 @@ export default function ReceiptImageModal({ isOpen, url, guestName, onClose }: R
               }}
             />
           ) : (
-            <div className="text-center space-y-3 p-6">
-              <div className="w-16 h-16 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-2xl mx-auto animate-bounce">
-                📸
-              </div>
-              <p className="text-sm font-black text-white">إيصال جدية الحجز مرفق برابط مباشر</p>
-              <p className="text-xs text-gray-400 font-bold max-w-sm mx-auto">
-                يمكنك معاينة وفتح إيصال التحويل بالحجم الكامل مباشرة في نافذة جديدة.
-              </p>
-              <a
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-[#C1A68D] hover:bg-[#b09378] text-black font-black px-6 py-3 rounded-xl text-xs transition-all shadow-lg mt-2"
-              >
-                <ExternalLink size={16} />
-                <span>فتح صورة الإيصال مباشرة ↗</span>
-              </a>
+            <div className="w-full h-[55vh] min-h-[400px] flex flex-col items-center justify-center bg-white rounded-xl overflow-hidden shadow-inner">
+              <iframe
+                src={`https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`}
+                className="w-full h-full border-0"
+                title="معاينة إثبات الدفع المباشرة"
+              />
             </div>
           )}
         </div>
