@@ -1191,7 +1191,8 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
                         if (id.startsWith('b1-s')) return parseInt(id.replace('b1-s',''),10);
                         if (id.startsWith('b2-s')) return parseInt(id.replace('b2-s',''),10)+12;
                         if (id.startsWith('p-s')) return parseInt(id.replace('p-s',''),10);
-                        return 99;
+                        if (id.startsWith('apt-')) return parseInt(id.replace('apt-',''),10)+30;
+                        return 999;
                       };
                       return n(a) - n(b);
                     })
@@ -1199,7 +1200,15 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
                       const isB1 = String(apt.id).startsWith('b1-s');
                       const isB2 = String(apt.id).startsWith('b2-s');
                       const isPs = String(apt.id).startsWith('p-s');
-                      const num = isB1 ? parseInt(apt.id.replace('b1-s',''),10) : isB2 ? parseInt(apt.id.replace('b2-s',''),10)+12 : isPs ? parseInt(apt.id.replace('p-s',''),10) : 0;
+                       const num = isB1 
+                         ? parseInt(apt.id.replace('b1-s',''),10) 
+                         : isB2 
+                           ? parseInt(apt.id.replace('b2-s',''),10)+12 
+                           : isPs 
+                             ? parseInt(apt.id.replace('p-s',''),10) 
+                             : String(apt.id).startsWith('apt-')
+                               ? parseInt(apt.id.replace('apt-',''),10)
+                               : 0;
                       const rowBg = isB1 ? 'bg-blue-50/40 hover:bg-blue-50/80' : isB2 ? 'bg-emerald-50/40 hover:bg-emerald-50/80' : isPs ? 'bg-purple-50/40 hover:bg-purple-50/80' : 'bg-amber-50/40 hover:bg-amber-50/80';
                       const badgeColor = isB1 ? 'bg-blue-600 text-white' : isB2 ? 'bg-emerald-600 text-white' : isPs ? 'bg-purple-600 text-white' : 'bg-[#C1A68D] text-white';
 
