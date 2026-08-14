@@ -12,7 +12,7 @@ export const units = [
     "next_booking": "لا يوجد",
     "description": null,
     "images": null,
-    "video": "/%D8%A7%D8%B3%D8%AA%D8%AF%D9%8A%D9%88%D9%87%D8%A7%D8%AA/s14/VID-20260814-WA0008.mp4",
+    "video": "/استديوهات/s14/VID-20260814-WA0008.mp4",
     "features": null,
     "original_price": null,
     "price": "200",
@@ -31,7 +31,7 @@ export const units = [
     "next_booking": "لا يوجد",
     "description": null,
     "images": null,
-    "video": "/%D8%A7%D8%B3%D8%AA%D8%AF%D9%8A%D9%88%D9%87%D8%A7%D8%AA/s17/VID-20260814-WA0016.mp4",
+    "video": "/استديوهات/s17/VID-20260814-WA0016.mp4",
     "features": null,
     "original_price": null,
     "price": "200",
@@ -50,7 +50,7 @@ export const units = [
     "next_booking": "لا يوجد",
     "description": null,
     "images": null,
-    "video": "/%D8%A7%D8%B3%D8%AA%D8%AF%D9%8A%D9%88%D9%87%D8%A7%D8%AA/s20/VID-20260814-WA0023.mp4",
+    "video": "/استديوهات/s20/VID-20260814-WA0023.mp4",
     "features": null,
     "original_price": null,
     "price": "200",
@@ -69,7 +69,7 @@ export const units = [
     "next_booking": "لا يوجد",
     "description": null,
     "images": null,
-    "video": "/%D8%A7%D8%B3%D8%AA%D8%AF%D9%8A%D9%88%D9%87%D8%A7%D8%AA/s23/VID-20260814-WA0014.mp4",
+    "video": "/استديوهات/s23/VID-20260814-WA0014.mp4",
     "features": null,
     "original_price": null,
     "price": "200",
@@ -88,7 +88,7 @@ export const units = [
     "next_booking": "لا يوجد",
     "description": null,
     "images": null,
-    "video": "/%D8%A7%D8%B3%D8%AA%D8%AF%D9%8A%D9%88%D9%87%D8%A7%D8%AA/s15/VID-20260814-WA0019.mp4",
+    "video": "/استديوهات/s15/VID-20260814-WA0019.mp4",
     "features": null,
     "original_price": null,
     "price": "200",
@@ -107,7 +107,7 @@ export const units = [
     "next_booking": "لا يوجد",
     "description": null,
     "images": null,
-    "video": "/%D8%A7%D8%B3%D8%AA%D8%AF%D9%8A%D9%88%D9%87%D8%A7%D8%AA/s18/VID-20260814-WA0013.mp4",
+    "video": "/استديوهات/s18/VID-20260814-WA0013.mp4",
     "features": null,
     "original_price": null,
     "price": "200",
@@ -126,7 +126,7 @@ export const units = [
     "next_booking": "لا يوجد",
     "description": null,
     "images": null,
-    "video": "/%D8%A7%D8%B3%D8%AA%D8%AF%D9%8A%D9%88%D9%87%D8%A7%D8%AA/s21/VID-20260814-WA0012.mp4",
+    "video": "/استديوهات/s21/VID-20260814-WA0012.mp4",
     "features": null,
     "original_price": null,
     "price": "200",
@@ -145,7 +145,7 @@ export const units = [
     "next_booking": "لا يوجد",
     "description": null,
     "images": null,
-    "video": "/%D8%A7%D8%B3%D8%AA%D8%AF%D9%8A%D9%88%D9%87%D8%A7%D8%AA/s24/VID-20260814-WA0011.mp4",
+    "video": "/استديوهات/s24/VID-20260814-WA0011.mp4",
     "features": null,
     "original_price": null,
     "price": "200",
@@ -164,7 +164,7 @@ export const units = [
     "next_booking": "لا يوجد",
     "description": null,
     "images": null,
-    "video": "/%D8%A7%D8%B3%D8%AA%D8%AF%D9%8A%D9%88%D9%87%D8%A7%D8%AA/s13/VID-20260814-WA0027.mp4",
+    "video": "/استديوهات/s13/VID-20260814-WA0027.mp4",
     "features": null,
     "original_price": null,
     "price": "200",
@@ -183,7 +183,7 @@ export const units = [
     "next_booking": "لا يوجد",
     "description": null,
     "images": null,
-    "video": "/%D8%A7%D8%B3%D8%AA%D8%AF%D9%8A%D9%88%D9%87%D8%A7%D8%AA/s16/VID-20260814-WA0021.mp4",
+    "video": "/استديوهات/s16/VID-20260814-WA0021.mp4",
     "features": null,
     "original_price": null,
     "price": "200",
@@ -202,7 +202,7 @@ export const units = [
     "next_booking": "لا يوجد",
     "description": null,
     "images": null,
-    "video": "/%D8%A7%D8%B3%D8%AA%D8%AF%D9%8A%D9%88%D9%87%D8%A7%D8%AA/s19/VID-20260814-WA0018.mp4",
+    "video": "/استديوهات/s19/VID-20260814-WA0018.mp4",
     "features": null,
     "original_price": null,
     "price": "200",
@@ -221,7 +221,7 @@ export const units = [
     "next_booking": "لا يوجد",
     "description": null,
     "images": null,
-    "video": "/%D8%A7%D8%B3%D8%AA%D8%AF%D9%8A%D9%88%D9%87%D8%A7%D8%AA/s22/VID-20260814-WA0015.mp4",
+    "video": "/استديوهات/s22/VID-20260814-WA0015.mp4",
     "features": null,
     "original_price": null,
     "price": "200",
@@ -284,7 +284,7 @@ export const units = [
     "next_booking": "لا يوجد",
     "description": null,
     "images": null,
-    "video": "/%D8%A7%D8%B3%D8%AA%D8%AF%D9%8A%D9%88%D9%87%D8%A7%D8%AA/s6/VID-20260814-WA0009.mp4",
+    "video": "/استديوهات/s6/VID-20260814-WA0009.mp4",
     "features": {
       "ar": [
         "تكييف",
@@ -348,7 +348,7 @@ export const units = [
     "next_booking": "لا يوجد",
     "description": null,
     "images": null,
-    "video": "/%D8%A7%D8%B3%D8%AA%D8%AF%D9%8A%D9%88%D9%87%D8%A7%D8%AA/s2/VID-20260814-WA0026.mp4",
+    "video": "/استديوهات/s2/VID-20260814-WA0026.mp4",
     "features": {
       "ar": [
         "تكييف",
@@ -424,7 +424,7 @@ export const units = [
     "next_booking": "لا يوجد",
     "description": null,
     "images": null,
-    "video": "/%D8%A7%D8%B3%D8%AA%D8%AF%D9%8A%D9%88%D9%87%D8%A7%D8%AA/s10/VID-20260814-WA0007.mp4",
+    "video": "/استديوهات/s10/VID-20260814-WA0007.mp4",
     "features": {
       "ar": [
         "سرير مزدوج",
@@ -458,7 +458,7 @@ export const units = [
     "next_booking": "لا يوجد",
     "description": null,
     "images": null,
-    "video": "/%D8%A7%D8%B3%D8%AA%D8%AF%D9%8A%D9%88%D9%87%D8%A7%D8%AA/s11/VID-20260814-WA0024.mp4",
+    "video": "/استديوهات/s11/VID-20260814-WA0024.mp4",
     "features": {
       "ar": [
         "سرير مزدوج",
@@ -492,7 +492,7 @@ export const units = [
     "next_booking": "لا يوجد",
     "description": null,
     "images": null,
-    "video": "/%D8%A7%D8%B3%D8%AA%D8%AF%D9%8A%D9%88%D9%87%D8%A7%D8%AA/s12/VID-20260814-WA0010.mp4",
+    "video": "/استديوهات/s12/VID-20260814-WA0010.mp4",
     "features": {
       "ar": [
         "سرير مزدوج",
@@ -526,7 +526,7 @@ export const units = [
     "next_booking": "لا يوجد",
     "description": null,
     "images": null,
-    "video": "/%D8%A7%D8%B3%D8%AA%D8%AF%D9%8A%D9%88%D9%87%D8%A7%D8%AA/s3/VID-20260814-WA0028.mp4",
+    "video": "/استديوهات/s3/VID-20260814-WA0028.mp4",
     "features": {
       "ar": [
         "تكييف",
@@ -558,7 +558,7 @@ export const units = [
     "next_booking": "لا يوجد",
     "description": null,
     "images": null,
-    "video": "/%D8%A7%D8%B3%D8%AA%D8%AF%D9%8A%D9%88%D9%87%D8%A7%D8%AA/s8/VID-20260814-WA0020.mp4",
+    "video": "/استديوهات/s8/VID-20260814-WA0020.mp4",
     "features": {
       "ar": [
         "تكييف",
@@ -590,7 +590,7 @@ export const units = [
     "next_booking": "لا يوجد",
     "description": null,
     "images": null,
-    "video": "/%D8%A7%D8%B3%D8%AA%D8%AF%D9%8A%D9%88%D9%87%D8%A7%D8%AA/s9/VID-20260814-WA0029.mp4",
+    "video": "/استديوهات/s9/VID-20260814-WA0029.mp4",
     "features": {
       "ar": [
         "سرير مزدوج",
@@ -624,7 +624,7 @@ export const units = [
     "next_booking": "لا يوجد",
     "description": null,
     "images": null,
-    "video": "/%D8%A7%D8%B3%D8%AA%D8%AF%D9%8A%D9%88%D9%87%D8%A7%D8%AA/s4/VID-20260814-WA0017.mp4",
+    "video": "/استديوهات/s4/VID-20260814-WA0017.mp4",
     "features": {
       "ar": [
         "٣ أسرة فردية",
@@ -656,7 +656,7 @@ export const units = [
     "next_booking": "لا يوجد",
     "description": null,
     "images": null,
-    "video": "/%D8%A7%D8%B3%D8%AA%D8%AF%D9%8A%D9%88%D9%87%D8%A7%D8%AA/s5/VID-20260814-WA0022.mp4",
+    "video": "/استديوهات/s5/VID-20260814-WA0022.mp4",
     "features": {
       "ar": [
         "سرير مزدوج",
@@ -965,7 +965,7 @@ export const units = [
       "/images/mazar1/WhatsApp-Image-2025-12-15-at-12.39.16_ff8ccd08.jpg",
       "/images/mazar1/WhatsApp-Image-2025-12-15-at-12.39.17_3a943570.jpg"
     ],
-    "video": "/%D8%A7%D8%B3%D8%AA%D8%AF%D9%8A%D9%88%D9%87%D8%A7%D8%AA/s1/VID-20260814-WA0025.mp4",
+    "video": "/استديوهات/s1/VID-20260814-WA0025.mp4",
     "features": {
       "ar": [
         "سرير مزدوج",
