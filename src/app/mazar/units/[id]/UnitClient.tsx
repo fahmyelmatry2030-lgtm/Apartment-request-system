@@ -239,7 +239,7 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
             {/* Main media */}
             <div className="relative h-[360px] md:h-[480px] rounded-[32px] overflow-hidden shadow-md bg-black flex items-center justify-center group">
               {activeMedia === 'video' && unit?.video ? (
-                <video src={encodeURI(unit.video)} controls autoPlay muted playsInline className="w-full h-full object-contain" />
+                <video src={encodeURI(unit.video)} controls autoPlay muted playsInline preload="metadata" className="w-full h-full object-contain" />
               ) : (
                 <Image
                   src={activeImage}

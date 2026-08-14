@@ -181,6 +181,7 @@ function ExternalApartmentCard({ apt }: { apt: typeof EXTERNAL_APARTMENTS[0] }) 
             muted
             loop
             playsInline
+            preload="metadata"
             className="w-full h-full object-cover"
           />
         ) : (

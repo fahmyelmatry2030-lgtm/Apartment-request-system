@@ -1052,7 +1052,7 @@ export default function BookingPage() {
                     return l.includes('.mp4') || l.includes('.mov') || l.includes('.webm');
                   };
                   return isVideo(quickViewActiveImage) ? (
-                    <video src={encodeURI(quickViewActiveImage)} controls autoPlay muted playsInline className="w-full h-full object-contain" />
+                    <video src={encodeURI(quickViewActiveImage)} controls autoPlay muted playsInline preload="metadata" className="w-full h-full object-contain" />
                   ) : (
                     <img src={quickViewActiveImage} alt="Active Media" className="w-full h-full object-cover transition-transform duration-700" />
                   );

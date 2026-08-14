@@ -83,6 +83,7 @@ export default function BranchCard({
             muted
             loop
             playsInline
+            preload="metadata"
             className="w-full h-full object-cover"
           />
         ) : (
