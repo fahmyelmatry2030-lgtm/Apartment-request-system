@@ -38,10 +38,18 @@
     @apply overflow-x-hidden w-full m-0 p-0;
     scroll-behavior: smooth;
     -webkit-tap-highlight-color: transparent;
+    touch-action: auto;
   }
   
   body {
     @apply bg-mazar-cream text-mazar-coffee font-cairo antialiased;
+  }
+
+  /* Prevent automatic unwanted iOS Safari zoom on focus while allowing smooth user zoom */
+  @media screen and (max-width: 768px) {
+    input, select, textarea {
+      font-size: 16px !important;
+    }
   }
 }
 

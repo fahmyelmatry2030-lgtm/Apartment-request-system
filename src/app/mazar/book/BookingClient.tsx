@@ -7,6 +7,8 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 import Calendar from '@/components/Calendar';
 import { useLanguage } from '@/lib/LanguageContext';
 import { uploadImage } from '@/lib/actions/upload';
+import PaymentInfoBox from '@/components/PaymentInfoBox';
+
 
 
 export default function BookingPage() {
@@ -926,11 +928,8 @@ export default function BookingPage() {
                           💳 {isRTL ? 'بيانات الدفع والتحويل للتأكيد' : 'Payment & Transfer Details'}
                         </h4>
                         
-                        <div className={`space-y-2 text-[11px] font-bold text-[#5C554B] leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
-                          <p>📱 <strong>فودافون كاش (Vodafone Cash):</strong> <span className="font-black text-rose-600">{isRTL ? 'قريباً' : 'Soon'}</span></p>
-                          <p>🔗 <strong>إنستاباي (Instapay):</strong> <span className="font-black text-blue-600">{isRTL ? 'قريباً' : 'Soon'}</span></p>
-                          <p>🏦 <strong>التحويل البنكي (Bank Transfer):</strong> <span className="font-black text-amber-800">{isRTL ? 'قريباً' : 'Soon'}</span></p>
-                        </div>
+                        <PaymentInfoBox isRTL={isRTL} />
+
 
                         <div className="space-y-2 pt-2">
                           <label className={`block text-[9px] md:text-[10px] font-black text-[#5C554B] uppercase ${isRTL ? 'text-right' : 'text-left'}`}>

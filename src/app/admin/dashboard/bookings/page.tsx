@@ -562,8 +562,9 @@ export default function BookingsManagement() {
                 )}
                 
                 <div className="flex flex-wrap gap-2">
-                   <button onClick={() => setPaymentInfo(prev => `${prev}\n\nعبر إنستا باي (Instapay) برقم: 01108109969.`)} className="text-[9px] bg-[#2A2723] text-white px-5 py-2.5 rounded-full border border-transparent hover:bg-black transition-all font-black shadow-lg shadow-black/10">إنستا باي +</button>
-                   <button onClick={() => setPaymentInfo(prev => `${prev}\n\nفودافون كاش على رقم: 01108109969.`)} className="text-[9px] bg-red-600 text-white px-5 py-2.5 rounded-full border border-transparent hover:bg-red-700 transition-all font-black shadow-lg shadow-red-600/10">فودافون كاش +</button>
+                   <button onClick={() => setPaymentInfo(prev => `${prev}\n\nتحويل عبر إنستا باي (InstaPay):\nالاسم: مدحت عزالدين\nالرقم: 01005318003`)} className="text-[9px] bg-[#2A2723] text-white px-4 py-2 rounded-full border border-transparent hover:bg-black transition-all font-black shadow-lg shadow-black/10">إنستا باي +</button>
+                   <button onClick={() => setPaymentInfo(prev => `${prev}\n\nتحويل عبر فودافون كاش (Vodafone Cash):\nالاسم: محمود علي\nالرقم: 01021691745`)} className="text-[9px] bg-red-600 text-white px-4 py-2 rounded-full border border-transparent hover:bg-red-700 transition-all font-black shadow-lg shadow-red-600/10">فودافون كاش +</button>
+                   <button onClick={() => setPaymentInfo(prev => `${prev}\n\nتحويل بنكي (البنك الأهلي المصري):\nاسم الحساب: مدحت عزالدين\nرقم الحساب: 1385171656685100017\nIBAN: EG620003013851716566851000170`)} className="text-[9px] bg-amber-800 text-white px-4 py-2 rounded-full border border-transparent hover:bg-amber-900 transition-all font-black shadow-lg shadow-amber-800/10">البنك الأهلي +</button>
                 </div>
                 <textarea 
                   placeholder="اكتب تفاصيل الدفع أو أي ملاحظات للعميل هنا..."

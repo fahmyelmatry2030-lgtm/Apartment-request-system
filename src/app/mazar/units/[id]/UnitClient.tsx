@@ -7,7 +7,9 @@ import Footer from '@/components/Footer';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useLanguage } from '@/lib/LanguageContext';
 import { uploadImage } from '@/lib/actions/upload';
+import PaymentInfoBox from '@/components/PaymentInfoBox';
 import Image from 'next/image';
+
 
 const ADMIN_WHATSAPP = '201108109969';
 
@@ -485,11 +487,7 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
                   <h4 className="text-xs font-black text-[#2A2723] pb-2 border-b border-[#EAE4D9]/60 text-right">
                     💳 {isRTL ? 'بيانات الدفع' : 'Payment Info'}
                   </h4>
-                  <div className="space-y-1 text-[11px] font-bold text-[#5C554B] leading-relaxed text-right" dir="rtl">
-                    <p>📱 <strong>فودافون كاش:</strong> <span className="text-rose-600 font-black">قريباً</span></p>
-                    <p>🔗 <strong>إنستاباي:</strong> <span className="text-blue-600 font-black">قريباً</span></p>
-                    <p>🏦 <strong>التحويل البنكي:</strong> <span className="text-amber-800 font-black">قريباً</span></p>
-                  </div>
+                  <PaymentInfoBox isRTL={isRTL} />
                   <div className="space-y-2 pt-1">
                     <label className="block text-[10px] font-black text-[#5C554B] uppercase text-right">
                       📸 {isRTL ? 'إرفاق إيصال التحويل (اختياري)' : 'Attach Receipt (Optional)'}

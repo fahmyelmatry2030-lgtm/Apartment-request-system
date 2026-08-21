@@ -105,17 +105,21 @@ export default function DashboardOverview() {
 const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
   if (!b || !unitId) return false;
   const targetId = String(unitId).trim().toLowerCase();
-  const bAptId = String(b.apartmentId || '').trim().toLowerCase();
+  const bAptId = String(b.apartmentId || b.apartment_id || '').trim().toLowerCase();
   const bStudio = String(b.studio || '').trim().toLowerCase();
-  const bUnitId = String(b.unitId || '').trim().toLowerCase();
+  const bUnitId = String(b.unitId || b.unit_id || '').trim().toLowerCase();
   const titleAr = String(unitTitleAr || '').trim();
+
+  // Prevent cross-building false matches (e.g. b2-s5 matching b1-s5)
+  if (targetId.startsWith('b1-') && (bAptId.startsWith('b2-') || bUnitId.startsWith('b2-'))) return false;
+  if (targetId.startsWith('b2-') && (bAptId.startsWith('b1-') || bUnitId.startsWith('b1-'))) return false;
 
   if (bAptId === targetId || bStudio === targetId || bUnitId === targetId) return true;
   if (titleAr && (bAptId === titleAr || bStudio === titleAr || bUnitId === titleAr)) return true;
 
   if (targetId === 'b1-s5') {
     if (['s5', '5', 'b1-s5', 'استوديو 5', 'استوديو 5 (دبل)'].some(alias => 
-      bAptId === alias || bStudio === alias || bUnitId === alias || bAptId.includes('استوديو 5') || bStudio.includes('استوديو 5')
+      bAptId === alias || bStudio === alias || bUnitId === alias
     )) return true;
   }
   

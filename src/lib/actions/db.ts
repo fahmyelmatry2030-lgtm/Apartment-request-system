@@ -81,7 +81,29 @@ export async function sendSecurityTelegramAlert(username: string, details: strin
   }
 }
 
-// --- BOOKINGS ---
+export function normalizeDateString(dateStr: any, defaultYear = 2026): string {
+  if (!dateStr || typeof dateStr !== 'string') return '';
+  const str = dateStr.trim().replace(/\\/g, '/').replace(/\/+/g, '/');
+  
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+
+  const partsYMD = str.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})$/);
+  if (partsYMD) {
+    return `${partsYMD[1]}-${partsYMD[2].padStart(2, '0')}-${partsYMD[3].padStart(2, '0')}`;
+  }
+
+  const partsDMY = str.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
+  if (partsDMY) {
+    return `${partsDMY[3]}-${partsDMY[2].padStart(2, '0')}-${partsDMY[1].padStart(2, '0')}`;
+  }
+
+  const partsDM = str.match(/^(\d{1,2})[/-](\d{1,2})$/);
+  if (partsDM) {
+    return `${defaultYear}-${partsDM[2].padStart(2, '0')}-${partsDM[1].padStart(2, '0')}`;
+  }
+
+  return str;
+}
 
 export async function getFreshDbBookings(nonce?: string) {
   if (nonce) console.log(`[SYNC] Fetching fresh bookings with nonce: ${nonce}`);
@@ -105,101 +127,57 @@ export async function getFreshDbBookings(nonce?: string) {
   const pendingStatuses = ['جديد', 'قيد المراجعة', 'pending', 'رد جديد'];
   
   const expiredIds = data
-    .filter((b: any) => pendingStatuses.includes(b.status) && b.check_in < today)
+    .filter((b: any) => pendingStatuses.includes(b.status) && normalizeDateString(b.check_in) < today)
     .map((b: any) => b.id);
 
   if (expiredIds.length > 0) {
     console.log(`[CLEANUP] Automatically deleting ${expiredIds.length} expired pending requests:`, expiredIds);
     // Hard delete from DB
     await supabase.from('bookings').delete().in('id', expiredIds);
-    
-    // Filter them out of the current result set
-    const detectPaymentStatus = (b: any) => {
-      const noteStr = String(b.notes || '').trim().toLowerCase();
-      const infoStr = String(b.payment_info || '').trim().toLowerCase();
-      const combined = `${noteStr} ${infoStr}`;
-
-      const cleanKeywords = ['حساب خالص', 'الحساب خالص', 'خالص', 'تم الدفع', 'تم السداد', 'مدفوع بالكامل'];
-      const isExplicitlyClean = cleanKeywords.some(kw => combined.includes(kw));
-
-      const debtKeywords = ['متبقي', 'باقي', 'باقى', 'علية', 'عليها', 'دين', 'مستحق', 'آجل', 'اجل', 'عقد'];
-      const hasNumbers = /\d+/.test(noteStr);
-      const hasDebtKeyword = debtKeywords.some(kw => combined.includes(kw));
-
-      if (!isExplicitlyClean && (hasDebtKeyword || hasNumbers)) {
-        return 'باقي';
-      }
-
-      if (isExplicitlyClean) {
-        return 'خالص';
-      }
-
-      if (b.payment_status === 'باقي') return 'باقي';
-      return 'خالص';
-    };
-
-    return data
-      .filter((b: any) => !expiredIds.includes(b.id))
-      .map((b: any) => ({
-        id: b.id,
-        name: b.name,
-        phone: b.phone,
-        checkIn: b.check_in,
-        checkOut: b.check_out,
-        apartmentId: b.apartment_id,
-        studio: b.studio,
-        status: b.status,
-        paymentInfo: b.payment_info,
-        paymentStatus: detectPaymentStatus(b),
-        totalAmount: Number(b.total_amount || 0),
-        numberOfDays: Number(b.number_of_days || 0),
-        nationality: b.nationality,
-        idNumber: b.id_number,
-        commission: Number(b.commission || 0),
-        brokerName: b.broker_name,
-        guestsCount: Number(b.guests_count || 1),
-        clientStatus: b.client_status || 'انتظار',
-        notes: b.notes,
-        timestamp: b.timestamp,
-      }));
   }
 
-    return (data || []).map((b: any) => {
+  const detectPaymentStatus = (b: any) => {
+    const noteStr = String(b.notes || '').trim().toLowerCase();
+    const infoStr = String(b.payment_info || '').trim().toLowerCase();
+    const combined = `${noteStr} ${infoStr}`;
+
+    const cleanKeywords = ['حساب خالص', 'الحساب خالص', 'خالص', 'تم الدفع', 'تم السداد', 'مدفوع بالكامل'];
+    const isExplicitlyClean = cleanKeywords.some(kw => combined.includes(kw));
+
+    const debtKeywords = ['متبقي', 'باقي', 'باقى', 'علية', 'عليها', 'دين', 'مستحق', 'آجل', 'اجل', 'عقد'];
+    const hasNumbers = /\d+/.test(noteStr);
+    const hasDebtKeyword = debtKeywords.some(kw => combined.includes(kw));
+
+    if (!isExplicitlyClean && (hasDebtKeyword || hasNumbers)) {
+      return 'باقي';
+    }
+
+    if (isExplicitlyClean) {
+      return 'خالص';
+    }
+
+    if (b.payment_status === 'باقي') return 'باقي';
+    return 'خالص';
+  };
+
+  return data
+    .filter((b: any) => !expiredIds.includes(b.id))
+    .map((b: any) => {
       const totalAmount = Number(b.total_amount || 0);
       const days = Number(b.number_of_days || 0);
-      
-      const noteStr = String(b.notes || '').trim().toLowerCase();
-      const infoStr = String(b.payment_info || '').trim().toLowerCase();
-      const combined = `${noteStr} ${infoStr}`;
-
-      const cleanKeywords = ['حساب خالص', 'الحساب خالص', 'خالص', 'تم الدفع', 'تم السداد', 'مدفوع بالكامل'];
-      const isExplicitlyClean = cleanKeywords.some(kw => combined.includes(kw));
-
-      const debtKeywords = ['متبقي', 'باقي', 'باقى', 'علية', 'عليها', 'دين', 'مستحق', 'آجل', 'اجل', 'عقد'];
-      const hasNumbers = /\d+/.test(noteStr);
-      const hasDebtKeyword = debtKeywords.some(kw => combined.includes(kw));
-
-      let computedStatus = b.payment_status;
-      if (!isExplicitlyClean && (hasDebtKeyword || hasNumbers)) {
-        computedStatus = 'باقي';
-      } else if (isExplicitlyClean) {
-        computedStatus = 'خالص';
-      } else if (!computedStatus) {
-        computedStatus = 'خالص';
-      }
 
       return {
         id: b.id,
         name: b.name,
         phone: b.phone,
-        checkIn: b.check_in,
-        checkOut: b.check_out,
+        checkIn: normalizeDateString(b.check_in),
+        checkOut: normalizeDateString(b.check_out),
         apartmentId: b.apartment_id,
         studio: b.studio,
         status: b.status,
         paymentInfo: b.payment_info,
-        paymentStatus: computedStatus,
-        totalAmount: totalAmount,
+        paymentStatus: detectPaymentStatus(b),
+        totalAmount,
         numberOfDays: days,
         pricePerNight: days > 0 ? (totalAmount / days) : 0,
         nationality: b.nationality,
