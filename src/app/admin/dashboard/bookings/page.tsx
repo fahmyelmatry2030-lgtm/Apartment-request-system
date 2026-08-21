@@ -216,9 +216,9 @@ export default function BookingsManagement() {
   const filteredBookings = bookings.filter((b: any) => {
     if (b.status === 'deleted') return false;
 
-    // Auto-hide: hide any booking once its check-in day arrives or passes
+    // Hide past check-in bookings older than today
     const today = new Date().toISOString().split('T')[0];
-    if (b.checkIn <= today) return false;
+    if (b.checkIn < today) return false;
 
     if (activeTab === 'all') return true;
     if (activeTab === 'pending') return b.status === 'رد جديد' || b.status === 'pending' || b.status === 'جديد' || b.status === 'قيد المراجعة';
