@@ -167,6 +167,8 @@ export async function getFreshDbBookings(nonce?: string) {
         bookingManager: b.booking_manager || '',
         paymentMethod: b.payment_method || '',
         notes: b.notes,
+        source: b.source || (String(b.payment_info || '').includes('[طلب') ? 'website' : 'manual'),
+        isWebsiteBooking: b.is_website_booking ?? (String(b.payment_info || '').includes('[طلب') || b.status === 'جديد' || b.status === 'pending'),
         timestamp: b.timestamp,
       };
     });

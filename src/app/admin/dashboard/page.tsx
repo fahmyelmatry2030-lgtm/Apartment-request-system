@@ -342,15 +342,10 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
     }
   };
 
-  const mockNames = [
-    'مراد لاغا', 'مينا صبرى', 'عاصم بن صالح', 'محمد عبدالحفيظ', 'عبدالحفيظ', 
-    'حسني معمر', 'صبرى يوسف', 'MFl', 'mfl', 'احمد الحسنى', 'احمد فارس شيخو', 
-    'رعد سلمان', 'مصطفي احمد', 'Ahmed', 'ahmed', 'محمد خليل', 'ابودراز', 'أبودراز', 'ابو دراز'
-  ];
+  const mockNames = ['test-mock-dummy-only'];
   
   const isMockRequest = (b: any) => {
-    const name = String(b.name || '').trim();
-    return mockNames.some(m => name.toLowerCase().includes(m.toLowerCase())) || String(b.id || '').startsWith('mock-');
+    return String(b.id || '').startsWith('mock-');
   };
 
   const pendingWebRequests = (allBookings || []).filter((b: any) => {
@@ -360,14 +355,18 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
       b.source === 'website' || 
       b.isWebsiteBooking === true || 
       b.is_website_booking === true || 
-      String(b.paymentInfo || '').includes('[طلب من الموقع]') || 
-      String(b.payment_info || '').includes('[طلب من الموقع]');
+      String(b.paymentInfo || '').includes('[طلب') || 
+      String(b.payment_info || '').includes('[طلب') ||
+      String(b.notes || '').includes('[طلب') ||
+      b.status === 'جديد' ||
+      b.status === 'pending' ||
+      b.status === 'رد جديد';
 
     if (!isFromWebsite) return false;
 
     const st = String(b.status || '').trim();
     const isConfirmed = CONFIRMED_STATUSES.some(cs => st === cs || st.includes('مؤكد') || st === 'approved');
-    return !isConfirmed && st !== 'ملغى';
+    return !isConfirmed && st !== 'ملغى' && st !== 'deleted';
   });
 
   useEffect(() => {
