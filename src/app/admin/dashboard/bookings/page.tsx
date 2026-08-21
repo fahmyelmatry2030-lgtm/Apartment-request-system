@@ -214,15 +214,19 @@ export default function BookingsManagement() {
   };
 
   const filteredBookings = bookings.filter((b: any) => {
-    if (b.status === 'deleted') return false;
+    if (b.status === 'deleted' || b.status === 'ملغى') return false;
 
-    // Hide past check-in bookings older than today
-    const today = new Date().toISOString().split('T')[0];
-    if (b.checkIn < today) return false;
+    const st = String(b.status || '').trim();
+    const isConfirmed = ['approved', 'مؤكد', 'مؤكد/دخول', 'مغادر/تنظيف', 'مغادر/تم'].some(s => st === s || st.includes('مؤكد'));
+    const isPending = !isConfirmed && st !== 'ملغى' && st !== 'deleted';
 
-    if (activeTab === 'all') return true;
-    if (activeTab === 'pending') return b.status === 'رد جديد' || b.status === 'pending' || b.status === 'جديد' || b.status === 'قيد المراجعة';
-    if (activeTab === 'approved') return b.status === 'approved' || b.status === 'مؤكد';
+    if (activeTab === 'pending') {
+      return isPending;
+    }
+    if (activeTab === 'approved') {
+      return isConfirmed;
+    }
+    // 'all' tab shows all bookings registered in system
     return true;
   });
 
@@ -261,9 +265,9 @@ export default function BookingsManagement() {
           {/* Status Tabs */}
           <div className="flex bg-white/50 p-1.5 rounded-2xl border border-[#EAE4D9]/60 w-full md:w-auto shadow-sm">
             {[
-              { id: 'pending', label: 'الطلبات الجديدة', icon: '📩' },
-              { id: 'approved', label: 'المؤكدة', icon: '✅' },
-              { id: 'all', label: 'الكل', icon: '📊' }
+              { id: 'pending', label: 'الطلبات الجديدة (قيد الانتظار)', icon: '📩' },
+              { id: 'approved', label: 'الكشف الحجوزات المؤكدة', icon: '✅' },
+              { id: 'all', label: 'الكل (الموقع والكشف)', icon: '📊' }
             ].map((tab) => (
               <button
                 key={tab.id}
