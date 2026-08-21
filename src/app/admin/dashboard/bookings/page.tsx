@@ -4,6 +4,15 @@ import { useEffect, useState, useCallback } from 'react';
 import { getSystemUnits, updateBookingStatus, getBookings, deleteBooking } from '@/lib/data-init';
 import { formatWhatsAppNumber } from '@/lib/utils';
 import { CheckCircle, Trash2, Smartphone } from 'lucide-react';
+import ReceiptImageModal from '@/components/ReceiptImageModal';
+
+const getReceiptUrl = (b: any) => {
+  if (!b) return null;
+  const text = `${b.paymentInfo || ''} ${b.notes || ''} ${b.payment_info || ''} ${b.paymentProof || ''}`;
+  const match = text.match(/https:\/\/[^\s"'\)]+/);
+  return match ? match[0] : null;
+};
+
 
 export default function BookingsManagement() {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -14,6 +23,7 @@ export default function BookingsManagement() {
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [activeReceiptModal, setActiveReceiptModal] = useState<{ isOpen: boolean; url: string | null; name?: string }>({ isOpen: false, url: null });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'pending' | 'approved' | 'rejected' | 'all'>('pending');
@@ -284,25 +294,26 @@ export default function BookingsManagement() {
             <table className="w-full text-right" dir="rtl">
               <thead>
                 <tr className="bg-[#FDFBF7] text-[#7A7061] text-[9px] uppercase tracking-[0.2em] font-black border-b border-[#EAE4D9]/50">
-                  <th className="px-8 py-6">العميل والاتصال</th>
-                  <th className="px-8 py-6">وقت الطلب</th>
-                  <th className="px-8 py-6">التواريخ</th>
-                  <th className="px-8 py-6">الوحدة المطلوبة</th>
-                  <th className="px-8 py-6">الحالة</th>
-                  <th className="px-8 py-6 text-left">الإجراءات</th>
+                  <th className="px-6 py-6">العميل والاتصال</th>
+                  <th className="px-6 py-6">وقت الطلب</th>
+                  <th className="px-6 py-6">التواريخ</th>
+                  <th className="px-6 py-6">الوحدة المطلوبة</th>
+                  <th className="px-6 py-6">إيصال التحويل</th>
+                  <th className="px-6 py-6">الحالة</th>
+                  <th className="px-6 py-6 text-left">الإجراءات</th>
                 </tr>
               </thead>
               <tbody className="text-xs">
                 {filteredBookings.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-8 py-24 text-center text-[#7A7061] italic font-bold opacity-40 uppercase tracking-widest">
+                    <td colSpan={7} className="px-8 py-24 text-center text-[#7A7061] italic font-bold opacity-40 uppercase tracking-widest">
                       {isLoading ? 'جاري تحميل البيانات...' : 'لا توجد طلبات حجز حالياً في هذا القسم.'}
                     </td>
                   </tr>
                 ) : (
                   filteredBookings.map((booking: any) => (
                     <tr key={booking.id} className="border-t border-[#EAE4D9]/30 hover:bg-[#FDFBF7]/50 transition-all group">
-                      <td className="px-8 py-6">
+                      <td className="px-6 py-6">
                         <div className="font-black text-[#2A2723] text-sm mb-1">{booking.name}</div>
                         <div className="flex items-center gap-2">
                           <button 
@@ -313,7 +324,7 @@ export default function BookingsManagement() {
                           </button>
                         </div>
                       </td>
-                      <td className="px-8 py-6">
+                      <td className="px-6 py-6">
                         <div className="bg-[#FDFBF7] px-3 py-1.5 rounded-lg border border-[#EAE4D9]/50 inline-block">
                           <span className="text-[11px] font-black text-[#2A2723]">
                             {booking.timestamp ? new Date(booking.timestamp).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '—'}
@@ -323,17 +334,34 @@ export default function BookingsManagement() {
                           {booking.timestamp ? new Date(booking.timestamp).toLocaleDateString('ar-EG', { day: '2-digit', month: '2-digit' }) : ''}
                         </div>
                       </td>
-                      <td className="px-8 py-6 font-black">
+                      <td className="px-6 py-6 font-black">
                         <div className="text-[#2A2723] mb-1.5"><span className="text-[#7A7061] text-[9px] ml-2 opacity-50">من:</span> {booking.checkIn}</div>
                         <div className="text-[#2A2723]"><span className="text-[#7A7061] text-[9px] ml-2 opacity-50">إلى:</span> {booking.checkOut}</div>
                       </td>
-                      <td className="px-8 py-6">
+                      <td className="px-6 py-6">
                         <div className="bg-[#C1A68D]/10 text-[#C1A68D] px-3.5 py-2 rounded-xl text-[10px] font-black inline-block border border-[#C1A68D]/20">
                           {booking.studio || '—'}
                         </div>
                         {booking.apartmentId && <p className="text-[9px] text-[#7A7061] mt-1.5 font-bold opacity-60">رقم الأي دي: {booking.apartmentId}</p>}
                       </td>
-                      <td className="px-8 py-6">
+                      <td className="px-6 py-6">
+                        {(() => {
+                          const receipt = getReceiptUrl(booking);
+                          return receipt ? (
+                            <button
+                              type="button"
+                              onClick={() => setActiveReceiptModal({ isOpen: true, url: receipt, name: booking.name })}
+                              className="flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white px-3 py-2 rounded-xl text-[10px] font-black transition-all border border-emerald-200/80 shadow-sm"
+                            >
+                              <span className="text-xs">🖼️</span>
+                              <span>صورة الإيصال</span>
+                            </button>
+                          ) : (
+                            <span className="text-[10px] text-[#7A7061] opacity-40 font-bold">—</span>
+                          );
+                        })()}
+                      </td>
+                      <td className="px-6 py-6">
                         <span className={`px-4 py-2 rounded-full text-[9px] font-black tracking-widest uppercase shadow-sm ${
                           booking.status === 'approved' ? 'bg-green-50 text-green-600 border border-green-100' : 
                           booking.status === 'rejected' ? 'bg-red-50 text-red-600 border border-red-100' : 
@@ -682,6 +710,14 @@ export default function BookingsManagement() {
           عند الضغط على رقم هاتف العميل، سيتم فتح محادثة <span className="text-green-600 font-black">WhatsApp</span> مباشرة مع رسالة مجهزة بتفاصيل الحجز لتسهيل التواصل والرد السريع.
         </div>
       </div>
+
+      {/* RECEIPT IMAGE MODAL */}
+      <ReceiptImageModal
+        isOpen={activeReceiptModal.isOpen}
+        url={activeReceiptModal.url}
+        guestName={activeReceiptModal.name}
+        onClose={() => setActiveReceiptModal({ isOpen: false, url: null })}
+      />
     </div>
   );
 }
