@@ -48,3 +48,28 @@ export function formatWhatsAppNumber(phone: string): string {
 
   return cleanPhone;
 }
+
+export function normalizeDateString(dateStr: any, defaultYear = 2026): string {
+  if (!dateStr || typeof dateStr !== 'string') return '';
+  const str = dateStr.trim().replace(/\\/g, '/').replace(/\/+/g, '/');
+  
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+
+  const partsYMD = str.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})$/);
+  if (partsYMD) {
+    return `${partsYMD[1]}-${partsYMD[2].padStart(2, '0')}-${partsYMD[3].padStart(2, '0')}`;
+  }
+
+  const partsDMY = str.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
+  if (partsDMY) {
+    return `${partsDMY[3]}-${partsDMY[2].padStart(2, '0')}-${partsDMY[1].padStart(2, '0')}`;
+  }
+
+  const partsDM = str.match(/^(\d{1,2})[/-](\d{1,2})$/);
+  if (partsDM) {
+    return `${defaultYear}-${partsDM[2].padStart(2, '0')}-${partsDM[1].padStart(2, '0')}`;
+  }
+
+  return str;
+}
+
