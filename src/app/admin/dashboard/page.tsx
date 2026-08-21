@@ -803,9 +803,9 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
               type="button"
               onClick={handleClearAllPendingWebRequests}
               className="bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 font-black px-4 py-2 rounded-xl text-xs transition-all shadow-md flex items-center gap-1.5 shrink-0"
-              title="مسح وتفريغ كافة الطلبات التجريبية الوهمية بضغطة واحدة"
+              title="مسح وتفريغ الطلبات المعلقة"
             >
-              <span>🧹 تنظيف ومسح الطلبات الوهمية ({pendingWebRequests.length})</span>
+              <span>🧹 مسح الطلبات المعلقة ({pendingWebRequests.length})</span>
             </button>
           )}
         </div>
