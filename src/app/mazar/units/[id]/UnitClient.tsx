@@ -258,22 +258,35 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
               {activeMedia === 'video' && unit?.video ? (
                 <video src={encodeURI(unit.video)} controls autoPlay muted playsInline preload="metadata" className="w-full h-full object-contain" />
               ) : (
-                <Image
-                  src={fixImagePath(activeImage)}
-                  alt={unit?.title?.[language] || ''}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  className="object-cover group-hover:scale-105 transition-transform duration-700"
-                  unoptimized
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    if (target) {
-                      target.srcset = '/images/logo-en.jpg';
-                      target.src = '/images/logo-en.jpg';
-                    }
-                  }}
-                  priority
-                />
+                <>
+                  <Image
+                    src={fixImagePath(activeImage)}
+                    alt={unit?.title?.[language] || ''}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-700"
+                    unoptimized
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      if (target) {
+                        target.srcset = '/images/logo-en.jpg';
+                        target.src = '/images/logo-en.jpg';
+                      }
+                    }}
+                    priority
+                  />
+                  {unit?.video && (
+                    <button
+                      type="button"
+                      onClick={() => setActiveMedia('video')}
+                      className="absolute inset-0 m-auto w-20 h-20 md:w-24 md:h-24 rounded-full bg-black/60 hover:bg-[#C1A68D] text-white hover:text-[#2A2723] backdrop-blur-md border-2 border-white/40 flex flex-col items-center justify-center gap-1 transition-all duration-300 transform hover:scale-110 shadow-2xl z-20 group/play cursor-pointer"
+                      title={isRTL ? 'تشغيل فيديو الاستوديو' : 'Play Studio Video'}
+                    >
+                      <span className="text-2xl md:text-3xl ml-1 text-[#C1A68D] group-hover/play:text-[#2A2723] transition-colors">▶</span>
+                      <span className="text-[10px] font-black tracking-wider uppercase">{isRTL ? 'تشغيل الفيديو' : 'Play Video'}</span>
+                    </button>
+                  )}
+                </>
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
               <div className={`absolute bottom-5 ${isRTL ? 'right-5' : 'left-5'}`}>
