@@ -27,6 +27,21 @@ const getTomorrowStr = () => {
   return d.toISOString().split('T')[0];
 };
 
+const fixImagePath = (src?: string) => {
+  if (!src) return '/images/logo-en.jpg';
+  try {
+    let clean = decodeURIComponent(src)
+      .replace(/\/Mazar%201%20Pictures\//gi, '/mazar1/')
+      .replace(/\/Mazar\s*1\s*Pictures\//gi, '/mazar1/');
+    if (!clean.startsWith('http') && !clean.startsWith('/')) {
+      clean = '/' + clean;
+    }
+    return clean;
+  } catch {
+    return src;
+  }
+};
+
 export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
   const { t, isRTL, language } = useLanguage();
   const params = useParams();
@@ -36,7 +51,7 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
   const [unit, setUnit] = useState<any>(initialUnit);
   const [activeMedia, setActiveMedia] = useState<'image' | 'video'>('image');
   const [activeImage, setActiveImage] = useState<string>(
-    (initialUnit?.images && initialUnit?.images[0]) || '/images/logo-en.jpg'
+    fixImagePath((initialUnit?.images && initialUnit?.images[0]) || '/images/logo-en.jpg')
   );
   const [status, setStatus] = useState<string>(initialUnit?.status || 'متاح');
   const [isLoading, setIsLoading] = useState(!initialUnit);
@@ -68,7 +83,7 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
         if (foundUnit) {
           setUnit(foundUnit);
           if (foundUnit.images && foundUnit.images.length > 0) {
-            setActiveImage(foundUnit.images[0]);
+            setActiveImage(fixImagePath(foundUnit.images[0]));
           }
           setStatus(foundUnit.status || 'متاح');
         }
@@ -244,11 +259,19 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
                 <video src={encodeURI(unit.video)} controls autoPlay muted playsInline preload="metadata" className="w-full h-full object-contain" />
               ) : (
                 <Image
-                  src={activeImage}
+                  src={fixImagePath(activeImage)}
                   alt={unit?.title?.[language] || ''}
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover group-hover:scale-105 transition-transform duration-700"
+                  unoptimized
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    if (target) {
+                      target.srcset = '/images/logo-en.jpg';
+                      target.src = '/images/logo-en.jpg';
+                    }
+                  }}
                   priority
                 />
               )}
@@ -264,21 +287,53 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
             <div className="grid grid-cols-5 sm:grid-cols-6 gap-2">
               {unit?.video && (
                 <button
+                  type="button"
                   onClick={() => setActiveMedia('video')}
-                  className={`relative aspect-square rounded-2xl overflow-hidden border-2 bg-black flex items-center justify-center transition-all ${activeMedia === 'video' ? 'border-[#C1A68D] scale-95 shadow-md' : 'border-[#EAE4D9] hover:border-[#C1A68D]/50'}`}
+                  className={`relative aspect-square rounded-2xl overflow-hidden border-2 bg-[#2A2723] text-white flex flex-col items-center justify-center gap-0.5 transition-all ${
+                    activeMedia === 'video'
+                      ? 'border-[#C1A68D] scale-95 shadow-lg ring-2 ring-[#C1A68D]'
+                      : 'border-[#EAE4D9] hover:border-[#C1A68D]/60'
+                  }`}
+                  title={isRTL ? 'تشغيل فيديو الاستوديو' : 'Play Studio Video'}
                 >
-                  <span className="text-white text-xl">▶</span>
+                  <span className="text-lg font-black text-[#C1A68D]">▶</span>
+                  <span className="text-[9px] font-black tracking-wider opacity-90">{isRTL ? 'فيديو' : 'Video'}</span>
                 </button>
               )}
-              {unit?.images?.map((img: string, i: number) => (
-                <button
-                  key={i}
-                  onClick={() => { setActiveMedia('image'); setActiveImage(img); }}
-                  className={`relative aspect-square rounded-2xl overflow-hidden border-2 transition-all ${activeMedia === 'image' && activeImage === img ? 'border-[#C1A68D] scale-95 shadow-md' : 'border-[#EAE4D9] hover:border-[#C1A68D]/50'}`}
-                >
-                  <Image src={img} alt={`Thumb ${i}`} fill sizes="80px" className="object-cover" />
-                </button>
-              ))}
+              {unit?.images?.map((imgRaw: string, i: number) => {
+                const img = fixImagePath(imgRaw);
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => {
+                      setActiveMedia('image');
+                      setActiveImage(img);
+                    }}
+                    className={`relative aspect-square rounded-2xl overflow-hidden border-2 transition-all ${
+                      activeMedia === 'image' && activeImage === img
+                        ? 'border-[#C1A68D] scale-95 shadow-md'
+                        : 'border-[#EAE4D9] hover:border-[#C1A68D]/50'
+                    }`}
+                  >
+                    <Image
+                      src={img}
+                      alt={unit?.title?.[language] || `Thumb ${i}`}
+                      fill
+                      sizes="80px"
+                      className="object-cover"
+                      unoptimized
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        if (target) {
+                          target.srcset = '/images/logo-en.jpg';
+                          target.src = '/images/logo-en.jpg';
+                        }
+                      }}
+                    />
+                  </button>
+                );
+              })}
             </div>
 
             {/* Unit info */}
