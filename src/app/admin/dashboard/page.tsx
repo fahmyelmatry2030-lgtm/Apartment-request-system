@@ -844,6 +844,25 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
                   </div>
 
                   <div className="space-y-2 text-xs font-bold text-gray-300">
+                    {/* RECEIPT / PAY PROOF BADGE AT THE VERY TOP */}
+                    {(() => {
+                      const receipt = getReceiptUrl(req);
+                      return receipt ? (
+                        <button
+                          type="button"
+                          onClick={() => setActiveReceiptModal({ isOpen: true, url: receipt, name: req.name })}
+                          className="w-full bg-emerald-500/20 hover:bg-emerald-500/30 border-2 border-emerald-400 text-emerald-200 px-3.5 py-3 rounded-xl text-xs font-black flex items-center justify-between transition-all shadow-lg animate-pulse"
+                        >
+                          <span className="flex items-center gap-1.5 text-sm">🧾 صورة إيصال التحويل المرفوع</span>
+                          <span className="text-[11px] bg-emerald-400 text-black px-3 py-1 rounded-full font-black shadow-md">معاينة وتكبير 📸</span>
+                        </button>
+                      ) : (
+                        <div className="text-[10px] text-gray-400 font-bold text-center bg-white/5 py-1.5 rounded-xl border border-white/5">
+                          ⚠️ لم يرفق إيصال تحويل
+                        </div>
+                      );
+                    })()}
+
                     <div className="flex justify-between bg-[#1F1C18] p-2.5 rounded-xl border border-white/5">
                       <span className="text-gray-400">🏠 الوحدة المطلوبة:</span>
                       <span className="text-amber-300 font-black">{req.studio || req.apartmentId || req.type || 'استوديو'}</span>
@@ -858,25 +877,6 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
                         <span className="text-emerald-400 font-black">{req.totalAmount} ج.م</span>
                       </div>
                     )}
-
-                    {/* RECEIPT / PAY PROOF BADGE & MODAL TRIGGER */}
-                    {(() => {
-                      const receipt = getReceiptUrl(req);
-                      return receipt ? (
-                        <button
-                          type="button"
-                          onClick={() => setActiveReceiptModal({ isOpen: true, url: receipt, name: req.name })}
-                          className="w-full bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 px-3 py-2.5 rounded-xl text-xs font-black flex items-center justify-between transition-all shadow-sm"
-                        >
-                          <span className="flex items-center gap-1.5">🧾 إيصال جدية الحجز / التحويل</span>
-                          <span className="text-[10px] bg-emerald-500 text-black px-2.5 py-0.5 rounded-full font-black">معاينة 📸</span>
-                        </button>
-                      ) : (
-                        <div className="text-[10px] text-gray-500 font-bold text-center bg-white/5 py-1.5 rounded-xl border border-white/5">
-                          ⚠️ لم يرفق إيصال تحويل
-                        </div>
-                      );
-                    })()}
                   </div>
 
                   <div className="flex items-center gap-2 pt-2 border-t border-white/10">

@@ -497,14 +497,14 @@ export default function FinancePage() {
         {/* عنوان القسم */}
         <div className="bg-[#2A2723] px-8 py-4 flex items-center gap-3">
           <span className="text-white font-black text-sm tracking-widest">الشقق الفندقية</span>
-          <span className="text-[#C1A68D] text-xs font-bold">— شقة فندقية (1) + (2) + (3)</span>
+          <span className="text-[#C1A68D] text-xs font-bold">— شقة (1) ذكي رستم + شقة (2) سيتي ستارز + شقة (3) عباس الرئيسي</span>
         </div>
 
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* شقة (1) */}
             <div className={`p-6 rounded-2xl border text-center ${apt1Net >= 0 ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
-              <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">صافي ربح شقة (1)</p>
+              <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">صافي ربح شقة 1 (ذكي رستم)</p>
               <div className={`text-3xl font-black ${apt1Net >= 0 ? 'text-green-700' : 'text-red-600'}`}>
                 {isLoading ? '...' : apt1Net.toLocaleString()}
                 <small className="text-sm font-bold text-[#7A7061] ml-1">ج.م</small>
@@ -518,7 +518,7 @@ export default function FinancePage() {
 
             {/* شقة (2) */}
             <div className={`p-6 rounded-2xl border text-center ${apt2Net >= 0 ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
-              <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">صافي ربح شقة (2)</p>
+              <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">صافي ربح شقة 2 (سيتي ستارز)</p>
               <div className={`text-3xl font-black ${apt2Net >= 0 ? 'text-green-700' : 'text-red-600'}`}>
                 {isLoading ? '...' : apt2Net.toLocaleString()}
                 <small className="text-sm font-bold text-[#7A7061] ml-1">ج.م</small>
@@ -532,7 +532,7 @@ export default function FinancePage() {
 
             {/* شقة (3) */}
             <div className={`p-6 rounded-2xl border text-center ${apt3Net >= 0 ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
-              <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">صافي ربح شقة (3)</p>
+              <p className="text-[10px] font-black text-[#7A7061] uppercase tracking-widest mb-3">صافي ربح شقة 3 (عباس الرئيسي)</p>
               <div className={`text-3xl font-black ${apt3Net >= 0 ? 'text-green-700' : 'text-red-600'}`}>
                 {isLoading ? '...' : apt3Net.toLocaleString()}
                 <small className="text-sm font-bold text-[#7A7061] ml-1">ج.م</small>
