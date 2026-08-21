@@ -321,10 +321,10 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
         apartmentId: finalAptId,
         studio: finalStudio,
         approvedByAdmin: true,
-        bookingManager: shiftLead,
+        bookingManager: 'فهد',
         notes: req.notes 
-          ? `${req.notes} [اعتماد: ${shiftLead} - فهد: ${finalStudio}]` 
-          : `[اعتماد: ${shiftLead} - فهد: ${finalStudio}]`
+          ? `${req.notes} [مسئول الحجز: فهد - اعتماد: ${shiftLead} - الوحدة: ${finalStudio}]` 
+          : `[مسئول الحجز: فهد - اعتماد: ${shiftLead} - الوحدة: ${finalStudio}]`
       });
       loadOverviewData();
     } catch {
@@ -853,10 +853,10 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
                     </div>
 
                     <div className="flex flex-col items-end gap-1">
-                      <span className="bg-blue-950/90 text-cyan-300 border border-cyan-400/50 text-[10px] font-black px-2.5 py-1 rounded-full shadow-inner flex items-center gap-1">
-                        <span className="text-xs animate-pulse">🤖</span> فهد - طلبات الموقع
+                      <span className="bg-blue-900/90 text-cyan-200 border border-blue-400/40 text-[10px] font-black px-3 py-1 rounded-lg shadow-sm flex items-center gap-1">
+                        👤 مسئول الحجوزات: فهد
                       </span>
-                      <span className="text-[9px] text-blue-400 font-bold">طلب جديد 🆕</span>
+                      <span className="text-[9px] text-cyan-400 font-bold">طلب جديد 🆕</span>
                     </div>
                   </div>
 
