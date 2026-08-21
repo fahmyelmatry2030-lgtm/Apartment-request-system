@@ -213,8 +213,28 @@ export default function BookingsManagement() {
     window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(msg)}`, '_blank');
   };
 
+  const isWebsiteBooking = (b: any) => {
+    const noteStr = String(b.notes || '');
+    const infoStr = String(b.paymentInfo || b.payment_info || '');
+
+    return (
+      b.source === 'website' ||
+      b.isWebsiteBooking === true ||
+      b.is_website_booking === true ||
+      infoStr.includes('[طلب') ||
+      noteStr.includes('[طلب') ||
+      b.status === 'جديد' ||
+      b.status === 'pending' ||
+      b.status === 'رد جديد' ||
+      b.status === 'قيد المراجعة'
+    );
+  };
+
   const filteredBookings = bookings.filter((b: any) => {
     if (b.status === 'deleted' || b.status === 'ملغى') return false;
+
+    // Filter strictly for website bookings only
+    if (!isWebsiteBooking(b)) return false;
 
     const st = String(b.status || '').trim();
     const isConfirmed = ['approved', 'مؤكد', 'مؤكد/دخول', 'مغادر/تنظيف', 'مغادر/تم'].some(s => st === s || st.includes('مؤكد'));
@@ -226,7 +246,6 @@ export default function BookingsManagement() {
     if (activeTab === 'approved') {
       return isConfirmed;
     }
-    // 'all' tab shows all bookings registered in system
     return true;
   });
 
@@ -239,8 +258,8 @@ export default function BookingsManagement() {
       )}
       <header className="flex justify-between items-end">
         <div>
-          <h1 className="text-4xl font-black mb-2 text-[#2A2723]">إدارة <span className="text-[#C1A68D]">الطلبات</span></h1>
-          <p className="text-[#7A7061] font-bold opacity-70 text-sm">مراجعة والرد على طلبات الحجز والتواصل المباشر مع العملاء.</p>
+          <h1 className="text-4xl font-black mb-2 text-[#2A2723]">طلبات <span className="text-[#C1A68D]">الموقع الإلكتروني</span></h1>
+          <p className="text-[#7A7061] font-bold opacity-70 text-sm">مراجعة ومعاينة كافة الطلبات المباشرة المرسلة من العملاء عبر الموقع الإلكتروني.</p>
         </div>
 
         <div className="flex gap-4">
@@ -265,9 +284,9 @@ export default function BookingsManagement() {
           {/* Status Tabs */}
           <div className="flex bg-white/50 p-1.5 rounded-2xl border border-[#EAE4D9]/60 w-full md:w-auto shadow-sm">
             {[
-              { id: 'pending', label: 'الطلبات الجديدة (قيد الانتظار)', icon: '📩' },
-              { id: 'approved', label: 'الكشف الحجوزات المؤكدة', icon: '✅' },
-              { id: 'all', label: 'الكل (الموقع والكشف)', icon: '📊' }
+              { id: 'pending', label: 'طلبات جديدة (قيد الانتظار)', icon: '📩' },
+              { id: 'approved', label: 'طلبات تم قبولها', icon: '✅' },
+              { id: 'all', label: 'كل طلبات الموقع', icon: '🌐' }
             ].map((tab) => (
               <button
                 key={tab.id}
