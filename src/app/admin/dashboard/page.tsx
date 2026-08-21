@@ -622,10 +622,11 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
       </header>
 
       {/* 🔮 Smart Booking Assistant Widget (Large Crimson Card) */}
-      <div className="bg-gradient-to-br from-[#2D1B1B] via-[#1E1212] to-[#2D1B1B] p-6 rounded-[2.5rem] border-2 border-red-500/30 shadow-2xl text-white space-y-4 animate-fade-in relative overflow-hidden">
+      {/* ── SECTION 1: SMART ACCOMMODATION ASSISTANT (قسم 1: مساعد التسكين الذكي - لون ذهبي دافئ) ── */}
+      <div className="bg-gradient-to-br from-[#231710] via-[#1A110B] to-[#231710] p-6 md:p-8 rounded-[2.5rem] border-2 border-amber-500/70 shadow-[0_0_25px_rgba(245,158,11,0.15)] hover:border-amber-400 text-white space-y-4 animate-fade-in relative overflow-hidden transition-all">
         {/* Decorative background glow */}
-        <div className="absolute -top-12 -left-12 w-32 h-32 bg-red-500/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-rose-500/10 rounded-full blur-3xl" />
+        <div className="absolute -top-12 -left-12 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-amber-600/10 rounded-full blur-3xl" />
 
         <button
           type="button"
@@ -633,11 +634,11 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
           className="w-full flex items-center justify-between text-right relative z-10"
         >
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-600 to-rose-700 flex items-center justify-center text-white font-black text-2xl shadow-lg shrink-0">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-600 to-amber-700 flex items-center justify-center text-white font-black text-2xl shadow-lg shrink-0 border border-amber-400/30">
               🔮
             </div>
             <div>
-              <h3 className="text-lg font-black text-red-200">مساعد التسكين الذكي واقتراح الغرف والتقسيم المتاح</h3>
+              <h3 className="text-lg font-black text-amber-200">مساعد التسكين الذكي واقتراح الغرف والتقسيم المتاح</h3>
               <p className="text-xs text-gray-400 font-bold mt-0.5">
                 أدخل تواريخ إقامة العميل المقترحة ونوع الغرفة لنقوم باقتراح الغرفة المناسبة أو توليد خطة تسكين مقسمة (Split-Stay) تلقائياً.
               </p>
@@ -982,15 +983,15 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
         </div>
       )}
 
-      {/* ── FULL-WIDTH DAILY OPERATIONS SCHEDULE (جدول خطة الدخول والخروج تفصيلي بعرض الصفحة) ── */}
-      <div className="bg-[#1F1C18] p-6 md:p-8 rounded-[2.5rem] shadow-2xl border border-white/10 text-white relative overflow-hidden space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-5">
+      {/* ── SECTION 3: FULL-WIDTH DAILY OPERATIONS SCHEDULE (قسم 3: جدول خطة الدخول والخروج اليومية - لون زمردي فاخر) ── */}
+      <div className="bg-gradient-to-br from-[#042018] via-[#021812] to-[#042018] p-6 md:p-8 rounded-[2.5rem] shadow-[0_0_25px_rgba(16,185,129,0.18)] border-2 border-emerald-500/70 hover:border-emerald-400 text-white relative overflow-hidden space-y-6 transition-all">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-emerald-500/20 pb-5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#C1A68D]/20 border border-[#C1A68D]/30 flex items-center justify-center text-[#C1A68D]">
-              <Calendar size={20} />
+            <div className="w-12 h-12 rounded-2xl bg-emerald-950/90 border border-emerald-400/50 flex items-center justify-center text-emerald-300 shadow-inner">
+              <Calendar size={22} />
             </div>
             <div>
-              <h3 className="text-xl font-black text-white">جدول وخطة حركة الدخول والخروج اليومية</h3>
+              <h3 className="text-xl font-black text-emerald-200">جدول وخطة حركة الدخول والخروج اليومية</h3>
               <p className="text-xs text-gray-400 font-bold">التفاصيل الكاملة لعملاء اليوم وغداً اضغط على اسم العميل لعرض السجل الكامل</p>
             </div>
           </div>
