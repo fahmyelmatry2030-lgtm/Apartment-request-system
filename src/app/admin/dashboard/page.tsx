@@ -40,6 +40,7 @@ export default function DashboardOverview() {
 
   // 🔮 Smart Accommodation Assistant States
   const [units, setUnits] = useState<any[]>([]);
+  const [selectedWebUnits, setSelectedWebUnits] = useState<Record<string, { id: string; studio: string }>>({});
   const [smartAssistantOpen, setSmartAssistantOpen] = useState(false);
   const [smartCheckIn, setSmartCheckIn] = useState('');
   const [smartCheckOut, setSmartCheckOut] = useState('');
@@ -90,6 +91,7 @@ export default function DashboardOverview() {
     }
 
     apts = apts.filter((u: any) => !['s-single', 's-double', 's-triple', 's-tworoom'].includes(u.id));
+    setUnits(apts);
 
     const targetDateStr = selectedDate;
     const nextDay = new Date(selectedDate);
@@ -310,11 +312,19 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
   const handleConfirmWebBooking = async (req: any) => {
     try {
       const shiftLead = getLoggedInAdminName();
+      const customUnit = selectedWebUnits[req.id];
+      const finalAptId = customUnit?.id || req.apartmentId || req.apartment_id;
+      const finalStudio = customUnit?.studio || req.studio;
+
       await updateDbBookingStatus(req.id, { 
         status: 'مؤكد', 
+        apartmentId: finalAptId,
+        studio: finalStudio,
         approvedByAdmin: true,
         bookingManager: shiftLead,
-        notes: req.notes ? `${req.notes} [اعتماد: ${shiftLead}]` : `[اعتماد: ${shiftLead}]`
+        notes: req.notes 
+          ? `${req.notes} [اعتماد: ${shiftLead} - فهد: ${finalStudio}]` 
+          : `[اعتماد: ${shiftLead} - فهد: ${finalStudio}]`
       });
       loadOverviewData();
     } catch {
@@ -824,26 +834,32 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
             {pendingWebRequests.map((req: any, idx: number) => {
               const cleanP = formatWhatsAppNumber(req.phone);
               return (
-                <div key={req.id || idx} className="bg-[#2A2723] border border-amber-500/30 hover:border-amber-400 rounded-2xl p-5 space-y-4 shadow-xl transition-all relative group">
-                  <div className="flex items-start justify-between gap-2 border-b border-white/10 pb-3">
+                <div key={req.id || idx} className="bg-[#0B132B] border-2 border-blue-500/80 hover:border-cyan-400 rounded-2xl p-5 space-y-4 shadow-[0_0_25px_rgba(59,130,246,0.18)] hover:shadow-[0_0_35px_rgba(6,182,212,0.35)] transition-all duration-300 relative group">
+                  {/* Header with Fahd Agent Badge */}
+                  <div className="flex items-start justify-between gap-2 border-b border-blue-500/20 pb-3">
                     <div className="space-y-1">
                       <button
+                        type="button"
                         onClick={() => openCustomerProfile(req.name, req.phone)}
-                        className="text-base font-black text-white hover:text-amber-300 transition-colors text-right flex items-center gap-1.5"
+                        className="text-base font-black text-white hover:text-cyan-300 transition-colors text-right flex items-center gap-1.5"
                       >
-                        <User size={16} className="text-amber-400 shrink-0" />
+                        <User size={16} className="text-cyan-400 shrink-0" />
                         <span className="truncate max-w-[180px]">{req.name || 'عميل جديد'}</span>
                       </button>
-                      <p className="text-[10px] text-gray-400 font-bold">
+                      <p className="text-[10px] text-blue-300/80 font-bold">
                         📞 {req.phone || 'بدون رقم'}
                       </p>
                     </div>
-                    <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black px-2.5 py-1 rounded-full shrink-0">
-                      طلب جديد 🆕
-                    </span>
+
+                    <div className="flex flex-col items-end gap-1">
+                      <span className="bg-blue-950/90 text-cyan-300 border border-cyan-400/50 text-[10px] font-black px-2.5 py-1 rounded-full shadow-inner flex items-center gap-1">
+                        <span className="text-xs animate-pulse">🤖</span> فهد - طلبات الموقع
+                      </span>
+                      <span className="text-[9px] text-blue-400 font-bold">طلب جديد 🆕</span>
+                    </div>
                   </div>
 
-                  <div className="space-y-2 text-xs font-bold text-gray-300">
+                  <div className="space-y-2 text-xs font-bold text-gray-200">
                     {/* RECEIPT / PAY PROOF BADGE AT THE VERY TOP */}
                     {(() => {
                       const receipt = getReceiptUrl(req);
@@ -853,33 +869,66 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
                           onClick={() => setActiveReceiptModal({ isOpen: true, url: receipt, name: req.name })}
                           className="w-full bg-emerald-500/20 hover:bg-emerald-500/30 border-2 border-emerald-400 text-emerald-200 px-3.5 py-3 rounded-xl text-xs font-black flex items-center justify-between transition-all shadow-lg animate-pulse"
                         >
-                          <span className="flex items-center gap-1.5 text-sm">🧾 صورة إيصال التحويل المرفوع</span>
-                          <span className="text-[11px] bg-emerald-400 text-black px-3 py-1 rounded-full font-black shadow-md">معاينة وتكبير 📸</span>
+                          <span className="flex items-center gap-1.5 text-xs">🧾 صورة إيصال التحويل المرفوع</span>
+                          <span className="text-[10px] bg-emerald-400 text-black px-3 py-1 rounded-full font-black shadow-md">معاينة وتكبير 📸</span>
                         </button>
                       ) : (
-                        <div className="text-[10px] text-gray-400 font-bold text-center bg-white/5 py-1.5 rounded-xl border border-white/5">
+                        <div className="text-[10px] text-blue-300/60 font-bold text-center bg-blue-950/40 py-1.5 rounded-xl border border-blue-500/10">
                           ⚠️ لم يرفق إيصال تحويل
                         </div>
                       );
                     })()}
 
-                    <div className="flex justify-between bg-[#1F1C18] p-2.5 rounded-xl border border-white/5">
-                      <span className="text-gray-400">🏠 الوحدة المطلوبة:</span>
-                      <span className="text-amber-300 font-black">{req.studio || req.apartmentId || req.type || 'استوديو'}</span>
+                    {/* 🔄 EDIT / ASSIGN UNIT DROPDOWN BEFORE CONFIRMING */}
+                    <div className="bg-[#1C2541] p-3 rounded-xl border border-blue-500/30 space-y-1.5 shadow-sm">
+                      <div className="flex justify-between items-center text-[10px] font-black text-cyan-300">
+                        <span>🏠 الوحدة المطلوبة من الموقع:</span>
+                        <span className="text-amber-300 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">
+                          {req.studio || req.apartmentId || 'غير محدد'}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between gap-2 pt-1">
+                        <label className="text-[9.5px] font-bold text-blue-200 shrink-0">
+                          🔄 تغيير الوحدة قبل التأكيد:
+                        </label>
+                        <select
+                          value={selectedWebUnits[req.id]?.id || req.apartmentId || ''}
+                          onChange={(e) => {
+                            const chosenId = e.target.value;
+                            const foundUnit = units.find((u: any) => u.id === chosenId);
+                            const chosenTitle = foundUnit?.title?.ar || foundUnit?.title?.en || chosenId;
+                            setSelectedWebUnits(prev => ({
+                              ...prev,
+                              [req.id]: { id: chosenId, studio: chosenTitle }
+                            }));
+                          }}
+                          className="bg-[#0B132B] text-amber-300 font-black text-[11px] px-2.5 py-1.5 rounded-lg border border-cyan-400/50 focus:border-cyan-300 outline-none w-full max-w-[170px] cursor-pointer shadow-inner"
+                        >
+                          <option value={req.apartmentId || ''} className="bg-[#0B132B] text-amber-300">
+                            {req.studio || req.apartmentId || 'اختر وحدة أخرى...'}
+                          </option>
+                          {units.map((u: any) => (
+                            <option key={u.id} value={u.id} className="bg-[#0B132B] text-white">
+                              {u.title?.ar || u.title?.en || u.id} ({u.id})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
-                    <div className="flex justify-between bg-[#1F1C18] p-2.5 rounded-xl border border-white/5">
-                      <span className="text-gray-400">📅 فترة الإقامة:</span>
-                      <span className="text-blue-300 font-black">{req.checkIn || req.check_in} ➔ {req.checkOut || req.check_out}</span>
+
+                    <div className="flex justify-between bg-[#1C2541] p-2.5 rounded-xl border border-blue-500/20">
+                      <span className="text-blue-300/80">📅 فترة الإقامة:</span>
+                      <span className="text-cyan-300 font-black">{req.checkIn || req.check_in} ➔ {req.checkOut || req.check_out}</span>
                     </div>
                     {req.totalAmount && (
-                      <div className="flex justify-between bg-[#1F1C18] p-2.5 rounded-xl border border-white/5">
-                        <span className="text-gray-400">💰 المبلغ المقدر:</span>
+                      <div className="flex justify-between bg-[#1C2541] p-2.5 rounded-xl border border-blue-500/20">
+                        <span className="text-blue-300/80">💰 المبلغ المقدر:</span>
                         <span className="text-emerald-400 font-black">{req.totalAmount} ج.م</span>
                       </div>
                     )}
                   </div>
 
-                  <div className="flex items-center gap-2 pt-2 border-t border-white/10">
+                  <div className="flex items-center gap-2 pt-2 border-t border-blue-500/20">
                     <button
                       type="button"
                       onClick={() => handleConfirmWebBooking(req)}
@@ -889,7 +938,11 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
                     </button>
                     {cleanP && (
                       <a
-                        href={`https://wa.me/${cleanP}?text=${encodeURIComponent(`أهلاً بك أستاذ ${req.name}، بخصوص طلب حجزك في مزار للفترة من ${req.checkIn || req.check_in} إلى ${req.checkOut || req.check_out}...`)}`}
+                        href={`https://wa.me/${cleanP}?text=${encodeURIComponent(
+                          `أهلاً بك أستاذ ${req.name}، بخصوص طلب حجزك في مزار للوحدة (${
+                            selectedWebUnits[req.id]?.studio || req.studio
+                          }) للفترة من ${req.checkIn || req.check_in} إلى ${req.checkOut || req.check_out}...`
+                        )}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 p-2.5 rounded-xl text-xs font-black flex items-center justify-center transition-all"
