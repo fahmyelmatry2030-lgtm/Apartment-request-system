@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cairo } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/lib/LanguageContext";
@@ -11,14 +11,11 @@ import MobileLangToggle from "@/components/MobileLangToggle";
 
 export const dynamic = 'force-dynamic';
 
-
-
 const cairo = Cairo({
   variable: "--font-cairo",
   subsets: ["arabic"],
   weight: ["300", "400", "500", "600", "700", "800", "900"],
 });
-
 
 export const metadata: Metadata = {
   title: {
@@ -74,7 +71,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport = {
+export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   minimumScale: 0.25,

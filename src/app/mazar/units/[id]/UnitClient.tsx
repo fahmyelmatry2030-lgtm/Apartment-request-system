@@ -9,6 +9,8 @@ import { useLanguage } from '@/lib/LanguageContext';
 import { uploadImage } from '@/lib/actions/upload';
 import PaymentInfoBox from '@/components/PaymentInfoBox';
 import Image from 'next/image';
+import UnitImageLightbox from '@/components/UnitImageLightbox';
+import { ZoomIn } from 'lucide-react';
 
 
 const ADMIN_WHATSAPP = '201108109969';
@@ -55,6 +57,8 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
   );
   const [status, setStatus] = useState<string>(initialUnit?.status || 'متاح');
   const [isLoading, setIsLoading] = useState(!initialUnit);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   // ── Booking form state ──────────────────────────────────────────────
   const [checkIn, setCheckIn] = useState(getTodayStr());
@@ -254,7 +258,16 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
           {/* ── LEFT: Gallery ──────────────────────────────────── */}
           <div className="space-y-6">
             {/* Main media */}
-            <div className="relative h-[360px] md:h-[480px] rounded-[32px] overflow-hidden shadow-md bg-black flex items-center justify-center group">
+            <div
+              onClick={() => {
+                if (activeMedia === 'image' && unit?.images?.length) {
+                  const idx = unit.images.findIndex((img: string) => fixImagePath(img) === fixImagePath(activeImage));
+                  setLightboxIndex(idx >= 0 ? idx : 0);
+                  setIsLightboxOpen(true);
+                }
+              }}
+              className="relative h-[360px] md:h-[480px] rounded-[32px] overflow-hidden shadow-md bg-black flex items-center justify-center group cursor-pointer"
+            >
               {activeMedia === 'video' && unit?.video ? (
                 <video src={encodeURI(unit.video)} controls autoPlay muted playsInline preload="metadata" className="w-full h-full object-contain" />
               ) : (
@@ -275,10 +288,29 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
                     }}
                     priority
                   />
+                  {activeMedia === 'image' && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const idx = unit?.images?.findIndex((img: string) => fixImagePath(img) === fixImagePath(activeImage));
+                        setLightboxIndex(idx >= 0 ? idx : 0);
+                        setIsLightboxOpen(true);
+                      }}
+                      className={`absolute top-4 ${isRTL ? 'right-4' : 'left-4'} z-20 bg-black/60 hover:bg-[#C1A68D] text-white hover:text-black p-2.5 px-3.5 rounded-full backdrop-blur-md border border-white/20 transition-all shadow-lg flex items-center gap-1.5 text-xs font-bold`}
+                      title={isRTL ? "تكبير واستعراض الصورة" : "Zoom & Preview Image"}
+                    >
+                      <ZoomIn size={16} />
+                      <span>{isRTL ? "تكبير الصورة" : "Zoom"}</span>
+                    </button>
+                  )}
                   {unit?.video && (
                     <button
                       type="button"
-                      onClick={() => setActiveMedia('video')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveMedia('video');
+                      }}
                       className="absolute inset-0 m-auto w-20 h-20 md:w-24 md:h-24 rounded-full bg-black/60 hover:bg-[#C1A68D] text-white hover:text-[#2A2723] backdrop-blur-md border-2 border-white/40 flex flex-col items-center justify-center gap-1 transition-all duration-300 transform hover:scale-110 shadow-2xl z-20 group/play cursor-pointer"
                       title={isRTL ? 'تشغيل فيديو الاستوديو' : 'Play Studio Video'}
                     >
@@ -643,7 +675,10 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
               {unit.images.map((img: string, i: number) => (
                 <div
                   key={i}
-                  onClick={() => setActiveImage(img)}
+                  onClick={() => {
+                    setLightboxIndex(i);
+                    setIsLightboxOpen(true);
+                  }}
                   className={`relative rounded-3xl overflow-hidden border border-[#EAE4D9] h-64 cursor-pointer hover:shadow-xl transition-all ${i % 3 === 0 ? 'md:col-span-2' : ''}`}
                 >
                   <Image src={img} alt={`Gallery ${i}`} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover hover:scale-105 transition-transform duration-700" />
@@ -654,6 +689,15 @@ export default function UnitDetailsPage({ initialUnit }: { initialUnit: any }) {
         )}
 
       </div>
+
+      <UnitImageLightbox
+        isOpen={isLightboxOpen}
+        images={(unit?.images || []).map(fixImagePath)}
+        currentIndex={lightboxIndex}
+        onClose={() => setIsLightboxOpen(false)}
+        onSelectIndex={(idx) => setLightboxIndex(idx)}
+        isRTL={isRTL}
+      />
 
       <Footer />
     </main>

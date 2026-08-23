@@ -34,15 +34,17 @@
 }
 
 @layer base {
-  html, body {
-    @apply overflow-x-hidden w-full m-0 p-0;
+  html {
+    @apply w-full m-0 p-0;
+    overflow-x: clip;
     scroll-behavior: smooth;
     -webkit-tap-highlight-color: transparent;
-    touch-action: auto;
+    touch-action: manipulation;
   }
   
   body {
-    @apply bg-mazar-cream text-mazar-coffee font-cairo antialiased;
+    @apply bg-mazar-cream text-mazar-coffee font-cairo antialiased overflow-x-hidden w-full m-0 p-0;
+    touch-action: manipulation;
   }
 
   /* Prevent automatic unwanted iOS Safari zoom on focus while allowing smooth user zoom */

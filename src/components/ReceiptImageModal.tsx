@@ -80,7 +80,7 @@ export default function ReceiptImageModal({ isOpen, url, guestName, onClose }: R
               <ZoomIn size={16} />
             </button>
             <button
-              onClick={() => setScale(prev => Math.max(prev - 0.25, 0.5))}
+              onClick={() => setScale(prev => Math.max(prev - 0.25, 0.25))}
               className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white transition-all text-xs flex items-center gap-1 font-bold"
               title="تصغير الصورة"
             >
