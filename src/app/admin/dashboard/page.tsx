@@ -1169,17 +1169,17 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
             </h4>
             {/* Color Distinction Legend Bar */}
             <div className="flex flex-wrap items-center gap-2 text-[10px] md:text-xs font-bold pt-1">
-              <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-900 border border-emerald-500/30">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
-                الـ 24 استوديو (الوحدات 1 - 24)
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF6F0] text-[#5C5042] border border-[#D8C7B5] shadow-2xs">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#C1A68D]"></span>
+                الـ 24 استوديو (1 - 24): بيج فاتح
               </span>
-              <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-950 border border-purple-500/30">
-                <span className="w-2.5 h-2.5 rounded-full bg-purple-600"></span>
-                الـ 6 شقق غرفتين (مزار 3: 25 - 30)
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EFE6D8] text-[#4A3B2C] border border-[#BCA389] shadow-2xs">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#A3866A]"></span>
+                الـ 6 شقق غرفتين (25 - 30): بيج دافئ
               </span>
-              <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/25 text-amber-950 border border-amber-500/30">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-600"></span>
-                الـ 3 شقق الخارجية
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E2D4C3] text-[#3D2C1E] border border-[#8C6D53] shadow-2xs">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#8C6D53]"></span>
+                الـ 3 شقق الخارجية: كافيه فاتح
               </span>
             </div>
           </div>
@@ -1380,23 +1380,23 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
                                ? parseInt(apt.id.replace('apt-',''),10)
                                : 0;
 
-                      // 1) 24 Studios (Units 1 - 24): Uniform Emerald Green row background
-                      // 2) 6 Two-room Apartments (Units 25 - 30): Clear Purple row background
-                      // 3) 3 External Apartments (apt-1, apt-2, apt-3): Distinct Amber/Gold row background
+                      // 1) 24 Studios (Units 1 - 24): Soft Light Cream Beige
+                      // 2) 6 Two-room Apartments (Units 25 - 30): Slightly Darker Warm Beige
+                      // 3) 3 External Apartments: Muted Soft Café Light
                       const isStudio24 = isB1 || isB2 || (num >= 1 && num <= 24 && !isPs && !isExt);
                       const isApt6 = isPs || (num >= 25 && num <= 30 && !isExt);
 
                       const rowBg = isStudio24
-                        ? 'bg-emerald-500/15 hover:bg-emerald-500/25 border-r-4 border-r-emerald-500'
+                        ? 'bg-[#FAF6F0] hover:bg-[#F4ECE2] border-r-4 border-r-[#C1A68D]'
                         : isApt6
-                        ? 'bg-purple-500/20 hover:bg-purple-500/30 border-r-4 border-r-purple-600'
-                        : 'bg-amber-500/25 hover:bg-amber-500/35 border-r-4 border-r-amber-500';
+                        ? 'bg-[#EFE6D8] hover:bg-[#E6DAC7] border-r-4 border-r-[#A3866A]'
+                        : 'bg-[#E2D4C3] hover:bg-[#D7C6B2] border-r-4 border-r-[#8C6D53]';
 
                       const badgeColor = isStudio24
-                        ? 'bg-emerald-600 text-white font-black shadow-md'
+                        ? 'bg-[#C1A68D] text-white font-black shadow-sm'
                         : isApt6
-                        ? 'bg-purple-600 text-white font-black shadow-md'
-                        : 'bg-amber-600 text-white font-black shadow-md';
+                        ? 'bg-[#A3866A] text-white font-black shadow-sm'
+                        : 'bg-[#8C6D53] text-white font-black shadow-sm';
 
                       return (
                         <tr key={apt.id} className={`${rowBg} transition-colors`}>
