@@ -7,7 +7,7 @@ import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { updateDbBookingStatus, deleteDbBooking, deleteAllPendingDbBookings } from '@/lib/actions/db';
 import CustomerProfileModal from '@/components/CustomerProfileModal';
 import ReceiptImageModal, { toDirectImageUrl } from '@/components/ReceiptImageModal';
-import { User, Phone, MessageSquare, FileText, Calendar, CheckCircle2, Home, X, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { User, Phone, MessageSquare, FileText, Calendar, CheckCircle2, Home, X, Trash2, ChevronDown, ChevronUp, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import { formatWhatsAppNumber } from '@/lib/utils';
 
 const CONFIRMED_STATUSES = ['مؤكد', 'approved', 'مؤكد/دخول', 'مغادر/تنظيف', 'مغادر/تم'];
@@ -18,6 +18,13 @@ export default function DashboardOverview() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [overviewZoom, setOverviewZoom] = useState<number>(100);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setOverviewZoom(75); // Initial auto zoom out on mobile screens for full table visibility
+    }
+  }, []);
 
   useEffect(() => {
     audioRef.current = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
@@ -1226,21 +1233,72 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
               >▶️</button>
             </div>
 
-            {/* Category filters */}
-            <div className="flex gap-1 overflow-x-auto">
-              <button
-                onClick={() => setSelectedCategory('all')}
-                className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${selectedCategory === 'all' ? 'bg-[#2A2723] text-white shadow-md' : 'bg-gray-50 text-[#7A7061] hover:bg-gray-100'}`}
-              >الكل</button>
-              {inventoryStats.map((item, i) => (
+            {/* Category filters & Zoom In / Zoom Out Controls */}
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex gap-1 overflow-x-auto">
                 <button
-                  key={i}
-                  onClick={() => setSelectedCategory(item.id)}
-                  className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${selectedCategory === item.id ? 'bg-[#C1A68D] text-white shadow-md' : 'bg-gray-50 text-[#7A7061] hover:bg-gray-100'}`}
+                  onClick={() => setSelectedCategory('all')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all ${selectedCategory === 'all' ? 'bg-[#2A2723] text-white shadow-md' : 'bg-gray-50 text-[#7A7061] hover:bg-gray-100'}`}
+                >الكل</button>
+                {inventoryStats.map((item, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setSelectedCategory(item.id)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all ${selectedCategory === item.id ? 'bg-[#C1A68D] text-white shadow-md' : 'bg-gray-50 text-[#7A7061] hover:bg-gray-100'}`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Table Zoom Controls */}
+              <div className="flex items-center gap-1 bg-[#FDFBF7] p-1 rounded-xl border border-[#EAE4D9] shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setOverviewZoom((prev) => Math.max(50, prev - 15))}
+                  className="bg-white hover:bg-rose-50 text-rose-600 border border-gray-200 p-1.5 rounded-lg font-black transition-all flex items-center gap-1 active:scale-90 text-[10px]"
+                  title="تصغير جدول الاستعراض العام"
                 >
-                  {item.label}
+                  <ZoomOut size={14} />
+                  <span>زوم اوت (-)</span>
                 </button>
-              ))}
+
+                <button
+                  type="button"
+                  onClick={() => setOverviewZoom(75)}
+                  className={`px-2 py-1 rounded-lg text-[9px] font-black transition-all border ${
+                    overviewZoom === 75
+                      ? 'bg-[#2A2723] text-white border-[#2A2723]'
+                      : 'bg-white text-gray-700 hover:bg-gray-100 border-gray-200'
+                  }`}
+                  title="عرض مصغر 75% للموبايل"
+                >
+                  75% (موبايل)
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setOverviewZoom(100)}
+                  className={`px-2 py-1 rounded-lg text-[9px] font-black transition-all border ${
+                    overviewZoom === 100
+                      ? 'bg-[#2A2723] text-white border-[#2A2723]'
+                      : 'bg-white text-gray-700 hover:bg-gray-100 border-gray-200'
+                  }`}
+                  title="عرض طبيعي 100%"
+                >
+                  100%
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setOverviewZoom((prev) => Math.min(150, prev + 15))}
+                  className="bg-white hover:bg-emerald-50 text-emerald-600 border border-gray-200 p-1.5 rounded-lg font-black transition-all flex items-center gap-1 active:scale-90 text-[10px]"
+                  title="تكبير جدول الاستعراض العام"
+                >
+                  <ZoomIn size={14} />
+                  <span>زوم ان (+)</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1271,8 +1329,17 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
           }
 
           return (
-            <div className="overflow-x-auto custom-scrollbar-horizontal pb-4">
-              <table className="w-full min-w-[1100px] border-collapse text-right">
+            <div
+              className="overflow-x-auto custom-scrollbar-horizontal pb-4 transition-all duration-300 origin-top-right"
+              style={{
+                fontSize: `${overviewZoom}%`,
+                zoom: overviewZoom / 100,
+                transform: `scale(${overviewZoom / 100})`,
+                transformOrigin: 'right top',
+                width: overviewZoom < 100 ? `${(100 / overviewZoom) * 100}%` : '100%',
+              }}
+            >
+              <table className="w-full min-w-[650px] md:min-w-[1100px] border-collapse text-right">
                 <thead>
                   <tr className="bg-[#2A2723] text-white text-xs font-black">
                     <th className="px-4 py-4 text-center w-12">#</th>
