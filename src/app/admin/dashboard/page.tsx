@@ -83,11 +83,16 @@ export default function DashboardOverview() {
       : adminRole;
     const isCurrentAkoura = currentRole === 'Akoura';
     const isCurrentPartner = currentRole === 'Partner';
+    const isCurrentMohsen = currentRole === 'Mohsen';
 
     if (isCurrentPartner || isCurrentAkoura) {
       apts = apts.filter((u: any) => u.branch === 3);
       const branch3Ids = apts.map((u: any) => u.id);
-      bookings = bookings.filter((b: any) => branch3Ids.includes(b.apartmentId) || String(b.apartmentId).startsWith('p-s'));
+      bookings = bookings.filter((b: any) => branch3Ids.includes(b.apartmentId) || String(b.apartmentId).startsWith('p-s') || String(b.apartmentId).startsWith('apt-'));
+    } else if (isCurrentMohsen) {
+      apts = apts.filter((u: any) => u.branch === 1 || u.branch === 2);
+      const mazar12Ids = new Set(apts.map((u: any) => u.id));
+      bookings = bookings.filter((b: any) => mazar12Ids.has(b.apartmentId) || (!String(b.apartmentId).startsWith('p-s') && !String(b.apartmentId).startsWith('apt-')));
     }
 
     apts = apts.filter((u: any) => !['s-single', 's-double', 's-triple', 's-tworoom'].includes(u.id));

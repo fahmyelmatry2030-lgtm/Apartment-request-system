@@ -471,7 +471,9 @@ export default function CustomersDatabase() {
       ? (JSON.parse(sessionStorage.getItem('adminInfo') || '{}')?.role || adminRole)
       : adminRole;
     if (currentRole === 'Akoura' || currentRole === 'Partner') {
-      data = data.filter((b: any) => String(b.apartmentId).startsWith('p-s') || !b.apartmentId);
+      data = data.filter((b: any) => String(b.apartmentId).startsWith('p-s') || String(b.apartmentId).startsWith('apt-') || !b.apartmentId);
+    } else if (currentRole === 'Mohsen') {
+      data = data.filter((b: any) => !String(b.apartmentId).startsWith('p-s') && !String(b.apartmentId).startsWith('apt-'));
     }
     setBookings(data);
     setIsLoading(false);
