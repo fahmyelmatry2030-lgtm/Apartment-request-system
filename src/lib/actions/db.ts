@@ -508,7 +508,6 @@ export async function verifyAdminAuth(username: string, pass: string) {
       admin: { username: 'Admin', name: 'Admin', role: 'Admin', password: 'Admin220' },
       moderator: { username: 'Moderator', name: 'Moderator', role: 'Moderator', password: 'Moderator90' },
       mohsen: { username: 'Mohsen', name: 'Mohsen', role: 'Mohsen', password: 'Mohsen 55' },
-      mazar: { username: 'mazar', name: 'Mazar Admin', role: 'Super Admin', password: 'mazar2026' },
     };
     const fixedAdmin = fixedAdmins[cleanUsername.toLowerCase()];
     if (fixedAdmin && fixedAdmin.password === cleanPass) {
