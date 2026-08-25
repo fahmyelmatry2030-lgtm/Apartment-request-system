@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { CustodyDataStore, CustodyTable, CustodyItem, CustodyLog, initialCustodyData } from '@/lib/custody-data';
-import { Plus, Trash2, Edit3, Save, RefreshCw, Layers, Box, Check, X, ShieldAlert, History, Search } from 'lucide-react';
+import { Plus, Trash2, Edit3, Save, RefreshCw, Layers, Box, Check, X, ShieldAlert, History, Search, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 
 export default function CustodyPage() {
   const [store, setStore] = useState<CustodyDataStore>(initialCustodyData);
@@ -13,6 +13,7 @@ export default function CustodyPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [notification, setNotification] = useState<string | null>(null);
+  const [tableZoom, setTableZoom] = useState<number>(100); // 70%, 85%, 100%, 115%, 130%
 
   // New Table Modal
   const [isAddTableModalOpen, setIsAddTableModalOpen] = useState(false);
@@ -393,16 +394,56 @@ export default function CustodyPage() {
         )}
       </div>
 
-      {/* Search Bar */}
-      <div className="relative max-w-md">
-        <Search size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400" />
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="ابحث عن جهاز، مفروشات، أو بند في عهدة القسم..."
-          className="w-full bg-white border border-[#EAE4D9] rounded-2xl pr-11 pl-4 py-3 text-xs font-bold focus:border-[#C1A68D] outline-none transition-all shadow-sm"
-        />
+      {/* Search Bar & Zoom In / Zoom Out Controls */}
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        {/* Search Bar */}
+        <div className="relative w-full max-w-md">
+          <Search size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="ابحث عن جهاز، مفروشات، أو بند في عهدة القسم..."
+            className="w-full bg-white border border-[#EAE4D9] rounded-2xl pr-11 pl-4 py-3 text-xs font-bold focus:border-[#C1A68D] outline-none transition-all shadow-sm"
+          />
+        </div>
+
+        {/* Zoom In & Zoom Out Controls */}
+        <div className="flex items-center gap-2 bg-white p-2 rounded-2xl border border-[#EAE4D9] shadow-sm self-start md:self-auto">
+          <span className="text-xs font-black text-[#5C554B] px-2 flex items-center gap-1">
+            <span>🔍 التكبير والتصغير:</span>
+            <span className="text-[#C1A68D] font-black">{tableZoom}%</span>
+          </span>
+
+          <div className="flex items-center gap-1 bg-[#FDFBF7] p-1 rounded-xl border border-[#EAE4D9]">
+            <button
+              type="button"
+              onClick={() => setTableZoom((prev) => Math.max(55, prev - 15))}
+              className="bg-white hover:bg-rose-50 text-rose-600 border border-gray-200 p-2 rounded-lg font-black transition-all flex items-center justify-center active:scale-90"
+              title="تصغير الجدول (Zoom Out)"
+            >
+              <ZoomOut size={16} />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setTableZoom(100)}
+              className="bg-white hover:bg-gray-100 text-gray-700 border border-gray-200 px-2 py-1.5 rounded-lg text-[10px] font-black transition-all"
+              title="إعادة الحجم الطبيعي 100%"
+            >
+              <RotateCcw size={14} />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setTableZoom((prev) => Math.min(160, prev + 15))}
+              className="bg-white hover:bg-emerald-50 text-emerald-600 border border-gray-200 p-2 rounded-lg font-black transition-all flex items-center justify-center active:scale-90"
+              title="تكبير الجدول (Zoom In)"
+            >
+              <ZoomIn size={16} />
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* ── TABLES DISPLAY SECTION ────────────────────────────────────────── */}
@@ -424,7 +465,7 @@ export default function CustodyPage() {
           </button>
         </div>
       ) : (
-        <div className="space-y-10">
+        <div className="space-y-10 transition-all duration-300 origin-top-right" style={{ zoom: `${tableZoom}%` }}>
           {currentTables.map((table) => {
             const filteredItems = table.items.filter((item) =>
               !searchTerm
