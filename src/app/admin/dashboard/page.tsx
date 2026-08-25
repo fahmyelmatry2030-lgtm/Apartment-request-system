@@ -1156,9 +1156,26 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
         
         {/* Header Filters & Date Picker */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-[#EAE4D9]/40">
-          <h4 className="font-black text-base text-[#2A2723]">
-            {selectedCategory === 'all' ? '🗺️ جميع الوحدات والاستديوهات' : `🟢 وحدات ${inventoryStats.find(i => i.id === selectedCategory)?.label} المتاحة`}
-          </h4>
+          <div className="space-y-1">
+            <h4 className="font-black text-base text-[#2A2723]">
+              {selectedCategory === 'all' ? '🗺️ جميع الوحدات والاستديوهات' : `🟢 وحدات ${inventoryStats.find(i => i.id === selectedCategory)?.label} المتاحة`}
+            </h4>
+            {/* Color Distinction Legend Bar */}
+            <div className="flex flex-wrap items-center gap-2 text-[10px] md:text-xs font-bold pt-1">
+              <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-900 border border-emerald-500/30">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                الـ 24 استوديو (الوحدات 1 - 24)
+              </span>
+              <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-950 border border-purple-500/30">
+                <span className="w-2.5 h-2.5 rounded-full bg-purple-600"></span>
+                الـ 6 شقق غرفتين (مزار 3: 25 - 30)
+              </span>
+              <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/25 text-amber-950 border border-amber-500/30">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-600"></span>
+                الـ 3 شقق الخارجية
+              </span>
+            </div>
+          </div>
 
           <div className="flex flex-wrap items-center gap-3">
             {/* Search Box */}
@@ -1284,17 +1301,35 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
                       const isB1 = String(apt.id).startsWith('b1-s');
                       const isB2 = String(apt.id).startsWith('b2-s');
                       const isPs = String(apt.id).startsWith('p-s');
-                       const num = isB1 
+                      const isExt = String(apt.id).startsWith('apt-');
+
+                      const num = isB1 
                          ? parseInt(apt.id.replace('b1-s',''),10) 
                          : isB2 
                            ? parseInt(apt.id.replace('b2-s',''),10)+12 
                            : isPs 
                              ? parseInt(apt.id.replace('p-s',''),10) 
-                             : String(apt.id).startsWith('apt-')
+                             : isExt
                                ? parseInt(apt.id.replace('apt-',''),10)
                                : 0;
-                      const rowBg = isB1 ? 'bg-blue-50/40 hover:bg-blue-50/80' : isB2 ? 'bg-emerald-50/40 hover:bg-emerald-50/80' : isPs ? 'bg-purple-50/40 hover:bg-purple-50/80' : 'bg-amber-50/40 hover:bg-amber-50/80';
-                      const badgeColor = isB1 ? 'bg-blue-600 text-white' : isB2 ? 'bg-emerald-600 text-white' : isPs ? 'bg-purple-600 text-white' : 'bg-[#C1A68D] text-white';
+
+                      // 1) 24 Studios (Units 1 - 24): Uniform Emerald Green row background
+                      // 2) 6 Two-room Apartments (Units 25 - 30): Clear Purple row background
+                      // 3) 3 External Apartments (apt-1, apt-2, apt-3): Distinct Amber/Gold row background
+                      const isStudio24 = isB1 || isB2 || (num >= 1 && num <= 24 && !isPs && !isExt);
+                      const isApt6 = isPs || (num >= 25 && num <= 30 && !isExt);
+
+                      const rowBg = isStudio24
+                        ? 'bg-emerald-500/15 hover:bg-emerald-500/25 border-r-4 border-r-emerald-500'
+                        : isApt6
+                        ? 'bg-purple-500/20 hover:bg-purple-500/30 border-r-4 border-r-purple-600'
+                        : 'bg-amber-500/25 hover:bg-amber-500/35 border-r-4 border-r-amber-500';
+
+                      const badgeColor = isStudio24
+                        ? 'bg-emerald-600 text-white font-black shadow-md'
+                        : isApt6
+                        ? 'bg-purple-600 text-white font-black shadow-md'
+                        : 'bg-amber-600 text-white font-black shadow-md';
 
                       return (
                         <tr key={apt.id} className={`${rowBg} transition-colors`}>
