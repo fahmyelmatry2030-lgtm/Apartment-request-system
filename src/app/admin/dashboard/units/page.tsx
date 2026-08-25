@@ -15,12 +15,20 @@ export default function UnitsManagement() {
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [adminRole, setAdminRole] = useState('Owner');
   
   // Feature management temporary states
   const [newFeatureAr, setNewFeatureAr] = useState('');
   const [newFeatureEn, setNewFeatureEn] = useState('');
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const info = sessionStorage.getItem('adminInfo');
+    if (info) setAdminRole(JSON.parse(info).role || 'Owner');
+  }, []);
+
+  const isModerator = adminRole === 'Moderator';
 
   const refreshData = useCallback(async () => {
     setIsLoading(true);
@@ -91,7 +99,7 @@ export default function UnitsManagement() {
       setIsLoading(true);
       setError(null);
       try {
-        await updateUnitDetails(editingUnit.id, editingUnit);
+        await updateUnitDetails(editingUnit.id, isModerator ? { price: editingUnit.price } : editingUnit);
         setIsModalOpen(false);
         setEditingUnit(null);
         await refreshData();
@@ -105,6 +113,7 @@ export default function UnitsManagement() {
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isModerator) return;
     const file = e.target.files?.[0];
     if (!file || !editingUnit) return;
 
@@ -174,6 +183,7 @@ export default function UnitsManagement() {
   };
 
   const replaceImage = async (index: number, file: File) => {
+    if (isModerator) return;
     setIsUploading(true);
     try {
         // Image Compression
@@ -220,6 +230,7 @@ export default function UnitsManagement() {
   };
 
   const addFeature = () => {
+    if (isModerator) return;
     if (!newFeatureAr.trim() || !newFeatureEn.trim()) return;
     
     const updatedFeatures = {
@@ -233,6 +244,7 @@ export default function UnitsManagement() {
   };
 
   const removeFeature = (index: number) => {
+    if (isModerator) return;
     const updatedAr = [...(editingUnit.features?.ar || [])];
     const updatedEn = [...(editingUnit.features?.en || [])];
     updatedAr.splice(index, 1);
@@ -345,7 +357,7 @@ export default function UnitsManagement() {
               </div>
               
               <div className="mt-auto pt-4 flex gap-2">
-                <button 
+                {!isModerator && <button 
                   onClick={() => toggleStatus(unit.id, unit.status)}
                   className={`flex-1 py-3 rounded-xl border font-black text-[10px] transition-all outline-none ${
                     unit.status === 'متاح' 
@@ -354,7 +366,7 @@ export default function UnitsManagement() {
                   }`}
                 >
                   {unit.status === 'متاح' ? 'تحويل للصيانة 🛠️' : 'تفعيل للجمهور ✅'}
-                </button>
+                </button>}
                 <button 
                   onClick={() => handleEdit(unit)}
                   className="p-3 rounded-xl border border-[#EAE4D9] hover:bg-[#FDFBF7] text-xl transition-all shadow-sm active:scale-95"
@@ -392,6 +404,7 @@ export default function UnitsManagement() {
                         <input 
                             type="text" 
                             value={editingUnit.title.ar}
+                            readOnly={isModerator}
                             onChange={(e) => setEditingUnit({...editingUnit, title: {...editingUnit.title, ar: e.target.value}})}
                             className="w-full bg-white border border-[#EAE4D9] rounded-2xl px-6 py-4 text-sm text-[#2A2723] focus:border-[#C1A68D] outline-none transition-all font-black shadow-sm"
                         />
@@ -401,6 +414,7 @@ export default function UnitsManagement() {
                         <input 
                             type="text" 
                             value={editingUnit.title.en}
+                            readOnly={isModerator}
                             onChange={(e) => setEditingUnit({...editingUnit, title: {...editingUnit.title, en: e.target.value}})}
                             className="w-full bg-white border border-[#EAE4D9] rounded-2xl px-6 py-4 text-sm text-[#2A2723] focus:border-[#C1A68D] outline-none transition-all font-black text-left shadow-sm"
                         />
@@ -420,6 +434,7 @@ export default function UnitsManagement() {
                         <input 
                             type="text" 
                             value={editingUnit.originalPrice || ''}
+                            readOnly={isModerator}
                             onChange={(e) => setEditingUnit({...editingUnit, originalPrice: e.target.value})}
                             placeholder="اختياري: يعرض للزبائن وعليه خط كأنه خصم"
                             className="w-full bg-white border border-[#EAE4D9] rounded-2xl px-6 py-4 text-sm text-[#7A7061] focus:border-[#C1A68D] outline-none transition-all font-black text-left shadow-sm opacity-60"
@@ -433,6 +448,7 @@ export default function UnitsManagement() {
                         <textarea 
                             rows={4}
                             value={editingUnit.description?.ar || ''}
+                            readOnly={isModerator}
                             onChange={(e) => setEditingUnit({...editingUnit, description: {...(editingUnit.description || {}), ar: e.target.value}})}
                             className="w-full bg-white border border-[#EAE4D9] rounded-3xl px-6 py-5 text-sm text-[#2A2723] focus:border-[#C1A68D] outline-none transition-all resize-none leading-relaxed font-bold shadow-sm"
                         />
@@ -442,6 +458,7 @@ export default function UnitsManagement() {
                         <textarea 
                             rows={4}
                             value={editingUnit.description?.en || ''}
+                            readOnly={isModerator}
                             onChange={(e) => setEditingUnit({...editingUnit, description: {...(editingUnit.description || {}), en: e.target.value}})}
                             className="w-full bg-white border border-[#EAE4D9] rounded-3xl px-6 py-5 text-sm text-[#2A2723] focus:border-[#C1A68D] outline-none transition-all resize-none leading-relaxed text-left font-bold shadow-sm"
                         />
@@ -462,13 +479,13 @@ export default function UnitsManagement() {
                                 ref={fileInputRef}
                                 onChange={handleFileUpload}
                             />
-                            <button 
+                            {!isModerator && <button 
                                 onClick={() => fileInputRef.current?.click()}
                                 disabled={isUploading}
                                 className="bg-[#2A2723] hover:bg-black text-white text-[10px] font-black px-8 py-3 rounded-full transition-all shadow-lg shadow-black/10 flex items-center gap-2"
                             >
                                 {isUploading ? 'جاري الرفع...' : 'رفع صورة إضافية من الجهاز +'}
-                            </button>
+                            </button>}
                         </div>
                     </div>
 
@@ -478,6 +495,7 @@ export default function UnitsManagement() {
                         <input 
                             type="text" 
                             value={editingUnit.video || ''}
+                            readOnly={isModerator}
                             onChange={(e) => setEditingUnit({...editingUnit, video: e.target.value})}
                             placeholder="انسخ رابط الفيديو هنا"
                             className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-2xl px-6 py-4 text-xs text-[#2A2723] focus:border-[#C1A68D] outline-none transition-all font-bold"
@@ -501,7 +519,7 @@ export default function UnitsManagement() {
                                     <div className="w-full h-full flex items-center justify-center bg-gray-50 text-gray-300 text-[8px]">IMAGE_ERR</div>
                                 )}
                                 <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3">
-                                    <label className="cursor-pointer bg-white text-[#2A2723] px-5 py-2 rounded-xl text-[10px] font-black hover:scale-105 transition-all shadow-xl">
+                                    {!isModerator && <label className="cursor-pointer bg-white text-[#2A2723] px-5 py-2 rounded-xl text-[10px] font-black hover:scale-105 transition-all shadow-xl">
                                         استبدال
                                         <input 
                                             type="file" 
@@ -512,13 +530,13 @@ export default function UnitsManagement() {
                                                 if(file) replaceImage(idx, file);
                                             }} 
                                         />
-                                    </label>
-                                    <button 
+                                    </label>}
+                                    {!isModerator && <button 
                                         onClick={() => removeImage(idx)}
                                         className="bg-red-600 text-white px-5 py-2 rounded-xl text-[10px] hover:scale-105 transition-all font-black shadow-lg shadow-red-600/20"
                                     >
                                         حذف
-                                    </button>
+                                    </button>}
                                 </div>
                             </div>
                         ))
@@ -543,6 +561,7 @@ export default function UnitsManagement() {
                                 type="text" 
                                 placeholder="مثال: تكييف مركزي"
                                 value={newFeatureAr}
+                                readOnly={isModerator}
                                 onChange={e => setNewFeatureAr(e.target.value)}
                                 className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-5 py-3 text-xs text-[#2A2723] font-bold"
                             />
@@ -553,16 +572,17 @@ export default function UnitsManagement() {
                                 type="text" 
                                 placeholder="e.g. Central AC"
                                 value={newFeatureEn}
+                                readOnly={isModerator}
                                 onChange={e => setNewFeatureEn(e.target.value)}
                                 className="w-full bg-[#FDFBF7] border border-[#EAE4D9] rounded-xl px-5 py-3 text-xs text-[#2A2723] text-left font-bold"
                             />
                          </div>
-                         <button 
+                         {!isModerator && <button 
                             onClick={addFeature}
                             className="bg-[#C1A68D] text-white font-black text-[10px] px-8 py-3.5 rounded-xl hover:scale-105 transition-transform shadow-lg shadow-[#C1A68D]/20 active:scale-95"
                          >
                              إضافة +
-                         </button>
+                         </button>}
                      </div>
 
                      {/* Features List */}
@@ -573,7 +593,7 @@ export default function UnitsManagement() {
                                 {(editingUnit.features?.ar || []).map((f: string, i: number) => (
                                     <div key={i} className="flex justify-between items-center bg-[#FDFBF7] px-5 py-3 rounded-xl border border-[#EAE4D9]/50 group">
                                         <span className="text-xs font-bold text-[#2A2723]">{f}</span>
-                                        <button onClick={() => removeFeature(i)} className="text-red-500 hover:scale-125 transition-transform p-1 opacity-40 group-hover:opacity-100">✕</button>
+                                        {!isModerator && <button onClick={() => removeFeature(i)} className="text-red-500 hover:scale-125 transition-transform p-1 opacity-40 group-hover:opacity-100">✕</button>}
                                     </div>
                                 ))}
                              </div>
@@ -584,7 +604,7 @@ export default function UnitsManagement() {
                                 {(editingUnit.features?.en || []).map((f: string, i: number) => (
                                     <div key={i} className="flex justify-between items-center bg-[#FDFBF7] px-5 py-3 rounded-xl border border-[#EAE4D9]/50 group">
                                         <span className="text-xs font-bold text-[#2A2723]">{f}</span>
-                                        <button onClick={() => removeFeature(i)} className="text-red-500 hover:scale-125 transition-transform p-1 opacity-40 group-hover:opacity-100">✕</button>
+                                        {!isModerator && <button onClick={() => removeFeature(i)} className="text-red-500 hover:scale-125 transition-transform p-1 opacity-40 group-hover:opacity-100">✕</button>}
                                     </div>
                                 ))}
                              </div>

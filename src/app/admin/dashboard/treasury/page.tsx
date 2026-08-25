@@ -1,0 +1,183 @@
+"use client";
+
+import { useEffect, useMemo, useState } from 'react';
+import { getBookings } from '@/lib/data-init';
+import {
+  deleteDbTreasuryTransfer,
+  getDbExpenses,
+  getDbTreasuryTransfers,
+  saveDbTreasuryTransfer,
+} from '@/lib/actions/db';
+import { ArrowLeftRight, Plus, Trash2, Wallet } from 'lucide-react';
+
+const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+const CONFIRMED_STATUSES = ['approved', 'مؤكد', 'مؤكد/دخول', 'مغادر/تنظيف', 'مغادر/تم'];
+
+type TreasuryTransfer = {
+  id: string;
+  amount: number;
+  handed_by: string;
+  received_by: string;
+  transfer_date: string;
+};
+
+const money = (value: number) => `${Math.round(value).toLocaleString('ar-EG')} ج.م`;
+
+export default function TreasuryPage() {
+  const today = new Date();
+  const [month, setMonth] = useState(today.getMonth());
+  const [year, setYear] = useState(today.getFullYear());
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [expenses, setExpenses] = useState<any[]>([]);
+  const [transfers, setTransfers] = useState<TreasuryTransfer[]>([]);
+  const [form, setForm] = useState({ amount: '', handedBy: '', receivedBy: '', date: today.toISOString().slice(0, 10) });
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const loadData = async () => {
+    setIsLoading(true);
+    try {
+      const [bookingData, expenseData, transferData] = await Promise.all([
+        getBookings(),
+        getDbExpenses(),
+        getDbTreasuryTransfers(),
+      ]);
+      setBookings(bookingData || []);
+      setExpenses(expenseData || []);
+      setTransfers(transferData || []);
+    } catch (loadError) {
+      console.error(loadError);
+      setError('تعذر تحميل بيانات الخزنة. تأكد من تطبيق جدول treasury_transfers في Supabase.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => { loadData(); }, []);
+
+  const monthlyBookings = useMemo(() => bookings.filter((booking) => {
+    if (!CONFIRMED_STATUSES.includes(String(booking.status))) return false;
+    const date = new Date(`${booking.checkIn}T00:00:00`);
+    return date.getMonth() === month && date.getFullYear() === year;
+  }), [bookings, month, year]);
+
+  const monthlyExpenses = useMemo(() => expenses.filter((expense) => {
+    const date = new Date(`${expense.date}T00:00:00`);
+    return date.getMonth() === month && date.getFullYear() === year;
+  }), [expenses, month, year]);
+
+  const grossTreasury = useMemo(() => {
+    const revenue = monthlyBookings.reduce((sum, booking) => sum + (Number(booking.totalAmount) || 0), 0);
+    const commissions = monthlyBookings.reduce((sum, booking) => sum + (Number(booking.commission) || 0), 0);
+    const expensesTotal = monthlyExpenses.reduce((sum, expense) => sum + (Number(expense.amount) || 0), 0);
+    return Math.max(0, revenue - commissions - expensesTotal);
+  }, [monthlyBookings, monthlyExpenses]);
+
+  const monthlyTransfers = useMemo(() => transfers.filter((transfer) => {
+    const date = new Date(`${transfer.transfer_date}T00:00:00`);
+    return date.getMonth() === month && date.getFullYear() === year;
+  }), [transfers, month, year]);
+
+  const mainTreasury = monthlyTransfers.reduce((sum, transfer) => sum + (Number(transfer.amount) || 0), 0);
+  const subTreasury = Math.max(0, grossTreasury - mainTreasury);
+
+  const submitTransfer = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!Number(form.amount) || !form.handedBy.trim() || !form.receivedBy.trim() || !form.date) {
+      setError('اكتب المبلغ واسم المسلم والمستلم والتاريخ.');
+      return;
+    }
+    setIsSaving(true);
+    setError('');
+    try {
+      await saveDbTreasuryTransfer({
+        amount: form.amount,
+        handed_by: form.handedBy,
+        received_by: form.receivedBy,
+        transfer_date: form.date,
+      });
+      setForm({ amount: '', handedBy: '', receivedBy: '', date: form.date });
+      await loadData();
+    } catch (saveError) {
+      console.error(saveError);
+      setError('فشل حفظ حركة التحويل.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const removeTransfer = async (id: string) => {
+    if (!window.confirm('هل تريد حذف حركة التحويل؟')) return;
+    try {
+      await deleteDbTreasuryTransfer(id);
+      setTransfers((current) => current.filter((transfer) => transfer.id !== id));
+    } catch (deleteError) {
+      console.error(deleteError);
+      setError('فشل حذف حركة التحويل.');
+    }
+  };
+
+  return (
+    <div className="space-y-8 animate-fade-in" dir="rtl">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-5">
+        <div>
+          <h1 className="text-4xl font-black text-[#2A2723]">الخزنة</h1>
+          <p className="text-sm font-bold text-[#7A7061] mt-2">حركة التوريد من الخزنة الفرعية إلى الخزنة الرئيسية</p>
+        </div>
+        <div className="flex gap-2 bg-white p-2 rounded-2xl border border-[#EAE4D9]">
+          <select value={month} onChange={(event) => setMonth(Number(event.target.value))} className="bg-[#FDFBF7] rounded-xl px-3 py-2 text-xs font-black">
+            {MONTHS_AR.map((name, index) => <option key={name} value={index}>{name}</option>)}
+          </select>
+          <select value={year} onChange={(event) => setYear(Number(event.target.value))} className="bg-[#FDFBF7] rounded-xl px-3 py-2 text-xs font-black">
+            {[2025, 2026, 2027].map((value) => <option key={value} value={value}>{value}</option>)}
+          </select>
+        </div>
+      </header>
+
+      {error && <div className="bg-red-50 border border-red-200 text-red-600 rounded-2xl p-4 text-xs font-black">{error}</div>}
+
+      <section className="grid md:grid-cols-3 gap-5">
+        <div className="bg-[#2A2723] text-white p-7 rounded-[2rem] shadow-xl">
+          <div className="flex items-center gap-3 text-[#C1A68D] text-xs font-black"><Wallet size={18} /> الخزنة الفرعية</div>
+          <div className="text-3xl font-black mt-5">{isLoading ? '...' : money(subTreasury)}</div>
+          <p className="text-[10px] text-white/60 font-bold mt-3">الحجوزات - العمولات - المصروفات</p>
+        </div>
+        <div className="bg-white border border-[#EAE4D9] p-7 rounded-[2rem] shadow-sm">
+          <div className="flex items-center gap-3 text-[#7A7061] text-xs font-black"><ArrowLeftRight size={18} /> الخزنة الرئيسية</div>
+          <div className="text-3xl font-black text-[#C1A68D] mt-5">{isLoading ? '...' : money(mainTreasury)}</div>
+          <p className="text-[10px] text-[#7A7061] font-bold mt-3">إجمالي ما تم توريده لصاحب المكان</p>
+        </div>
+        <div className="bg-[#FDFBF7] border border-[#EAE4D9] p-7 rounded-[2rem] shadow-sm">
+          <div className="text-xs font-black text-[#7A7061]">الإجمالي الشامل</div>
+          <div className="text-3xl font-black text-[#2A2723] mt-5">{isLoading ? '...' : money(grossTreasury)}</div>
+          <p className="text-[10px] text-[#7A7061] font-bold mt-3">الخزنة الفرعية + الخزنة الرئيسية</p>
+        </div>
+      </section>
+
+      <section className="bg-white border border-[#EAE4D9] rounded-[2rem] p-6 md:p-8 shadow-sm">
+        <h2 className="text-lg font-black text-[#2A2723] mb-6">إضافة مبلغ من الخزنة الفرعية إلى الرئيسية</h2>
+        <form onSubmit={submitTransfer} className="grid md:grid-cols-5 gap-3 items-end">
+          <label className="text-[10px] font-black text-[#7A7061]">المبلغ<input required type="number" min="1" value={form.amount} onChange={(event) => setForm({ ...form, amount: event.target.value })} className="mt-2 w-full border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-black" /></label>
+          <label className="text-[10px] font-black text-[#7A7061]">مسلم<input required value={form.handedBy} onChange={(event) => setForm({ ...form, handedBy: event.target.value })} className="mt-2 w-full border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-black" /></label>
+          <label className="text-[10px] font-black text-[#7A7061]">مستلم<input required value={form.receivedBy} onChange={(event) => setForm({ ...form, receivedBy: event.target.value })} className="mt-2 w-full border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-black" /></label>
+          <label className="text-[10px] font-black text-[#7A7061]">التاريخ<input required type="date" value={form.date} onChange={(event) => setForm({ ...form, date: event.target.value })} className="mt-2 w-full border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-black" /></label>
+          <button disabled={isSaving} className="bg-[#2A2723] text-white rounded-xl px-4 py-3 font-black text-xs flex items-center justify-center gap-2 disabled:opacity-50"><Plus size={16} /> {isSaving ? 'جاري الحفظ' : 'إضافة'}</button>
+        </form>
+      </section>
+
+      <section className="bg-white border border-[#EAE4D9] rounded-[2rem] overflow-hidden shadow-sm">
+        <div className="p-6 border-b border-[#EAE4D9] flex justify-between items-center">
+          <h2 className="text-lg font-black text-[#2A2723]">حركات التوريد</h2>
+          <span className="text-xs font-black text-[#7A7061]">{monthlyTransfers.length} حركة</span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-right text-xs">
+            <thead className="bg-[#FDFBF7] text-[#7A7061] font-black"><tr><th className="p-5">المبلغ</th><th className="p-5">مسلم</th><th className="p-5">مستلم</th><th className="p-5">التاريخ</th><th className="p-5">حذف</th></tr></thead>
+            <tbody>{monthlyTransfers.length === 0 ? <tr><td colSpan={5} className="p-12 text-center text-[#7A7061] font-bold">لا توجد تحويلات لهذا الشهر</td></tr> : monthlyTransfers.map((transfer) => <tr key={transfer.id} className="border-t border-[#EAE4D9]/60 font-bold"><td className="p-5 text-[#C1A68D] font-black">{money(Number(transfer.amount))}</td><td className="p-5">{transfer.handed_by}</td><td className="p-5">{transfer.received_by}</td><td className="p-5">{transfer.transfer_date}</td><td className="p-5"><button onClick={() => removeTransfer(transfer.id)} title="حذف الحركة" className="text-red-500"><Trash2 size={17} /></button></td></tr>)}</tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  );
+}

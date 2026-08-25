@@ -87,3 +87,16 @@ create table if not exists public.expenses (
 
 alter table public.expenses enable row level security;
 create policy " Allow all access\ on public.expenses for all using (true) with check (true);
+
+-- TREASURY TRANSFERS
+create table if not exists public.treasury_transfers (
+  id uuid default gen_random_uuid() primary key,
+  amount numeric not null check (amount >= 0),
+  handed_by text not null,
+  received_by text not null,
+  transfer_date date not null default current_date,
+  created_at timestamptz default now()
+);
+
+alter table public.treasury_transfers enable row level security;
+create policy "Allow all access on treasury transfers" on public.treasury_transfers for all using (true) with check (true);

@@ -87,9 +87,15 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
       const isBookingsAdmin = info?.role === 'مدير الحجوزات';
       const isUnitsAdmin = info?.role === 'مدير الوحدات';
       const isAkoura = info?.role === 'Akoura';
+      const isAdmin = info?.role === 'Admin';
+      const isModerator = info?.role === 'Moderator';
+      const isMohsen = info?.role === 'Mohsen';
 
       const restrictedForBookings = ['/admin/dashboard/units', '/admin/dashboard/reports', '/admin/dashboard/admins'];
       const restrictedForUnits = ['/admin/dashboard/bookings', '/admin/dashboard/reports', '/admin/dashboard/admins'];
+      const restrictedForAdmin = ['/admin/dashboard/finance'];
+      const moderatorAllowed = ['/admin/dashboard/bookings', '/admin/dashboard/units'];
+      const mohsenAllowed = ['/admin/dashboard/bookings', '/admin/dashboard/finance'];
       const restrictedForAkoura = [
         '/admin/dashboard/units',
         '/admin/dashboard/hr/salaries',
@@ -110,6 +116,21 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
 
       if (isAkoura && restrictedForAkoura.includes(pathname)) {
         router.push('/admin/dashboard');
+        return;
+      }
+
+      if (isAdmin && restrictedForAdmin.includes(pathname)) {
+        router.push('/admin/dashboard');
+        return;
+      }
+
+      if (isModerator && !moderatorAllowed.includes(pathname)) {
+        router.push('/admin/dashboard/bookings');
+        return;
+      }
+
+      if (isMohsen && !mohsenAllowed.includes(pathname)) {
+        router.push('/admin/dashboard/bookings');
         return;
       }
 
@@ -184,16 +205,17 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
   if (pathname === '/admin/login') return <>{children}</>;
 
   const menuItems = [
-    { name: 'الاستعراض العام', href: '/admin/dashboard', icon: '📊', roles: ['Super Admin', 'مدير الحجوزات', 'مدير الوحدات', 'Akoura'] },
-    { name: 'طلبات الحجز', href: '/admin/dashboard/bookings', icon: '📩', roles: ['Super Admin', 'مدير الحجوزات', 'Akoura'] },
-    { name: 'إدارة الوحدات', href: '/admin/dashboard/units', icon: '🏢', roles: ['Super Admin', 'مدير الوحدات'] },
-    { name: 'قاعدة العملاء', href: '/admin/dashboard/customers', icon: '📞', roles: ['Super Admin', 'Akoura'] },
-    { name: 'مرتبات الموظفين', href: '/admin/dashboard/hr/salaries', icon: '💸', roles: ['Super Admin'] },
-    { name: 'إجازات الموظفين', href: '/admin/dashboard/hr/vacations', icon: '🌴', roles: ['Super Admin'] },
-    { name: 'إدارة المحتوى', href: '/admin/dashboard/content', icon: '📝', roles: ['Super Admin'] },
-    { name: 'المصروفات', href: '/admin/dashboard/reports', icon: '💰', roles: ['Super Admin', 'Akoura'] },
-    { name: 'كشف الحساب الشهري', href: '/admin/dashboard/finance', icon: '🏛️', roles: ['Super Admin', 'Akoura'] },
-    { name: 'فريق الإدارة', href: '/admin/dashboard/admins', icon: '👥', roles: ['Super Admin'] },
+    { name: 'الاستعراض العام', href: '/admin/dashboard', icon: '📊', roles: ['Owner', 'Admin', 'Moderator', 'Super Admin', 'مدير الحجوزات', 'مدير الوحدات', 'Akoura'] },
+    { name: 'طلبات الحجز', href: '/admin/dashboard/bookings', icon: '📩', roles: ['Owner', 'Admin', 'Moderator', 'Mohsen', 'Super Admin', 'مدير الحجوزات', 'Akoura'] },
+    { name: 'إدارة الوحدات', href: '/admin/dashboard/units', icon: '🏢', roles: ['Owner', 'Admin', 'Moderator', 'Super Admin', 'مدير الوحدات'] },
+    { name: 'قاعدة العملاء', href: '/admin/dashboard/customers', icon: '📞', roles: ['Owner', 'Admin', 'Super Admin', 'Akoura'] },
+    { name: 'مرتبات الموظفين', href: '/admin/dashboard/hr/salaries', icon: '💸', roles: ['Owner', 'Admin', 'Super Admin'] },
+    { name: 'إجازات الموظفين', href: '/admin/dashboard/hr/vacations', icon: '🌴', roles: ['Owner', 'Admin', 'Super Admin'] },
+    { name: 'إدارة المحتوى', href: '/admin/dashboard/content', icon: '📝', roles: ['Owner', 'Admin', 'Super Admin'] },
+    { name: 'المصروفات', href: '/admin/dashboard/reports', icon: '💰', roles: ['Owner', 'Admin', 'Super Admin', 'Akoura'] },
+    { name: 'الخزنة', href: '/admin/dashboard/treasury', icon: '🔐', roles: ['Owner', 'Admin'] },
+    { name: 'كشف الحساب الشهري', href: '/admin/dashboard/finance', icon: '🏛️', roles: ['Owner', 'Mohsen', 'Super Admin', 'Akoura'] },
+    { name: 'فريق الإدارة', href: '/admin/dashboard/admins', icon: '👥', roles: ['Owner', 'Admin', 'Super Admin'] },
   ].filter(item => item.roles.includes(adminRole as string));
 
 
@@ -370,7 +392,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
                   <div className="text-xs font-black text-[#2A2723]">{adminName}</div>
                   <div className="text-[10px] text-[#C1A68D] uppercase font-black">{adminRole}</div>
                 </div>
-                {adminRole === 'Super Admin' && (
+                {(adminRole === 'Owner' || adminRole === 'Admin' || adminRole === 'Super Admin') && (
                   <Link
                     href="/admin/dashboard/admins"
                     onClick={() => setShowProfile(false)}

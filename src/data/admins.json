@@ -1,9 +1,30 @@
 [
   {
-    "id": "admin-1",
-    "username": "admin",
-    "password": "mazar2026",
-    "name": "مدير النظام",
-    "role": "Super Admin"
+    "id": "fixed-owner",
+    "username": "Owner",
+    "password": "Owner50",
+    "name": "Owner",
+    "role": "Owner"
+  },
+  {
+    "id": "fixed-admin",
+    "username": "Admin",
+    "password": "Admin220",
+    "name": "Admin",
+    "role": "Admin"
+  },
+  {
+    "id": "fixed-moderator",
+    "username": "Moderator",
+    "password": "Moderator90",
+    "name": "Moderator",
+    "role": "Moderator"
+  },
+  {
+    "id": "fixed-mohsen",
+    "username": "Mohsen",
+    "password": "Mohsen 55",
+    "name": "Mohsen",
+    "role": "Mohsen"
   }
 ]

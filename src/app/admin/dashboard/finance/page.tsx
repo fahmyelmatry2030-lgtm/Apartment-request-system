@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from 'react';
 import { getBookings, getSystemUnits } from '@/lib/data-init';
 import { getDbExpenses, getDbSalaries } from '@/lib/actions/db';
 import { Calendar, TrendingUp } from 'lucide-react';
-import FinancialLockModal from '@/components/FinancialLockModal';
 import FinancialSummaryTab from '../reports/FinancialSummaryTab';
 
 const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
@@ -107,7 +106,6 @@ export default function FinancePage() {
   const [selectedMonth, setSelectedMonth] = useState(-1);
   const [selectedYear, setSelectedYear] = useState(-1);
   const [isLoading, setIsLoading] = useState(true);
-  const [isUnlocked, setIsUnlocked] = useState(false);
   const [adminRole, setAdminRole] = useState<string>('Super Admin');
 
 
@@ -120,6 +118,7 @@ export default function FinancePage() {
   }, []);
 
   const isAkoura = adminRole === 'Akoura';
+  const isMohsen = adminRole === 'Mohsen';
 
   const loadData = async () => {
     setIsLoading(true);
@@ -175,6 +174,7 @@ export default function FinancePage() {
         if (isAkoura) {
           return u?.branch === 3 || String(b.apartmentId).startsWith('p-s');
         }
+        if (isMohsen) return u?.branch === 1 || u?.branch === 2;
         return true;
       });
 
@@ -190,6 +190,7 @@ export default function FinancePage() {
         if (isAkoura) {
           return e.branch === 3 || e.branch === '3' || String(e.unitId || '').startsWith('p-s');
         }
+        if (isMohsen) return [1, 2, 12].includes(Number(e.branch) || 12);
         return true;
       });
 
@@ -209,7 +210,7 @@ export default function FinancePage() {
     }
 
     return result;
-  }, [bookings, expenses, units, selectedYear, isAkoura]);
+  }, [bookings, expenses, units, selectedYear, isAkoura, isMohsen]);
 
   // ── الحجوزات المؤكدة للشهر المختار ──
   const monthlyBookings = useMemo(() => {
@@ -218,9 +219,12 @@ export default function FinancePage() {
       if (b.status !== 'approved' && b.status !== 'مؤكد') return false;
       const parts = b.checkIn?.split('-');
       if (!parts || parts.length < 2) return false;
-      return parseInt(parts[1], 10) - 1 === selectedMonth && parseInt(parts[0], 10) === selectedYear;
+      if (parseInt(parts[1], 10) - 1 !== selectedMonth || parseInt(parts[0], 10) !== selectedYear) return false;
+      if (!isMohsen) return true;
+      const unit = units.find((candidate: any) => candidate.id === b.apartmentId);
+      return unit?.branch === 1 || unit?.branch === 2;
     });
-  }, [bookings, selectedMonth, selectedYear]);
+  }, [bookings, selectedMonth, selectedYear, units, isMohsen]);
 
   // ── المصروفات الشهرية ──
   const monthlyExpenses = useMemo(() => {
@@ -230,9 +234,10 @@ export default function FinancePage() {
       if (parts.length < 2) return false;
       const year = parseInt(parts[0]);
       const month = parseInt(parts[1]) - 1;
-      return month === selectedMonth && year === selectedYear;
+      if (month !== selectedMonth || year !== selectedYear) return false;
+      return !isMohsen || [1, 2, 12].includes(Number(e.branch) || 12);
     });
-  }, [expenses, selectedMonth, selectedYear]);
+  }, [expenses, selectedMonth, selectedYear, isMohsen]);
 
   const monthlySalaries = useMemo(() => {
     return salaries.filter((s: any) =>
@@ -324,14 +329,6 @@ export default function FinancePage() {
   const apt2Net = aptRevenue('apt-2') - aptCommission('apt-2') - apt2Expenses;
   const apt3Net = aptRevenue('apt-3') - aptCommission('apt-3') - apt3Expenses;
 
-  if (!isUnlocked) {
-    return (
-      <div className="flex items-center justify-center min-h-[65vh]">
-        <FinancialLockModal isOpen={true} onUnlock={() => setIsUnlocked(true)} />
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-10 animate-fade-in" dir="rtl">
 
@@ -339,7 +336,7 @@ export default function FinancePage() {
       <header className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
         <div>
           <h1 className="text-4xl font-black text-[#2A2723]">
-            {isAkoura ? 'مزار' : 'الإدارة'} <span className="text-[#C1A68D]">{isAkoura ? '(3) — كشف الحساب' : 'المالية الشاملة'}</span>
+            {isAkoura ? 'مزار' : isMohsen ? 'مزار 1 و 2' : 'الإدارة'} <span className="text-[#C1A68D]">{isAkoura ? '(3) — كشف الحساب' : 'المالية الشاملة'}</span>
           </h1>
           <p className="text-[#7A7061] font-bold opacity-70 text-sm mt-1">
             كشف حساب شهر{' '}
@@ -369,8 +366,7 @@ export default function FinancePage() {
       {/* ══════════════════════════════════════════════════════════════
           SECTION 1 ★ مزار(1) + مزار(2) — من استوديو 1 إلى 24
       ══════════════════════════════════════════════════════════════ */}
-      {!isAkoura && (
-      <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
+      {!isAkoura && <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
         {/* عنوان القسم */}
         <div className="bg-[#2A2723] px-8 py-4 flex items-center gap-3">
           <span className="text-white font-black text-sm tracking-widest">★ مزار (1) + مزار (2)</span>
@@ -426,13 +422,12 @@ export default function FinancePage() {
             />
           </div>
         </div>
-      </div>
-      )}
+      </div>}
 
       {/* ══════════════════════════════════════════════════════════════
           SECTION 2 ★ مزار(3) — الوحدات من شقة 25 إلى شقة 30
       ══════════════════════════════════════════════════════════════ */}
-      <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
+      {!isMohsen && <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
         {/* عنوان القسم */}
         <div className="bg-[#2A2723] px-8 py-4 flex items-center gap-3">
           <span className="text-white font-black text-sm tracking-widest">مزار (3)</span>
@@ -487,12 +482,12 @@ export default function FinancePage() {
             />
           </div>
         </div>
-      </div>
+      </div>}
 
       {/* ══════════════════════════════════════════════════════════════
           SECTION 3 ★ الشقق الفندقية — شقة(1) + شقة(2) + شقة(3)
       ══════════════════════════════════════════════════════════════ */}
-      {!isAkoura && (
+      {!isAkoura && !isMohsen && (
       <div className="bg-white rounded-[2.5rem] border border-[#EAE4D9]/50 shadow-sm overflow-hidden">
         {/* عنوان القسم */}
         <div className="bg-[#2A2723] px-8 py-4 flex items-center gap-3">
@@ -548,7 +543,7 @@ export default function FinancePage() {
       </div>
       )}
       {/* ════════════════ التقرير المالي الشامل ════════════════ */}
-      <div className="border-t border-[#EAE4D9] pt-10">
+      {!isMohsen && <div className="border-t border-[#EAE4D9] pt-10">
         <FinancialSummaryTab
           bookings={bookings}
           units={units}
@@ -557,7 +552,7 @@ export default function FinancePage() {
           setSelectedMonth={setSelectedMonth}
           setSelectedYear={setSelectedYear}
         />
-      </div>
+      </div>}
 
     </div>
   );

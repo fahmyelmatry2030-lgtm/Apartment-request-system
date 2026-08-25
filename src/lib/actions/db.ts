@@ -490,7 +490,7 @@ export async function verifyAdminAuth(username: string, pass: string) {
     
     console.log(`Login attempt for: ${cleanUsername}`);
 
-    // Fallback credentials check for Akoura
+    // Keep the partner login independent from the admin database.
     if (cleanUsername.toLowerCase() === 'akoura' && cleanPass === 'akoura2026') {
       return {
         success: true,
@@ -501,6 +501,18 @@ export async function verifyAdminAuth(username: string, pass: string) {
           role: 'Akoura'
         }
       };
+    }
+
+    const fixedAdmins: Record<string, { username: string; name: string; role: string; password: string }> = {
+      owner: { username: 'Owner', name: 'Owner', role: 'Owner', password: 'Owner50' },
+      admin: { username: 'Admin', name: 'Admin', role: 'Admin', password: 'Admin220' },
+      moderator: { username: 'Moderator', name: 'Moderator', role: 'Moderator', password: 'Moderator90' },
+      mohsen: { username: 'Mohsen', name: 'Mohsen', role: 'Mohsen', password: 'Mohsen 55' },
+    };
+    const fixedAdmin = fixedAdmins[cleanUsername.toLowerCase()];
+    if (fixedAdmin && fixedAdmin.password === cleanPass) {
+      const { password, ...admin } = fixedAdmin;
+      return { success: true, admin: { id: `fixed-${admin.role.toLowerCase()}`, ...admin } };
     }
     
     const supabase = getSupabaseServerClient();
@@ -889,6 +901,48 @@ export async function updateDbExpense(id: string, updates: any) {
   
   revalidatePath('/admin/dashboard/reports');
   revalidatePath('/admin/dashboard/finance');
+}
+
+// --- TREASURY TRANSFERS ---
+
+export async function getDbTreasuryTransfers() {
+  const supabase = getSupabaseServerClient();
+  if (!supabase) throw new Error('Supabase configuration missing on server');
+
+  const { data, error } = await supabase
+    .from('treasury_transfers')
+    .select('*')
+    .order('transfer_date', { ascending: false })
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+}
+
+export async function saveDbTreasuryTransfer(transfer: any) {
+  const supabase = getSupabaseServerClient();
+  if (!supabase) throw new Error('Supabase configuration missing on server');
+
+  const row = {
+    amount: Number(transfer.amount) || 0,
+    handed_by: String(transfer.handed_by || '').trim(),
+    received_by: String(transfer.received_by || '').trim(),
+    transfer_date: transfer.transfer_date || new Date().toISOString().slice(0, 10),
+  };
+  const { data, error } = await supabase.from('treasury_transfers').insert([row]).select().single();
+  if (error) throw error;
+
+  revalidatePath('/admin/dashboard/treasury');
+  return data;
+}
+
+export async function deleteDbTreasuryTransfer(id: string) {
+  const supabase = getSupabaseServerClient();
+  if (!supabase) throw new Error('Supabase configuration missing on server');
+
+  const { error } = await supabase.from('treasury_transfers').delete().eq('id', id);
+  if (error) throw error;
+  revalidatePath('/admin/dashboard/treasury');
 }
 
 

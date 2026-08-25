@@ -49,6 +49,8 @@ export default function BookingsManagement() {
     }
   }, []);
 
+  const isModerator = adminRole === 'Moderator';
+
   const refreshBookings = useCallback(async () => {
     setIsLoading(true);
     let data = await getBookings();
@@ -63,6 +65,11 @@ export default function BookingsManagement() {
         String(b.apartmentId).startsWith('p-s') || 
         !b.apartmentId
       );
+    }
+    if (currentRole === 'Mohsen') {
+      const units = await getSystemUnits();
+      const mazar12Ids = new Set(units.filter((unit: any) => unit.branch === 1 || unit.branch === 2).map((unit: any) => unit.id));
+      data = data.filter((booking: any) => mazar12Ids.has(booking.apartmentId));
     }
     
     setBookings(data);
@@ -86,6 +93,9 @@ export default function BookingsManagement() {
             
             if (currentRole === 'Akoura' || currentRole === 'Partner') {
               units = units.filter((a: any) => a.branch === 3);
+            }
+            if (currentRole === 'Mohsen') {
+              units = units.filter((a: any) => a.branch === 1 || a.branch === 2);
             }
 
             const approved = allBookings.filter((b: any) => b.status === 'approved' && b.id !== selectedBooking.id);
@@ -371,6 +381,7 @@ export default function BookingsManagement() {
                         {(() => {
                           const receipt = getReceiptUrl(booking);
                           return receipt ? (
+                            isModerator ? <span className="text-[10px] text-[#7A7061] opacity-40 font-bold">متاح للإدارة</span> : (
                             <button
                               type="button"
                               onClick={() => setActiveReceiptModal({ isOpen: true, url: receipt, name: booking.name })}
@@ -378,7 +389,7 @@ export default function BookingsManagement() {
                             >
                               <span className="text-xs">🖼️</span>
                               <span>صورة الإيصال</span>
-                            </button>
+                            </button>)
                           ) : (
                             <span className="text-[10px] text-[#7A7061] opacity-40 font-bold">—</span>
                           );
@@ -509,12 +520,12 @@ export default function BookingsManagement() {
                                     <CheckCircle size={18} strokeWidth={2.5} />
                                 </button>
                             )}
-                            <button 
+                            {!isModerator && <button 
                                 onClick={() => openWhatsAppChat(b)}
                                 className="flex-1 py-4 bg-white/5 text-white border border-white/10 rounded-2xl text-[10px] font-black hover:bg-white/10 transition-all"
                             >
                                 <Smartphone size={18} strokeWidth={2.5} />
-                            </button>
+                            </button>}
                             <button 
                                 onClick={() => { setSelectedBooking(b); setShowDeleteModal(true); }}
                                 className="px-6 py-4 bg-red-500/10 text-red-400 border border-red-500/20 rounded-2xl text-[10px] font-black hover:bg-red-600 hover:text-white transition-all"
