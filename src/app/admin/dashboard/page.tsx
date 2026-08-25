@@ -1418,13 +1418,28 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
                             </button>
                           </td>
                           <td className="px-4 py-3 font-black text-sm text-[#2A2723]">
-                            {(apt.guest || apt.arrivingGuest || apt.leavingGuest) ? (
+                            {apt.isTurnover ? (
+                              <div className="flex flex-col gap-1.5 items-start justify-center">
+                                <button
+                                  onClick={() => openCustomerProfile(apt.leavingGuest, apt.leavingPhone)}
+                                  className="text-rose-600 hover:underline font-black text-xs text-right truncate max-w-[160px]"
+                                >
+                                  🛫 {apt.leavingGuest}
+                                </button>
+                                <button
+                                  onClick={() => openCustomerProfile(apt.arrivingGuest, apt.arrivingPhone)}
+                                  className="text-blue-600 hover:underline font-black text-xs text-right truncate max-w-[160px]"
+                                >
+                                  🛬 {apt.arrivingGuest}
+                                </button>
+                              </div>
+                            ) : apt.guest ? (
                               <button
-                                onClick={() => openCustomerProfile(apt.guest || apt.arrivingGuest || apt.leavingGuest, apt.phone || apt.arrivingPhone || apt.leavingPhone)}
+                                onClick={() => openCustomerProfile(apt.guest, apt.phone)}
                                 className="hover:text-[#C1A68D] text-[#2A2723] transition-colors flex items-center gap-1.5 font-black text-sm text-right"
                               >
                                 <User size={15} className="text-[#C1A68D] shrink-0" />
-                                <span>{apt.guest || apt.arrivingGuest || apt.leavingGuest}</span>
+                                <span>{apt.guest}</span>
                               </button>
                             ) : (
                               <span className="text-gray-300 font-normal">—</span>
@@ -1449,6 +1464,7 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
                           {/* STATUS COLUMN (RIGHT AFTER NOTES) */}
                           <td className="px-4 py-3 text-center">
                             <span className={`text-xs font-black px-3 py-1.5 rounded-full shadow-sm whitespace-nowrap ${
+                              apt.isTurnover ? 'bg-orange-500 text-white animate-pulse' :
                               apt.isCheckingOut ? 'bg-rose-600 text-white font-black' :
                               apt.isCheckingOutTomorrow ? 'bg-amber-500 text-white font-black' :
                               apt.isCheckingIn ? 'bg-blue-600 text-white font-black' :
@@ -1456,7 +1472,8 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
                               apt.isOccupied ? 'bg-red-100 text-red-700' : 
                               'bg-emerald-100 text-emerald-800'
                             }`}>
-                              {apt.isCheckingOut ? '🛫 خروج اليوم' :
+                              {apt.isTurnover ? '🔄 تبديل اليوم' : 
+                               apt.isCheckingOut ? '🛫 خروج اليوم' :
                                apt.isCheckingOutTomorrow ? `🛫 خروج غداً (${formatMiniDate(apt.checkOut || apt.leavingCheckOut)})` :
                                apt.isCheckingIn ? '🛬 وصول اليوم' :
                                apt.isOccupied ? (apt.checkOut ? `مشغول (خروج: ${formatMiniDate(apt.checkOut)})` : 'مشغول') : 
