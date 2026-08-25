@@ -38,9 +38,14 @@ export default function CustodyPage() {
   });
   const [actionReason, setActionReason] = useState('');
 
-  // Read Role from sessionStorage
+  // Read Role & Set Initial Mobile Zoom
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      // Auto initial zoom out on mobile screens
+      if (window.innerWidth < 768) {
+        setTableZoom(80);
+      }
+
       const info = sessionStorage.getItem('adminInfo');
       if (info) {
         try {
@@ -409,40 +414,58 @@ export default function CustodyPage() {
         </div>
 
         {/* Zoom In & Zoom Out Controls */}
-        <div className="flex items-center gap-2 bg-white p-2 rounded-2xl border border-[#EAE4D9] shadow-sm self-start md:self-auto">
-          <span className="text-xs font-black text-[#5C554B] px-2 flex items-center gap-1">
-            <span>🔍 التكبير والتصغير:</span>
-            <span className="text-[#C1A68D] font-black">{tableZoom}%</span>
-          </span>
-
+        <div className="flex items-center gap-2 bg-white p-2 rounded-2xl border border-[#EAE4D9] shadow-sm self-start md:self-auto flex-wrap">
           <div className="flex items-center gap-1 bg-[#FDFBF7] p-1 rounded-xl border border-[#EAE4D9]">
             <button
               type="button"
-              onClick={() => setTableZoom((prev) => Math.max(55, prev - 15))}
-              className="bg-white hover:bg-rose-50 text-rose-600 border border-gray-200 p-2 rounded-lg font-black transition-all flex items-center justify-center active:scale-90"
+              onClick={() => setTableZoom((prev) => Math.max(50, prev - 15))}
+              className="bg-white hover:bg-rose-50 text-rose-600 border border-gray-200 p-2 rounded-lg font-black transition-all flex items-center gap-1 active:scale-90 text-[11px]"
               title="تصغير الجدول (Zoom Out)"
             >
-              <ZoomOut size={16} />
+              <ZoomOut size={15} />
+              <span>زوم اوت (-)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setTableZoom(80)}
+              className={`px-2.5 py-1.5 rounded-lg text-[10px] font-black transition-all border ${
+                tableZoom === 80
+                  ? 'bg-[#2A2723] text-white border-[#2A2723]'
+                  : 'bg-white text-gray-700 hover:bg-gray-100 border-gray-200'
+              }`}
+              title="عرض مصغر 80% للموبايل"
+            >
+              80% (موبايل)
             </button>
 
             <button
               type="button"
               onClick={() => setTableZoom(100)}
-              className="bg-white hover:bg-gray-100 text-gray-700 border border-gray-200 px-2 py-1.5 rounded-lg text-[10px] font-black transition-all"
-              title="إعادة الحجم الطبيعي 100%"
+              className={`px-2.5 py-1.5 rounded-lg text-[10px] font-black transition-all border ${
+                tableZoom === 100
+                  ? 'bg-[#2A2723] text-white border-[#2A2723]'
+                  : 'bg-white text-gray-700 hover:bg-gray-100 border-gray-200'
+              }`}
+              title="عرض طبيعي 100%"
             >
-              <RotateCcw size={14} />
+              100%
             </button>
 
             <button
               type="button"
               onClick={() => setTableZoom((prev) => Math.min(160, prev + 15))}
-              className="bg-white hover:bg-emerald-50 text-emerald-600 border border-gray-200 p-2 rounded-lg font-black transition-all flex items-center justify-center active:scale-90"
+              className="bg-white hover:bg-emerald-50 text-emerald-600 border border-gray-200 p-2 rounded-lg font-black transition-all flex items-center gap-1 active:scale-90 text-[11px]"
               title="تكبير الجدول (Zoom In)"
             >
-              <ZoomIn size={16} />
+              <ZoomIn size={15} />
+              <span>زوم ان (+)</span>
             </button>
           </div>
+
+          <span className="text-xs font-black text-[#5C554B] px-1">
+            النسبة: <span className="text-[#C1A68D] font-black">{tableZoom}%</span>
+          </span>
         </div>
       </div>
 
