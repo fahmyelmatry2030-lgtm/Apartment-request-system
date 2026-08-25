@@ -117,7 +117,7 @@ export default function FinancePage() {
     setSelectedYear(new Date().getFullYear());
   }, []);
 
-  const isAkoura = adminRole === 'Akoura';
+  const isAkoura = adminRole === 'Akoura' || adminRole === 'Aura';
   const isMohsen = adminRole === 'Mohsen';
 
   const loadData = async () => {

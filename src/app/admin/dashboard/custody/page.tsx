@@ -55,7 +55,7 @@ export default function CustodyPage() {
 
           // Role tab locking
           if (parsed.role === 'Mohsen') setActiveTab('mazar12');
-          if (parsed.role === 'Akoura') setActiveTab('mazar3');
+          if (parsed.role === 'Akoura' || parsed.role === 'Aura') setActiveTab('mazar3');
         } catch (e) {}
       }
     }
@@ -124,7 +124,7 @@ export default function CustodyPage() {
 
   // Role Checks
   const isMohsen = adminRole === 'Mohsen';
-  const isAkoura = adminRole === 'Akoura';
+  const isAkoura = adminRole === 'Akoura' || adminRole === 'Aura';
 
   // Allowed Tabs logic
   const canAccessTab = (tab: 'mazar12' | 'mazar3' | 'external') => {

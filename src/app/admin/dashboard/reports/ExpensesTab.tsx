@@ -115,13 +115,13 @@ export default function ExpensesTab() {
     const info = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem('adminInfo') || '{}') : {};
     if (info?.role) {
       setAdminRole(info.role);
-      if (info.role === 'Akoura') {
+      if (info.role === 'Akoura' || info.role === 'Aura') {
         setNewExpense(prev => ({ ...prev, branch: '3' }));
       }
     }
   }, []);
 
-  const isAkoura = adminRole === 'Akoura';
+  const isAkoura = adminRole === 'Akoura' || adminRole === 'Aura';
 
   // Sync branch filter with form branch field
   useEffect(() => {

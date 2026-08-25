@@ -33,7 +33,7 @@ export default function FinancialSummaryTab({
     if (info?.role) setAdminRole(info.role);
   }, []);
 
-  const isAkoura = adminRole === 'Akoura';
+  const isAkoura = adminRole === 'Akoura' || adminRole === 'Aura';
 
   useEffect(() => {
     const loadExpenses = async () => {

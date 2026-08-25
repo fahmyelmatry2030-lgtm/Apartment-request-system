@@ -180,7 +180,7 @@ export default function AdminsManagementPage() {
                   <option value="Super Admin">مدير عام (وصول تام لكل شيء)</option>
                   <option value="مدير الحجوزات">مدير حجوزات (لا يمكنه تعديل الوحدات أو التقارير)</option>
                   <option value="مدير الوحدات">مدير وحدات (لا يمكنه رؤية الحجوزات والتقارير)</option>
-                  <option value="Akoura">شريك مزار 3 (حساب Akoura - رؤية مزار 3 فقط)</option>
+                  <option value="Aura">شريك مزار 3 (حساب Aura - رؤية مزار 3 فقط)</option>
                 </select>
               </div>
             </div>

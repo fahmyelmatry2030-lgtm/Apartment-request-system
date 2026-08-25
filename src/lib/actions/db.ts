@@ -491,14 +491,14 @@ export async function verifyAdminAuth(username: string, pass: string) {
     console.log(`Login attempt for: ${cleanUsername}`);
 
     // Keep the partner login independent from the admin database.
-    if (cleanUsername.toLowerCase() === 'akoura' && cleanPass === 'akoura2026') {
+    if (['akoura', 'aura', 'أورا', 'اورا'].includes(cleanUsername.toLowerCase()) && (cleanPass === 'aura2026' || cleanPass === 'akoura2026')) {
       return {
         success: true,
         admin: {
-          id: 'akoura-admin',
-          username: 'Akoura',
-          name: 'Akoura (مزار 3)',
-          role: 'Akoura'
+          id: 'aura-admin',
+          username: 'Aura',
+          name: 'Aura (مزار 3)',
+          role: 'Aura'
         }
       };
     }
@@ -508,6 +508,8 @@ export async function verifyAdminAuth(username: string, pass: string) {
       admin: { username: 'Admin', name: 'Admin', role: 'Admin', password: 'Admin220' },
       moderator: { username: 'Moderator', name: 'Moderator', role: 'Moderator', password: 'Moderator90' },
       mohsen: { username: 'Mohsen', name: 'Mohsen', role: 'Mohsen', password: 'Mohsen 55' },
+      aura: { username: 'Aura', name: 'Aura (مزار 3)', role: 'Aura', password: 'aura2026' },
+      akoura: { username: 'Aura', name: 'Aura (مزار 3)', role: 'Aura', password: 'aura2026' },
     };
     const fixedAdmin = fixedAdmins[cleanUsername.toLowerCase()];
     if (fixedAdmin && fixedAdmin.password === cleanPass) {
