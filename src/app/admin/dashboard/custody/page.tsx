@@ -298,28 +298,28 @@ export default function CustodyPage() {
       )}
 
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-[#2A2723] via-[#3A3530] to-[#1F1C18] p-8 rounded-[2.5rem] text-white shadow-2xl border border-[#C1A68D]/30 relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div className="space-y-2 z-10">
+      <div className="bg-gradient-to-r from-[#2A2723] via-[#3A3530] to-[#1F1C18] p-5 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] text-white shadow-2xl border border-[#C1A68D]/30 relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-6">
+        <div className="space-y-1.5 md:space-y-2 z-10">
           <div className="flex items-center gap-3">
-            <span className="text-3xl p-3 bg-amber-500/20 border border-amber-500/30 rounded-2xl">📦</span>
+            <span className="text-2xl md:text-3xl p-2.5 md:p-3 bg-amber-500/20 border border-amber-500/30 rounded-xl md:rounded-2xl">📦</span>
             <div>
-              <h1 className="text-2xl md:text-3xl font-black text-white">عهدة مزار والأجهزة والمحتويات</h1>
-              <p className="text-xs text-amber-200/80 font-bold mt-1">
+              <h1 className="text-xl md:text-3xl font-black text-white">عهدة مزار والأجهزة والمحتويات</h1>
+              <p className="text-[11px] md:text-xs text-amber-200/80 font-bold mt-0.5 md:mt-1">
                 إدارة كافة المعدات، المفروشات، والأجهزة الكهربائية الخاصة باستوديوهات وشقق مزار
               </p>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 z-10">
+        <div className="flex items-center gap-2.5 md:gap-3 z-10 w-full md:w-auto justify-end">
           <button
             type="button"
             onClick={fetchCustodyData}
             disabled={isLoading}
-            className="bg-white/10 hover:bg-white/20 text-white font-black px-4 py-3 rounded-2xl text-xs transition-all border border-white/10 flex items-center gap-2"
+            className="bg-white/10 hover:bg-white/20 text-white font-black px-3.5 py-2.5 md:px-4 md:py-3 rounded-xl md:rounded-2xl text-[11px] md:text-xs transition-all border border-white/10 flex items-center gap-1.5"
             title="تحديث البيانات"
           >
-            <RefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
+            <RefreshCw size={15} className={isLoading ? 'animate-spin' : ''} />
             <span>تحديث</span>
           </button>
 
@@ -327,9 +327,9 @@ export default function CustodyPage() {
             <button
               type="button"
               onClick={() => setIsAddTableModalOpen(true)}
-              className="bg-[#C1A68D] hover:bg-[#a68d74] text-black font-black px-6 py-3 rounded-2xl text-xs transition-all shadow-xl flex items-center gap-2 active:scale-95"
+              className="bg-[#C1A68D] hover:bg-[#a68d74] text-black font-black px-4 py-2.5 md:px-6 md:py-3 rounded-xl md:rounded-2xl text-[11px] md:text-xs transition-all shadow-xl flex items-center gap-1.5 active:scale-95 shrink-0"
             >
-              <Plus size={18} />
+              <Plus size={16} />
               <span>إضافة جدول جديد</span>
             </button>
           )}
@@ -337,12 +337,12 @@ export default function CustodyPage() {
       </div>
 
       {/* ── TOP SECTION NAVIGATION TABS (3 MAIN TABS) ─────────────────────── */}
-      <div className="flex items-center gap-3 overflow-x-auto pb-2 custom-scrollbar border-b border-[#EAE4D9] pb-4">
+      <div className="flex items-center gap-2.5 md:gap-3 overflow-x-auto pb-2 custom-scrollbar border-b border-[#EAE4D9]">
         {canAccessTab('mazar12') && (
           <button
             type="button"
             onClick={() => setActiveTab('mazar12')}
-            className={`px-6 py-4 rounded-2xl font-black text-sm transition-all flex items-center gap-2 shadow-sm shrink-0 ${
+            className={`px-4 py-3 md:px-6 md:py-4 rounded-xl md:rounded-2xl font-black text-xs md:text-sm transition-all flex items-center gap-2 shadow-sm shrink-0 ${
               activeTab === 'mazar12'
                 ? 'bg-[#2A2723] text-white shadow-xl scale-105 border border-[#C1A68D]'
                 : 'bg-white text-[#7A7061] hover:bg-[#FDFBF7] border border-[#EAE4D9]'
@@ -350,7 +350,7 @@ export default function CustodyPage() {
           >
             <span>🏢</span>
             <span>مزار 1 و 2 (الوحدات 1 - 24)</span>
-            <span className="bg-[#C1A68D]/20 text-[#C1A68D] text-[10px] px-2 py-0.5 rounded-full font-bold">
+            <span className="bg-[#C1A68D]/20 text-[#C1A68D] text-[9px] md:text-[10px] px-2 py-0.5 rounded-full font-bold">
               {store.sections.mazar12.tables.length} جدول
             </span>
           </button>
@@ -360,7 +360,7 @@ export default function CustodyPage() {
           <button
             type="button"
             onClick={() => setActiveTab('mazar3')}
-            className={`px-6 py-4 rounded-2xl font-black text-sm transition-all flex items-center gap-2 shadow-sm shrink-0 ${
+            className={`px-4 py-3 md:px-6 md:py-4 rounded-xl md:rounded-2xl font-black text-xs md:text-sm transition-all flex items-center gap-2 shadow-sm shrink-0 ${
               activeTab === 'mazar3'
                 ? 'bg-[#2A2723] text-white shadow-xl scale-105 border border-[#C1A68D]'
                 : 'bg-white text-[#7A7061] hover:bg-[#FDFBF7] border border-[#EAE4D9]'
@@ -368,7 +368,7 @@ export default function CustodyPage() {
           >
             <span>🏬</span>
             <span>مزار 3 (عكورة / الشقق)</span>
-            <span className="bg-[#C1A68D]/20 text-[#C1A68D] text-[10px] px-2 py-0.5 rounded-full font-bold">
+            <span className="bg-[#C1A68D]/20 text-[#C1A68D] text-[9px] md:text-[10px] px-2 py-0.5 rounded-full font-bold">
               {store.sections.mazar3.tables.length} جدول
             </span>
           </button>
@@ -378,7 +378,7 @@ export default function CustodyPage() {
           <button
             type="button"
             onClick={() => setActiveTab('external')}
-            className={`px-6 py-4 rounded-2xl font-black text-sm transition-all flex items-center gap-2 shadow-sm shrink-0 ${
+            className={`px-4 py-3 md:px-6 md:py-4 rounded-xl md:rounded-2xl font-black text-xs md:text-sm transition-all flex items-center gap-2 shadow-sm shrink-0 ${
               activeTab === 'external'
                 ? 'bg-[#2A2723] text-white shadow-xl scale-105 border border-[#C1A68D]'
                 : 'bg-white text-[#7A7061] hover:bg-[#FDFBF7] border border-[#EAE4D9]'
@@ -386,7 +386,7 @@ export default function CustodyPage() {
           >
             <span>🏡</span>
             <span>الشقق الخارجية</span>
-            <span className="bg-[#C1A68D]/20 text-[#C1A68D] text-[10px] px-2 py-0.5 rounded-full font-bold">
+            <span className="bg-[#C1A68D]/20 text-[#C1A68D] text-[9px] md:text-[10px] px-2 py-0.5 rounded-full font-bold">
               {store.sections.external.tables.length} جدول
             </span>
           </button>
@@ -438,12 +438,12 @@ export default function CustodyPage() {
             return (
               <div
                 key={table.id}
-                className="bg-white rounded-[2.5rem] border border-[#EAE4D9] shadow-md p-6 md:p-8 space-y-6 relative overflow-hidden"
+                className="bg-white rounded-[1.5rem] md:rounded-[2.5rem] border border-[#EAE4D9] shadow-md p-4 md:p-8 space-y-4 md:space-y-6 relative overflow-hidden"
               >
                 {/* Table Header & Controls */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#EAE4D9] pb-5">
-                  <div className="flex items-center gap-3">
-                    <span className="w-10 h-10 rounded-2xl bg-[#C1A68D]/10 border border-[#C1A68D]/30 flex items-center justify-center text-[#C1A68D] font-black text-lg">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4 border-b border-[#EAE4D9] pb-4 md:pb-5">
+                  <div className="flex items-center gap-2.5 md:gap-3">
+                    <span className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl bg-[#C1A68D]/10 border border-[#C1A68D]/30 flex items-center justify-center text-[#C1A68D] font-black text-base md:text-lg shrink-0">
                       📋
                     </span>
                     {editingTableId === table.id ? (
@@ -452,12 +452,12 @@ export default function CustodyPage() {
                           type="text"
                           value={editTableTitle}
                           onChange={(e) => setEditTableTitle(e.target.value)}
-                          className="bg-[#FDFBF7] border border-[#C1A68D] font-black text-base px-3 py-1.5 rounded-xl outline-none"
+                          className="bg-[#FDFBF7] border border-[#C1A68D] font-black text-sm md:text-base px-2.5 py-1 md:px-3 md:py-1.5 rounded-xl outline-none"
                         />
                         <button
                           type="button"
                           onClick={() => handleRenameTable(table.id)}
-                          className="bg-emerald-600 text-white p-2 rounded-xl"
+                          className="bg-emerald-600 text-white p-1.5 md:p-2 rounded-xl"
                           title="حفظ الاسم"
                         >
                           <Check size={16} />
@@ -465,7 +465,7 @@ export default function CustodyPage() {
                       </div>
                     ) : (
                       <div className="flex items-center gap-2">
-                        <h2 className="text-xl font-black text-[#2A2723]">{table.title}</h2>
+                        <h2 className="text-base md:text-xl font-black text-[#2A2723]">{table.title}</h2>
                         <button
                           type="button"
                           onClick={() => {
@@ -475,20 +475,20 @@ export default function CustodyPage() {
                           className="text-gray-400 hover:text-[#C1A68D] p-1"
                           title="تعديل اسم الجدول"
                         >
-                          <Edit3 size={16} />
+                          <Edit3 size={15} />
                         </button>
                       </div>
                     )}
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap md:flex-nowrap">
                     <button
                       type="button"
                       onClick={() => handleAddItem(table.id)}
-                      className="bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white border border-emerald-200 px-4 py-2.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 shadow-sm"
+                      className="bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white border border-emerald-200 px-3 py-2 md:px-4 md:py-2.5 rounded-xl text-[11px] md:text-xs font-black transition-all flex items-center gap-1 shadow-sm"
                     >
-                      <Plus size={16} />
+                      <Plus size={15} />
                       <span>إضافة بند صف جديد</span>
                     </button>
 
@@ -496,38 +496,38 @@ export default function CustodyPage() {
                       type="button"
                       onClick={() => handleSaveTableItems(table.id)}
                       disabled={isSaving}
-                      className="bg-[#2A2723] hover:bg-black text-white px-4 py-2.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 shadow-md"
+                      className="bg-[#2A2723] hover:bg-black text-white px-3 py-2 md:px-4 md:py-2.5 rounded-xl text-[11px] md:text-xs font-black transition-all flex items-center gap-1 shadow-md"
                       title="حفظ تغييرات البيانات في هذا الجدول"
                     >
-                      <Save size={16} />
+                      <Save size={15} />
                       <span>حفظ الجدول</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => handleDeleteTable(table.id)}
-                      className="bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white border border-rose-200 p-2.5 rounded-xl text-xs font-black transition-all"
+                      className="bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white border border-rose-200 p-2 md:p-2.5 rounded-xl text-xs font-black transition-all"
                       title="حذف الجدول بالكامل"
                     >
-                      <Trash2 size={16} />
+                      <Trash2 size={15} />
                     </button>
                   </div>
                 </div>
 
                 {/* Table Data View */}
-                <div className="overflow-x-auto custom-scrollbar rounded-2xl border border-[#EAE4D9]">
-                  <table className="w-full text-right text-xs">
+                <div className="overflow-x-auto custom-scrollbar rounded-xl md:rounded-2xl border border-[#EAE4D9]">
+                  <table className="w-full text-right text-[11px] md:text-xs">
                     <thead className="bg-[#2A2723] text-white font-black">
                       <tr>
-                        <th className="p-3.5 text-center w-12 border-b border-white/10">م</th>
-                        <th className="p-3.5 min-w-[180px] border-b border-white/10">البند</th>
-                        <th className="p-3.5 text-center w-28 border-b border-white/10">العدد الإجمالي</th>
-                        <th className="p-3.5 text-center w-32 border-b border-white/10">المتواجد بالوحدات</th>
-                        <th className="p-3.5 min-w-[180px] border-b border-white/10">أسلوب التوزيع</th>
-                        <th className="p-3.5 text-center w-24 border-b border-white/10">الاحتياط</th>
-                        <th className="p-3.5 min-w-[150px] border-b border-white/10">مكان الاحتياط</th>
-                        <th className="p-3.5 min-w-[160px] border-b border-white/10">ملاحظات</th>
-                        <th className="p-3.5 text-center w-16 border-b border-white/10">حذف</th>
+                        <th className="p-2 md:p-3.5 text-center w-10 md:w-12 border-b border-white/10 text-[10px] md:text-xs">م</th>
+                        <th className="p-2 md:p-3.5 min-w-[140px] md:min-w-[180px] border-b border-white/10 text-[10px] md:text-xs">البند</th>
+                        <th className="p-2 md:p-3.5 text-center w-24 md:w-28 border-b border-white/10 text-[10px] md:text-xs">العدد الإجمالي</th>
+                        <th className="p-2 md:p-3.5 text-center w-28 md:w-32 border-b border-white/10 text-[10px] md:text-xs">المتواجد بالوحدات</th>
+                        <th className="p-2 md:p-3.5 min-w-[140px] md:min-w-[180px] border-b border-white/10 text-[10px] md:text-xs">أسلوب التوزيع</th>
+                        <th className="p-2 md:p-3.5 text-center w-20 md:w-24 border-b border-white/10 text-[10px] md:text-xs">الاحتياط</th>
+                        <th className="p-2 md:p-3.5 min-w-[120px] md:min-w-[150px] border-b border-white/10 text-[10px] md:text-xs">مكان الاحتياط</th>
+                        <th className="p-2 md:p-3.5 min-w-[130px] md:min-w-[160px] border-b border-white/10 text-[10px] md:text-xs">ملاحظات</th>
+                        <th className="p-2 md:p-3.5 text-center w-12 md:w-16 border-b border-white/10 text-[10px] md:text-xs">حذف</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#EAE4D9] bg-white font-bold text-[#2A2723]">
@@ -541,94 +541,94 @@ export default function CustodyPage() {
                         filteredItems.map((item, idx) => (
                           <tr key={item.id} className="hover:bg-[#FDFBF7] transition-colors">
                             {/* Serial Number */}
-                            <td className="p-3 text-center font-black text-gray-500 bg-[#FDFBF7]">{idx + 1}</td>
+                            <td className="p-1.5 md:p-3 text-center font-black text-gray-500 bg-[#FDFBF7] text-[10px] md:text-xs">{idx + 1}</td>
 
                             {/* Item Name */}
-                            <td className="p-2">
+                            <td className="p-1 md:p-2">
                               <input
                                 type="text"
                                 value={item.name}
                                 onChange={(e) => handleUpdateItem(table.id, item.id, 'name', e.target.value)}
-                                className="w-full bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D] px-2.5 py-2 rounded-xl outline-none font-bold text-xs"
-                                placeholder="اسم البند أو الجهاز..."
+                                className="w-full bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D] px-1.5 py-1 md:px-2.5 md:py-2 rounded-lg md:rounded-xl outline-none font-bold text-[10px] md:text-xs"
+                                placeholder="اسم البند..."
                               />
                             </td>
 
                             {/* Total Count */}
-                            <td className="p-2">
+                            <td className="p-1 md:p-2">
                               <input
                                 type="text"
                                 value={item.totalCount}
                                 onChange={(e) => handleUpdateItem(table.id, item.id, 'totalCount', e.target.value)}
-                                className="w-full bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D] px-2 py-2 rounded-xl outline-none font-black text-center text-xs text-amber-700"
+                                className="w-full bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D] px-1 py-1 md:px-2 md:py-2 rounded-lg md:rounded-xl outline-none font-black text-center text-[10px] md:text-xs text-amber-700"
                                 placeholder="0"
                               />
                             </td>
 
                             {/* Units Count */}
-                            <td className="p-2">
+                            <td className="p-1 md:p-2">
                               <input
                                 type="text"
                                 value={item.unitCount}
                                 onChange={(e) => handleUpdateItem(table.id, item.id, 'unitCount', e.target.value)}
-                                className="w-full bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D] px-2 py-2 rounded-xl outline-none font-black text-center text-xs text-emerald-700"
+                                className="w-full bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D] px-1 py-1 md:px-2 md:py-2 rounded-lg md:rounded-xl outline-none font-black text-center text-[10px] md:text-xs text-emerald-700"
                                 placeholder="0"
                               />
                             </td>
 
                             {/* Distribution Style */}
-                            <td className="p-2">
+                            <td className="p-1 md:p-2">
                               <input
                                 type="text"
                                 value={item.distributionStyle}
                                 onChange={(e) => handleUpdateItem(table.id, item.id, 'distributionStyle', e.target.value)}
-                                className="w-full bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D] px-2.5 py-2 rounded-xl outline-none font-bold text-xs"
-                                placeholder="صالة 1 + غرفة 1..."
+                                className="w-full bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D] px-1.5 py-1 md:px-2.5 md:py-2 rounded-lg md:rounded-xl outline-none font-bold text-[10px] md:text-xs"
+                                placeholder="توزيع..."
                               />
                             </td>
 
                             {/* Reserve Count */}
-                            <td className="p-2">
+                            <td className="p-1 md:p-2">
                               <input
                                 type="text"
                                 value={item.reserveCount}
                                 onChange={(e) => handleUpdateItem(table.id, item.id, 'reserveCount', e.target.value)}
-                                className="w-full bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D] px-2 py-2 rounded-xl outline-none font-black text-center text-xs text-blue-700"
+                                className="w-full bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D] px-1 py-1 md:px-2 md:py-2 rounded-lg md:rounded-xl outline-none font-black text-center text-[10px] md:text-xs text-blue-700"
                                 placeholder="0"
                               />
                             </td>
 
                             {/* Reserve Location */}
-                            <td className="p-2">
+                            <td className="p-1 md:p-2">
                               <input
                                 type="text"
                                 value={item.reserveLocation}
                                 onChange={(e) => handleUpdateItem(table.id, item.id, 'reserveLocation', e.target.value)}
-                                className="w-full bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D] px-2.5 py-2 rounded-xl outline-none font-bold text-xs"
-                                placeholder="اسم المكان أو المخزن..."
+                                className="w-full bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D] px-1.5 py-1 md:px-2.5 md:py-2 rounded-lg md:rounded-xl outline-none font-bold text-[10px] md:text-xs"
+                                placeholder="المخزن..."
                               />
                             </td>
 
                             {/* Notes */}
-                            <td className="p-2">
+                            <td className="p-1 md:p-2">
                               <input
                                 type="text"
                                 value={item.notes}
                                 onChange={(e) => handleUpdateItem(table.id, item.id, 'notes', e.target.value)}
-                                className="w-full bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D] px-2.5 py-2 rounded-xl outline-none font-bold text-xs text-gray-600"
+                                className="w-full bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D] px-1.5 py-1 md:px-2.5 md:py-2 rounded-lg md:rounded-xl outline-none font-bold text-[10px] md:text-xs text-gray-600"
                                 placeholder="ملاحظات..."
                               />
                             </td>
 
                             {/* Delete Row Action */}
-                            <td className="p-2 text-center">
+                            <td className="p-1 md:p-2 text-center">
                               <button
                                 type="button"
                                 onClick={() => handleDeleteItem(table.id, item.id)}
-                                className="text-gray-400 hover:text-rose-600 p-2 rounded-lg transition-colors"
+                                className="text-gray-400 hover:text-rose-600 p-1.5 rounded-lg transition-colors"
                                 title="حذف الصف"
                               >
-                                <Trash2 size={16} />
+                                <Trash2 size={14} />
                               </button>
                             </td>
                           </tr>
