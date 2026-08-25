@@ -94,8 +94,8 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
       const restrictedForBookings = ['/admin/dashboard/units', '/admin/dashboard/reports', '/admin/dashboard/admins'];
       const restrictedForUnits = ['/admin/dashboard/bookings', '/admin/dashboard/reports', '/admin/dashboard/admins'];
       const restrictedForAdmin = ['/admin/dashboard/finance'];
-      const moderatorAllowed = ['/admin/dashboard', '/admin/dashboard/bookings', '/admin/dashboard/units'];
-      const mohsenAllowed = ['/admin/dashboard', '/admin/dashboard/bookings', '/admin/dashboard/customers', '/admin/dashboard/finance'];
+      const moderatorAllowed = ['/admin/dashboard', '/admin/dashboard/bookings', '/admin/dashboard/units', '/admin/dashboard/custody'];
+      const mohsenAllowed = ['/admin/dashboard', '/admin/dashboard/bookings', '/admin/dashboard/customers', '/admin/dashboard/finance', '/admin/dashboard/custody'];
       const restrictedForAkoura = [
         '/admin/dashboard/units',
         '/admin/dashboard/hr/salaries',
@@ -206,6 +206,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
 
   const menuItems = [
     { name: 'الاستعراض العام', href: '/admin/dashboard', icon: '📊', roles: ['Owner', 'Admin', 'Moderator', 'Mohsen', 'Super Admin', 'مدير الحجوزات', 'مدير الوحدات', 'Akoura'] },
+    { name: 'العهدة', href: '/admin/dashboard/custody', icon: '📦', roles: ['Owner', 'Admin', 'Moderator', 'Mohsen', 'Super Admin', 'Akoura'] },
     { name: 'طلبات الحجز', href: '/admin/dashboard/bookings', icon: '📩', roles: ['Owner', 'Admin', 'Moderator', 'Mohsen', 'Super Admin', 'مدير الحجوزات', 'Akoura'] },
     { name: 'إدارة الوحدات', href: '/admin/dashboard/units', icon: '🏢', roles: ['Owner', 'Admin', 'Moderator', 'Super Admin', 'مدير الوحدات'] },
     { name: 'قاعدة العملاء', href: '/admin/dashboard/customers', icon: '📞', roles: ['Owner', 'Admin', 'Mohsen', 'Super Admin', 'Akoura'] },
