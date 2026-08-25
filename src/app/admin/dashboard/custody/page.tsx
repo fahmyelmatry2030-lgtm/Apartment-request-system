@@ -489,8 +489,9 @@ export default function CustodyPage() {
         </div>
       ) : (
         <div
-          className="space-y-10 transition-transform duration-300 ease-out origin-top-right"
+          className="space-y-10 transition-all duration-300 ease-out origin-top-right"
           style={{
+            fontSize: `${tableZoom}%`,
             zoom: tableZoom / 100,
             transform: `scale(${tableZoom / 100})`,
             transformOrigin: 'right top',
