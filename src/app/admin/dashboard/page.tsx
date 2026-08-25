@@ -1167,21 +1167,6 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
             <h4 className="font-black text-base text-[#2A2723]">
               {selectedCategory === 'all' ? '🗺️ جميع الوحدات والاستديوهات' : `🟢 وحدات ${inventoryStats.find(i => i.id === selectedCategory)?.label} المتاحة`}
             </h4>
-            {/* Color Distinction Legend Bar */}
-            <div className="flex flex-wrap items-center gap-2 text-[10px] md:text-xs font-bold pt-1">
-              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF6F0] text-[#5C5042] border border-[#D8C7B5] shadow-2xs">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#C1A68D]"></span>
-                الـ 24 استوديو (1 - 24): بيج فاتح
-              </span>
-              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EFE6D8] text-[#4A3B2C] border border-[#BCA389] shadow-2xs">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#A3866A]"></span>
-                الـ 6 شقق غرفتين (25 - 30): بيج دافئ
-              </span>
-              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E2D4C3] text-[#3D2C1E] border border-[#8C6D53] shadow-2xs">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#8C6D53]"></span>
-                الـ 3 شقق الخارجية: كافيه فاتح
-              </span>
-            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
