@@ -381,7 +381,6 @@ export default function BookingsManagement() {
                         {(() => {
                           const receipt = getReceiptUrl(booking);
                           return receipt ? (
-                            isModerator ? <span className="text-[10px] text-[#7A7061] opacity-40 font-bold">متاح للإدارة</span> : (
                             <button
                               type="button"
                               onClick={() => setActiveReceiptModal({ isOpen: true, url: receipt, name: booking.name })}
@@ -389,7 +388,7 @@ export default function BookingsManagement() {
                             >
                               <span className="text-xs">🖼️</span>
                               <span>صورة الإيصال</span>
-                            </button>)
+                            </button>
                           ) : (
                             <span className="text-[10px] text-[#7A7061] opacity-40 font-bold">—</span>
                           );

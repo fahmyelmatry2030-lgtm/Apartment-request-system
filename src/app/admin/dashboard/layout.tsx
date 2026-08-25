@@ -94,7 +94,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
       const restrictedForBookings = ['/admin/dashboard/units', '/admin/dashboard/reports', '/admin/dashboard/admins'];
       const restrictedForUnits = ['/admin/dashboard/bookings', '/admin/dashboard/reports', '/admin/dashboard/admins'];
       const restrictedForAdmin = ['/admin/dashboard/finance'];
-      const moderatorAllowed = ['/admin/dashboard/bookings', '/admin/dashboard/units'];
+      const moderatorAllowed = ['/admin/dashboard', '/admin/dashboard/bookings', '/admin/dashboard/units'];
       const mohsenAllowed = ['/admin/dashboard/bookings', '/admin/dashboard/finance'];
       const restrictedForAkoura = [
         '/admin/dashboard/units',

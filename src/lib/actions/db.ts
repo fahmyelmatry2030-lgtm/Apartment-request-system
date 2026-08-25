@@ -905,6 +905,19 @@ export async function updateDbExpense(id: string, updates: any) {
 
 // --- TREASURY TRANSFERS ---
 
+function isTableMissingError(error: any) {
+  if (!error) return false;
+
+  const errorText = `${error.message || ''} ${error.details || ''} ${error.hint || ''}`.toLowerCase();
+  return (
+    error.code === '42P01' ||
+    error.code === 'PGRST301' ||
+    error.code === 'PGRST205' ||
+    (errorText.includes('treasury_transfers') &&
+      (errorText.includes('does not exist') || errorText.includes('relation') || errorText.includes('not found')))
+  );
+}
+
 export async function getDbTreasuryTransfers() {
   const supabase = getSupabaseServerClient();
   if (!supabase) throw new Error('Supabase configuration missing on server');
@@ -915,7 +928,14 @@ export async function getDbTreasuryTransfers() {
     .order('transfer_date', { ascending: false })
     .order('created_at', { ascending: false });
 
-  if (error) throw error;
+  if (error) {
+    if (isTableMissingError(error)) {
+      console.warn('⚠️ Treasury table is not yet present in Supabase. Returning empty transfer list.');
+      return [];
+    }
+    throw error;
+  }
+
   return data || [];
 }
 
@@ -929,8 +949,14 @@ export async function saveDbTreasuryTransfer(transfer: any) {
     received_by: String(transfer.received_by || '').trim(),
     transfer_date: transfer.transfer_date || new Date().toISOString().slice(0, 10),
   };
+
   const { data, error } = await supabase.from('treasury_transfers').insert([row]).select().single();
-  if (error) throw error;
+  if (error) {
+    if (isTableMissingError(error)) {
+      throw new Error('جدول treasury_transfers غير موجود في Supabase. يرجى تطبيقه أولاً في قاعدة البيانات.');
+    }
+    throw error;
+  }
 
   revalidatePath('/admin/dashboard/treasury');
   return data;
@@ -941,7 +967,12 @@ export async function deleteDbTreasuryTransfer(id: string) {
   if (!supabase) throw new Error('Supabase configuration missing on server');
 
   const { error } = await supabase.from('treasury_transfers').delete().eq('id', id);
-  if (error) throw error;
+  if (error) {
+    if (isTableMissingError(error)) {
+      throw new Error('جدول treasury_transfers غير موجود في Supabase. يرجى تطبيقه أولاً في قاعدة البيانات.');
+    }
+    throw error;
+  }
   revalidatePath('/admin/dashboard/treasury');
 }
 
