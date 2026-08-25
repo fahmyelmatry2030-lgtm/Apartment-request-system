@@ -7,7 +7,7 @@ import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { updateDbBookingStatus, deleteDbBooking, deleteAllPendingDbBookings } from '@/lib/actions/db';
 import CustomerProfileModal from '@/components/CustomerProfileModal';
 import ReceiptImageModal, { toDirectImageUrl } from '@/components/ReceiptImageModal';
-import { User, Phone, MessageSquare, FileText, Calendar, CheckCircle2, Home, X, Trash2 } from 'lucide-react';
+import { User, Phone, MessageSquare, FileText, Calendar, CheckCircle2, Home, X, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import { formatWhatsAppNumber } from '@/lib/utils';
 
 const CONFIRMED_STATUSES = ['مؤكد', 'approved', 'مؤكد/دخول', 'مغادر/تنظيف', 'مغادر/تم'];
@@ -48,6 +48,7 @@ export default function DashboardOverview() {
   const [smartSuggestions, setSmartSuggestions] = useState<any[]>([]);
   const [hasSearchedSmart, setHasSearchedSmart] = useState(false);
   const [conflictDays, setConflictDays] = useState<string[]>([]);
+  const [isPendingRequestsExpanded, setIsPendingRequestsExpanded] = useState(false);
 
   // Customer Profile Modal State
   const [profileModal, setProfileModal] = useState<{ isOpen: boolean; name: string | null; phone?: string | null }>({
@@ -794,49 +795,68 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
 
       {/* ── WEBSITE INCOMING BOOKING REQUESTS SECTION (قسم طلبات الحجز القادمة من الويب سايت) ── */}
       <div className="bg-gradient-to-br from-[#1F1C18] to-[#2A241F] p-6 md:p-8 rounded-[2.5rem] shadow-2xl border border-amber-500/30 text-white relative overflow-hidden space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-5">
+        <div
+          onClick={() => setIsPendingRequestsExpanded(!isPendingRequestsExpanded)}
+          className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-5 cursor-pointer group/accordion"
+        >
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 font-black text-xl shadow-inner">
+            <div className="w-11 h-11 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 font-black text-xl shadow-inner group-hover/accordion:scale-105 transition-transform">
               🌐
             </div>
             <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="text-xl font-black text-white">طلبات الحجز الجديدة القادمة من الويب سايت</h3>
+              <div className="flex items-center gap-3 flex-wrap">
+                <h3 className="text-xl font-black text-white group-hover/accordion:text-amber-400 transition-colors">
+                  طلبات الحجز
+                </h3>
                 {pendingWebRequests.length > 0 && (
-                  <span className="bg-amber-500 text-black text-xs font-black px-3 py-1 rounded-full animate-pulse shadow-md">
-                    {pendingWebRequests.length} طلب جديد
+                  <span className="w-8 h-8 rounded-full bg-rose-500 text-white text-sm font-black flex items-center justify-center animate-pulse shadow-[0_0_15px_rgba(244,63,94,0.6)] border-2 border-white/20">
+                    {pendingWebRequests.length}
                   </span>
                 )}
+                <span className="text-xs text-gray-400 font-bold bg-white/5 px-3 py-1 rounded-full border border-white/10">
+                  {isPendingRequestsExpanded ? 'انقر للطي' : 'انقر لعرض الطلبات'}
+                </span>
               </div>
               <p className="text-xs text-gray-400 font-bold mt-0.5">
-                طلبات الحجوزات المرسلة مباشر من العملاء عبر الموقع الإلكتروني للمعاينة، التواصل والتأكيد
+                طلبات الحجوزات المرسلة مباشرة من العملاء عبر الموقع الإلكتروني للمعاينة والتأكيد
               </p>
             </div>
           </div>
 
-          {pendingWebRequests.length > 0 && (
-            <button
-              type="button"
-              onClick={handleClearAllPendingWebRequests}
-              className="bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 font-black px-4 py-2 rounded-xl text-xs transition-all shadow-md flex items-center gap-1.5 shrink-0"
-              title="مسح وتفريغ الطلبات المعلقة"
-            >
-              <span>🧹 مسح الطلبات المعلقة ({pendingWebRequests.length})</span>
-            </button>
-          )}
+          <div className="flex items-center gap-3 self-end md:self-auto">
+            {pendingWebRequests.length > 0 && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleClearAllPendingWebRequests();
+                }}
+                className="bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 font-black px-4 py-2 rounded-xl text-xs transition-all shadow-md flex items-center gap-1.5 shrink-0"
+                title="مسح وتفريغ الطلبات المعلقة"
+              >
+                <span>🧹 مسح الطلبات ({pendingWebRequests.length})</span>
+              </button>
+            )}
+
+            <div className="w-10 h-10 rounded-xl bg-white/10 group-hover/accordion:bg-amber-500 group-hover/accordion:text-black text-white flex items-center justify-center transition-all duration-300 shadow-md">
+              {isPendingRequestsExpanded ? <ChevronUp size={22} /> : <ChevronDown size={22} />}
+            </div>
+          </div>
         </div>
 
-        {pendingWebRequests.length === 0 ? (
-          <div className="bg-[#2A2723]/60 p-6 rounded-2xl border border-white/5 text-center space-y-1.5">
-            <p className="text-sm font-black text-gray-300">
-              ✨ لا يوجد طلبات حجز معلقة من الويب سايت حالياً
-            </p>
-            <p className="text-xs text-gray-500 font-bold">
-              جميع الحجوزات المرفوعة عبر الموقع تم التأكد منها ومراجعتها بنجاح.
-            </p>
-          </div>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {isPendingRequestsExpanded && (
+          <div className="animate-fade-in space-y-6">
+            {pendingWebRequests.length === 0 ? (
+              <div className="bg-[#2A2723]/60 p-6 rounded-2xl border border-white/5 text-center space-y-1.5">
+                <p className="text-sm font-black text-gray-300">
+                  ✨ لا يوجد طلبات حجز معلقة من الويب سايت حالياً
+                </p>
+                <p className="text-xs text-gray-500 font-bold">
+                  جميع الحجوزات المرفوعة عبر الموقع تم التأكد منها ومراجعتها بنجاح.
+                </p>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {pendingWebRequests.map((req: any, idx: number) => {
               const cleanP = formatWhatsAppNumber(req.phone);
               return (
@@ -971,6 +991,7 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
             })}
           </div>
         )}
+        </div>
       </div>
 
       {/* ── REALTIME TOAST ── */}
