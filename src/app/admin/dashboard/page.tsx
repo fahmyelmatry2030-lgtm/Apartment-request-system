@@ -991,8 +991,9 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
             })}
           </div>
         )}
-        </div>
       </div>
+    )}
+  </div>
 
       {/* ── REALTIME TOAST ── */}
       {newBookingToast && (
