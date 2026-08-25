@@ -45,10 +45,10 @@
     @apply bg-mazar-cream text-mazar-coffee font-cairo antialiased overflow-x-hidden w-full m-0 p-0;
   }
 
-  /* Prevent automatic unwanted iOS Safari zoom on focus while allowing smooth user zoom */
+  /* Allow custom mobile font-size scaling on inputs */
   @media screen and (max-width: 768px) {
-    input, select, textarea {
-      font-size: 16px !important;
+    input:not([class*="text-"]), select:not([class*="text-"]), textarea:not([class*="text-"]) {
+      font-size: 16px;
     }
   }
 }

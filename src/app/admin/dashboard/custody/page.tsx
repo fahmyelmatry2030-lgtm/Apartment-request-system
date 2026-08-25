@@ -488,7 +488,15 @@ export default function CustodyPage() {
           </button>
         </div>
       ) : (
-        <div className="space-y-10 transition-all duration-300 origin-top-right" style={{ zoom: `${tableZoom}%` }}>
+        <div
+          className="space-y-10 transition-transform duration-300 ease-out origin-top-right"
+          style={{
+            zoom: tableZoom / 100,
+            transform: `scale(${tableZoom / 100})`,
+            transformOrigin: 'right top',
+            width: tableZoom < 100 ? `${(100 / tableZoom) * 100}%` : '100%',
+          }}
+        >
           {currentTables.map((table) => {
             const filteredItems = table.items.filter((item) =>
               !searchTerm
