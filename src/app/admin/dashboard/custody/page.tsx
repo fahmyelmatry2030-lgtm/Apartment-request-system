@@ -124,7 +124,8 @@ export default function CustodyPage() {
 
   // Role Checks
   const isMohsen = adminRole === 'Mohsen';
-  const isAkoura = adminRole === 'Akoura' || adminRole === 'Aura';
+  const isAkoura = adminRole === 'Akoura' || adminRole === 'Aura' || adminRole === 'koura';
+  const isReadOnly = isMohsen || isAkoura;
 
   // Allowed Tabs logic
   const canAccessTab = (tab: 'mazar12' | 'mazar3' | 'external') => {
@@ -329,7 +330,7 @@ export default function CustodyPage() {
             <span>تحديث</span>
           </button>
 
-          {!isMohsen && !isAkoura && (
+          {!isReadOnly && (
             <button
               type="button"
               onClick={() => setIsAddTableModalOpen(true)}
@@ -539,52 +540,56 @@ export default function CustodyPage() {
                     ) : (
                       <div className="flex items-center gap-2">
                         <h2 className="text-base md:text-xl font-black text-[#2A2723]">{table.title}</h2>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setEditingTableId(table.id);
-                            setEditTableTitle(table.title);
-                          }}
-                          className="text-gray-400 hover:text-[#C1A68D] p-1"
-                          title="تعديل اسم الجدول"
-                        >
-                          <Edit3 size={15} />
-                        </button>
+                        {!isReadOnly && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingTableId(table.id);
+                              setEditTableTitle(table.title);
+                            }}
+                            className="text-gray-400 hover:text-[#C1A68D] p-1"
+                            title="تعديل اسم الجدول"
+                          >
+                            <Edit3 size={15} />
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-2 flex-wrap md:flex-nowrap">
-                    <button
-                      type="button"
-                      onClick={() => handleAddItem(table.id)}
-                      className="bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white border border-emerald-200 px-3 py-2 md:px-4 md:py-2.5 rounded-xl text-[11px] md:text-xs font-black transition-all flex items-center gap-1 shadow-sm"
-                    >
-                      <Plus size={15} />
-                      <span>إضافة بند صف جديد</span>
-                    </button>
+                  {!isReadOnly && (
+                    <div className="flex items-center gap-2 flex-wrap md:flex-nowrap">
+                      <button
+                        type="button"
+                        onClick={() => handleAddItem(table.id)}
+                        className="bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white border border-emerald-200 px-3 py-2 md:px-4 md:py-2.5 rounded-xl text-[11px] md:text-xs font-black transition-all flex items-center gap-1 shadow-sm"
+                      >
+                        <Plus size={15} />
+                        <span>إضافة بند صف جديد</span>
+                      </button>
 
-                    <button
-                      type="button"
-                      onClick={() => handleSaveTableItems(table.id)}
-                      disabled={isSaving}
-                      className="bg-[#2A2723] hover:bg-black text-white px-3 py-2 md:px-4 md:py-2.5 rounded-xl text-[11px] md:text-xs font-black transition-all flex items-center gap-1 shadow-md"
-                      title="حفظ تغييرات البيانات في هذا الجدول"
-                    >
-                      <Save size={15} />
-                      <span>حفظ الجدول</span>
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => handleSaveTableItems(table.id)}
+                        disabled={isSaving}
+                        className="bg-[#2A2723] hover:bg-black text-white px-3 py-2 md:px-4 md:py-2.5 rounded-xl text-[11px] md:text-xs font-black transition-all flex items-center gap-1 shadow-md"
+                        title="حفظ تغييرات البيانات في هذا الجدول"
+                      >
+                        <Save size={15} />
+                        <span>حفظ الجدول</span>
+                      </button>
 
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteTable(table.id)}
-                      className="bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white border border-rose-200 p-2 md:p-2.5 rounded-xl text-xs font-black transition-all"
-                      title="حذف الجدول بالكامل"
-                    >
-                      <Trash2 size={15} />
-                    </button>
-                  </div>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteTable(table.id)}
+                        className="bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white border border-rose-200 p-2 md:p-2.5 rounded-xl text-xs font-black transition-all"
+                        title="حذف الجدول بالكامل"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Table Data View */}
@@ -600,14 +605,14 @@ export default function CustodyPage() {
                         <th className="p-2 md:p-3.5 text-center w-20 md:w-24 border-b border-white/10 text-[10px] md:text-xs">الاحتياط</th>
                         <th className="p-2 md:p-3.5 min-w-[120px] md:min-w-[150px] border-b border-white/10 text-[10px] md:text-xs">مكان الاحتياط</th>
                         <th className="p-2 md:p-3.5 min-w-[130px] md:min-w-[160px] border-b border-white/10 text-[10px] md:text-xs">ملاحظات</th>
-                        <th className="p-2 md:p-3.5 text-center w-12 md:w-16 border-b border-white/10 text-[10px] md:text-xs">حذف</th>
+                        {!isReadOnly && <th className="p-2 md:p-3.5 text-center w-12 md:w-16 border-b border-white/10 text-[10px] md:text-xs">حذف</th>}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#EAE4D9] bg-white font-bold text-[#2A2723]">
                       {filteredItems.length === 0 ? (
                         <tr>
-                          <td colSpan={9} className="p-8 text-center text-gray-400 font-bold">
-                            لا يوجد بنود مسجلة في هذا الجدول حتى الآن. انقر على "+ إضافة بند صف جديد".
+                          <td colSpan={isReadOnly ? 8 : 9} className="p-8 text-center text-gray-400 font-bold">
+                            {isReadOnly ? 'لا يوجد بنود مسجلة في هذا الجدول.' : 'لا يوجد بنود مسجلة في هذا الجدول حتى الآن. انقر على "+ إضافة بند صف جديد".'}
                           </td>
                         </tr>
                       ) : (
@@ -621,8 +626,9 @@ export default function CustodyPage() {
                               <input
                                 type="text"
                                 value={item.name}
+                                readOnly={isReadOnly}
                                 onChange={(e) => handleUpdateItem(table.id, item.id, 'name', e.target.value)}
-                                className="w-full bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D] px-1.5 py-1 md:px-2.5 md:py-2 rounded-lg md:rounded-xl outline-none font-bold text-[10px] md:text-xs"
+                                className={`w-full ${isReadOnly ? 'bg-transparent border-transparent select-none cursor-default' : 'bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D]'} px-1.5 py-1 md:px-2.5 md:py-2 rounded-lg md:rounded-xl outline-none font-bold text-[10px] md:text-xs`}
                                 placeholder="اسم البند..."
                               />
                             </td>
@@ -632,8 +638,9 @@ export default function CustodyPage() {
                               <input
                                 type="text"
                                 value={item.totalCount}
+                                readOnly={isReadOnly}
                                 onChange={(e) => handleUpdateItem(table.id, item.id, 'totalCount', e.target.value)}
-                                className="w-full bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D] px-1 py-1 md:px-2 md:py-2 rounded-lg md:rounded-xl outline-none font-black text-center text-[10px] md:text-xs text-amber-700"
+                                className={`w-full ${isReadOnly ? 'bg-transparent border-transparent select-none cursor-default' : 'bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D]'} px-1 py-1 md:px-2 md:py-2 rounded-lg md:rounded-xl outline-none font-black text-center text-[10px] md:text-xs text-amber-700`}
                                 placeholder="0"
                               />
                             </td>
@@ -643,8 +650,9 @@ export default function CustodyPage() {
                               <input
                                 type="text"
                                 value={item.unitCount}
+                                readOnly={isReadOnly}
                                 onChange={(e) => handleUpdateItem(table.id, item.id, 'unitCount', e.target.value)}
-                                className="w-full bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D] px-1 py-1 md:px-2 md:py-2 rounded-lg md:rounded-xl outline-none font-black text-center text-[10px] md:text-xs text-emerald-700"
+                                className={`w-full ${isReadOnly ? 'bg-transparent border-transparent select-none cursor-default' : 'bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D]'} px-1 py-1 md:px-2 md:py-2 rounded-lg md:rounded-xl outline-none font-black text-center text-[10px] md:text-xs text-emerald-700`}
                                 placeholder="0"
                               />
                             </td>
@@ -654,8 +662,9 @@ export default function CustodyPage() {
                               <input
                                 type="text"
                                 value={item.distributionStyle}
+                                readOnly={isReadOnly}
                                 onChange={(e) => handleUpdateItem(table.id, item.id, 'distributionStyle', e.target.value)}
-                                className="w-full bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D] px-1.5 py-1 md:px-2.5 md:py-2 rounded-lg md:rounded-xl outline-none font-bold text-[10px] md:text-xs"
+                                className={`w-full ${isReadOnly ? 'bg-transparent border-transparent select-none cursor-default' : 'bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D]'} px-1.5 py-1 md:px-2.5 md:py-2 rounded-lg md:rounded-xl outline-none font-bold text-[10px] md:text-xs`}
                                 placeholder="توزيع..."
                               />
                             </td>
@@ -665,8 +674,9 @@ export default function CustodyPage() {
                               <input
                                 type="text"
                                 value={item.reserveCount}
+                                readOnly={isReadOnly}
                                 onChange={(e) => handleUpdateItem(table.id, item.id, 'reserveCount', e.target.value)}
-                                className="w-full bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D] px-1 py-1 md:px-2 md:py-2 rounded-lg md:rounded-xl outline-none font-black text-center text-[10px] md:text-xs text-blue-700"
+                                className={`w-full ${isReadOnly ? 'bg-transparent border-transparent select-none cursor-default' : 'bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D]'} px-1 py-1 md:px-2 md:py-2 rounded-lg md:rounded-xl outline-none font-black text-center text-[10px] md:text-xs text-blue-700`}
                                 placeholder="0"
                               />
                             </td>
@@ -676,8 +686,9 @@ export default function CustodyPage() {
                               <input
                                 type="text"
                                 value={item.reserveLocation}
+                                readOnly={isReadOnly}
                                 onChange={(e) => handleUpdateItem(table.id, item.id, 'reserveLocation', e.target.value)}
-                                className="w-full bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D] px-1.5 py-1 md:px-2.5 md:py-2 rounded-lg md:rounded-xl outline-none font-bold text-[10px] md:text-xs"
+                                className={`w-full ${isReadOnly ? 'bg-transparent border-transparent select-none cursor-default' : 'bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D]'} px-1.5 py-1 md:px-2.5 md:py-2 rounded-lg md:rounded-xl outline-none font-bold text-[10px] md:text-xs`}
                                 placeholder="المخزن..."
                               />
                             </td>
@@ -687,23 +698,26 @@ export default function CustodyPage() {
                               <input
                                 type="text"
                                 value={item.notes}
+                                readOnly={isReadOnly}
                                 onChange={(e) => handleUpdateItem(table.id, item.id, 'notes', e.target.value)}
-                                className="w-full bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D] px-1.5 py-1 md:px-2.5 md:py-2 rounded-lg md:rounded-xl outline-none font-bold text-[10px] md:text-xs text-gray-600"
+                                className={`w-full ${isReadOnly ? 'bg-transparent border-transparent select-none cursor-default' : 'bg-[#FDFBF7] focus:bg-white border border-transparent focus:border-[#C1A68D]'} px-1.5 py-1 md:px-2.5 md:py-2 rounded-lg md:rounded-xl outline-none font-bold text-[10px] md:text-xs text-gray-600`}
                                 placeholder="ملاحظات..."
                               />
                             </td>
 
                             {/* Delete Row Action */}
-                            <td className="p-1 md:p-2 text-center">
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteItem(table.id, item.id)}
-                                className="text-gray-400 hover:text-rose-600 p-1.5 rounded-lg transition-colors"
-                                title="حذف الصف"
-                              >
-                                <Trash2 size={14} />
-                              </button>
-                            </td>
+                            {!isReadOnly && (
+                              <td className="p-1 md:p-2 text-center">
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteItem(table.id, item.id)}
+                                  className="text-gray-400 hover:text-rose-600 p-1.5 rounded-lg transition-colors"
+                                  title="حذف الصف"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </td>
+                            )}
                           </tr>
                         ))
                       )}
@@ -716,13 +730,15 @@ export default function CustodyPage() {
                   <span className="text-xs font-bold text-gray-500">
                     إجمالي البنود المسجلة: {table.items.length} بند
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => handleAddItem(table.id)}
-                    className="text-xs font-black text-[#C1A68D] hover:underline flex items-center gap-1"
-                  >
-                    + إضافة سطر بند جديد لهذا الجدول
-                  </button>
+                  {!isReadOnly && (
+                    <button
+                      type="button"
+                      onClick={() => handleAddItem(table.id)}
+                      className="text-xs font-black text-[#C1A68D] hover:underline flex items-center gap-1"
+                    >
+                      + إضافة سطر بند جديد لهذا الجدول
+                    </button>
+                  )}
                 </div>
               </div>
             );
