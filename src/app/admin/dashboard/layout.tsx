@@ -201,6 +201,8 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
     setDeferredPrompt(null);
   };
 
+  const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] = useState(false);
+
   if (!isAuthorized && pathname !== '/admin/login') return null;
   if (pathname === '/admin/login') return <>{children}</>;
 
@@ -222,10 +224,12 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] flex custom-scrollbar" dir="rtl">
-      {/* Toggle Button for Mobile */}
-
       {/* Sidebar */}
-      <aside className={`fixed inset-y-0 right-0 z-40 w-[280px] bg-[#FDFBF7] border-l border-[#EAE4D9]/50 transform transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : 'translate-x-full'} flex flex-col`}>
+      <aside className={`fixed inset-y-0 right-0 z-40 w-[280px] bg-[#FDFBF7] border-l border-[#EAE4D9]/50 transform transition-all duration-300 ease-in-out lg:static ${
+        isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : 'translate-x-full lg:translate-x-0'
+      } ${
+        isDesktopSidebarCollapsed ? 'hidden lg:!hidden' : 'flex'
+      } flex-col`}>
         <div className="p-6 md:p-8 flex flex-col items-center justify-between border-b border-[#EAE4D9]/50 mb-6 gap-4">
           <div className="w-full flex justify-between items-center">
             <Link href="/admin/dashboard" className="transition-all hover:scale-105" title="الرئيسية للوحة التحكم">
@@ -309,13 +313,23 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Header */}
-        <header className="h-20 bg-white/60 backdrop-blur-xl border-b border-[#EAE4D9]/50 flex items-center justify-between lg:justify-end px-6 md:px-8 gap-6 z-30 sticky top-0">
-          {/* Hamburger Menu for Mobile */}
+        <header className="h-20 bg-white/60 backdrop-blur-xl border-b border-[#EAE4D9]/50 flex items-center justify-between px-6 md:px-8 gap-6 z-30 sticky top-0">
+          {/* Hamburger Menu ☰ Toggle for Desktop & Mobile */}
           <button
-            onClick={() => setIsMobileMenuOpen(true)}
-            className="lg:hidden p-3 bg-[#2A2723] text-white rounded-xl shadow-lg active:scale-95 transition-all"
+            onClick={() => {
+              if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
+                setIsDesktopSidebarCollapsed(!isDesktopSidebarCollapsed);
+              } else {
+                setIsMobileMenuOpen(!isMobileMenuOpen);
+              }
+            }}
+            className="p-3 bg-[#2A2723] hover:bg-black text-white rounded-xl shadow-lg active:scale-95 transition-all flex items-center gap-2 cursor-pointer shrink-0"
+            title={isDesktopSidebarCollapsed ? 'إظهار شريط القوائم الجانبي' : 'إخفاء شريط القوائم وفتح الشاشة بالكامل'}
           >
-            <span className="text-xl">☰</span>
+            <span className="text-xl font-bold">☰</span>
+            <span className="text-xs font-black hidden sm:inline">
+              {isDesktopSidebarCollapsed ? 'إظهار القائمة' : 'عرض ملء الشاشة'}
+            </span>
           </button>
 
           <div className="flex items-center gap-4 md:gap-6">
