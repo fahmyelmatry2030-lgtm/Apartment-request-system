@@ -656,6 +656,38 @@ export async function updateDbTranslations(newTranslations: any) {
   }
 }
 
+export async function getDbCustody() {
+  try {
+    const supabase = getSupabaseServerClient();
+    if (!supabase) return null;
+
+    const { data, error } = await supabase.from('translations').select('data').eq('id', 99).single();
+    if (error || !data?.data) {
+      return null;
+    }
+    return data.data;
+  } catch (err) {
+    console.error('Error reading custody from DB:', err);
+    return null;
+  }
+}
+
+export async function updateDbCustody(custodyData: any) {
+  try {
+    const supabase = getSupabaseServerClient();
+    if (!supabase) return { success: false };
+
+    const { error } = await supabase
+      .from('translations')
+      .upsert({ id: 99, data: custodyData, updated_at: new Date().toISOString() });
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating custody in DB:', error);
+    return { success: false };
+  }
+}
+
 // --- HR: STAFF ---
 
 export async function getDbStaff() {
