@@ -39,14 +39,55 @@ export default function CustodyPage() {
   });
   const [actionReason, setActionReason] = useState('');
 
-  // Migration Helper for backward compatibility
+  // Comprehensive Migration Helper for backward compatibility and restoring data
   const formatStoreData = (data: any): CustodyDataStore => {
     const s = data?.sections || {};
-    const mazar1Tables = s.mazar1?.tables || (s.mazar12?.tables ? s.mazar12.tables.filter((t: any) => t.id.includes('-m1') || t.title.includes('مزار 1')) : []);
-    const mazar2Tables = s.mazar2?.tables || (s.mazar12?.tables ? s.mazar12.tables.filter((t: any) => !t.id.includes('-m1') && !t.title.includes('مزار 1')) : []);
-    const apt1Tables = s.apt1?.tables || s.external?.tables || [];
-    const apt2Tables = s.apt2?.tables || [];
-    const apt3Tables = s.apt3?.tables || [];
+
+    const oldMazar12Tables = s.mazar12?.tables || [];
+    const existingMazar1Tables = s.mazar1?.tables || [];
+    const existingMazar2Tables = s.mazar2?.tables || [];
+
+    const existingIds = new Set([
+      ...existingMazar1Tables.map((t: any) => t.id),
+      ...existingMazar2Tables.map((t: any) => t.id),
+    ]);
+
+    const mazar1Tables = [...existingMazar1Tables];
+    const mazar2Tables = [...existingMazar2Tables];
+
+    for (const t of oldMazar12Tables) {
+      if (!existingIds.has(t.id)) {
+        if (t.id.includes('-m2') || t.title.includes('مزار 2')) {
+          mazar2Tables.push(t);
+        } else {
+          mazar1Tables.push(t);
+        }
+        existingIds.add(t.id);
+      }
+    }
+
+    const oldExternalTables = s.external?.tables || [];
+    const existingApt1Tables = s.apt1?.tables || [];
+    const existingApt2Tables = s.apt2?.tables || [];
+    const existingApt3Tables = s.apt3?.tables || [];
+
+    const existingAptIds = new Set([
+      ...existingApt1Tables.map((t: any) => t.id),
+      ...existingApt2Tables.map((t: any) => t.id),
+      ...existingApt3Tables.map((t: any) => t.id),
+    ]);
+
+    const apt1Tables = [...existingApt1Tables];
+    const apt2Tables = [...existingApt2Tables];
+    const apt3Tables = [...existingApt3Tables];
+
+    for (const t of oldExternalTables) {
+      if (!existingAptIds.has(t.id)) {
+        apt1Tables.push(t);
+        existingAptIds.add(t.id);
+      }
+    }
+
     const mazar3Tables = s.mazar3?.tables || [];
 
     return {
@@ -59,6 +100,42 @@ export default function CustodyPage() {
         apt2: { tables: apt2Tables },
         apt3: { tables: apt3Tables },
       },
+    };
+  };
+
+  // Helper to merge local backup store with server store
+  const mergeBackupStore = (serverStore: CustodyDataStore, backupStore: CustodyDataStore): CustodyDataStore => {
+    if (!backupStore || !backupStore.sections) return serverStore;
+    const formattedBackup = formatStoreData(backupStore);
+
+    const mergedSections = { ...serverStore.sections };
+    const sectionKeys: (keyof CustodyDataStore['sections'])[] = ['mazar1', 'mazar2', 'mazar3', 'apt1', 'apt2', 'apt3'];
+
+    for (const k of sectionKeys) {
+      const serverTables = mergedSections[k]?.tables || [];
+      const backupTables = formattedBackup.sections[k]?.tables || [];
+
+      const serverTableIds = new Set(serverTables.map((t) => t.id));
+      const combinedTables = [...serverTables];
+
+      for (const bt of backupTables) {
+        if (!serverTableIds.has(bt.id)) {
+          combinedTables.push(bt);
+          serverTableIds.add(bt.id);
+        } else {
+          // Replace server table with backup table if backup table has more items
+          const serverTableIdx = combinedTables.findIndex((t) => t.id === bt.id);
+          if (serverTableIdx !== -1 && (bt.items?.length || 0) > (combinedTables[serverTableIdx].items?.length || 0)) {
+            combinedTables[serverTableIdx] = bt;
+          }
+        }
+      }
+      mergedSections[k] = { tables: combinedTables };
+    }
+
+    return {
+      ...serverStore,
+      sections: mergedSections,
     };
   };
 
@@ -106,7 +183,19 @@ export default function CustodyPage() {
       if (res.ok) {
         const data = await res.json();
         if (data && data.sections) {
-          setStore(formatStoreData(data));
+          const formatted = formatStoreData(data);
+          if (typeof window !== 'undefined') {
+            try {
+              const backupRaw = localStorage.getItem('mazar_custody_backup');
+              if (backupRaw) {
+                const backupStore = JSON.parse(backupRaw);
+                const merged = mergeBackupStore(formatted, backupStore);
+                setStore(merged);
+                return;
+              }
+            } catch (e) {}
+          }
+          setStore(formatted);
         }
       }
     } catch (e) {
@@ -120,9 +209,14 @@ export default function CustodyPage() {
     fetchCustodyData();
   }, [fetchCustodyData]);
 
-  // Save Store to Server
+  // Save Store to Server and Backup Locally
   const saveStore = async (updatedStore: CustodyDataStore, msg = 'تم حفظ التعديلات بنجاح') => {
     setIsSaving(true);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('mazar_custody_backup', JSON.stringify(updatedStore));
+      } catch (e) {}
+    }
     try {
       const res = await fetch('/api/custody', {
         method: 'POST',
