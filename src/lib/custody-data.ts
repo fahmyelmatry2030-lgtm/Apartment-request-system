@@ -28,61 +28,81 @@ export interface CustodyLog {
 export interface CustodyDataStore {
   isSetupPhase?: boolean;
   sections: {
-    mazar12: { tables: CustodyTable[] };
+    mazar1: { tables: CustodyTable[] };
+    mazar2: { tables: CustodyTable[] };
     mazar3: { tables: CustodyTable[] };
-    external: { tables: CustodyTable[] };
+    apt1: { tables: CustodyTable[] };
+    apt2: { tables: CustodyTable[] };
+    apt3: { tables: CustodyTable[] };
+    mazar12?: { tables: CustodyTable[] };
+    external?: { tables: CustodyTable[] };
   };
   logs: CustodyLog[];
 }
 
 export const initialCustodyData: CustodyDataStore = {
+  isSetupPhase: true,
   sections: {
-    mazar12: {
+    mazar1: {
       tables: [
         {
-          id: 'table-devices-12',
-          title: 'جدول الأجهزة والكهربائيات',
+          id: 'table-devices-m1',
+          title: 'جدول الأجهزة والكهربائيات - مزار 1',
           items: [
             {
-              id: 'item-1',
+              id: 'item-m1-1',
               num: 1,
               name: 'تكييف 1.5 حصان',
-              totalCount: '24',
-              unitCount: '20',
-              distributionStyle: 'صالة 1 + غرفة 1',
-              reserveCount: '4',
+              totalCount: '12',
+              unitCount: '12',
+              distributionStyle: 'استوديوهات 1 - 12',
+              reserveCount: '0',
               reserveLocation: 'مخزن مزار 1',
               notes: 'حالة ممتازة',
             },
             {
-              id: 'item-2',
+              id: 'item-m1-2',
               num: 2,
               name: 'شاشة سمارت 43 بوصة',
-              totalCount: '15',
+              totalCount: '12',
               unitCount: '12',
-              distributionStyle: 'صالة الاستوديو',
-              reserveCount: '3',
+              distributionStyle: 'استوديوهات 1 - 12',
+              reserveCount: '0',
               reserveLocation: 'رف الأجهزة',
-              notes: 'احتياطي معلق',
+              notes: 'سليمة',
             },
           ],
         },
         {
-          id: 'table-[#furniture-12]',
-          title: 'جدول المفروشات والأثاث',
+          id: 'table-furniture-m1',
+          title: 'جدول المفروشات والأثاث - مزار 1',
+          items: [],
+        },
+      ],
+    },
+    mazar2: {
+      tables: [
+        {
+          id: 'table-devices-m2',
+          title: 'جدول الأجهزة والكهربائيات - مزار 2',
           items: [
             {
-              id: 'item-f1',
+              id: 'item-m2-1',
               num: 1,
-              name: 'ملاية سرير دبل',
-              totalCount: '50',
-              unitCount: '30',
-              distributionStyle: '2 لكل استوديو دبل',
-              reserveCount: '20',
-              reserveLocation: 'مخزن المغسلة',
-              notes: 'طقم بريميوم',
+              name: 'تكييف 1.5 حصان',
+              totalCount: '12',
+              unitCount: '12',
+              distributionStyle: 'استوديوهات 13 - 24',
+              reserveCount: '0',
+              reserveLocation: 'مخزن مزار 2',
+              notes: 'حالة ممتازة',
             },
           ],
+        },
+        {
+          id: 'table-furniture-m2',
+          title: 'جدول المفروشات والأثاث - مزار 2',
+          items: [],
         },
       ],
     },
@@ -90,7 +110,7 @@ export const initialCustodyData: CustodyDataStore = {
       tables: [
         {
           id: 'table-devices-3',
-          title: 'جدول الأجهزة والكهربائيات - مزار 3',
+          title: 'جدول الأجهزة والكهربائيات - مزار 3 (أ. عكورة)',
           items: [
             {
               id: 'item-3-1',
@@ -107,11 +127,29 @@ export const initialCustodyData: CustodyDataStore = {
         },
       ],
     },
-    external: {
+    apt1: {
       tables: [
         {
-          id: 'table-ext-1',
-          title: 'معدات وأجهزة الشقق الخارجية',
+          id: 'table-ext-apt1',
+          title: 'معدات وأجهزة شقة 1 الخارجية',
+          items: [],
+        },
+      ],
+    },
+    apt2: {
+      tables: [
+        {
+          id: 'table-ext-apt2',
+          title: 'معدات وأجهزة شقة 2 الخارجية',
+          items: [],
+        },
+      ],
+    },
+    apt3: {
+      tables: [
+        {
+          id: 'table-ext-apt3',
+          title: 'معدات وأجهزة شقة 3 الخارجية',
           items: [],
         },
       ],
@@ -123,7 +161,7 @@ export const initialCustodyData: CustodyDataStore = {
       timestamp: new Date().toISOString(),
       user: 'Admin',
       action: 'إضافة',
-      details: 'تهيئة جدول عهدة مزار والأجهزة المبدئي',
+      details: 'تهيئة جدول عهدة مزار 1 ومزار 2 ومزار 3 والشقق الخارجية',
     },
   ],
 };

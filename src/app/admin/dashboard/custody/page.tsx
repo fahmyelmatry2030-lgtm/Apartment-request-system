@@ -6,7 +6,8 @@ import { Plus, Trash2, Edit3, Save, RefreshCw, Layers, Box, Check, X, ShieldAler
 
 export default function CustodyPage() {
   const [store, setStore] = useState<CustodyDataStore>(initialCustodyData);
-  const [activeTab, setActiveTab] = useState<'mazar12' | 'mazar3' | 'external'>('mazar12');
+  const [activeTab, setActiveTab] = useState<'mazar1' | 'mazar2' | 'mazar3' | 'external'>('mazar1');
+  const [activeExternalSubTab, setActiveExternalSubTab] = useState<'apt1' | 'apt2' | 'apt3' | 'all'>('apt1');
   const [adminRole, setAdminRole] = useState<string>('Admin');
   const [adminName, setAdminName] = useState<string>('مدير النظام');
   const [isLoading, setIsLoading] = useState(true);
@@ -38,6 +39,40 @@ export default function CustodyPage() {
   });
   const [actionReason, setActionReason] = useState('');
 
+  // Migration Helper for backward compatibility
+  const formatStoreData = (data: any): CustodyDataStore => {
+    const s = data?.sections || {};
+    const mazar1Tables = s.mazar1?.tables || (s.mazar12?.tables ? s.mazar12.tables.filter((t: any) => t.id.includes('-m1') || t.title.includes('مزار 1')) : []);
+    const mazar2Tables = s.mazar2?.tables || (s.mazar12?.tables ? s.mazar12.tables.filter((t: any) => !t.id.includes('-m1') && !t.title.includes('مزار 1')) : []);
+    const apt1Tables = s.apt1?.tables || s.external?.tables || [];
+    const apt2Tables = s.apt2?.tables || [];
+    const apt3Tables = s.apt3?.tables || [];
+    const mazar3Tables = s.mazar3?.tables || [];
+
+    return {
+      ...data,
+      sections: {
+        mazar1: { tables: mazar1Tables },
+        mazar2: { tables: mazar2Tables },
+        mazar3: { tables: mazar3Tables },
+        apt1: { tables: apt1Tables },
+        apt2: { tables: apt2Tables },
+        apt3: { tables: apt3Tables },
+      },
+    };
+  };
+
+  // Helper to locate table section in store
+  const findTableSection = (sections: any, tableId: string): keyof CustodyDataStore['sections'] | null => {
+    const keys: (keyof CustodyDataStore['sections'])[] = ['mazar1', 'mazar2', 'mazar3', 'apt1', 'apt2', 'apt3'];
+    for (const k of keys) {
+      if (sections[k]?.tables?.some((t: CustodyTable) => t.id === tableId)) {
+        return k;
+      }
+    }
+    return null;
+  };
+
   // Read Role & Set Initial Mobile Zoom
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -54,8 +89,8 @@ export default function CustodyPage() {
           if (parsed?.name) setAdminName(parsed.name);
 
           // Role tab locking
-          if (parsed.role === 'Mohsen') setActiveTab('mazar12');
-          if (parsed.role === 'Akoura' || parsed.role === 'Aura') setActiveTab('mazar3');
+          if (parsed.role === 'Mohsen') setActiveTab('mazar1');
+          if (parsed.role === 'Akoura' || parsed.role === 'Aura' || parsed.role === 'koura') setActiveTab('mazar3');
         } catch (e) {}
       }
     }
@@ -69,7 +104,7 @@ export default function CustodyPage() {
       if (res.ok) {
         const data = await res.json();
         if (data && data.sections) {
-          setStore(data);
+          setStore(formatStoreData(data));
         }
       }
     } catch (e) {
@@ -128,8 +163,8 @@ export default function CustodyPage() {
   const isReadOnly = isMohsen || isAkoura;
 
   // Allowed Tabs logic
-  const canAccessTab = (tab: 'mazar12' | 'mazar3' | 'external') => {
-    if (isMohsen) return tab === 'mazar12';
+  const canAccessTab = (tab: 'mazar1' | 'mazar2' | 'mazar3' | 'external') => {
+    if (isMohsen) return tab === 'mazar1' || tab === 'mazar2';
     if (isAkoura) return tab === 'mazar3';
     return true;
   };
@@ -145,10 +180,12 @@ export default function CustodyPage() {
       items: [],
     };
 
+    const targetKey = activeTab === 'external' ? (activeExternalSubTab === 'all' ? 'apt1' : activeExternalSubTab) : activeTab;
     const updatedSections = { ...store.sections };
-    updatedSections[activeTab].tables.push(newTable);
+    if (!updatedSections[targetKey]) updatedSections[targetKey] = { tables: [] };
+    updatedSections[targetKey].tables.push(newTable);
 
-    const log = createLog('إضافة', `إنشاء جدول جديد بعنوان: "${newTableTitle.trim()}" في قسم (${tabLabel(activeTab)})`);
+    const log = createLog('إضافة', `إنشاء جدول جديد بعنوان: "${newTableTitle.trim()}" في قسم (${tabLabel(targetKey)})`);
     const updatedStore = {
       ...store,
       sections: updatedSections,
@@ -164,7 +201,9 @@ export default function CustodyPage() {
   const handleRenameTable = (tableId: string) => {
     if (!editTableTitle.trim()) return;
     const updatedSections = { ...store.sections };
-    const table = updatedSections[activeTab].tables.find((t) => t.id === tableId);
+    const secKey = findTableSection(updatedSections, tableId);
+    if (!secKey) return;
+    const table = updatedSections[secKey].tables.find((t) => t.id === tableId);
     if (table) {
       const oldTitle = table.title;
       table.title = editTableTitle.trim();
@@ -184,14 +223,16 @@ export default function CustodyPage() {
 
   // Delete Table
   const handleDeleteTable = (tableId: string) => {
-    const table = store.sections[activeTab].tables.find((t) => t.id === tableId);
+    const updatedSections = { ...store.sections };
+    const secKey = findTableSection(updatedSections, tableId);
+    if (!secKey) return;
+    const table = updatedSections[secKey].tables.find((t) => t.id === tableId);
     if (!table) return;
     if (!confirm(`هل أنت تأكد من حذف الجدول الكامل "${table.title}" بجميع محتوياته؟`)) return;
 
-    const updatedSections = { ...store.sections };
-    updatedSections[activeTab].tables = updatedSections[activeTab].tables.filter((t) => t.id !== tableId);
+    updatedSections[secKey].tables = updatedSections[secKey].tables.filter((t) => t.id !== tableId);
 
-    const log = createLog('حذف', `حذف جدول بالكامل بعنوان: "${table.title}" من قسم (${tabLabel(activeTab)})`);
+    const log = createLog('حذف', `حذف جدول بالكامل بعنوان: "${table.title}" من قسم (${tabLabel(secKey)})`);
     saveStore(
       {
         ...store,
@@ -205,7 +246,9 @@ export default function CustodyPage() {
   // Add Item to Table
   const handleAddItem = (tableId: string) => {
     const updatedSections = { ...store.sections };
-    const table = updatedSections[activeTab].tables.find((t) => t.id === tableId);
+    const secKey = findTableSection(updatedSections, tableId);
+    if (!secKey) return;
+    const table = updatedSections[secKey].tables.find((t) => t.id === tableId);
     if (!table) return;
 
     const newItem: CustodyItem = {
@@ -236,7 +279,9 @@ export default function CustodyPage() {
   // Update Item Property
   const handleUpdateItem = (tableId: string, itemId: string, field: keyof CustodyItem, value: any) => {
     const updatedSections = { ...store.sections };
-    const table = updatedSections[activeTab].tables.find((t) => t.id === tableId);
+    const secKey = findTableSection(updatedSections, tableId);
+    if (!secKey) return;
+    const table = updatedSections[secKey].tables.find((t) => t.id === tableId);
     if (!table) return;
 
     const item = table.items.find((i) => i.id === itemId);
@@ -248,7 +293,9 @@ export default function CustodyPage() {
 
   // Save Current Table Items & Log Edit
   const handleSaveTableItems = (tableId: string) => {
-    const table = store.sections[activeTab].tables.find((t) => t.id === tableId);
+    const secKey = findTableSection(store.sections, tableId);
+    if (!secKey) return;
+    const table = store.sections[secKey].tables.find((t) => t.id === tableId);
     if (!table) return;
 
     const log = createLog('تعديل', `حفظ وتحديث بيانات جدول (${table.title})`);
@@ -263,19 +310,17 @@ export default function CustodyPage() {
 
   // Delete Item
   const handleDeleteItem = (tableId: string, itemId: string) => {
-    const table = store.sections[activeTab].tables.find((t) => t.id === tableId);
+    const updatedSections = { ...store.sections };
+    const secKey = findTableSection(updatedSections, tableId);
+    if (!secKey) return;
+    const table = updatedSections[secKey].tables.find((t) => t.id === tableId);
     if (!table) return;
     const item = table.items.find((i) => i.id === itemId);
 
-    const updatedSections = { ...store.sections };
-    const targetTable = updatedSections[activeTab].tables.find((t) => t.id === tableId);
-    if (targetTable) {
-      targetTable.items = targetTable.items.filter((i) => i.id !== itemId);
-      // Re-index numbers
-      targetTable.items.forEach((it, index) => {
-        it.num = index + 1;
-      });
-    }
+    table.items = table.items.filter((i) => i.id !== itemId);
+    table.items.forEach((it, index) => {
+      it.num = index + 1;
+    });
 
     const log = createLog('حذف', `إزالة بند "${item?.name || ''}" من جدول (${table.title})`);
     saveStore(
@@ -327,12 +372,31 @@ export default function CustodyPage() {
   };
 
   const tabLabel = (tabKey: string) => {
-    if (tabKey === 'mazar12') return 'مزار 1 و 2';
-    if (tabKey === 'mazar3') return 'مزار 3 (عكورة)';
+    if (tabKey === 'mazar1') return 'مزار 1';
+    if (tabKey === 'mazar2') return 'مزار 2';
+    if (tabKey === 'mazar3') return 'مزار 3 (أ. عكورة)';
+    if (tabKey === 'apt1') return 'شقة 1';
+    if (tabKey === 'apt2') return 'شقة 2';
+    if (tabKey === 'apt3') return 'شقة 3';
     return 'الشقق الخارجية';
   };
 
-  const currentTables = store.sections[activeTab]?.tables || [];
+  const currentTables = (() => {
+    if (activeTab === 'mazar1') return store.sections?.mazar1?.tables || [];
+    if (activeTab === 'mazar2') return store.sections?.mazar2?.tables || [];
+    if (activeTab === 'mazar3') return store.sections?.mazar3?.tables || [];
+    if (activeTab === 'external') {
+      if (activeExternalSubTab === 'apt1') return store.sections?.apt1?.tables || [];
+      if (activeExternalSubTab === 'apt2') return store.sections?.apt2?.tables || [];
+      if (activeExternalSubTab === 'apt3') return store.sections?.apt3?.tables || [];
+      return [
+        ...(store.sections?.apt1?.tables || []),
+        ...(store.sections?.apt2?.tables || []),
+        ...(store.sections?.apt3?.tables || []),
+      ];
+    }
+    return [];
+  })();
 
   return (
     <div className="space-y-8 animate-fade-in text-[#2A2723]" dir="rtl">
@@ -450,22 +514,40 @@ export default function CustodyPage() {
         </div>
       </div>
 
-      {/* ── TOP SECTION NAVIGATION TABS (3 MAIN TABS) ─────────────────────── */}
+      {/* ── TOP SECTION NAVIGATION TABS (4 MAIN TABS) ─────────────────────── */}
       <div className="flex items-center gap-2.5 md:gap-3 overflow-x-auto pb-2 custom-scrollbar border-b border-[#EAE4D9]">
-        {canAccessTab('mazar12') && (
+        {canAccessTab('mazar1') && (
           <button
             type="button"
-            onClick={() => setActiveTab('mazar12')}
+            onClick={() => setActiveTab('mazar1')}
             className={`px-4 py-3 md:px-6 md:py-4 rounded-xl md:rounded-2xl font-black text-xs md:text-sm transition-all flex items-center gap-2 shadow-sm shrink-0 ${
-              activeTab === 'mazar12'
+              activeTab === 'mazar1'
                 ? 'bg-[#2A2723] text-white shadow-xl scale-105 border border-[#C1A68D]'
                 : 'bg-white text-[#7A7061] hover:bg-[#FDFBF7] border border-[#EAE4D9]'
             }`}
           >
             <span>🏢</span>
-            <span>مزار 1 و 2 (الوحدات 1 - 24)</span>
+            <span>مزار 1 (الوحدات 1 - 12)</span>
             <span className="bg-[#C1A68D]/20 text-[#C1A68D] text-[9px] md:text-[10px] px-2 py-0.5 rounded-full font-bold">
-              {store.sections.mazar12.tables.length} جدول
+              {store.sections.mazar1?.tables?.length || 0} جدول
+            </span>
+          </button>
+        )}
+
+        {canAccessTab('mazar2') && (
+          <button
+            type="button"
+            onClick={() => setActiveTab('mazar2')}
+            className={`px-4 py-3 md:px-6 md:py-4 rounded-xl md:rounded-2xl font-black text-xs md:text-sm transition-all flex items-center gap-2 shadow-sm shrink-0 ${
+              activeTab === 'mazar2'
+                ? 'bg-[#2A2723] text-white shadow-xl scale-105 border border-[#C1A68D]'
+                : 'bg-white text-[#7A7061] hover:bg-[#FDFBF7] border border-[#EAE4D9]'
+            }`}
+          >
+            <span>🏢</span>
+            <span>مزار 2 (الوحدات 13 - 24)</span>
+            <span className="bg-[#C1A68D]/20 text-[#C1A68D] text-[9px] md:text-[10px] px-2 py-0.5 rounded-full font-bold">
+              {store.sections.mazar2?.tables?.length || 0} جدول
             </span>
           </button>
         )}
@@ -481,9 +563,9 @@ export default function CustodyPage() {
             }`}
           >
             <span>🏬</span>
-            <span>مزار 3 (عكورة / الشقق)</span>
+            <span>مزار 3 (أ. عكورة / الشقق 25 - 30)</span>
             <span className="bg-[#C1A68D]/20 text-[#C1A68D] text-[9px] md:text-[10px] px-2 py-0.5 rounded-full font-bold">
-              {store.sections.mazar3.tables.length} جدول
+              {store.sections.mazar3?.tables?.length || 0} جدول
             </span>
           </button>
         )}
@@ -501,11 +583,78 @@ export default function CustodyPage() {
             <span>🏡</span>
             <span>الشقق الخارجية</span>
             <span className="bg-[#C1A68D]/20 text-[#C1A68D] text-[9px] md:text-[10px] px-2 py-0.5 rounded-full font-bold">
-              {store.sections.external.tables.length} جدول
+              {(store.sections.apt1?.tables?.length || 0) + (store.sections.apt2?.tables?.length || 0) + (store.sections.apt3?.tables?.length || 0)} جدول
             </span>
           </button>
         )}
       </div>
+
+      {/* ── SUB-TABS FOR EXTERNAL APARTMENTS ── */}
+      {activeTab === 'external' && (
+        <div className="flex items-center gap-2 bg-[#FDFBF7] p-2.5 rounded-2xl border border-[#EAE4D9] overflow-x-auto shadow-inner">
+          <span className="text-xs font-black text-[#7A7061] px-2 shrink-0 flex items-center gap-1">
+            <span>🛋️</span>
+            <span>اختر الشقة الخارجية:</span>
+          </span>
+
+          <button
+            type="button"
+            onClick={() => setActiveExternalSubTab('apt1')}
+            className={`px-3.5 py-2 rounded-xl font-black text-xs transition-all shrink-0 flex items-center gap-1.5 ${
+              activeExternalSubTab === 'apt1'
+                ? 'bg-[#2A2723] text-white shadow-md'
+                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+            }`}
+          >
+            <span>شقة 1</span>
+            <span className="bg-amber-500/20 text-amber-900 text-[9px] px-1.5 py-0.5 rounded-full font-bold">
+              {store.sections.apt1?.tables?.length || 0} جدول
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveExternalSubTab('apt2')}
+            className={`px-3.5 py-2 rounded-xl font-black text-xs transition-all shrink-0 flex items-center gap-1.5 ${
+              activeExternalSubTab === 'apt2'
+                ? 'bg-[#2A2723] text-white shadow-md'
+                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+            }`}
+          >
+            <span>شقة 2</span>
+            <span className="bg-amber-500/20 text-amber-900 text-[9px] px-1.5 py-0.5 rounded-full font-bold">
+              {store.sections.apt2?.tables?.length || 0} جدول
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveExternalSubTab('apt3')}
+            className={`px-3.5 py-2 rounded-xl font-black text-xs transition-all shrink-0 flex items-center gap-1.5 ${
+              activeExternalSubTab === 'apt3'
+                ? 'bg-[#2A2723] text-white shadow-md'
+                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+            }`}
+          >
+            <span>شقة 3</span>
+            <span className="bg-amber-500/20 text-amber-900 text-[9px] px-1.5 py-0.5 rounded-full font-bold">
+              {store.sections.apt3?.tables?.length || 0} جدول
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveExternalSubTab('all')}
+            className={`px-3.5 py-2 rounded-xl font-black text-xs transition-all shrink-0 flex items-center gap-1.5 ${
+              activeExternalSubTab === 'all'
+                ? 'bg-[#C1A68D] text-black shadow-md'
+                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+            }`}
+          >
+            <span>عرض كل الشقق الخارجية</span>
+          </button>
+        </div>
+      )}
 
       {/* Search Bar & Zoom In / Zoom Out Controls */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
