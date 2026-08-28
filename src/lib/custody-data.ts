@@ -110,7 +110,7 @@ export const initialCustodyData: CustodyDataStore = {
       tables: [
         {
           id: 'table-devices-3',
-          title: 'جدول الأجهزة والكهربائيات - مزار 3 (أ. عكورة)',
+          title: 'جدول الأجهزة والكهربائيات - مزار 3 (أ. أكورة)',
           items: [
             {
               id: 'item-3-1',

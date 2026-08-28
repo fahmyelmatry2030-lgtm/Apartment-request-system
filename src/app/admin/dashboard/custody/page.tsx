@@ -376,7 +376,7 @@ export default function CustodyPage() {
   const tabLabel = (tabKey: string) => {
     if (tabKey === 'mazar1') return 'مزار 1';
     if (tabKey === 'mazar2') return 'مزار 2';
-    if (tabKey === 'mazar3') return 'مزار 3 (أ. عكورة)';
+    if (tabKey === 'mazar3') return 'مزار 3 (أ. أكورة)';
     if (tabKey === 'apt1') return 'شقة 1';
     if (tabKey === 'apt2') return 'شقة 2';
     if (tabKey === 'apt3') return 'شقة 3';
@@ -565,7 +565,7 @@ export default function CustodyPage() {
             }`}
           >
             <span>🏬</span>
-            <span>مزار 3 (أ. عكورة / الشقق 25 - 30)</span>
+            <span>مزار 3 (أ. أكورة / الشقق 25 - 30)</span>
             <span className="bg-[#C1A68D]/20 text-[#C1A68D] text-[9px] md:text-[10px] px-2 py-0.5 rounded-full font-bold">
               {store.sections.mazar3?.tables?.length || 0} جدول
             </span>

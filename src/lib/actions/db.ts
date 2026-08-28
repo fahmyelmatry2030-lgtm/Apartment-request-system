@@ -491,13 +491,13 @@ export async function verifyAdminAuth(username: string, pass: string) {
     console.log(`Login attempt for: ${cleanUsername}`);
 
     // Keep the partner login independent from the admin database.
-    if (['akoura', 'aura', 'أورا', 'اورا', 'koura', 'كورة'].includes(cleanUsername.toLowerCase()) && (cleanPass === 'akoura2026' || cleanPass === 'aura2026')) {
+    if (['akoura', 'aura', 'أورا', 'اورا', 'koura', 'كورة', 'أكورة', 'اكورة', 'اكوره'].includes(cleanUsername.toLowerCase()) && (cleanPass === 'akoura2026' || cleanPass === 'aura2026')) {
       return {
         success: true,
         admin: {
           id: 'akoura-admin',
           username: 'Akoura',
-          name: 'أورا (مزار 3)',
+          name: 'أكورة (مزار 3)',
           role: 'Akoura'
         }
       };
@@ -508,9 +508,9 @@ export async function verifyAdminAuth(username: string, pass: string) {
       admin: { username: 'Admin', name: 'Admin', role: 'Admin', password: 'Admin220' },
       moderator: { username: 'Moderator', name: 'Moderator', role: 'Moderator', password: 'Moderator90' },
       mohsen: { username: 'Mohsen', name: 'Mohsen', role: 'Mohsen', password: 'Mohsen 55' },
-      akoura: { username: 'Akoura', name: 'أورا (مزار 3)', role: 'Akoura', password: 'akoura2026' },
-      aura: { username: 'Akoura', name: 'أورا (مزار 3)', role: 'Akoura', password: 'akoura2026' },
-      koura: { username: 'Akoura', name: 'أورا (مزار 3)', role: 'Akoura', password: 'akoura2026' },
+      akoura: { username: 'Akoura', name: 'أكورة (مزار 3)', role: 'Akoura', password: 'akoura2026' },
+      aura: { username: 'Akoura', name: 'أكورة (مزار 3)', role: 'Akoura', password: 'akoura2026' },
+      koura: { username: 'Akoura', name: 'أكورة (مزار 3)', role: 'Akoura', password: 'akoura2026' },
     };
     const fixedAdmin = fixedAdmins[cleanUsername.toLowerCase()];
     if (fixedAdmin && fixedAdmin.password === cleanPass) {
