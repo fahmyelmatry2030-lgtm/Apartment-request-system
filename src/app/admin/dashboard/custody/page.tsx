@@ -62,9 +62,11 @@ export default function CustodyPage() {
     };
   };
 
+  type StandardSectionKey = 'mazar1' | 'mazar2' | 'mazar3' | 'apt1' | 'apt2' | 'apt3';
+
   // Helper to locate table section in store
-  const findTableSection = (sections: any, tableId: string): keyof CustodyDataStore['sections'] | null => {
-    const keys: (keyof CustodyDataStore['sections'])[] = ['mazar1', 'mazar2', 'mazar3', 'apt1', 'apt2', 'apt3'];
+  const findTableSection = (sections: any, tableId: string): StandardSectionKey | null => {
+    const keys: StandardSectionKey[] = ['mazar1', 'mazar2', 'mazar3', 'apt1', 'apt2', 'apt3'];
     for (const k of keys) {
       if (sections[k]?.tables?.some((t: CustodyTable) => t.id === tableId)) {
         return k;
@@ -202,7 +204,7 @@ export default function CustodyPage() {
     if (!editTableTitle.trim()) return;
     const updatedSections = { ...store.sections };
     const secKey = findTableSection(updatedSections, tableId);
-    if (!secKey) return;
+    if (!secKey || !updatedSections[secKey]) return;
     const table = updatedSections[secKey].tables.find((t) => t.id === tableId);
     if (table) {
       const oldTitle = table.title;
@@ -225,7 +227,7 @@ export default function CustodyPage() {
   const handleDeleteTable = (tableId: string) => {
     const updatedSections = { ...store.sections };
     const secKey = findTableSection(updatedSections, tableId);
-    if (!secKey) return;
+    if (!secKey || !updatedSections[secKey]) return;
     const table = updatedSections[secKey].tables.find((t) => t.id === tableId);
     if (!table) return;
     if (!confirm(`هل أنت تأكد من حذف الجدول الكامل "${table.title}" بجميع محتوياته؟`)) return;
@@ -247,7 +249,7 @@ export default function CustodyPage() {
   const handleAddItem = (tableId: string) => {
     const updatedSections = { ...store.sections };
     const secKey = findTableSection(updatedSections, tableId);
-    if (!secKey) return;
+    if (!secKey || !updatedSections[secKey]) return;
     const table = updatedSections[secKey].tables.find((t) => t.id === tableId);
     if (!table) return;
 
@@ -280,7 +282,7 @@ export default function CustodyPage() {
   const handleUpdateItem = (tableId: string, itemId: string, field: keyof CustodyItem, value: any) => {
     const updatedSections = { ...store.sections };
     const secKey = findTableSection(updatedSections, tableId);
-    if (!secKey) return;
+    if (!secKey || !updatedSections[secKey]) return;
     const table = updatedSections[secKey].tables.find((t) => t.id === tableId);
     if (!table) return;
 
@@ -294,7 +296,7 @@ export default function CustodyPage() {
   // Save Current Table Items & Log Edit
   const handleSaveTableItems = (tableId: string) => {
     const secKey = findTableSection(store.sections, tableId);
-    if (!secKey) return;
+    if (!secKey || !store.sections[secKey]) return;
     const table = store.sections[secKey].tables.find((t) => t.id === tableId);
     if (!table) return;
 
@@ -312,7 +314,7 @@ export default function CustodyPage() {
   const handleDeleteItem = (tableId: string, itemId: string) => {
     const updatedSections = { ...store.sections };
     const secKey = findTableSection(updatedSections, tableId);
-    if (!secKey) return;
+    if (!secKey || !updatedSections[secKey]) return;
     const table = updatedSections[secKey].tables.find((t) => t.id === tableId);
     if (!table) return;
     const item = table.items.find((i) => i.id === itemId);
