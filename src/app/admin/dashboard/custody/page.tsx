@@ -134,6 +134,8 @@ export default function CustodyPage() {
     return true;
   };
 
+  const isSetup = store.isSetupPhase !== false;
+
   // Add New Table
   const handleAddTable = () => {
     if (!newTableTitle.trim()) return;
@@ -150,7 +152,7 @@ export default function CustodyPage() {
     const updatedStore = {
       ...store,
       sections: updatedSections,
-      logs: [log, ...store.logs],
+      logs: isSetup ? (store.logs || []) : [log, ...(store.logs || [])],
     };
 
     saveStore(updatedStore, `تمت إضافة جدول "${newTableTitle.trim()}" بنجاح`);
@@ -171,7 +173,7 @@ export default function CustodyPage() {
         {
           ...store,
           sections: updatedSections,
-          logs: [log, ...store.logs],
+          logs: isSetup ? (store.logs || []) : [log, ...(store.logs || [])],
         },
         'تم تغيير اسم الجدول بنجاح'
       );
@@ -194,7 +196,7 @@ export default function CustodyPage() {
       {
         ...store,
         sections: updatedSections,
-        logs: [log, ...store.logs],
+        logs: isSetup ? (store.logs || []) : [log, ...(store.logs || [])],
       },
       'تم حذف الجدول بنجاح'
     );
@@ -225,7 +227,7 @@ export default function CustodyPage() {
       {
         ...store,
         sections: updatedSections,
-        logs: [log, ...store.logs],
+        logs: isSetup ? (store.logs || []) : [log, ...(store.logs || [])],
       },
       'تم إضافة بند جديد للجدول'
     );
@@ -253,7 +255,7 @@ export default function CustodyPage() {
     saveStore(
       {
         ...store,
-        logs: [log, ...store.logs],
+        logs: isSetup ? (store.logs || []) : [log, ...(store.logs || [])],
       },
       'تم حفظ جدول ' + table.title
     );
@@ -280,9 +282,47 @@ export default function CustodyPage() {
       {
         ...store,
         sections: updatedSections,
-        logs: [log, ...store.logs],
+        logs: isSetup ? (store.logs || []) : [log, ...(store.logs || [])],
       },
       'تم حذف البند بنجاح'
+    );
+  };
+
+  // Finalize Setup & Lock Initial Baseline
+  const handleFinalizeSetup = () => {
+    if (!confirm('هل أنت تأكد من الانتهاء من تأسيس وتنسيق العهدة؟ عند التثبيت، أي حركة إضافة أو مسح أو تعديل قادمة ستسجل تلقائياً في السجل.')) return;
+    const log = createLog('إضافة', '🟢 تم اعتماد وتثبيت العهدة الأساسية بنجاح وتفعيل سجل التعديلات والحركة المباشر');
+    saveStore(
+      {
+        ...store,
+        isSetupPhase: false,
+        logs: [log, ...(store.logs || [])],
+      },
+      'تم تثبيت العهدة وتفعيل سجل التعديلات بنجاح 🎉'
+    );
+  };
+
+  // Return to Setup Phase
+  const handleReturnToSetup = () => {
+    if (!confirm('هل تريد العودة إلى وضع التأسيس؟ في وضع التأسيس، يمكنك تعديل وإضافة البيانات بحرية دون تسجيلها في جدول السجل.')) return;
+    saveStore(
+      {
+        ...store,
+        isSetupPhase: true,
+      },
+      'تم فتح وضع التأسيس (السجل معطل مؤقتاً)'
+    );
+  };
+
+  // Clear All Audit Logs
+  const handleClearLogs = () => {
+    if (!confirm('هل أنت تأكد من تصفير ومسح جميع سجلات الحركة والتغييرات القديمة؟')) return;
+    saveStore(
+      {
+        ...store,
+        logs: [],
+      },
+      'تم تصفير سجل التعديلات بنجاح'
     );
   };
 
@@ -338,6 +378,73 @@ export default function CustodyPage() {
             >
               <Plus size={16} />
               <span>إضافة جدول جديد</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* ── SETUP PHASE STATUS CONTROL BAR ── */}
+      <div
+        className={`p-4 md:p-5 rounded-2xl md:rounded-3xl border flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm transition-all ${
+          isSetup
+            ? 'bg-amber-500/10 border-amber-500/30 text-amber-950'
+            : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-950'
+        }`}
+      >
+        <div className="flex items-center gap-3">
+          <span className={`text-xl md:text-2xl p-2.5 rounded-2xl ${isSetup ? 'bg-amber-500/20' : 'bg-emerald-500/20'}`}>
+            {isSetup ? '🛠️' : '🟢'}
+          </span>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="font-black text-sm md:text-base">
+                {isSetup ? 'وضع تأسيس العهدة حالياً (سجل التعديلات معطل مؤقتاً)' : 'وضع التشغيل المباشر (سجل الحركة والتعديلات مفعل وموثق 100%)'}
+              </h3>
+              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black ${isSetup ? 'bg-amber-200 text-amber-900' : 'bg-emerald-200 text-emerald-900'}`}>
+                {isSetup ? 'مرحلة التأسيس' : 'مكتمل ومثبت'}
+              </span>
+            </div>
+            <p className="text-xs font-bold opacity-80 mt-1 leading-relaxed">
+              {isSetup
+                ? 'يمكنك الآن كتابة، تعديل، وإضافة أجهزة ومحتويات العهدة بحرية دون تسجيل أو تلوث جدول السجل. عند انتهائك، انقر زر "اعتماد وتثبيت العهدة".'
+                : 'أي حركة إضافة أو مسح أو تعديل تتم الآن تُسجل وتُوثق تلقائياً بالاسم والوقت وسبب التعديل في جدول السجل بالأسفل.'}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+          {!isReadOnly && isSetup && (
+            <button
+              type="button"
+              onClick={handleFinalizeSetup}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-4 py-2.5 rounded-xl text-xs shadow-md transition-all flex items-center gap-1.5 active:scale-95"
+            >
+              <Check size={16} />
+              <span>اعتماد وتثبيت العهدة (تفعيل السجل)</span>
+            </button>
+          )}
+
+          {!isReadOnly && !isSetup && (
+            <button
+              type="button"
+              onClick={handleReturnToSetup}
+              className="bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 font-bold px-3 py-2 rounded-xl text-xs transition-all flex items-center gap-1"
+              title="العودة لوضع التأسيس لو كان هناك تعديل تاسيسي تود إجراؤه دون تسجيله"
+            >
+              <RotateCcw size={14} />
+              <span>العودة لوضع التأسيس</span>
+            </button>
+          )}
+
+          {!isReadOnly && (
+            <button
+              type="button"
+              onClick={handleClearLogs}
+              className="bg-white hover:bg-rose-50 text-rose-600 border border-gray-200 font-bold px-3 py-2 rounded-xl text-xs transition-all flex items-center gap-1"
+              title="تصفير ومسح السجلات القديمة"
+            >
+              <Trash2 size={14} />
+              <span>تصفير السجل</span>
             </button>
           )}
         </div>

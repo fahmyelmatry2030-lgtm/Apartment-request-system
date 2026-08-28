@@ -26,6 +26,7 @@ export interface CustodyLog {
 }
 
 export interface CustodyDataStore {
+  isSetupPhase?: boolean;
   sections: {
     mazar12: { tables: CustodyTable[] };
     mazar3: { tables: CustodyTable[] };
