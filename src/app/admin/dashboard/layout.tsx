@@ -201,7 +201,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
     setDeferredPrompt(null);
   };
 
-  const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] = useState(false);
+  const [isNavOpen, setIsNavOpen] = useState(false);
 
   if (!isAuthorized && pathname !== '/admin/login') return null;
   if (pathname === '/admin/login') return <>{children}</>;
@@ -223,22 +223,30 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
 
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] flex custom-scrollbar" dir="rtl">
-      {/* Sidebar */}
-      <aside className={`fixed inset-y-0 right-0 z-40 w-[280px] bg-[#FDFBF7] border-l border-[#EAE4D9]/50 transform transition-all duration-300 ease-in-out lg:static ${
-        isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : 'translate-x-full lg:translate-x-0'
-      } ${
-        isDesktopSidebarCollapsed ? 'hidden lg:!hidden' : 'flex'
-      } flex-col`}>
+    <div className="min-h-screen bg-[#FDFBF7] flex custom-scrollbar relative" dir="rtl">
+      {/* Backdrop overlay when navbar menu is open */}
+      {isNavOpen && (
+        <div
+          onClick={() => setIsNavOpen(false)}
+          className="fixed inset-0 bg-black/40 backdrop-blur-xs z-40 transition-opacity duration-300"
+          title="إغلاق القائمة"
+        />
+      )}
+
+      {/* Floating Sidebar Drawer (Hidden by default, opens on ☰ click, closes on link click) */}
+      <aside className={`fixed inset-y-0 right-0 z-50 w-[280px] md:w-[320px] bg-[#FDFBF7] border-l border-[#EAE4D9] shadow-2xl transform transition-transform duration-300 ease-in-out ${
+        isNavOpen ? 'translate-x-0' : 'translate-x-full'
+      } flex flex-col`}>
         <div className="p-6 md:p-8 flex flex-col items-center justify-between border-b border-[#EAE4D9]/50 mb-6 gap-4">
           <div className="w-full flex justify-between items-center">
-            <Link href="/admin/dashboard" className="transition-all hover:scale-105" title="الرئيسية للوحة التحكم">
+            <Link href="/admin/dashboard" onClick={() => setIsNavOpen(false)} className="transition-all hover:scale-105" title="الرئيسية للوحة التحكم">
               <Logo size={25} className="!justify-start" imageClassName="max-h-[50px]" />
             </Link>
-            {/* Close button for mobile */}
+            {/* Close button */}
             <button
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="lg:hidden p-2 text-[#7A7061] hover:bg-[#EAE4D9]/50 rounded-lg transition-colors"
+              onClick={() => setIsNavOpen(false)}
+              className="p-2 text-[#7A7061] hover:bg-[#EAE4D9]/50 rounded-lg transition-colors"
+              title="إغلاق القائمة"
             >
               ✖️
             </button>
@@ -260,9 +268,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={() => {
-                  setIsMobileMenuOpen(false);
-                }}
+                onClick={() => setIsNavOpen(false)}
                 className={`flex items-center gap-4 px-6 py-4 rounded-2xl font-black transition-all duration-300 ${isActive
                     ? 'bg-[#2A2723] text-white shadow-xl shadow-black/10'
                     : 'text-[#7A7061] hover:text-[#2A2723] hover:bg-[#FDFBF7]'
@@ -313,25 +319,19 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
         </div>
       </aside>
 
-      {/* Main Content Area */}
+      {/* Main Content Area (Takes 100% Full Width by default) */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Header */}
         <header className="h-20 bg-white/60 backdrop-blur-xl border-b border-[#EAE4D9]/50 flex items-center justify-between px-6 md:px-8 gap-6 z-30 sticky top-0">
-          {/* Hamburger Menu ☰ Toggle for Desktop & Mobile */}
+          {/* Hamburger Menu ☰ Toggle Button */}
           <button
-            onClick={() => {
-              if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
-                setIsDesktopSidebarCollapsed(!isDesktopSidebarCollapsed);
-              } else {
-                setIsMobileMenuOpen(!isMobileMenuOpen);
-              }
-            }}
+            onClick={() => setIsNavOpen(!isNavOpen)}
             className="p-2.5 md:p-3 bg-white hover:bg-[#FDFBF7] text-[#2A2723] border border-[#EAE4D9] rounded-2xl shadow-sm hover:shadow-md active:scale-95 transition-all flex items-center gap-2 cursor-pointer shrink-0"
-            title={isDesktopSidebarCollapsed ? 'إظهار شريط القوائم الجانبي' : 'إخفاء شريط القوائم وفتح الشاشة بالكامل'}
+            title={isNavOpen ? 'إغلاق القائمة' : 'فتح القائمة الرئيسية'}
           >
             <span className="text-xl font-bold leading-none">☰</span>
-            <span className="text-xs font-black hidden sm:inline">
-              {isDesktopSidebarCollapsed ? 'إظهار القائمة' : 'عرض ملء الشاشة'}
+            <span className="text-xs font-black">
+              {isNavOpen ? 'إغلاق' : 'القائمة'}
             </span>
           </button>
 
