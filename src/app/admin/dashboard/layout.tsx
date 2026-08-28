@@ -260,6 +260,9 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                }}
                 className={`flex items-center gap-4 px-6 py-4 rounded-2xl font-black transition-all duration-300 ${isActive
                     ? 'bg-[#2A2723] text-white shadow-xl shadow-black/10'
                     : 'text-[#7A7061] hover:text-[#2A2723] hover:bg-[#FDFBF7]'
@@ -323,10 +326,10 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
                 setIsMobileMenuOpen(!isMobileMenuOpen);
               }
             }}
-            className="p-3 bg-[#2A2723] hover:bg-black text-white rounded-xl shadow-lg active:scale-95 transition-all flex items-center gap-2 cursor-pointer shrink-0"
+            className="p-2.5 md:p-3 bg-white hover:bg-[#FDFBF7] text-[#2A2723] border border-[#EAE4D9] rounded-2xl shadow-sm hover:shadow-md active:scale-95 transition-all flex items-center gap-2 cursor-pointer shrink-0"
             title={isDesktopSidebarCollapsed ? 'إظهار شريط القوائم الجانبي' : 'إخفاء شريط القوائم وفتح الشاشة بالكامل'}
           >
-            <span className="text-xl font-bold">☰</span>
+            <span className="text-xl font-bold leading-none">☰</span>
             <span className="text-xs font-black hidden sm:inline">
               {isDesktopSidebarCollapsed ? 'إظهار القائمة' : 'عرض ملء الشاشة'}
             </span>
