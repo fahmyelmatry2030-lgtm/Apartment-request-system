@@ -239,6 +239,14 @@ export default function UnitsManagement() {
     };
     
     setEditingUnit({ ...editingUnit, features: updatedFeatures });
+    setNewFeatureAr('');
+    setNewFeatureEn('');
+  };
+
+  const removeFeature = (index: number) => {
+    if (isModerator) return;
+    const updatedAr = [...(editingUnit.features?.ar || [])];
+    const updatedEn = [...(editingUnit.features?.en || [])];
     updatedAr.splice(index, 1);
     updatedEn.splice(index, 1);
     
