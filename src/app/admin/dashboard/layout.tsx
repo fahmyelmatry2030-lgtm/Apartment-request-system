@@ -98,6 +98,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
       const mohsenAllowed = ['/admin/dashboard', '/admin/dashboard/bookings', '/admin/dashboard/customers', '/admin/dashboard/finance', '/admin/dashboard/custody'];
       const restrictedForAkoura = [
         '/admin/dashboard/units',
+        '/admin/dashboard/hr/staff',
         '/admin/dashboard/hr/salaries',
         '/admin/dashboard/hr/vacations',
         '/admin/dashboard/content',
@@ -212,8 +213,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
     { name: 'طلبات الحجز', href: '/admin/dashboard/bookings', icon: '📩', roles: ['Owner', 'Admin', 'Moderator', 'Mohsen', 'Super Admin', 'مدير الحجوزات', 'Akoura', 'Aura'] },
     { name: 'إدارة الوحدات', href: '/admin/dashboard/units', icon: '🏢', roles: ['Owner', 'Admin', 'Moderator', 'Super Admin', 'مدير الوحدات'] },
     { name: 'قاعدة العملاء', href: '/admin/dashboard/customers', icon: '📞', roles: ['Owner', 'Admin', 'Mohsen', 'Super Admin', 'Akoura', 'Aura'] },
-    { name: 'مرتبات الموظفين', href: '/admin/dashboard/hr/salaries', icon: '💸', roles: ['Owner', 'Admin', 'Super Admin'] },
-    { name: 'إجازات الموظفين', href: '/admin/dashboard/hr/vacations', icon: '🌴', roles: ['Owner', 'Admin', 'Super Admin'] },
+    { name: 'الموظفين', href: '/admin/dashboard/hr/staff', icon: '👥', roles: ['Owner', 'Admin', 'Super Admin'] },
     { name: 'إدارة المحتوى', href: '/admin/dashboard/content', icon: '📝', roles: ['Owner', 'Admin', 'Super Admin'] },
     { name: 'المصروفات', href: '/admin/dashboard/reports', icon: '💰', roles: ['Owner', 'Admin', 'Super Admin', 'Akoura', 'Aura'] },
     { name: 'الخزنة', href: '/admin/dashboard/treasury', icon: '🔐', roles: ['Owner', 'Admin'] },
