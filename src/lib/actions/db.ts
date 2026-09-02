@@ -1170,19 +1170,36 @@ export async function saveDbTodo(todo: { title: string; notes?: string; created_
   return data;
 }
 
-export async function updateDbTodoStatus(id: string, completed: boolean) {
+export async function updateDbTodoStatus(id: string, completed: boolean, completed_by?: string) {
   const supabase = getSupabaseServerClient();
   if (!supabase) return;
 
+  const updateData: any = {
+    completed,
+    completed_at: completed ? new Date().toISOString() : null,
+  };
+  if (completed && completed_by) {
+    updateData.completed_by = completed_by;
+  }
+
   const { error } = await supabase
     .from('todo_items')
-    .update({ completed })
+    .update(updateData)
     .eq('id', id);
 
-  if (error && !isTableMissingError(error)) {
-    console.error('Error updating todo status:', error);
+  if (error) {
+    if (error.code === '42703' || error.message?.includes('column')) {
+      const { error: retryErr } = await supabase
+        .from('todo_items')
+        .update({ completed })
+        .eq('id', id);
+      if (retryErr) console.error('Error updating todo status fallback:', retryErr);
+    } else if (!isTableMissingError(error)) {
+      console.error('Error updating todo status:', error);
+    }
   }
   revalidatePath('/admin/dashboard');
+  revalidatePath('/admin/dashboard/tasks');
 }
 
 export async function deleteDbTodo(id: string) {
