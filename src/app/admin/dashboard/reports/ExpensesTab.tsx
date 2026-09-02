@@ -72,6 +72,8 @@ export default function ExpensesTab() {
     ordered_by: '',
     invoice_number: '',
     notes: '',
+    status: 'PENDING',
+    approved_by: '',
   });
 
   useEffect(() => {
@@ -252,7 +254,8 @@ export default function ExpensesTab() {
         ordered_by: newExpense.ordered_by.trim(),
         invoice_number: newExpense.invoice_number.trim(),
         notes: newExpense.notes.trim(),
-        status: 'PENDING',
+        status: newExpense.status || 'PENDING',
+        approved_by: newExpense.approved_by || '',
       });
       setNewExpense({
         amount: '',
@@ -264,6 +267,8 @@ export default function ExpensesTab() {
         ordered_by: '',
         invoice_number: '',
         notes: '',
+        status: 'PENDING',
+        approved_by: '',
       });
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
