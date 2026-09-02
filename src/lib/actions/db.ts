@@ -1081,22 +1081,28 @@ export async function saveDbTreasuryTransfer(transfer: any) {
     if (isTableMissingError(error)) {
       throw new Error('جدول treasury_transfers غير موجود في Supabase. يرجى تطبيقه أولاً في قاعدة البيانات.');
     }
-    if (error.code === '42703' || error.message?.includes('notes')) {
-      const fallbackRow = { ...row };
-      delete fallbackRow.notes;
-      if (transfer.notes) {
-        fallbackRow.handed_by = `[ملاحظة: ${transfer.notes}] ${fallbackRow.handed_by}`.trim();
-      }
-      const { data: retryData, error: retryError } = await supabase
-        .from('treasury_transfers')
-        .insert([fallbackRow])
-        .select()
-        .single();
-      if (retryError) throw retryError;
-      revalidatePath('/admin/dashboard/treasury');
-      return retryData;
+    
+    console.warn('⚠️ Standard treasury insert failed. Retrying with schema fallback...', error.message);
+    const fallbackRow = {
+      amount: Number(transfer.amount) || 0,
+      handed_by: transfer.notes ? `[ملاحظة: ${transfer.notes}] ${String(transfer.handed_by || '').trim()}`.trim() : String(transfer.handed_by || '').trim(),
+      received_by: String(transfer.received_by || '').trim(),
+      transfer_date: transfer.transfer_date || new Date().toISOString().slice(0, 10),
+    };
+
+    const { data: retryData, error: retryError } = await supabase
+      .from('treasury_transfers')
+      .insert([fallbackRow])
+      .select()
+      .single();
+
+    if (retryError) {
+      console.error('Error saving treasury transfer on fallback retry:', retryError);
+      throw new Error(retryError.message || 'فشل حفظ حركة التحويل');
     }
-    throw error;
+
+    revalidatePath('/admin/dashboard/treasury');
+    return retryData;
   }
 
   revalidatePath('/admin/dashboard/treasury');
