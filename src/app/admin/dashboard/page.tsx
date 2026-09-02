@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { getBookings, getSystemUnits } from '@/lib/data-init';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
-import { updateDbBookingStatus, deleteDbBooking, deleteAllPendingDbBookings } from '@/lib/actions/db';
+import { updateDbBookingStatus, deleteDbBooking, deleteAllPendingDbBookings, getDbTodos, saveDbTodo, updateDbTodoStatus, deleteDbTodo } from '@/lib/actions/db';
 import CustomerProfileModal from '@/components/CustomerProfileModal';
 import ReceiptImageModal, { toDirectImageUrl } from '@/components/ReceiptImageModal';
 import { User, Phone, MessageSquare, FileText, Calendar, CheckCircle2, Home, X, Trash2, ChevronDown, ChevronUp, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
@@ -58,6 +58,13 @@ export default function DashboardOverview() {
   const [isPendingRequestsExpanded, setIsPendingRequestsExpanded] = useState(false);
   const [isDailyScheduleExpanded, setIsDailyScheduleExpanded] = useState(false);
 
+  // 📝 To-Do List States
+  const [todos, setTodos] = useState<any[]>([]);
+  const [newTodoTitle, setNewTodoTitle] = useState('');
+  const [newTodoNotes, setNewTodoNotes] = useState('');
+  const [isSavingTodo, setIsSavingTodo] = useState(false);
+  const [isTodoExpanded, setIsTodoExpanded] = useState(true);
+
   // Customer Profile Modal State
   const [profileModal, setProfileModal] = useState<{ isOpen: boolean; name: string | null; phone?: string | null }>({
     isOpen: false,
@@ -81,11 +88,16 @@ export default function DashboardOverview() {
 
   const isPartner = adminRole === 'Partner';
   const isAkoura = adminRole === 'Akoura';
+  const canManageTodo = adminRole === 'Owner' || adminRole === 'Super Admin' || adminRole === 'Admin';
 
   const loadOverviewData = useCallback(async () => {
     setIsLoading(true);
-    let bookings = await getBookings(Date.now().toString());
-    let apts = await getSystemUnits();
+    let [bookings, apts, todoData] = await Promise.all([
+      getBookings(Date.now().toString()),
+      getSystemUnits(),
+      getDbTodos(),
+    ]);
+    setTodos(todoData || []);
 
     const currentRole = typeof window !== 'undefined'
       ? (JSON.parse(sessionStorage.getItem('adminInfo') || '{}')?.role || adminRole)
@@ -1173,6 +1185,199 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
               )}
             </div>
 
+          </div>
+        )}
+      {/* ── SECTION 4: TO-DO LIST & NOTES (جدول قائمة المهام والملاحظات) ── */}
+      <div className="bg-white p-6 md:p-8 rounded-[2.5rem] border border-[#EAE4D9] shadow-sm space-y-6 animate-fade-in">
+        <div
+          onClick={() => setIsTodoExpanded(!isTodoExpanded)}
+          className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#EAE4D9]/60 pb-5 cursor-pointer group/todo"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-[#2A2723] text-[#C1A68D] flex items-center justify-center font-black shadow-md group-hover/todo:scale-105 transition-transform">
+              <CheckCircle2 size={22} />
+            </div>
+            <div>
+              <div className="flex items-center gap-3 flex-wrap">
+                <h3 className="text-xl font-black text-[#2A2723]">
+                  ملاحظات - To-Do List
+                </h3>
+                <span className="text-xs text-gray-500 font-bold bg-[#FDFBF7] px-3 py-1 rounded-full border border-[#EAE4D9]">
+                  {isTodoExpanded ? 'انقر للطي' : 'انقر لعرض المهام'}
+                </span>
+              </div>
+              <p className="text-xs text-[#7A7061] font-bold mt-0.5">
+                قائمة المهام والملاحظات الخاصة بشيفتات الأدمين والأونر
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 self-end md:self-auto">
+            <span className="bg-emerald-50 text-emerald-700 border border-green-200 px-3.5 py-1.5 rounded-full text-xs font-black">
+              ✅ تمت: {todos.filter((t: any) => t.completed).length}
+            </span>
+            <span className="bg-amber-50 text-amber-800 border border-amber-200 px-3.5 py-1.5 rounded-full text-xs font-black">
+              ⏳ قيد التنفيذ: {todos.filter((t: any) => !t.completed).length}
+            </span>
+            <div className="w-10 h-10 rounded-xl bg-gray-100 group-hover/todo:bg-[#2A2723] group-hover/todo:text-white text-[#2A2723] flex items-center justify-center transition-all shadow-sm">
+              {isTodoExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+            </div>
+          </div>
+        </div>
+
+        {isTodoExpanded && (
+          <div className="space-y-6 animate-fade-in">
+            {/* Add New Todo Form (Allowed for Admin and Owner) */}
+            {canManageTodo && (
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (!newTodoTitle.trim()) return;
+                  setIsSavingTodo(true);
+                  try {
+                    const createdBy = getLoggedInAdminName();
+                    const newTodo = await saveDbTodo({
+                      title: newTodoTitle,
+                      notes: newTodoNotes,
+                      created_by: createdBy,
+                    });
+                    setTodos((current) => [newTodo, ...current]);
+                    setNewTodoTitle('');
+                    setNewTodoNotes('');
+                  } catch (err: any) {
+                    alert('فشل إضافة الملاحظة: ' + (err.message || 'خطأ غير معروف'));
+                  } finally {
+                    setIsSavingTodo(false);
+                  }
+                }}
+                className="bg-[#FDFBF7] border border-[#EAE4D9] p-5 rounded-2xl space-y-4"
+              >
+                <div className="flex items-center gap-2 text-xs font-black text-[#2A2723]">
+                  <span>➕ إضافة ملاحظة أو مهمة جديدة إلى القائمة</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+                  <input
+                    type="text"
+                    required
+                    placeholder="المهمة / الملاحظة (مثلاً: الساعة 5 يتم تسليم استضافات للمهمات)..."
+                    value={newTodoTitle}
+                    onChange={(e) => setNewTodoTitle(e.target.value)}
+                    className="md:col-span-7 bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-xs font-normal text-[#2A2723] outline-none focus:border-[#C1A68D] transition-all"
+                  />
+                  <input
+                    type="text"
+                    placeholder="ملاحظة إضافية (اختياري)..."
+                    value={newTodoNotes}
+                    onChange={(e) => setNewTodoNotes(e.target.value)}
+                    className="md:col-span-3 bg-white border border-[#EAE4D9] rounded-xl px-4 py-3 text-xs font-normal text-[#2A2723] outline-none focus:border-[#C1A68D] transition-all"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isSavingTodo}
+                    className="md:col-span-2 bg-[#2A2723] hover:bg-[#C1A68D] hover:text-[#2A2723] text-white font-black text-xs px-4 py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    <span>{isSavingTodo ? 'جاري الحفظ...' : '+ إضافة'}</span>
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* Todo List Table */}
+            <div className="overflow-x-auto rounded-2xl border border-[#EAE4D9]/80">
+              <table className="w-full text-right text-xs border-collapse">
+                <thead>
+                  <tr className="bg-[#2A2723] text-white font-black text-xs">
+                    <th className="p-4 w-12 text-center">#</th>
+                    <th className="p-4 w-28 text-center">تمت</th>
+                    <th className="p-4">الملاحظة / المهمة</th>
+                    <th className="p-4">ملاحظات إضافية</th>
+                    <th className="p-4 w-28 text-center">بواسطة</th>
+                    {canManageTodo && <th className="p-4 w-20 text-center">حذف</th>}
+                  </tr>
+                </thead>
+                <tbody className="bg-white">
+                  {todos.length === 0 ? (
+                    <tr>
+                      <td colSpan={canManageTodo ? 6 : 5} className="p-10 text-center text-gray-400 font-bold">
+                        لا توجد ملاحظات أو مهام قائمة حالياً
+                      </td>
+                    </tr>
+                  ) : (
+                    todos.map((item: any, idx: number) => (
+                      <tr
+                        key={item.id || idx}
+                        className={`border-t border-[#EAE4D9]/60 transition-colors ${
+                          item.completed ? 'bg-green-50/30 text-gray-400' : 'hover:bg-[#FDFBF7]'
+                        }`}
+                      >
+                        <td className="p-4 text-center font-bold text-[#7A7061]">{idx + 1}</td>
+                        <td className="p-4 text-center">
+                          <button
+                            type="button"
+                            disabled={!canManageTodo}
+                            onClick={async () => {
+                              const newStatus = !item.completed;
+                              setTodos((prev) =>
+                                prev.map((t) => (t.id === item.id ? { ...t, completed: newStatus } : t))
+                              );
+                              await updateDbTodoStatus(item.id, newStatus);
+                            }}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-bold text-xs transition-all ${
+                              item.completed
+                                ? 'bg-green-100 text-green-700 border border-green-300'
+                                : 'bg-amber-100 text-amber-800 border border-amber-300 hover:bg-green-100 hover:text-green-700'
+                            } ${!canManageTodo ? 'cursor-not-allowed opacity-75' : 'cursor-pointer active:scale-95'}`}
+                          >
+                            {item.completed ? (
+                              <>
+                                <CheckCircle2 size={14} className="text-green-600" />
+                                <span>تمت ✅</span>
+                              </>
+                            ) : (
+                              <>
+                                <span className="w-3.5 h-3.5 rounded border border-amber-600 bg-white inline-block"></span>
+                                <span>لم تتم ⏳</span>
+                              </>
+                            )}
+                          </button>
+                        </td>
+                        <td className="p-4">
+                          <span
+                            className={`text-sm font-normal ${
+                              item.completed ? 'line-through text-gray-400 font-normal' : 'text-[#2A2723] font-normal'
+                            }`}
+                          >
+                            {item.title}
+                          </span>
+                        </td>
+                        <td className="p-4 text-[#7A7061] font-normal text-xs">
+                          {item.notes || '—'}
+                        </td>
+                        <td className="p-4 text-center text-gray-500 font-medium text-xs">
+                          {item.created_by || 'Admin'}
+                        </td>
+                        {canManageTodo && (
+                          <td className="p-4 text-center">
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                if (!confirm('هل تريد حذف هذه الملاحظة؟')) return;
+                                setTodos((prev) => prev.filter((t) => t.id !== item.id));
+                                await deleteDbTodo(item.id);
+                              }}
+                              title="حذف الملاحظة"
+                              className="text-red-500 hover:text-red-700 transition-colors p-1.5 rounded-lg hover:bg-red-50"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </td>
+                        )}
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>

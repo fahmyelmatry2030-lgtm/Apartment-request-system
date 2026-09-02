@@ -1123,4 +1123,77 @@ export async function deleteDbTreasuryTransfer(id: string) {
   revalidatePath('/admin/dashboard/treasury');
 }
 
+// --- TO-DO LIST DB FUNCTIONS ---
+
+export async function getDbTodos() {
+  const supabase = getSupabaseServerClient();
+  if (!supabase) return [];
+
+  const { data, error } = await supabase
+    .from('todo_items')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    if (isTableMissingError(error)) {
+      console.warn('⚠️ Table todo_items does not exist in Supabase yet.');
+      return [];
+    }
+    console.error('Error fetching todo_items:', error);
+    return [];
+  }
+
+  return data || [];
+}
+
+export async function saveDbTodo(todo: { title: string; notes?: string; created_by?: string }) {
+  const supabase = getSupabaseServerClient();
+  if (!supabase) throw new Error('Supabase configuration missing on server');
+
+  const row = {
+    title: String(todo.title || '').trim(),
+    notes: String(todo.notes || '').trim(),
+    completed: false,
+    created_by: String(todo.created_by || 'Admin').trim(),
+  };
+
+  const { data, error } = await supabase.from('todo_items').insert([row]).select().single();
+  if (error) {
+    if (isTableMissingError(error)) {
+      console.warn('⚠️ Table todo_items missing in Supabase. Returning fallback object.');
+      return { id: `todo-${Date.now()}`, ...row, created_at: new Date().toISOString() };
+    }
+    throw new Error(error.message || 'فشل حفظ المهمة');
+  }
+
+  revalidatePath('/admin/dashboard');
+  return data;
+}
+
+export async function updateDbTodoStatus(id: string, completed: boolean) {
+  const supabase = getSupabaseServerClient();
+  if (!supabase) return;
+
+  const { error } = await supabase
+    .from('todo_items')
+    .update({ completed })
+    .eq('id', id);
+
+  if (error && !isTableMissingError(error)) {
+    console.error('Error updating todo status:', error);
+  }
+  revalidatePath('/admin/dashboard');
+}
+
+export async function deleteDbTodo(id: string) {
+  const supabase = getSupabaseServerClient();
+  if (!supabase) return;
+
+  const { error } = await supabase.from('todo_items').delete().eq('id', id);
+  if (error && !isTableMissingError(error)) {
+    console.error('Error deleting todo item:', error);
+  }
+  revalidatePath('/admin/dashboard');
+}
+
 
