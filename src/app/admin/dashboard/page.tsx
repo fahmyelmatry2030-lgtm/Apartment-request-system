@@ -1290,33 +1290,34 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
               </form>
             )}
 
-            {/* Todo List Table */}
+            {/* Todo List Table (Active / Pending Shift Tasks) */}
             <div className="overflow-x-auto rounded-2xl border border-[#EAE4D9]/80">
               <table className="w-full text-right text-xs border-collapse">
                 <thead>
                   <tr className="bg-[#2A2723] text-white font-black text-xs">
                     <th className="p-4 w-12 text-center">#</th>
                     <th className="p-4 w-36 text-center">حالة المهمة</th>
-                    <th className="p-4">الملاحظة / المهمة</th>
+                    <th className="p-4">الملاحظة / المهمة (نشطة)</th>
                     <th className="p-4">ملاحظات إضافية</th>
                     <th className="p-4 w-28 text-center">بواسطة</th>
                     {canManageTodo && <th className="p-4 w-20 text-center">حذف</th>}
                   </tr>
                 </thead>
                 <tbody className="bg-white">
-                  {todos.length === 0 ? (
+                  {todos.filter((t: any) => !t.completed).length === 0 ? (
                     <tr>
                       <td colSpan={canManageTodo ? 6 : 5} className="p-10 text-center text-gray-400 font-bold">
-                        لا توجد ملاحظات أو مهام قائمة حالياً
+                        <div className="space-y-2">
+                          <p className="text-sm font-black text-[#2A2723]">🎉 لا توجد مهام أو ملاحظات معلقة اليوم</p>
+                          <p className="text-xs text-gray-400">جميع المهام تم تنفيذها بنجاح ومُرَحَّلَة تلقائياً إلى <button type="button" onClick={() => router.push('/admin/dashboard/tasks')} className="text-emerald-600 underline font-black">صفحة المهام الكاملة</button></p>
+                        </div>
                       </td>
                     </tr>
                   ) : (
-                    todos.map((item: any, idx: number) => (
+                    todos.filter((t: any) => !t.completed).map((item: any, idx: number) => (
                       <tr
                         key={item.id || idx}
-                        className={`border-t border-[#EAE4D9]/60 transition-colors ${
-                          item.completed ? 'bg-emerald-50/20 text-gray-400' : 'hover:bg-[#FDFBF7]'
-                        }`}
+                        className="border-t border-[#EAE4D9]/60 transition-colors hover:bg-[#FDFBF7]"
                       >
                         <td className="p-4 text-center font-bold text-[#7A7061]">{idx + 1}</td>
                         <td className="p-4 text-center">
@@ -1351,11 +1352,7 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
                           </button>
                         </td>
                         <td className="p-4">
-                          <span
-                            className={`text-sm font-normal ${
-                              item.completed ? 'line-through text-gray-400 font-normal' : 'text-[#2A2723] font-normal'
-                            }`}
-                          >
+                          <span className="text-xs md:text-sm font-normal text-[#2A2723]">
                             {item.title}
                           </span>
                         </td>

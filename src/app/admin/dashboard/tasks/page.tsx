@@ -210,48 +210,6 @@ export default function TasksPage() {
 
       {error && <div className="bg-red-50 border border-red-200 text-red-600 rounded-2xl p-4 text-xs font-black">{error}</div>}
 
-      {/* Add New Task Section */}
-      {canManage && (
-        <section className="bg-white border border-[#EAE4D9] rounded-[2rem] p-6 md:p-8 shadow-sm">
-          <h2 className="text-base font-black text-[#2A2723] mb-4 flex items-center gap-2">
-            <span>➕ تسجيل مهمة أو ملاحظة جديدة</span>
-          </h2>
-          <form onSubmit={handleAddTodo} className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-            <div className="md:col-span-6 space-y-1.5">
-              <label className="text-[10px] font-black text-[#7A7061]">المهمة / الملاحظة</label>
-              <input
-                required
-                type="text"
-                placeholder="كتب المهمة بخط رفيع (مثلاً: الساعة 5 يتم تسليم استضافات للمهمات)..."
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                className="w-full border border-[#EAE4D9] rounded-xl px-4 py-3 text-xs font-normal text-[#2A2723] outline-none focus:border-[#C1A68D] transition-all"
-              />
-            </div>
-            <div className="md:col-span-4 space-y-1.5">
-              <label className="text-[10px] font-black text-[#7A7061]">ملاحظات إضافية (اختياري)</label>
-              <input
-                type="text"
-                placeholder="أضف أي تفاصيل إضافية هنا..."
-                value={form.notes}
-                onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                className="w-full border border-[#EAE4D9] rounded-xl px-4 py-3 text-xs font-normal text-[#2A2723] outline-none focus:border-[#C1A68D] transition-all"
-              />
-            </div>
-            <div className="md:col-span-2">
-              <button
-                type="submit"
-                disabled={isSaving}
-                className="w-full bg-[#2A2723] hover:bg-[#C1A68D] hover:text-[#2A2723] text-white rounded-xl px-4 py-3 font-black text-xs flex items-center justify-center gap-2 disabled:opacity-50 transition-all shadow-md h-[46px]"
-              >
-                <Plus size={16} />
-                <span>{isSaving ? 'جاري الحفظ...' : 'إضافة مهمة'}</span>
-              </button>
-            </div>
-          </form>
-        </section>
-      )}
-
       {/* Filters Bar */}
       <section className="bg-white p-4 rounded-2xl border border-[#EAE4D9] shadow-sm flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-2 flex-wrap">
