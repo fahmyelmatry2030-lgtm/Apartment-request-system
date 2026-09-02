@@ -1044,24 +1044,57 @@ export async function getDbTreasuryTransfers() {
     throw error;
   }
 
-  return data || [];
+  return (data || []).map((t: any) => {
+    let notes = t.notes || '';
+    let handedBy = t.handed_by || '';
+
+    if (!notes && handedBy.includes('[ملاحظة:')) {
+      const match = handedBy.match(/\[ملاحظة:\s*([^\]]+)\]/);
+      if (match) {
+        notes = match[1];
+        handedBy = handedBy.replace(/\[ملاحظة:\s*([^\]]+)\]/g, '').trim();
+      }
+    }
+
+    return {
+      ...t,
+      handed_by: handedBy,
+      notes,
+    };
+  });
 }
 
 export async function saveDbTreasuryTransfer(transfer: any) {
   const supabase = getSupabaseServerClient();
   if (!supabase) throw new Error('Supabase configuration missing on server');
 
-  const row = {
+  const row: any = {
     amount: Number(transfer.amount) || 0,
     handed_by: String(transfer.handed_by || '').trim(),
     received_by: String(transfer.received_by || '').trim(),
     transfer_date: transfer.transfer_date || new Date().toISOString().slice(0, 10),
+    notes: String(transfer.notes || '').trim(),
   };
 
   const { data, error } = await supabase.from('treasury_transfers').insert([row]).select().single();
   if (error) {
     if (isTableMissingError(error)) {
       throw new Error('جدول treasury_transfers غير موجود في Supabase. يرجى تطبيقه أولاً في قاعدة البيانات.');
+    }
+    if (error.code === '42703' || error.message?.includes('notes')) {
+      const fallbackRow = { ...row };
+      delete fallbackRow.notes;
+      if (transfer.notes) {
+        fallbackRow.handed_by = `[ملاحظة: ${transfer.notes}] ${fallbackRow.handed_by}`.trim();
+      }
+      const { data: retryData, error: retryError } = await supabase
+        .from('treasury_transfers')
+        .insert([fallbackRow])
+        .select()
+        .single();
+      if (retryError) throw retryError;
+      revalidatePath('/admin/dashboard/treasury');
+      return retryData;
     }
     throw error;
   }

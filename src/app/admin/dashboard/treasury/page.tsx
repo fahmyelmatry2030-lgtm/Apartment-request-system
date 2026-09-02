@@ -19,6 +19,7 @@ type TreasuryTransfer = {
   handed_by: string;
   received_by: string;
   transfer_date: string;
+  notes?: string;
 };
 
 const money = (value: number) => `${Math.round(value).toLocaleString('ar-EG')} ج.م`;
@@ -30,7 +31,7 @@ export default function TreasuryPage() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [expenses, setExpenses] = useState<any[]>([]);
   const [transfers, setTransfers] = useState<TreasuryTransfer[]>([]);
-  const [form, setForm] = useState({ amount: '', handedBy: '', receivedBy: '', date: today.toISOString().slice(0, 10) });
+  const [form, setForm] = useState({ amount: '', handedBy: '', receivedBy: '', date: today.toISOString().slice(0, 10), notes: '' });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
@@ -96,8 +97,9 @@ export default function TreasuryPage() {
         handed_by: form.handedBy,
         received_by: form.receivedBy,
         transfer_date: form.date,
+        notes: form.notes,
       });
-      setForm({ amount: '', handedBy: '', receivedBy: '', date: form.date });
+      setForm({ amount: '', handedBy: '', receivedBy: '', date: form.date, notes: '' });
       await loadData();
     } catch (saveError) {
       console.error(saveError);
@@ -157,12 +159,13 @@ export default function TreasuryPage() {
 
       <section className="bg-white border border-[#EAE4D9] rounded-[2rem] p-6 md:p-8 shadow-sm">
         <h2 className="text-lg font-black text-[#2A2723] mb-6">إضافة مبلغ من الخزنة الفرعية إلى الرئيسية</h2>
-        <form onSubmit={submitTransfer} className="grid md:grid-cols-5 gap-3 items-end">
+        <form onSubmit={submitTransfer} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-3 items-end">
           <label className="text-[10px] font-black text-[#7A7061]">المبلغ<input required type="number" min="1" value={form.amount} onChange={(event) => setForm({ ...form, amount: event.target.value })} className="mt-2 w-full border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-black" /></label>
           <label className="text-[10px] font-black text-[#7A7061]">مسلم<input required value={form.handedBy} onChange={(event) => setForm({ ...form, handedBy: event.target.value })} className="mt-2 w-full border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-black" /></label>
           <label className="text-[10px] font-black text-[#7A7061]">مستلم<input required value={form.receivedBy} onChange={(event) => setForm({ ...form, receivedBy: event.target.value })} className="mt-2 w-full border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-black" /></label>
+          <label className="text-[10px] font-black text-[#7A7061]">ملاحظة<input placeholder="أضف ملاحظة..." value={form.notes} onChange={(event) => setForm({ ...form, notes: event.target.value })} className="mt-2 w-full border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-black" /></label>
           <label className="text-[10px] font-black text-[#7A7061]">التاريخ<input required type="date" value={form.date} onChange={(event) => setForm({ ...form, date: event.target.value })} className="mt-2 w-full border border-[#EAE4D9] rounded-xl px-4 py-3 text-sm font-black" /></label>
-          <button disabled={isSaving} className="bg-[#2A2723] text-white rounded-xl px-4 py-3 font-black text-xs flex items-center justify-center gap-2 disabled:opacity-50"><Plus size={16} /> {isSaving ? 'جاري الحفظ' : 'إضافة'}</button>
+          <button disabled={isSaving} className="bg-[#2A2723] text-white rounded-xl px-4 py-3 font-black text-xs flex items-center justify-center gap-2 disabled:opacity-50 h-[46px]"><Plus size={16} /> {isSaving ? 'جاري الحفظ' : 'إضافة'}</button>
         </form>
       </section>
 
@@ -173,8 +176,36 @@ export default function TreasuryPage() {
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-right text-xs">
-            <thead className="bg-[#FDFBF7] text-[#7A7061] font-black"><tr><th className="p-5">المبلغ</th><th className="p-5">مسلم</th><th className="p-5">مستلم</th><th className="p-5">التاريخ</th><th className="p-5">حذف</th></tr></thead>
-            <tbody>{monthlyTransfers.length === 0 ? <tr><td colSpan={5} className="p-12 text-center text-[#7A7061] font-bold">لا توجد تحويلات لهذا الشهر</td></tr> : monthlyTransfers.map((transfer) => <tr key={transfer.id} className="border-t border-[#EAE4D9]/60 font-bold"><td className="p-5 text-[#C1A68D] font-black">{money(Number(transfer.amount))}</td><td className="p-5">{transfer.handed_by}</td><td className="p-5">{transfer.received_by}</td><td className="p-5">{transfer.transfer_date}</td><td className="p-5"><button onClick={() => removeTransfer(transfer.id)} title="حذف الحركة" className="text-red-500"><Trash2 size={17} /></button></td></tr>)}</tbody>
+            <thead className="bg-[#FDFBF7] text-[#7A7061] font-black">
+              <tr>
+                <th className="p-5">المبلغ</th>
+                <th className="p-5">مسلم</th>
+                <th className="p-5">مستلم</th>
+                <th className="p-5">ملاحظة</th>
+                <th className="p-5">التاريخ</th>
+                <th className="p-5">حذف</th>
+              </tr>
+            </thead>
+            <tbody>
+              {monthlyTransfers.length === 0 ? (
+                <tr><td colSpan={6} className="p-12 text-center text-[#7A7061] font-bold">لا توجد تحويلات لهذا الشهر</td></tr>
+              ) : (
+                monthlyTransfers.map((transfer) => (
+                  <tr key={transfer.id} className="border-t border-[#EAE4D9]/60 font-bold">
+                    <td className="p-5 text-[#C1A68D] font-black">{money(Number(transfer.amount))}</td>
+                    <td className="p-5">{transfer.handed_by}</td>
+                    <td className="p-5">{transfer.received_by}</td>
+                    <td className="p-5 text-[#7A7061]">{transfer.notes || '—'}</td>
+                    <td className="p-5">{transfer.transfer_date}</td>
+                    <td className="p-5">
+                      <button onClick={() => removeTransfer(transfer.id)} title="حذف الحركة" className="text-red-500">
+                        <Trash2 size={17} />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
           </table>
         </div>
       </section>
