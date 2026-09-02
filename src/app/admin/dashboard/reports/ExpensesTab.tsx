@@ -461,6 +461,28 @@ export default function ExpensesTab() {
               <label className="text-[10px] font-black text-mazar-coffee uppercase tracking-widest opacity-40 group-focus-within:opacity-100 transition-opacity">السبب / البيان (Reason)</label>
               <input required placeholder="مثلاً: إعلانات فيسبوك، شراء أدوات نظافة..." value={newExpense.description} onChange={e => setNewExpense({...newExpense, description: e.target.value})} className="w-full bg-transparent border-b-2 border-gray-100 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all placeholder:text-gray-300" />
             </div>
+            
+            {/* حالة الاعتماد */}
+            <div className="space-y-3 group">
+              <label className="text-[10px] font-black text-green-700 uppercase tracking-widest opacity-70 group-focus-within:opacity-100 transition-opacity">حالة الاعتماد (Approval Status)</label>
+              <select
+                value={newExpense.status}
+                onChange={e => {
+                  const val = e.target.value;
+                  const approver = val.includes('مؤمن') ? 'مؤمن' : val.includes('مدحت') ? 'مدحت' : (currentUserName || 'Owner');
+                  setNewExpense({ ...newExpense, status: val, approved_by: val === 'PENDING' ? '' : approver });
+                }}
+                className="w-full bg-transparent border-b-2 border-green-200 px-0 py-4 text-sm font-bold text-green-800 outline-none focus:border-mazar-gold transition-all cursor-pointer"
+              >
+                <option value="PENDING">⏳ غير معتمد (قيد الانتظار)</option>
+                <option value={`تم الموافقة بواسطة: ${currentUserName || 'مؤمن'}`}>✅ تم الموافقة بواسطة: {currentUserName || 'مؤمن'}</option>
+                <option value="تم الموافقة بواسطة: مؤمن">✅ تم الموافقة بواسطة: مؤمن</option>
+                <option value="تم الموافقة بواسطة: مدحت">✅ تم الموافقة بواسطة: مدحت</option>
+                <option value="تم الموافقة بواسطة: Owner">✅ تم الموافقة بواسطة: Owner</option>
+              </select>
+            </div>
+
+            {/* ملاحظات */}
             <div className="space-y-3 lg:col-span-4 group">
               <label className="text-[10px] font-black text-amber-700 uppercase tracking-widest opacity-70 group-focus-within:opacity-100 transition-opacity">ملاحظات إضافية (Notes)</label>
               <input placeholder="أضف أي ملاحظات إضافية هنا..." value={newExpense.notes} onChange={e => setNewExpense({...newExpense, notes: e.target.value})} className="w-full bg-transparent border-b-2 border-amber-200 px-0 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all placeholder:text-gray-300" />
@@ -470,7 +492,7 @@ export default function ExpensesTab() {
           <button type="submit" disabled={saving} className={`w-full font-black py-6 rounded-2xl transition-all shadow-2xl active:scale-95 uppercase tracking-[0.3em] text-xs ${saving ? 'bg-gray-400 text-white cursor-wait' : saveSuccess ? 'bg-green-600 text-white' : 'bg-mazar-coffee text-white hover:bg-mazar-gold hover:text-mazar-coffee'}`}>
             {saving ? (
               <span className="flex items-center justify-center gap-3"><span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>جاري الحفظ...</span>
-            ) : saveSuccess ? '✅ تم تسجيل المصروف بنجاح (بانتظار الاعتماد)' : 'إدراج المصروف وتسجيله بنجاح'}
+            ) : saveSuccess ? '✅ تم تسجيل المصروف بنجاح' : 'إدراج المصروف وتسجيله بنجاح'}
           </button>
         </form>
       </div>
@@ -568,6 +590,36 @@ export default function ExpensesTab() {
                 <div className="space-y-2"><label className="text-[9px] font-black text-mazar-coffee uppercase tracking-widest opacity-60">إلى</label><input value={editingExpense.to_entity} onChange={e => setEditingExpense({...editingExpense, to_entity: e.target.value})} className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all" /></div>
                 <div className="space-y-2"><label className="text-[9px] font-black text-mazar-coffee uppercase tracking-widest opacity-60">الفرع / القسم</label><select disabled={isAkoura} value={editingExpense.branch} onChange={e => setEditingExpense({...editingExpense, branch: e.target.value})} className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all"><option value="12">مزار 1 و 2</option><option value="3">مزار 3</option><option value="4">شقة 1</option><option value="5">شقة 2</option><option value="6">شقة 3</option></select></div>
                 <div className="space-y-2"><label className="text-[9px] font-black text-mazar-coffee uppercase tracking-widest opacity-60">السبب / البيان</label><input required value={editingExpense.description} onChange={e => setEditingExpense({...editingExpense, description: e.target.value})} className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all" /></div>
+
+                {/* حالة الاعتماد */}
+                <div className="space-y-2">
+                  <label className="text-[9px] font-black text-green-700 uppercase tracking-widest opacity-80">حالة الاعتماد (Approval)</label>
+                  <select
+                    value={
+                      isExpenseApproved(editingExpense)
+                        ? (editingExpense.status && editingExpense.status.includes('تم الموافقة')
+                            ? editingExpense.status
+                            : `تم الموافقة بواسطة: ${editingExpense.approved_by || currentUserName || 'الأونر'}`)
+                        : 'PENDING'
+                    }
+                    onChange={e => {
+                      const val = e.target.value;
+                      if (val === 'PENDING') {
+                        setEditingExpense({ ...editingExpense, status: 'PENDING', approved_by: '' });
+                      } else {
+                        const approver = val.includes('مؤمن') ? 'مؤمن' : val.includes('مدحت') ? 'مدحت' : (currentUserName || 'Owner');
+                        setEditingExpense({ ...editingExpense, status: val, approved_by: approver });
+                      }
+                    }}
+                    className="w-full bg-green-50 border border-green-200 rounded-2xl px-6 py-4 text-sm font-bold text-green-900 outline-none focus:border-green-500 transition-all cursor-pointer"
+                  >
+                    <option value="PENDING">⏳ غير معتمد (قيد الانتظار)</option>
+                    <option value="تم الموافقة بواسطة: مؤمن">✅ تم الموافقة بواسطة: مؤمن</option>
+                    <option value="تم الموافقة بواسطة: مدحت">✅ تم الموافقة بواسطة: مدحت</option>
+                    <option value="تم الموافقة بواسطة: Owner">✅ تم الموافقة بواسطة: Owner</option>
+                  </select>
+                </div>
+
                 <div className="space-y-2"><label className="text-[9px] font-black text-amber-700 uppercase tracking-widest opacity-70">ملاحظات</label><input value={editingExpense.notes || ''} onChange={e => setEditingExpense({...editingExpense, notes: e.target.value})} className="w-full bg-gray-50 border border-amber-200 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-mazar-gold transition-all" /></div>
               </div>
               <div className="flex gap-4 pt-4">
