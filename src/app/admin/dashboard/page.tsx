@@ -56,6 +56,7 @@ export default function DashboardOverview() {
   const [hasSearchedSmart, setHasSearchedSmart] = useState(false);
   const [conflictDays, setConflictDays] = useState<string[]>([]);
   const [isPendingRequestsExpanded, setIsPendingRequestsExpanded] = useState(false);
+  const [isDailyScheduleExpanded, setIsDailyScheduleExpanded] = useState(false);
 
   // Customer Profile Modal State
   const [profileModal, setProfileModal] = useState<{ isOpen: boolean; name: string | null; phone?: string | null }>({
@@ -1019,143 +1020,161 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
 
       {/* ── SECTION 3: FULL-WIDTH DAILY OPERATIONS SCHEDULE (قسم 3: جدول خطة الدخول والخروج اليومية - لون زمردي فاخر) ── */}
       <div className="bg-gradient-to-br from-[#042018] via-[#021812] to-[#042018] p-6 md:p-8 rounded-[2.5rem] shadow-[0_0_25px_rgba(16,185,129,0.18)] border-2 border-emerald-500/70 hover:border-emerald-400 text-white relative overflow-hidden space-y-6 transition-all">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-emerald-500/20 pb-5">
+        <div
+          onClick={() => setIsDailyScheduleExpanded(!isDailyScheduleExpanded)}
+          className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-emerald-500/20 pb-5 cursor-pointer group/accordion"
+        >
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-950/90 border border-emerald-400/50 flex items-center justify-center text-emerald-300 shadow-inner">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-950/90 border border-emerald-400/50 flex items-center justify-center text-emerald-300 shadow-inner group-hover/accordion:scale-105 transition-transform">
               <Calendar size={22} />
             </div>
             <div>
-              <h3 className="text-xl font-black text-emerald-200">جدول وخطة حركة الدخول والخروج اليومية</h3>
-              <p className="text-xs text-gray-400 font-bold">التفاصيل الكاملة لعملاء اليوم وغداً اضغط على اسم العميل لعرض السجل الكامل</p>
+              <div className="flex items-center gap-3 flex-wrap">
+                <h3 className="text-xl font-black text-emerald-200 group-hover/accordion:text-emerald-300 transition-colors">
+                  جدول وخطة حركة الدخول والخروج اليومية
+                </h3>
+                <span className="text-xs text-gray-300 font-bold bg-white/10 px-3 py-1 rounded-full border border-white/10">
+                  {isDailyScheduleExpanded ? 'انقر للطي' : 'انقر لعرض الجدول'}
+                </span>
+              </div>
+              <p className="text-xs text-gray-400 font-bold mt-0.5">التفاصيل الكاملة لعملاء اليوم وغداً اضغط على اسم العميل لعرض السجل الكامل</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3.5 py-1.5 rounded-full text-xs font-black">
-              🛬 وصول اليوم: {todaySchedule.in.length}
-            </span>
-            <span className="bg-rose-500/20 text-rose-400 border border-rose-500/30 px-3.5 py-1.5 rounded-full text-xs font-black">
-              🛫 مغادرة اليوم: {todaySchedule.out.length}
-            </span>
+          <div className="flex items-center gap-3 self-end md:self-auto">
+            <div className="flex items-center gap-2">
+              <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3.5 py-1.5 rounded-full text-xs font-black">
+                🛬 وصول اليوم: {todaySchedule.in.length}
+              </span>
+              <span className="bg-rose-500/20 text-rose-400 border border-rose-500/30 px-3.5 py-1.5 rounded-full text-xs font-black">
+                🛫 مغادرة اليوم: {todaySchedule.out.length}
+              </span>
+            </div>
+
+            <div className="w-10 h-10 rounded-xl bg-white/10 group-hover/accordion:bg-emerald-500 group-hover/accordion:text-black text-white flex items-center justify-center transition-all duration-300 shadow-md">
+              {isDailyScheduleExpanded ? <ChevronUp size={22} /> : <ChevronDown size={22} />}
+            </div>
           </div>
         </div>
 
-        {/* Detailed Operations Grid */}
-        <div className="grid lg:grid-cols-2 gap-6">
+        {/* Detailed Operations Grid (Collapsible) */}
+        {isDailyScheduleExpanded && (
+          <div className="animate-fade-in grid lg:grid-cols-2 gap-6">
 
-          {/* CHECK-INS TODAY */}
-          <div className="bg-[#2A2723] rounded-2xl p-5 border border-emerald-500/30 space-y-4">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <span className="font-black text-sm text-emerald-400 flex items-center gap-2">
-                🛬 حركات وصول اليوم ({todaySchedule.in.length})
-              </span>
-              <span className="text-[10px] text-gray-400 font-bold">سياسة الدخول: 02:00 ظهراً</span>
-            </div>
+            {/* CHECK-INS TODAY */}
+            <div className="bg-[#2A2723] rounded-2xl p-5 border border-emerald-500/30 space-y-4">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <span className="font-black text-sm text-emerald-400 flex items-center gap-2">
+                  🛬 حركات وصول اليوم ({todaySchedule.in.length})
+                </span>
+                <span className="text-[10px] text-gray-400 font-bold">سياسة الدخول: 02:00 ظهراً</span>
+              </div>
 
-            {todaySchedule.in.length === 0 ? (
-              <p className="text-xs text-gray-500 text-center py-6 font-bold">لا يوجد حالات وصول مسجلة لليوم</p>
-            ) : (
-              <div className="space-y-3 max-h-72 overflow-y-auto custom-scrollbar-horizontal pr-1">
-                {todaySchedule.in.map((b: any, i: number) => {
-                  const cleanP = formatWhatsAppNumber(b.phone);
-                  return (
-                    <div key={`in-${i}`} className="bg-[#1F1C18] p-4 rounded-xl border border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:border-emerald-500/40 transition-all">
-                      <div className="space-y-1">
-                        <button
-                          onClick={() => openCustomerProfile(b.name, b.phone)}
-                          className="text-base font-black text-white hover:text-[#C1A68D] transition-colors text-right flex items-center gap-1.5"
-                        >
-                          <User size={16} className="text-[#C1A68D]" />
-                          <span>{b.name}</span>
-                        </button>
-                        <div className="flex items-center gap-3 text-xs text-gray-300 font-bold flex-wrap">
-                          <span>🏠 الوحدة: <strong className="text-amber-400">{b.studio || b.apartmentId}</strong></span>
-                          <span>📅 الفترة: <strong className="text-blue-300">{b.checkIn} ← {b.checkOut}</strong></span>
+              {todaySchedule.in.length === 0 ? (
+                <p className="text-xs text-gray-500 text-center py-6 font-bold">لا يوجد حالات وصول مسجلة لليوم</p>
+              ) : (
+                <div className="space-y-3 max-h-72 overflow-y-auto custom-scrollbar-horizontal pr-1">
+                  {todaySchedule.in.map((b: any, i: number) => {
+                    const cleanP = formatWhatsAppNumber(b.phone);
+                    return (
+                      <div key={`in-${i}`} className="bg-[#1F1C18] p-4 rounded-xl border border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:border-emerald-500/40 transition-all">
+                        <div className="space-y-1">
+                          <button
+                            onClick={() => openCustomerProfile(b.name, b.phone)}
+                            className="text-base font-black text-white hover:text-[#C1A68D] transition-colors text-right flex items-center gap-1.5"
+                          >
+                            <User size={16} className="text-[#C1A68D]" />
+                            <span>{b.name}</span>
+                          </button>
+                          <div className="flex items-center gap-3 text-xs text-gray-300 font-bold flex-wrap">
+                            <span>🏠 الوحدة: <strong className="text-amber-400">{b.studio || b.apartmentId}</strong></span>
+                            <span>📅 الفترة: <strong className="text-blue-300">{b.checkIn} ← {b.checkOut}</strong></span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0">
+                          {b.totalAmount && (
+                            <span className="bg-emerald-500/20 text-emerald-300 font-black text-xs px-3 py-1.5 rounded-xl border border-emerald-500/30">
+                              {b.totalAmount} ج.م
+                            </span>
+                          )}
+                          {b.phone && (
+                            <a
+                              href={`https://wa.me/${cleanP}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="bg-emerald-600 hover:bg-emerald-500 text-white p-2 rounded-xl text-xs font-black flex items-center justify-center shadow"
+                              title="تواصل واتساب"
+                            >
+                              <MessageSquare size={14} />
+                            </a>
+                          )}
                         </div>
                       </div>
-
-                      <div className="flex items-center gap-2 shrink-0">
-                        {b.totalAmount && (
-                          <span className="bg-emerald-500/20 text-emerald-300 font-black text-xs px-3 py-1.5 rounded-xl border border-emerald-500/30">
-                            {b.totalAmount} ج.م
-                          </span>
-                        )}
-                        {b.phone && (
-                          <a
-                            href={`https://wa.me/${cleanP}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="bg-emerald-600 hover:bg-emerald-500 text-white p-2 rounded-xl text-xs font-black flex items-center justify-center shadow"
-                            title="تواصل واتساب"
-                          >
-                            <MessageSquare size={14} />
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* CHECK-OUTS TODAY */}
-          <div className="bg-[#2A2723] rounded-2xl p-5 border border-rose-500/30 space-y-4">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <span className="font-black text-sm text-rose-400 flex items-center gap-2">
-                🛫 حركات مغادرة اليوم ({todaySchedule.out.length})
-              </span>
-              <span className="text-[10px] text-gray-400 font-bold">سياسة المغادرة: 12:00 ظهراً</span>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
-            {todaySchedule.out.length === 0 ? (
-              <p className="text-xs text-gray-500 text-center py-6 font-bold">لا يوجد حالات مغادرة مسجلة لليوم</p>
-            ) : (
-              <div className="space-y-3 max-h-72 overflow-y-auto custom-scrollbar-horizontal pr-1">
-                {todaySchedule.out.map((b: any, i: number) => {
-                  const cleanP = formatWhatsAppNumber(b.phone);
-                  return (
-                    <div key={`out-${i}`} className="bg-[#1F1C18] p-4 rounded-xl border border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:border-rose-500/40 transition-all">
-                      <div className="space-y-1">
-                        <button
-                          onClick={() => openCustomerProfile(b.name, b.phone)}
-                          className="text-base font-black text-white hover:text-[#C1A68D] transition-colors text-right flex items-center gap-1.5"
-                        >
-                          <User size={16} className="text-[#C1A68D]" />
-                          <span>{b.name}</span>
-                        </button>
-                        <div className="flex items-center gap-3 text-xs text-gray-300 font-bold flex-wrap">
-                          <span>🏠 الوحدة: <strong className="text-amber-400">{b.studio || b.apartmentId}</strong></span>
-                          <span>📅 خروج: <strong className="text-rose-300">{b.checkOut}</strong></span>
+            {/* CHECK-OUTS TODAY */}
+            <div className="bg-[#2A2723] rounded-2xl p-5 border border-rose-500/30 space-y-4">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <span className="font-black text-sm text-rose-400 flex items-center gap-2">
+                  🛫 حركات مغادرة اليوم ({todaySchedule.out.length})
+                </span>
+                <span className="text-[10px] text-gray-400 font-bold">سياسة المغادرة: 12:00 ظهراً</span>
+              </div>
+
+              {todaySchedule.out.length === 0 ? (
+                <p className="text-xs text-gray-500 text-center py-6 font-bold">لا يوجد حالات مغادرة مسجلة لليوم</p>
+              ) : (
+                <div className="space-y-3 max-h-72 overflow-y-auto custom-scrollbar-horizontal pr-1">
+                  {todaySchedule.out.map((b: any, i: number) => {
+                    const cleanP = formatWhatsAppNumber(b.phone);
+                    return (
+                      <div key={`out-${i}`} className="bg-[#1F1C18] p-4 rounded-xl border border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:border-rose-500/40 transition-all">
+                        <div className="space-y-1">
+                          <button
+                            onClick={() => openCustomerProfile(b.name, b.phone)}
+                            className="text-base font-black text-white hover:text-[#C1A68D] transition-colors text-right flex items-center gap-1.5"
+                          >
+                            <User size={16} className="text-[#C1A68D]" />
+                            <span>{b.name}</span>
+                          </button>
+                          <div className="flex items-center gap-3 text-xs text-gray-300 font-bold flex-wrap">
+                            <span>🏠 الوحدة: <strong className="text-amber-400">{b.studio || b.apartmentId}</strong></span>
+                            <span>📅 خروج: <strong className="text-rose-300">{b.checkOut}</strong></span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0">
+                          {b.totalAmount && (
+                            <span className="bg-rose-500/20 text-rose-300 font-black text-xs px-3 py-1.5 rounded-xl border border-rose-500/30">
+                              {b.totalAmount} ج.م
+                            </span>
+                          )}
+                          {b.phone && (
+                            <a
+                              href={`https://wa.me/${cleanP}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="bg-emerald-600 hover:bg-emerald-500 text-white p-2 rounded-xl text-xs font-black flex items-center justify-center shadow"
+                              title="تواصل واتساب"
+                            >
+                              <MessageSquare size={14} />
+                            </a>
+                          )}
                         </div>
                       </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
 
-                      <div className="flex items-center gap-2 shrink-0">
-                        {b.totalAmount && (
-                          <span className="bg-rose-500/20 text-rose-300 font-black text-xs px-3 py-1.5 rounded-xl border border-rose-500/30">
-                            {b.totalAmount} ج.م
-                          </span>
-                        )}
-                        {b.phone && (
-                          <a
-                            href={`https://wa.me/${cleanP}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="bg-emerald-600 hover:bg-emerald-500 text-white p-2 rounded-xl text-xs font-black flex items-center justify-center shadow"
-                            title="تواصل واتساب"
-                          >
-                            <MessageSquare size={14} />
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
           </div>
-
-        </div>
+        )}
       </div>
 
       {/* ── UNIT INVENTORY TABLE & QUICK FILTERS ── */}
