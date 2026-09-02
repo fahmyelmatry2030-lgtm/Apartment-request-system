@@ -296,12 +296,20 @@ export default function ExpensesTab() {
   };
 
   const handleEdit = (expense: any) => {
+    if (!isOwner) {
+      alert('عفواً، صلاحية التعديل متاحة فقط لحسابات الأونر (مؤمن ومدحت)');
+      return;
+    }
     setEditingExpense({ ...expense });
     setIsEditModalOpen(true);
   };
 
   const handleSaveEdit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isOwner) {
+      alert('عفواً، صلاحية التعديل متاحة فقط لحسابات الأونر (مؤمن ومدحت)');
+      return;
+    }
     try {
       await updateDbExpense(editingExpense.id, {
         amount: parseFloat(editingExpense.amount),
@@ -312,6 +320,8 @@ export default function ExpensesTab() {
         ordered_by: editingExpense.ordered_by,
         invoice_number: editingExpense.invoice_number,
         notes: editingExpense.notes,
+        status: editingExpense.status || 'PENDING',
+        approved_by: editingExpense.approved_by || '',
         branch: parseInt(editingExpense.branch) || 12,
       });
       setIsEditModalOpen(false);
@@ -323,6 +333,10 @@ export default function ExpensesTab() {
   };
 
   const handleDelete = async (id: string) => {
+    if (!isOwner) {
+      alert('عفواً، صلاحية الحذف متاحة فقط لحسابات الأونر (مؤمن ومدحت)');
+      return;
+    }
     if (!confirm('هل أنت متأكد من الحذف؟')) return;
     try {
       await deleteDbExpense(id);
@@ -563,10 +577,14 @@ export default function ExpensesTab() {
                         )}
                       </td>
                       <td className="px-4 py-5 border border-[#EAE4D9]/40">
-                        <div className="flex gap-2 justify-center opacity-0 group-hover:opacity-100 transition-all">
-                          <button onClick={() => handleEdit(exp)} className="w-9 h-9 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-all shadow-sm"><Pencil size={15} strokeWidth={2.5} /></button>
-                          <button onClick={() => handleDelete(exp.id)} className="w-9 h-9 rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm"><Trash2 size={15} strokeWidth={2.5} /></button>
-                        </div>
+                        {isOwner ? (
+                          <div className="flex gap-2 justify-center opacity-0 group-hover:opacity-100 transition-all">
+                            <button onClick={() => handleEdit(exp)} title="تعديل المصروف (للأونر)" className="w-9 h-9 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-all shadow-sm"><Pencil size={15} strokeWidth={2.5} /></button>
+                            <button onClick={() => handleDelete(exp.id)} title="حذف المصروف (للأونر)" className="w-9 h-9 rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm"><Trash2 size={15} strokeWidth={2.5} /></button>
+                          </div>
+                        ) : (
+                          <span className="text-[10px] text-gray-400 font-bold">🔒 للأونر فقط</span>
+                        )}
                       </td>
                     </tr>
                   );
