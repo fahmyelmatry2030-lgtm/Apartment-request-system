@@ -2,14 +2,12 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { getDbStaff, saveDbStaff, deleteDbStaff, getDbSalaries, saveDbSalary, deleteDbSalary } from '@/lib/actions/db';
-import FinancialLockModal from '@/components/FinancialLockModal';
 import { User, Phone, FileText, Calendar, Plus, Trash2, Edit, CreditCard, ShieldCheck, FileSpreadsheet, X, DollarSign, Wallet } from 'lucide-react';
 
 export default function SalariesManagement() {
   const [staff, setStaff] = useState<any[]>([]);
   const [salaries, setSalaries] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isUnlocked, setIsUnlocked] = useState(false);
   
   // Modals
   const [showStaffModal, setShowStaffModal] = useState(false);
@@ -98,14 +96,6 @@ export default function SalariesManagement() {
     if (selectedDossierStaff?.id === id) setSelectedDossierStaff(null);
     loadData();
   };
-
-  if (!isUnlocked) {
-    return (
-      <div className="flex items-center justify-center min-h-[65vh]">
-        <FinancialLockModal isOpen={true} onUnlock={() => setIsUnlocked(true)} />
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-10 animate-fade-in" dir="rtl">
