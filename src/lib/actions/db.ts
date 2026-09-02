@@ -701,7 +701,52 @@ export async function getDbStaff() {
     console.error('Error reading staff:', error);
     return [];
   }
-  return data || [];
+
+  return (data || []).map((s: any) => {
+    let position = s.position || '';
+    let housing = s.housing_allowance || 0;
+    let transport = s.transport_allowance || 0;
+    let otherAllowances = s.other_allowances || 0;
+    let nationalId = s.national_id || '';
+    let notes = s.notes || '';
+
+    if (position.includes('[بدلات:')) {
+      const match = position.match(/\[بدلات:\s*([^\]]+)\]/);
+      if (match) {
+        const parts = match[1].split('|');
+        housing = Number(parts[0]) || 0;
+        transport = Number(parts[1]) || 0;
+        otherAllowances = Number(parts[2]) || 0;
+        position = position.replace(/\[بدلات:\s*([^\]]+)\]/g, '').trim();
+      }
+    }
+
+    if (position.includes('[قومي:')) {
+      const match = position.match(/\[قومي:\s*([^\]]+)\]/);
+      if (match) {
+        nationalId = match[1];
+        position = position.replace(/\[قومي:\s*([^\]]+)\]/g, '').trim();
+      }
+    }
+
+    if (position.includes('[ملاحظات:')) {
+      const match = position.match(/\[ملاحظات:\s*([^\]]+)\]/);
+      if (match) {
+        notes = match[1];
+        position = position.replace(/\[ملاحظات:\s*([^\]]+)\]/g, '').trim();
+      }
+    }
+
+    return {
+      ...s,
+      position,
+      housing_allowance: housing,
+      transport_allowance: transport,
+      other_allowances: otherAllowances,
+      national_id: nationalId,
+      notes,
+    };
+  });
 }
 
 export async function saveDbStaff(staff: any) {
@@ -709,7 +754,40 @@ export async function saveDbStaff(staff: any) {
   if (!supabase) return staff;
 
   const { error } = await supabase.from('staff').upsert(staff);
-  if (error) throw error;
+  if (error) {
+    if (error.code === '42703' || error.message?.includes('column') || error.message?.includes('schema')) {
+      const fallbackStaff = { ...staff };
+      let metaTags = [];
+
+      if (staff.housing_allowance || staff.transport_allowance || staff.other_allowances) {
+        metaTags.push(`[بدلات: ${staff.housing_allowance || 0}|${staff.transport_allowance || 0}|${staff.other_allowances || 0}]`);
+        delete fallbackStaff.housing_allowance;
+        delete fallbackStaff.transport_allowance;
+        delete fallbackStaff.other_allowances;
+      }
+
+      if (staff.national_id) {
+        metaTags.push(`[قومي: ${staff.national_id}]`);
+        delete fallbackStaff.national_id;
+      }
+
+      if (staff.notes) {
+        metaTags.push(`[ملاحظات: ${staff.notes}]`);
+        delete fallbackStaff.notes;
+      }
+
+      if (metaTags.length > 0) {
+        fallbackStaff.position = `${metaTags.join(' ')} ${staff.position || ''}`.trim();
+      }
+
+      const { error: retryError } = await supabase.from('staff').upsert(fallbackStaff);
+      if (retryError) throw retryError;
+      revalidatePath('/admin/dashboard/hr/salaries');
+      return fallbackStaff;
+    }
+    throw error;
+  }
+  revalidatePath('/admin/dashboard/hr/salaries');
   return staff;
 }
 
@@ -719,6 +797,7 @@ export async function deleteDbStaff(id: string) {
 
   const { error } = await supabase.from('staff').delete().eq('id', id);
   if (error) throw error;
+  revalidatePath('/admin/dashboard/hr/salaries');
 }
 
 // --- HR: SALARIES ---
