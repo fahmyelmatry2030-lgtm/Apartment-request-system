@@ -505,6 +505,8 @@ export async function verifyAdminAuth(username: string, pass: string) {
 
     const fixedAdmins: Record<string, { username: string; name: string; role: string; password: string }> = {
       owner: { username: 'Owner', name: 'Owner', role: 'Owner', password: 'Owner50' },
+      mo2men: { username: 'Mo2men', name: 'مؤمن', role: 'Owner', password: 'Mo2men50' },
+      medhat: { username: 'Medhat', name: 'مدحت', role: 'Owner', password: 'Medhat55' },
       admin: { username: 'Admin', name: 'Admin', role: 'Admin', password: 'Admin220' },
       moderator: { username: 'Moderator', name: 'Moderator', role: 'Moderator', password: 'Moderator90' },
       mohsen: { username: 'Mohsen', name: 'Mohsen', role: 'Mohsen', password: 'Mohsen 55' },

@@ -87,8 +87,16 @@ export default function FinancialSummaryTab({
         return true;
       });
 
+      const isApprovedExpense = (e: any) => {
+        if (!e) return false;
+        if (e.status && (e.status.includes('تم الموافقة') || e.status === 'APPROVED')) return true;
+        if (e.approved_by && e.approved_by !== '') return true;
+        if (e.status === undefined || e.status === null || e.status === '') return true;
+        return false;
+      };
+
       const rev = mBookings.reduce((acc, b) => acc + (parseFloat(b.totalAmount || 0) - parseFloat(b.commission || 0)), 0);
-      const exp = mExpenses.reduce((acc, e) => acc + parseFloat(e.amount || 0), 0);
+      const exp = mExpenses.reduce((acc, e) => isApprovedExpense(e) ? acc + parseFloat(e.amount || 0) : acc, 0);
       const profit = rev - exp;
 
       result.push({
@@ -176,7 +184,10 @@ export default function FinancialSummaryTab({
       0
     );
 
-    const expensesAmount = entityExpensesList.reduce((acc, e) => acc + parseFloat(e.amount || 0), 0);
+    const expensesAmount = entityExpensesList.reduce((acc, e) => {
+      const isApproved = !e.status || e.status.includes('تم الموافقة') || e.status === 'APPROVED' || (e.approved_by && e.approved_by !== '');
+      return isApproved ? acc + parseFloat(e.amount || 0) : acc;
+    }, 0);
 
     return {
       revenue,
