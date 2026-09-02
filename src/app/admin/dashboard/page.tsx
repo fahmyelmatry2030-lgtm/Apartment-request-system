@@ -1187,6 +1187,8 @@ const isUnitMatch = (b: any, unitId: string, unitTitleAr?: string) => {
 
           </div>
         )}
+      </div>
+
       {/* ── SECTION 4: TO-DO LIST & NOTES (جدول قائمة المهام والملاحظات) ── */}
       <div className="bg-white p-6 md:p-8 rounded-[2.5rem] border border-[#EAE4D9] shadow-sm space-y-6 animate-fade-in">
         <div
