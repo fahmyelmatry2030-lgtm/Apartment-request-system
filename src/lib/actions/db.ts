@@ -848,7 +848,46 @@ export async function getDbExpenses() {
     console.error('Error fetching expenses:', error);
     throw error;
   }
-  return data || [];
+
+  return (data || []).map((exp: any) => {
+    let cleanDesc = exp.description || '';
+    let extractedNotes = exp.notes || '';
+    let extractedStatus = exp.status || '';
+    let extractedApprovedBy = exp.approved_by || '';
+
+    if (!extractedNotes && cleanDesc.includes('[ملاحظات:')) {
+      const match = cleanDesc.match(/\[ملاحظات:\s*([^\]]+)\]/);
+      if (match) {
+        extractedNotes = match[1];
+        cleanDesc = cleanDesc.replace(/\[ملاحظات:\s*([^\]]+)\]/g, '').trim();
+      }
+    }
+
+    if (!extractedStatus && cleanDesc.includes('[حالة:')) {
+      const match = cleanDesc.match(/\[حالة:\s*([^\]]+)\]/);
+      if (match) {
+        extractedStatus = match[1];
+        cleanDesc = cleanDesc.replace(/\[حالة:\s*([^\]]+)\]/g, '').trim();
+      }
+    }
+
+    if (!extractedStatus && cleanDesc.includes('[اعتماد:')) {
+      const match = cleanDesc.match(/\[اعتماد:\s*([^\]]+)\]/);
+      if (match) {
+        extractedStatus = `تم الموافقة بواسطة: ${match[1]}`;
+        extractedApprovedBy = match[1];
+        cleanDesc = cleanDesc.replace(/\[اعتماد:\s*([^\]]+)\]/g, '').trim();
+      }
+    }
+
+    return {
+      ...exp,
+      description: cleanDesc,
+      notes: extractedNotes,
+      status: extractedStatus,
+      approved_by: extractedApprovedBy,
+    };
+  });
 }
 
 export async function saveDbExpense(expense: any) {
@@ -868,21 +907,35 @@ export async function saveDbExpense(expense: any) {
 
   const { error } = await supabase.from('expenses').insert([expense]);
   if (error) {
-    if (error.message?.includes('invoice_number') || error.code === '42703') {
-      console.warn('⚠️ Column "invoice_number" not found in DB table. Retrying with fallback...');
-      const fallbackExpense = { ...expense };
+    console.warn('⚠️ Standard insert failed. Retrying with schema fallback...', error.message);
+    const fallbackExpense = { ...expense };
+    let metaTags = [];
+
+    if (expense.invoice_number) {
+      metaTags.push(`[فاتورة: ${expense.invoice_number}]`);
       delete fallbackExpense.invoice_number;
-      if (expense.invoice_number) {
-        fallbackExpense.description = `[فاتورة: ${expense.invoice_number}] ${expense.description || ''}`.trim();
-      }
-      const { error: retryError } = await supabase.from('expenses').insert([fallbackExpense]);
-      if (retryError) {
-        console.error('Error saving expense on fallback retry:', retryError);
-        throw retryError;
-      }
-    } else {
-      console.error('Error saving expense:', error);
-      throw error;
+    }
+    if (expense.notes) {
+      metaTags.push(`[ملاحظات: ${expense.notes}]`);
+      delete fallbackExpense.notes;
+    }
+    if (expense.status) {
+      metaTags.push(`[حالة: ${expense.status}]`);
+      delete fallbackExpense.status;
+    }
+    if (expense.approved_by) {
+      metaTags.push(`[اعتماد: ${expense.approved_by}]`);
+      delete fallbackExpense.approved_by;
+    }
+
+    if (metaTags.length > 0) {
+      fallbackExpense.description = `${metaTags.join(' ')} ${expense.description || ''}`.trim();
+    }
+
+    const { error: retryError } = await supabase.from('expenses').insert([fallbackExpense]);
+    if (retryError) {
+      console.error('Error saving expense on fallback retry:', retryError);
+      throw new Error(retryError.message || 'فشل حفظ المصروف في قاعدة البيانات');
     }
   }
   
@@ -915,24 +968,42 @@ export async function updateDbExpense(id: string, updates: any) {
     .eq('id', id);
 
   if (error) {
-    if (error.message?.includes('invoice_number') || error.code === '42703') {
-      console.warn('⚠️ Column "invoice_number" not found in DB table on update. Retrying with fallback...');
-      const fallbackUpdates = { ...updates };
+    console.warn('⚠️ Standard update failed. Retrying with schema fallback...', error.message);
+    const fallbackUpdates = { ...updates };
+    let metaTags = [];
+
+    if (updates.invoice_number !== undefined) {
+      if (updates.invoice_number) metaTags.push(`[فاتورة: ${updates.invoice_number}]`);
       delete fallbackUpdates.invoice_number;
-      if (updates.invoice_number) {
-        fallbackUpdates.description = `[فاتورة: ${updates.invoice_number}] ${updates.description || ''}`.trim();
+    }
+    if (updates.notes !== undefined) {
+      if (updates.notes) metaTags.push(`[ملاحظات: ${updates.notes}]`);
+      delete fallbackUpdates.notes;
+    }
+    if (updates.status !== undefined) {
+      if (updates.status && updates.status.includes('تم الموافقة')) {
+        metaTags.push(`[اعتماد: ${updates.approved_by || 'الأونر'}]`);
+      } else if (updates.status) {
+        metaTags.push(`[حالة: ${updates.status}]`);
       }
-      const { error: retryError } = await supabase
-        .from('expenses')
-        .update(fallbackUpdates)
-        .eq('id', id);
-      if (retryError) {
-        console.error('Error updating expense on fallback retry:', retryError);
-        throw retryError;
-      }
-    } else {
-      console.error('Error updating expense:', error);
-      throw error;
+      delete fallbackUpdates.status;
+    }
+    if (updates.approved_by !== undefined) {
+      delete fallbackUpdates.approved_by;
+    }
+
+    if (metaTags.length > 0) {
+      fallbackUpdates.description = `${metaTags.join(' ')} ${updates.description || ''}`.trim();
+    }
+
+    const { error: retryError } = await supabase
+      .from('expenses')
+      .update(fallbackUpdates)
+      .eq('id', id);
+
+    if (retryError) {
+      console.error('Error updating expense on fallback retry:', retryError);
+      throw new Error(retryError.message || 'فشل تعديل المصروف في قاعدة البيانات');
     }
   }
   
