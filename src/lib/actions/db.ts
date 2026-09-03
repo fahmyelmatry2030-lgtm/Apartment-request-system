@@ -504,7 +504,6 @@ export async function verifyAdminAuth(username: string, pass: string) {
     }
 
     const fixedAdmins: Record<string, { username: string; name: string; role: string; password: string }> = {
-      owner: { username: 'Owner', name: 'Owner', role: 'Owner', password: 'Owner50' },
       mo2men: { username: 'Mo2men', name: 'مؤمن', role: 'Owner', password: 'Mo2men50' },
       medhat: { username: 'Medhat', name: 'مدحت', role: 'Owner', password: 'Medhat55' },
       admin: { username: 'Admin', name: 'Admin', role: 'Admin', password: 'Admin220' },
@@ -522,19 +521,7 @@ export async function verifyAdminAuth(username: string, pass: string) {
     
     const supabase = getSupabaseServerClient();
     if (!supabase) {
-      console.warn('Database offline, using fallback authentication');
-      // Fallback for demo: if no DB, check a default admin
-      if (cleanUsername === 'admin' && cleanPass === 'mazar2026') {
-        return { 
-          success: true, 
-          admin: { 
-            id: 'fallback-admin', 
-            username: 'admin', 
-            name: 'Admin (Offline Mode)', 
-            role: 'Super Admin' 
-          } 
-        };
-      }
+      console.warn('Database offline, authentication failed');
       return { success: false };
     }
 

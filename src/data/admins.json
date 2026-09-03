@@ -1,9 +1,16 @@
 [
   {
-    "id": "fixed-owner",
-    "username": "Owner",
-    "password": "Owner50",
-    "name": "Owner",
+    "id": "fixed-mo2men",
+    "username": "Mo2men",
+    "password": "Mo2men50",
+    "name": "مؤمن",
+    "role": "Owner"
+  },
+  {
+    "id": "fixed-medhat",
+    "username": "Medhat",
+    "password": "Medhat55",
+    "name": "مدحت",
     "role": "Owner"
   },
   {
