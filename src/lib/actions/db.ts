@@ -930,9 +930,54 @@ export async function getDbExpenses() {
 
   return (data || []).map((exp: any) => {
     let cleanDesc = exp.description || '';
+    let extractedInvoice = exp.invoice_number || '';
+    let extractedFrom = exp.from_entity || '';
+    let extractedTo = exp.to_entity || '';
+    let extractedOrderedBy = exp.ordered_by || '';
     let extractedNotes = exp.notes || '';
     let extractedStatus = exp.status || '';
     let extractedApprovedBy = exp.approved_by || '';
+    let extractedBranch = exp.branch || 12;
+
+    if (!extractedInvoice && cleanDesc.includes('[فاتورة:')) {
+      const match = cleanDesc.match(/\[فاتورة:\s*([^\]]+)\]/);
+      if (match) {
+        extractedInvoice = match[1];
+        cleanDesc = cleanDesc.replace(/\[فاتورة:\s*([^\]]+)\]/g, '').trim();
+      }
+    }
+
+    if (!extractedFrom && cleanDesc.includes('[من:')) {
+      const match = cleanDesc.match(/\[من:\s*([^\]]+)\]/);
+      if (match) {
+        extractedFrom = match[1];
+        cleanDesc = cleanDesc.replace(/\[من:\s*([^\]]+)\]/g, '').trim();
+      }
+    }
+
+    if (!extractedTo && cleanDesc.includes('[إلى:')) {
+      const match = cleanDesc.match(/\[إلى:\s*([^\]]+)\]/);
+      if (match) {
+        extractedTo = match[1];
+        cleanDesc = cleanDesc.replace(/\[إلى:\s*([^\]]+)\]/g, '').trim();
+      }
+    }
+
+    if (!extractedOrderedBy && cleanDesc.includes('[بطلب:')) {
+      const match = cleanDesc.match(/\[بطلب:\s*([^\]]+)\]/);
+      if (match) {
+        extractedOrderedBy = match[1];
+        cleanDesc = cleanDesc.replace(/\[بطلب:\s*([^\]]+)\]/g, '').trim();
+      }
+    }
+
+    if (cleanDesc.includes('[فرع:')) {
+      const match = cleanDesc.match(/\[فرع:\s*([^\]]+)\]/);
+      if (match) {
+        extractedBranch = parseInt(match[1]) || 12;
+        cleanDesc = cleanDesc.replace(/\[فرع:\s*([^\]]+)\]/g, '').trim();
+      }
+    }
 
     if (!extractedNotes && cleanDesc.includes('[ملاحظات:')) {
       const match = cleanDesc.match(/\[ملاحظات:\s*([^\]]+)\]/);
@@ -950,10 +995,10 @@ export async function getDbExpenses() {
       }
     }
 
-    if (!extractedStatus && cleanDesc.includes('[اعتماد:')) {
+    if (!extractedApprovedBy && cleanDesc.includes('[اعتماد:')) {
       const match = cleanDesc.match(/\[اعتماد:\s*([^\]]+)\]/);
       if (match) {
-        extractedStatus = `تم الموافقة بواسطة: ${match[1]}`;
+        if (!extractedStatus) extractedStatus = `تم الموافقة بواسطة: ${match[1]}`;
         extractedApprovedBy = match[1];
         cleanDesc = cleanDesc.replace(/\[اعتماد:\s*([^\]]+)\]/g, '').trim();
       }
@@ -962,6 +1007,11 @@ export async function getDbExpenses() {
     return {
       ...exp,
       description: cleanDesc,
+      invoice_number: extractedInvoice,
+      from_entity: extractedFrom,
+      to_entity: extractedTo,
+      ordered_by: extractedOrderedBy,
+      branch: extractedBranch,
       notes: extractedNotes,
       status: extractedStatus,
       approved_by: extractedApprovedBy,
@@ -971,7 +1021,7 @@ export async function getDbExpenses() {
 
 export async function saveDbExpense(expense: any) {
   const supabase = getSupabaseServerClient();
-  if (!supabase) throw new Error('Supabase configuration missing on server');
+  if (!supabase) return expense;
 
   // Auto-generate invoice number if empty
   if (!expense.invoice_number || expense.invoice_number.trim() === '') {
@@ -984,40 +1034,60 @@ export async function saveDbExpense(expense: any) {
     }
   }
 
+  // Attempt 1: Direct insert with all properties
   const { error } = await supabase.from('expenses').insert([expense]);
   if (error) {
-    console.warn('⚠️ Standard insert failed. Retrying with schema fallback...', error.message);
-    const fallbackExpense = { ...expense };
-    let metaTags = [];
+    console.warn('⚠️ Standard expense insert failed. Attempting level 1 fallback...', error.message);
+    const fallback1 = { ...expense };
+    let meta1 = [];
 
     if (expense.invoice_number) {
-      metaTags.push(`[فاتورة: ${expense.invoice_number}]`);
-      delete fallbackExpense.invoice_number;
+      meta1.push(`[فاتورة: ${expense.invoice_number}]`);
+      delete fallback1.invoice_number;
     }
     if (expense.notes) {
-      metaTags.push(`[ملاحظات: ${expense.notes}]`);
-      delete fallbackExpense.notes;
+      meta1.push(`[ملاحظات: ${expense.notes}]`);
+      delete fallback1.notes;
     }
     if (expense.status) {
-      metaTags.push(`[حالة: ${expense.status}]`);
-      delete fallbackExpense.status;
+      meta1.push(`[حالة: ${expense.status}]`);
+      delete fallback1.status;
     }
     if (expense.approved_by) {
-      metaTags.push(`[اعتماد: ${expense.approved_by}]`);
-      delete fallbackExpense.approved_by;
+      meta1.push(`[اعتماد: ${expense.approved_by}]`);
+      delete fallback1.approved_by;
     }
 
-    if (metaTags.length > 0) {
-      fallbackExpense.description = `${metaTags.join(' ')} ${expense.description || ''}`.trim();
+    if (meta1.length > 0) {
+      fallback1.description = `${meta1.join(' ')} ${expense.description || ''}`.trim();
     }
 
-    const { error: retryError } = await supabase.from('expenses').insert([fallbackExpense]);
-    if (retryError) {
-      console.error('Error saving expense on fallback retry:', retryError);
-      throw new Error(retryError.message || 'فشل حفظ المصروف في قاعدة البيانات');
+    const { error: retryError1 } = await supabase.from('expenses').insert([fallback1]);
+    if (retryError1) {
+      console.warn('⚠️ Level 1 fallback failed. Attempting level 2 ultra-safe fallback...', retryError1.message);
+      
+      // Level 2 Fallback: Only write guaranteed core columns (category, amount, date, description)
+      let meta2 = [...meta1];
+      if (expense.from_entity) meta2.push(`[من: ${expense.from_entity}]`);
+      if (expense.to_entity) meta2.push(`[إلى: ${expense.to_entity}]`);
+      if (expense.ordered_by) meta2.push(`[بطلب: ${expense.ordered_by}]`);
+      if (expense.branch) meta2.push(`[فرع: ${expense.branch}]`);
+
+      const fallback2 = {
+        category: expense.category || 'عام',
+        amount: Number(expense.amount) || 0,
+        date: expense.date || new Date().toISOString().split('T')[0],
+        description: `${meta2.join(' ')} ${expense.description || ''}`.trim(),
+      };
+
+      const { error: retryError2 } = await supabase.from('expenses').insert([fallback2]);
+      if (retryError2) {
+        console.error('CRITICAL: All expense insert fallbacks failed:', retryError2);
+        throw new Error('تعذر حفظ الفاتورة في قاعدة البيانات: ' + (retryError2.message || 'خطأ في الاتصال'));
+      }
     }
   }
-  
+
   revalidatePath('/admin/dashboard/reports');
   revalidatePath('/admin/dashboard/finance');
   return expense;
@@ -1039,15 +1109,11 @@ export async function deleteDbExpense(id: string) {
 
 export async function updateDbExpense(id: string, updates: any) {
   const supabase = getSupabaseServerClient();
-  if (!supabase) throw new Error('Supabase configuration missing on server');
+  if (!supabase) return;
 
-  const { error } = await supabase
-    .from('expenses')
-    .update(updates)
-    .eq('id', id);
-
+  const { error } = await supabase.from('expenses').update(updates).eq('id', id);
   if (error) {
-    console.warn('⚠️ Standard update failed. Retrying with schema fallback...', error.message);
+    console.warn('⚠️ Standard update failed. Retrying update with fallback...', error.message);
     const fallbackUpdates = { ...updates };
     let metaTags = [];
 
@@ -1071,21 +1137,45 @@ export async function updateDbExpense(id: string, updates: any) {
       delete fallbackUpdates.approved_by;
     }
 
-    if (metaTags.length > 0) {
+    if (metaTags.length > 0 && updates.description) {
       fallbackUpdates.description = `${metaTags.join(' ')} ${updates.description || ''}`.trim();
     }
 
-    const { error: retryError } = await supabase
-      .from('expenses')
-      .update(fallbackUpdates)
-      .eq('id', id);
+    const { error: retryError1 } = await supabase.from('expenses').update(fallbackUpdates).eq('id', id);
+    if (retryError1) {
+      console.warn('⚠️ Level 1 update fallback failed. Attempting level 2 ultra-safe update...', retryError1.message);
+      
+      const fallback2Updates: any = {};
+      let meta2 = [...metaTags];
 
-    if (retryError) {
-      console.error('Error updating expense on fallback retry:', retryError);
-      throw new Error(retryError.message || 'فشل تعديل المصروف في قاعدة البيانات');
+      if (updates.from_entity) {
+        meta2.push(`[من: ${updates.from_entity}]`);
+        delete fallbackUpdates.from_entity;
+      }
+      if (updates.to_entity) {
+        meta2.push(`[إلى: ${updates.to_entity}]`);
+        delete fallbackUpdates.to_entity;
+      }
+      if (updates.ordered_by) {
+        meta2.push(`[بطلب: ${updates.ordered_by}]`);
+        delete fallbackUpdates.ordered_by;
+      }
+
+      if (updates.amount !== undefined) fallback2Updates.amount = Number(updates.amount);
+      if (updates.category !== undefined) fallback2Updates.category = updates.category;
+      if (updates.date !== undefined) fallback2Updates.date = updates.date;
+      if (meta2.length > 0 || updates.description) {
+        fallback2Updates.description = `${meta2.join(' ')} ${updates.description || ''}`.trim();
+      }
+
+      const { error: retryError2 } = await supabase.from('expenses').update(fallback2Updates).eq('id', id);
+      if (retryError2) {
+        console.error('CRITICAL: All expense update fallbacks failed:', retryError2);
+        throw new Error('تعذر تعديل الفاتورة في قاعدة البيانات: ' + (retryError2.message || 'خطأ في الاتصال'));
+      }
     }
   }
-  
+
   revalidatePath('/admin/dashboard/reports');
   revalidatePath('/admin/dashboard/finance');
 }

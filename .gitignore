@@ -44,3 +44,7 @@ next-env.d.ts
 
 # app data
 /brain/
+
+# large media files
+*.mp4
+public/**/*.mp4
