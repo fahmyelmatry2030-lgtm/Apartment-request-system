@@ -297,7 +297,7 @@ export default function ExpensesTab() {
 
   const handleEdit = (expense: any) => {
     if (!isOwner) {
-      alert('عفواً، صلاحية التعديل متاحة فقط لحسابات الأونر (مؤمن ومدحت)');
+      alert('عفواً، هذه الصلاحية مقتصرة على الأونر فقط (مؤمن ومدحت)');
       return;
     }
     setEditingExpense({ ...expense });
@@ -307,7 +307,7 @@ export default function ExpensesTab() {
   const handleSaveEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isOwner) {
-      alert('عفواً، صلاحية التعديل متاحة فقط لحسابات الأونر (مؤمن ومدحت)');
+      alert('عفواً، هذه الصلاحية مقتصرة على الأونر فقط (مؤمن ومدحت)');
       return;
     }
     try {
@@ -334,7 +334,7 @@ export default function ExpensesTab() {
 
   const handleDelete = async (id: string) => {
     if (!isOwner) {
-      alert('عفواً، صلاحية الحذف متاحة فقط لحسابات الأونر (مؤمن ومدحت)');
+      alert('عفواً، هذه الصلاحية مقتصرة على الأونر فقط (مؤمن ومدحت)');
       return;
     }
     if (!confirm('هل أنت متأكد من الحذف؟')) return;
@@ -485,19 +485,23 @@ export default function ExpensesTab() {
             <div className="space-y-3 group">
               <label className="text-[10px] font-black text-green-700 uppercase tracking-widest opacity-70 group-focus-within:opacity-100 transition-opacity">حالة الاعتماد (Approval Status)</label>
               <select
+                disabled={!isOwner}
                 value={newExpense.status}
                 onChange={e => {
                   const val = e.target.value;
                   const approver = val.includes('مؤمن') ? 'مؤمن' : val.includes('مدحت') ? 'مدحت' : (currentUserName || 'Owner');
                   setNewExpense({ ...newExpense, status: val, approved_by: val === 'PENDING' ? '' : approver });
                 }}
-                className="w-full bg-transparent border-b-2 border-green-200 px-0 py-4 text-sm font-bold text-green-800 outline-none focus:border-mazar-gold transition-all cursor-pointer"
+                className="w-full bg-transparent border-b-2 border-green-200 px-0 py-4 text-sm font-bold text-green-800 outline-none focus:border-mazar-gold transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <option value="PENDING">⏳ غير معتمد (قيد الانتظار)</option>
-                <option value={`تم الموافقة بواسطة: ${currentUserName || 'مؤمن'}`}>✅ تم الموافقة بواسطة: {currentUserName || 'مؤمن'}</option>
-                <option value="تم الموافقة بواسطة: مؤمن">✅ تم الموافقة بواسطة: مؤمن</option>
-                <option value="تم الموافقة بواسطة: مدحت">✅ تم الموافقة بواسطة: مدحت</option>
-                <option value="تم الموافقة بواسطة: Owner">✅ تم الموافقة بواسطة: Owner</option>
+                {isOwner && (
+                  <>
+                    <option value="تم الموافقة بواسطة: مؤمن">✅ تم الموافقة بواسطة: مؤمن</option>
+                    <option value="تم الموافقة بواسطة: مدحت">✅ تم الموافقة بواسطة: مدحت</option>
+                    <option value="تم الموافقة بواسطة: Owner">✅ تم الموافقة بواسطة: Owner</option>
+                  </>
+                )}
               </select>
             </div>
 
@@ -579,11 +583,11 @@ export default function ExpensesTab() {
                       <td className="px-4 py-5 border border-[#EAE4D9]/40">
                         {isOwner ? (
                           <div className="flex gap-2 justify-center opacity-0 group-hover:opacity-100 transition-all">
-                            <button onClick={() => handleEdit(exp)} title="تعديل المصروف (للأونر)" className="w-9 h-9 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-all shadow-sm"><Pencil size={15} strokeWidth={2.5} /></button>
-                            <button onClick={() => handleDelete(exp.id)} title="حذف المصروف (للأونر)" className="w-9 h-9 rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm"><Trash2 size={15} strokeWidth={2.5} /></button>
+                            <button onClick={() => handleEdit(exp)} title="تعديل المصروف" className="w-9 h-9 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-all shadow-sm"><Pencil size={15} strokeWidth={2.5} /></button>
+                            <button onClick={() => handleDelete(exp.id)} title="حذف المصروف" className="w-9 h-9 rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm"><Trash2 size={15} strokeWidth={2.5} /></button>
                           </div>
                         ) : (
-                          <span className="text-[10px] text-gray-400 font-bold">🔒 للأونر فقط</span>
+                          <span className="text-[10px] text-gray-400 font-bold">🔒 للمسؤولين فقط</span>
                         )}
                       </td>
                     </tr>
